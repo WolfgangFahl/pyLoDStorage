@@ -14,7 +14,6 @@ setup(
 
     packages=['storage',],
     author='Wolfgang Fahl',
-    author='Somnath Rakshit',
     author_email='wf@bitplan.com',
     maintainer='Wolfgang Fahl',
     url='https://github.com/WolfgangFahl/pyLodStorage',
