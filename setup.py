@@ -11,7 +11,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pylodstorage',
-    version='0.0.4',
+    version='0.0.6',
 
     packages=['lodstorage',],
     author='Wolfgang Fahl',
@@ -22,7 +22,7 @@ setup(
         (
             ("Documentation", "http://wiki.bitplan.com/index.php/PyLoDStorage"),
             ("Code", "https://github.com/WolfgangFahl/pyLodStorage"),
-            ("Issue tracker", "https://github.com/WolfgangFahl/pyLodStorage"),
+            ("Issue tracker", "https://github.com/WolfgangFahl/pyLodStorage/issues"),
         )
     ),
     license='Apache License',
