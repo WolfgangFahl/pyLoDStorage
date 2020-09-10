@@ -8,9 +8,9 @@ from datetime import datetime
 import time
 import os
 import sys
-from storage.sample import Sample
-from storage.uml import UML
-from storage.sql import SQLDB, EntityInfo
+from lodstorage.sample import Sample
+from lodstorage.uml import UML
+from lodstorage.sql import SQLDB, EntityInfo
 
 
 class TestSQLDB(unittest.TestCase):

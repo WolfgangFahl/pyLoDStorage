@@ -17,6 +17,20 @@ Installation
 pip install pylodstorage
 ```
 
+Get Sources 
+===========
+```bash
+git clone https://github.com/WolfgangFahl/pyLoDStorage
+cd pyLodStorage
+scripts/install
+```
+
+Testing
+=======
+```bash
+scripts/test
+```
+
 Usage
 =====
 see [test cases](https://github.com/WolfgangFahl/pyLoDStorage/tests)

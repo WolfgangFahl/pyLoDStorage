@@ -12,7 +12,7 @@ setup(
     name='pylodstorage',
     version='0.0.1',
 
-    packages=['storage',],
+    packages=['lodstorage',],
     author='Wolfgang Fahl',
     author_email='wf@bitplan.com',
     maintainer='Wolfgang Fahl',
