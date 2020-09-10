@@ -20,7 +20,7 @@ setup(
     url='https://github.com/WolfgangFahl/pyLodStorage',
     project_urls=OrderedDict(
         (
-            ("Documentation", "http://wiki.bitplan.com/index.php/Special:FormEdit/OsProject/PyLoDStorage"),
+            ("Documentation", "http://wiki.bitplan.com/index.php/PyLoDStorage"),
             ("Code", "https://github.com/WolfgangFahl/pyLodStorage"),
             ("Issue tracker", "https://github.com/WolfgangFahl/pyLodStorage"),
         )
