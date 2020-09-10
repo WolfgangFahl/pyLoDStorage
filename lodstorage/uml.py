@@ -4,7 +4,6 @@ Created on 2020-09-04
 @author: wf
 '''
 from collections import Counter
-
 class UML(object):
     '''
     UML diagrams via plantuml
@@ -114,10 +113,15 @@ hide Circle
         '''
         gCol=None
         for table in tableList:
-            for col in table['columns']:
+            for col in table['columns']: 
                 if col['name']==colName:
-                    gCol=col
-                    table['columns'].remove(col)
+                    gCol=col.copy()
+                    # no linking yet @FIXME - will need this later
+                    if 'link' in gCol:
+                        gCol.pop('link')
+                    # is generalization protected for this column?
+                    if not 'special' in col or not col['special']:
+                        table['columns'].remove(col)
         return gCol                
         
     def getGeneral(self,tableList,name):
@@ -145,12 +149,13 @@ hide Circle
                 general['columns'].append(generalCol)    
         return general
             
-    def tableListToPlantUml(self,tableList, packageName=None,generalizeTo=None,withSkin=True):
+    def tableListToPlantUml(self,tableList,title=None,packageName=None,generalizeTo=None,withSkin=True):
         '''
         convert tableList to PlantUml notation
         
         Args:
             tableList(list): the tableList list of Dicts from getTableList() to convert
+            title(string): optional title to be added
             packageName(string): optional packageName to be added
             generalizeTo(string): optional name of a general table to be derived
             withSkin(boolean): if True add default BITPlan skin parameters 
@@ -161,6 +166,8 @@ hide Circle
         uml=""
         indent=""
         inherit=""
+        if title is not None:
+            uml+="title\n%s\nend title\n" % title
         if packageName is not None:
             uml+="package %s {\n" % packageName
             indent="  "
@@ -171,11 +178,19 @@ hide Circle
             tableList.insert(0,generalTable)
         for table in tableList:
             colUml=""
-            for col in table['columns']:
+            sortedColumns=sorted(table['columns'],key=lambda col:col['name'])
+            for col in sortedColumns:
                 mandatory="*" if col['notnull']==1 else ""
                 pk="<<PK>>" if col['pk']==1 else ""
-                colUml+="%s  %s%s : %s %s\n" % (indent,mandatory,col['name'],col['type'],pk)
-            uml+="%sentity %s {\n%s%s}\n" % (indent,table['name'],colUml,indent)
+                colName=col['name']
+                colType=col['type']
+                if 'link' in col:
+                    colName=col['link']
+                colUml+="%s %s%s : %s %s\n" % (indent,mandatory,colName,colType,pk)
+            tableName=table['name']    
+            if 'notes' in table:
+                uml+="Note top of %s\n%s\nEnd note\n" % (tableName,table['notes'])
+            uml+="%sclass %s << Entity >> {\n%s%s}\n" % (indent,tableName,colUml,indent)
         uml+=inherit    
         if packageName is not None:
             uml+="}\n"
@@ -183,5 +198,42 @@ hide Circle
             uml+=UML.skinparams    
         return uml
     
-    
+    def mergeSchema(self,schemaManager,tableList, title=None,packageName=None,generalizeTo=None,withSkin=True):
+        '''
+        merge Schema and tableList to PlantUml notation
         
+        Args:
+            schemaManager(SchemaManager): a schema manager to be used
+            tableList(list): the tableList list of Dicts from getTableList() to convert
+            title(string): optional title to be added
+            packageName(string): optional packageName to be added
+            generalizeTo(string): optional name of a general table to be derived
+            withSkin(boolean): if True add default BITPlan skin parameters 
+            
+        Returns:
+            string: the Plantuml notation for the entities in columns of the given tablelist
+
+        '''
+        if schemaManager is not None:
+            for table in tableList:
+                if 'schema' in table:
+                    schema=schemaManager.schemasByName[table['schema']]
+                    url="%s/%s" % (schemaManager.baseUrl,schema.name)
+                    url=url.replace(" ", "_") # mediawiki
+                    instanceNote=""
+                    if 'instances' in table:
+                        instanceNote="\n%d instances " % (table['instances'])
+                    table['notes']="""[[%s %s]]%s""" % (url,schema.name,instanceNote)
+                    for col in table['columns']:
+                        colName=col['name']
+                        if colName in schema.propsByName:
+                            prop=schema.propsByName[colName]
+                            if prop.iri is not None:
+                                tooltip=""
+                                if prop.definition is not None:
+                                    tooltip="{%s}" % prop.definition
+                                col['link']="[[%s%s %s]]" % (prop.iri,tooltip,colName)
+                                col['special']=True # keep column even if generalized
+                    pass
+        plantuml=self.tableListToPlantUml(tableList, title=title,packageName=packageName, generalizeTo=generalizeTo, withSkin=withSkin) 
+        return plantuml

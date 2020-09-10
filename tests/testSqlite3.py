@@ -75,14 +75,14 @@ class TestSQLDB(unittest.TestCase):
         if self.debug:
             print(plantUml)
         expected="""package Royals {
-  entity Person {
-    name : TEXT <<PK>>
-    born : DATE 
-    numberInLine : INTEGER 
-    wikidataurl : TEXT 
-    age : FLOAT 
-    ofAge : BOOLEAN 
-    lastmodified : TIMESTAMP 
+  class Person << Entity >> {
+   age : FLOAT 
+   born : DATE 
+   lastmodified : TIMESTAMP 
+   name : TEXT <<PK>>
+   numberInLine : INTEGER 
+   ofAge : BOOLEAN 
+   wikidataurl : TEXT 
   }
 }
 """
@@ -96,19 +96,19 @@ class TestSQLDB(unittest.TestCase):
         uml=UML()
         plantUml=uml.tableListToPlantUml(tableList,generalizeTo="PersonBase",withSkin=False)
         print(plantUml)
-        expected='''entity PersonBase {
-  name : TEXT <<PK>>
-  lastmodified : TIMESTAMP 
+        expected='''class PersonBase << Entity >> {
+ lastmodified : TIMESTAMP 
+ name : TEXT <<PK>>
 }
-entity Person {
-  born : DATE 
-  numberInLine : INTEGER 
-  wikidataurl : TEXT 
-  age : FLOAT 
-  ofAge : BOOLEAN 
+class Person << Entity >> {
+ age : FLOAT 
+ born : DATE 
+ numberInLine : INTEGER 
+ ofAge : BOOLEAN 
+ wikidataurl : TEXT 
 }
-entity Family {
-  country : TEXT 
+class Family << Entity >> {
+ country : TEXT 
 }
 PersonBase <|-- Person
 PersonBase <|-- Family
