@@ -76,4 +76,7 @@ cd $src
 
 fixconf 2020 "Wolfgang Fahl"
 make clean html
-open _build/html/index.html
+if [ "$GHACTIONS" != "ACTIVE" ]
+then
+  open _build/html/index.html
+fi
