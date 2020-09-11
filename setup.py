@@ -21,7 +21,7 @@ setup(
     project_urls=OrderedDict(
         (
             ("Documentation", "http://wiki.bitplan.com/index.php/PyLoDStorage"),
-            ("Code", "https://github.com/WolfgangFahl/pyLodStorage"),
+            ("Code", "https://github.com/WolfgangFahl/pyLoDStorage/blob/master/lodstorage/sql.py"),
             ("Issue tracker", "https://github.com/WolfgangFahl/pyLodStorage/issues"),
         )
     ),
