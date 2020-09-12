@@ -5,6 +5,7 @@ Created on 2020-08-24
 '''
 import urllib.request
 import json
+from lodstorage.jsonable import JSONAble
 from datetime import date, datetime
 
 class Sample(object):
@@ -69,3 +70,10 @@ class Sample(object):
             person['lastmodified']=datetime.now()
         return listOfDicts
         
+class Royals(JSONAble):
+    def __init__(self):
+        self.royals=Sample.getRoyals()
+        
+class Cities(JSONAble):
+    def __init__(self):
+        self.cities=Sample.getCities()        
