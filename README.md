@@ -34,3 +34,9 @@ scripts/test
 Usage
 =====
 see [test cases](https://github.com/WolfgangFahl/pyLoDStorage/tests)
+
+## Documentation
+[Wiki](http://wiki.bitplan.com/index.php/PyLoDStorage)
+
+### Authors
+* [Wolfgang Fahl](http://www.bitplan.com/Wolfgang_Fahl)
