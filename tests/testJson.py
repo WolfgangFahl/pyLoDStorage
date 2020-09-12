@@ -7,8 +7,8 @@ import unittest
 import json
 from lodstorage.sample import Royals,Cities
 from lodstorage.jsonable import JSONAble
+from lodstorage.types import Types
 import time
-import re
 
 class TestJsonAble(unittest.TestCase):
     '''
@@ -16,6 +16,7 @@ class TestJsonAble(unittest.TestCase):
     '''
 
     def setUp(self):
+        self.profile=True
         pass
 
     def tearDown(self):
@@ -47,25 +48,45 @@ class TestJsonAble(unittest.TestCase):
         '''
         test JSONAble
         '''
-        examples=[Royals(),Cities()]
+        examples=[{
+            'manager': Royals(),
+            'listName': 'royals'
+        }, {
+            'manager': Cities(),
+            'listName': 'cities'
+        }
+        ]
         index=0
         for useToJson in [True,False]:
             for example in examples:
                 starttime=time.time()
+                manager=example['manager']
+                listName=example['listName']
                 if useToJson:
-                    jsonStr=example.toJSON()
+                    jsonStr=manager.toJSON()
                 else:
-                    jsonStr=example.asJSON()
-                print(jsonStr[:500])
-                print(jsonStr,file=open('/tmp/example%d.json' %index,'w'))
+                    jsonStr=manager.asJSON()
+                if self.debug:
+                    print(jsonStr[:500])
+                    #print(jsonStr,file=open('/tmp/example%d.json' %index,'w'))
                 index+=1
-                print("->JSON took %7.3f s" % (time.time()-starttime))
+                if self.profile:
+                    print("->JSON for %d took %7.3f s" % (index, (time.time()-starttime)))
                 self.assertTrue(isinstance(jsonStr,str))
                 starttime=time.time()
                 jsonDict=json.loads(jsonStr)
                 self.assertTrue(isinstance(jsonDict,dict))
-                print(str(jsonDict)[:500])
-                print("<-JSON took %7.3f s" % (time.time()-starttime))
+                if self.debug:
+                    print(str(jsonDict)[:500])
+                if self.profile:
+                    print("<-JSON for %d took %7.3f s" % (index, time.time()-starttime))
+                cls=manager.__class__
+                types=Types(cls.__name__)
+                types.getTypes(manager.__dict__[listName])
+                example1=cls()
+                example1.fromJson(jsonStr)
+                print(example1.__dict__)
+                #self.assertEqual(example,example1)    
         pass
 
 

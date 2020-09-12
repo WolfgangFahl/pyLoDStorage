@@ -11,7 +11,6 @@ class JSONAble(object):
     mixin to allow classes to be JSON serializable see
     
     - https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
-    - https://medium.com/@yzhong.cs/serialize-and-deserialize-complex-json-in-python-205ecc636caa
     
     '''
     indent=4
@@ -45,6 +44,15 @@ class JSONAble(object):
                 inDouble=not inDouble
         doubleQuoted="".join(cList)    
         return doubleQuoted
+    
+    def fromJson(self,jsonStr):
+        '''
+        initialize me from the given JSON string
+        Args:
+            jsonStr(string): the JSON string
+        '''
+        data=json.loads(jsonStr)           
+        self.__dict__=data
     
     def toJsonAbleValue(self,v):
         '''
