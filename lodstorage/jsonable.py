@@ -5,7 +5,6 @@ Created on 2020-09-03
 '''
 import json
 import datetime
-import re
 
 class JSONAble(object):
     '''
@@ -31,8 +30,7 @@ class JSONAble(object):
         Returns:
             string: the double quoted version of the string e.g. 
         see
-           - https://stackoverflow.com/a/50257217/1497139   
-           - https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
+           - https://stackoverflow.com/questions/55600788/python-replace-single-quotes-with-double-quotes-but-leave-ones-within-double-q 
         '''
         cList=list(singleQuoted)
         inDouble=False;
