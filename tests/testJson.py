@@ -58,6 +58,7 @@ class TestJsonAble(unittest.TestCase):
                 doubleQuoted=JSONAble.singleQuoteToDoubleQuote(example,useRegex=useRegex)
                 print(doubleQuoted)
             print
+            
     def testJsonAble(self):
         '''
         test JSONAble
@@ -96,9 +97,9 @@ class TestJsonAble(unittest.TestCase):
                     print("<-JSON for %d took %7.3f s" % (index, time.time()-starttime))
                 cls=manager.__class__
                 types=Types(cls.__name__)
-                types.getTypes(manager.__dict__[listName])
+                types.getTypes(listName,manager.__dict__[listName])
                 example1=cls()
-                example1.fromJson(jsonStr)
+                example1.fromJson(jsonStr,types=types)
                 print(example1.__dict__)
                 #self.assertEqual(example,example1)    
         pass

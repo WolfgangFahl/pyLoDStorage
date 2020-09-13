@@ -101,14 +101,17 @@ class JSONAble(object):
         doubleQuoted="".join(cList)    
         return doubleQuoted
     
-    def fromJson(self,jsonStr):
+    def fromJson(self,jsonStr,types=None):
         '''
         initialize me from the given JSON string
         
         Args:
             jsonStr(str): the JSON string
+            fixType(Types): the types to be fixed
         '''
-        data=json.loads(jsonStr)           
+        data=json.loads(jsonStr)       
+        if types is not None:
+            types.fixTypes(data)                      
         self.__dict__=data
     
     def toJsonAbleValue(self,v):
