@@ -17,6 +17,7 @@ class TestJsonAble(unittest.TestCase):
 
     def setUp(self):
         self.profile=True
+        self.debug=True
         pass
 
     def tearDown(self):
@@ -59,6 +60,16 @@ class TestJsonAble(unittest.TestCase):
                 print(doubleQuoted)
             print
             
+    def dumpListOfDicts(self,listOfDicts,limit):
+        if self.debug:
+            for index,record in enumerate(listOfDicts[:limit]):
+                print("%2d:%s" % (index,record))
+                
+    def check(self,manager,manager1,listName,debugLimit):
+        self.dumpListOfDicts(manager.__dict__[listName], debugLimit)
+        self.dumpListOfDicts(manager1.__dict__[listName], debugLimit)
+        #self.assertEqual(manager.__dict__,manager1.__dict__)    
+            
     def testJsonAble(self):
         '''
         test JSONAble
@@ -71,6 +82,8 @@ class TestJsonAble(unittest.TestCase):
             'listName': 'cities'
         }
         ]
+        debugLimit=10
+        debugChars=debugLimit*100
         index=0
         for useToJson in [True,False]:
             for example in examples:
@@ -82,7 +95,7 @@ class TestJsonAble(unittest.TestCase):
                 else:
                     jsonStr=manager.asJSON()
                 if self.debug:
-                    print(jsonStr[:500])
+                    print(jsonStr[:debugChars])
                     #print(jsonStr,file=open('/tmp/example%d.json' %index,'w'))
                 index+=1
                 if self.profile:
@@ -92,16 +105,15 @@ class TestJsonAble(unittest.TestCase):
                 jsonDict=json.loads(jsonStr)
                 self.assertTrue(isinstance(jsonDict,dict))
                 if self.debug:
-                    print(str(jsonDict)[:500])
+                    print(str(jsonDict)[:debugChars])
                 if self.profile:
                     print("<-JSON for %d took %7.3f s" % (index, time.time()-starttime))
                 cls=manager.__class__
                 types=Types(cls.__name__)
                 types.getTypes(listName,manager.__dict__[listName])
-                example1=cls()
-                example1.fromJson(jsonStr,types=types)
-                print(example1.__dict__)
-                #self.assertEqual(example,example1)    
+                manager1=cls()
+                manager1.fromJson(jsonStr,types=types)
+                self.check(manager,manager1,listName,debugLimit=debugLimit)
         pass
 
 

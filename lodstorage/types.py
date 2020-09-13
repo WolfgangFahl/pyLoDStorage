@@ -90,14 +90,18 @@ class Types(object):
                 key,value=keyValue
                 if key in typeMap:
                     valueType=typeMap[key]
-                    if valueType==datetime.date:
+                    if valueType==bool:
+                        b= value in ['True','TRUE','true']
+                        record[key]=b
+                    elif valueType==datetime.date:
                         dt=datetime.datetime.strptime(value,"%Y-%m-%d") 
-                        record[key]=dt.date
+                        record[key]=dt.date()
                     elif valueType==datetime.datetime:
+                        # see https://stackoverflow.com/questions/127803/how-do-i-parse-an-iso-8601-formatted-date
                         if sys.version_info >= (3, 7):
                             dtime=datetime.datetime.fromisoformat(value)
                         else:
-                            dtime=datetime.datetime.strptime(value,"%Y-%m-%d %H:%M:%S.%f")  
+                            dtime=datetime.datetime.strptime(value,"%Y-%m-%dT%H:%M:%S.%f")  
                         record[key]=dtime
 
                         
