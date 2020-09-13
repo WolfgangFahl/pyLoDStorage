@@ -44,6 +44,20 @@ class TestJsonAble(unittest.TestCase):
             print(jsonStr2)
         self.assertEqual('''{"cities": [{"name": "Upper Hell's Gate"}, {"name": "N'zeto"}]}''',jsonStr2)
         
+    def testSingleQuoteToDoubleQuoteStackoverflow(self):
+        """
+        see 
+            - https://stackoverflow.com/a/63862387/1497139 
+            - https://stackoverflow.com/a/50257217/1497139
+        """
+        singleQuotedExamples=[
+            '''{'cities': [{'name': "Upper Hell's Gate"}, {'name': "N'zeto"}]''']
+        for example in singleQuotedExamples:
+            print (example)
+            for useRegex in [False,True]:
+                doubleQuoted=JSONAble.singleQuoteToDoubleQuote(example,useRegex=useRegex)
+                print(doubleQuoted)
+            print
     def testJsonAble(self):
         '''
         test JSONAble

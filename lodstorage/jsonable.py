@@ -1,10 +1,12 @@
-'''
+'''This module has a class JSONAble for serialization of tables/list of dicts to and from JSON encoding
+
 Created on 2020-09-03
 
 @author: wf
 '''
 import json
 import datetime
+import re
 
 class JSONAble(object):
     '''
@@ -14,6 +16,12 @@ class JSONAble(object):
     
     '''
     indent=4
+    
+    '''
+    regular expression to be used for conversion from singleQuote to doubleQuote
+    see https://stackoverflow.com/a/50257217/1497139
+    '''
+    singleQuoteRegex = re.compile('(?<!\\\\)\'')
  
     def __init__(self):
         '''
@@ -21,16 +29,63 @@ class JSONAble(object):
         '''
         
     @staticmethod 
-    def singleQuoteToDoubleQuote(singleQuoted):
+    def singleQuoteToDoubleQuote(singleQuoted,useRegex=False):
         '''
         convert a single quoted string to a double quoted one
+        
+        Args:
+            singleQuoted (str): a single quoted string e.g.
+            
+                .. highlight:: json
+                
+                {'cities': [{'name': "Upper Hell's Gate"}]}
+                
+            useRegex (boolean): True if a regular expression shall be used for matching
+            
+        Returns:
+            string: the double quoted version of the string 
+        
+        Note:
+            see
+            - https://stackoverflow.com/questions/55600788/python-replace-single-quotes-with-double-quotes-but-leave-ones-within-double-q 
+
+        '''
+        if useRegex:
+            doubleQuoted=JSONAble.singleQuoteToDoubleQuoteUsingRegex(singleQuoted)
+        else:
+            doubleQuoted=JSONAble.singleQuoteToDoubleQuoteUsingBracketLoop(singleQuoted)
+        return doubleQuoted
+    
+    @staticmethod
+    def singleQuoteToDoubleQuoteUsingRegex(singleQuoted):
+        """
+        convert a single quoted string to a double quoted one using a regular expression
+        
         Args:
             singleQuoted(string): a single quoted string e.g. {'cities': [{'name': "Upper Hell's Gate"}]}
+            useRegex(boolean): True if a regular expression shall be used for matching
         Returns:
             string: the double quoted version of the string e.g. 
-        see
-           - https://stackoverflow.com/questions/55600788/python-replace-single-quotes-with-double-quotes-but-leave-ones-within-double-q 
-        '''
+        Note:
+            see https://stackoverflow.com/a/50257217/1497139
+        """
+        doubleQuoted=JSONAble.singleQuoteRegex.sub('\"', singleQuoted)
+        return doubleQuoted
+    
+    @staticmethod    
+    def singleQuoteToDoubleQuoteUsingBracketLoop(singleQuoted):  
+        """
+        convert a single quoted string to a double quoted one using a regular expression
+        
+        Args:
+            singleQuoted(string): a single quoted string e.g. {'cities': [{'name': "Upper Hell's Gate"}]}
+            useRegex(boolean): True if a regular expression shall be used for matching
+        Returns:
+            string: the double quoted version of the string e.g. 
+        Note:
+            see https://stackoverflow.com/a/63862387/1497139
+        
+        """
         cList=list(singleQuoted)
         inDouble=False;
         inSingle=False;
@@ -42,14 +97,16 @@ class JSONAble(object):
                     cList[i]='"'
             elif c=='"':
                 inDouble=not inDouble
+                inSingle=False
         doubleQuoted="".join(cList)    
         return doubleQuoted
     
     def fromJson(self,jsonStr):
         '''
         initialize me from the given JSON string
+        
         Args:
-            jsonStr(string): the JSON string
+            jsonStr(str): the JSON string
         '''
         data=json.loads(jsonStr)           
         self.__dict__=data
@@ -82,8 +139,12 @@ class JSONAble(object):
     def getJSONValue(self,v):
         '''
         get the value of the given v as JSON
+        
         Args:
             v(object): the value to get
+            
+        Returns:
+            the the value making sure objects are return as dicts
         '''
         if (hasattr(v, "asJSON")):
             return v.asJSON(asString=False)
@@ -106,7 +167,13 @@ class JSONAble(object):
     
     def reprDict(self,srcDict):
         '''
-        get my dict elements
+        get the given srcDict as new dict with fields being converted with getJSONValue
+        
+        Args:
+            scrcDict(dict): the source dictionary
+        
+        Returns
+            dict: the converted dictionary
         '''
         d = dict()
         for a, v in srcDict.items():
@@ -116,6 +183,9 @@ class JSONAble(object):
     def asJSON(self,asString=True):
         '''
         recursively return my dict elements
+        
+        Args:
+            asString(boolean): if True return my result as a string
         '''
         jsonDict=self.reprDict(self.__dict__)
         if asString:
