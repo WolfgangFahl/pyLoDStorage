@@ -115,6 +115,28 @@ PersonBase <|-- Family
 '''
         self.assertEqual(expected,plantUml)
         
+    def testUniqueConstraint(self):
+        '''
+        test for https://github.com/WolfgangFahl/pyLoDStorage/issues/4
+        sqlite3.IntegrityError: UNIQUE constraint failed: ... show debug info
+        '''
+        listOfDicts=[
+            {"name": "John Doe"},
+            {"name": "Frank Doe"}, 
+            {"name": "John Doe"}, 
+            {"name":"Tim Doe"}]
+        sqlDB=SQLDB(debug=self.debug,errorDebug=True)
+        entityInfo=sqlDB.createTable(listOfDicts[:10],'Does','name')
+        try:
+            sqlDB.store(listOfDicts,entityInfo,executeMany=False)
+            self.fail("There should be an exception")
+        except Exception as ex:
+            expected="""INSERT INTO Does (name) values (:name)
+failed:UNIQUE constraint failed: Does.name
+record  #3={'name': 'John Doe'}"""
+            errMsg=str(ex)
+            self.assertEqual(expected,errMsg)
+            
     def testSqlite3(self):
         '''
         test sqlite3 with a few records from the royal family

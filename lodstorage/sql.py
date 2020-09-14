@@ -82,8 +82,13 @@ class SQLDB(object):
         '''
         debugInfo=""
         if not executeMany:
+            # shall we shoe the details of the record (which might be a security risk)
             if self.errorDebug:
+                # show details of record
                 debugInfo="\nrecord  #%d=%s" % (index,repr(record))
+            else:
+                # show only index
+                debugInfo="\nrecord #%d" % index
         return debugInfo
         
        
@@ -124,6 +129,10 @@ class SQLDB(object):
                 raise Exception("%s\nfailed: error binding column '%s'%s" % (insertCmd,columnName,debugInfo))
             else:
                 raise ie
+        except Exception as ex:
+            debugInfo=self.getDebugInfo(record, index, executeMany)
+            msg="%s\nfailed:%s%s" % (insertCmd,str(ex),debugInfo)
+            raise Exception(msg)
         
     def query(self,sqlQuery):
         '''
