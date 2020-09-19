@@ -134,22 +134,28 @@ class SQLDB(object):
             msg="%s\nfailed:%s%s" % (insertCmd,str(ex),debugInfo)
             raise Exception(msg)
         
-    def query(self,sqlQuery):
+    def query(self,sqlQuery,params=None):
         '''
         run the given sqlQuery and return a list of Dicts
         
         Args:
             
             sqlQuery(string): the SQL query to be executed
+            params(tuple): the query params, if any
                 
         Returns:
             list: a list of Dicts
         '''
         if self.debug:
             print(sqlQuery)
+            if params is not None:
+                print(params)
         # https://stackoverflow.com/a/13735506/1497139
         cur=self.c.cursor()
-        query = cur.execute(sqlQuery)
+        if params is not None:
+            query = cur.execute(sqlQuery,params)
+        else:
+            query = cur.execute(sqlQuery)
         colname = [ d[0] for d in query.description ]
         resultList=[]
         for row in query:

@@ -171,6 +171,24 @@ record  #3={'name': 'John Doe'}"""
         for fixDates in [True,False]:
             retrievedList=self.checkListOfRecords(listOfRecords,'City',fixDates=fixDates)
             self.assertEqual(len(listOfRecords),len(retrievedList))
+            
+    def testQueryParams(self):
+        '''
+        test Query Params
+        '''
+        listOfDicts=[
+            {"city": "New York", "country": "US"},
+            {"city": "Amsterdam", "country": "NL"},
+            {"city": "Paris", "country": "FR"}]
+        sqlDB=SQLDB(debug=self.debug,errorDebug=True)
+        entityInfo=sqlDB.createTable(listOfDicts[:10],'cities','city')
+        sqlDB.store(listOfDicts,entityInfo,executeMany=False)
+        query="SELECT * from cities WHERE country in (?)"
+        params=('FR',)
+        frCities=sqlDB.query(query,params)
+        if self.debug:
+            print (frCities);
+        self.assertEqual([{'city': 'Paris', 'country': 'FR'}],frCities)
         
     def testSqllite3Speed(self):
         '''
