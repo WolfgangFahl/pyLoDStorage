@@ -145,7 +145,7 @@ record  #3={'name': 'John Doe'}"""
         resultList=self.checkListOfRecords(listOfRecords, 'Person', 'name',debug=True)
         if self.debug:
             print(resultList)
-        self.assertEquals(listOfRecords,resultList)
+        self.assertEqual(listOfRecords,resultList)
         
     def testBindingError(self):
         '''

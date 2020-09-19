@@ -41,3 +41,4 @@ see [test cases](https://github.com/WolfgangFahl/pyLoDStorage/tests)
 
 ### Authors
 * [Wolfgang Fahl](http://www.bitplan.com/Wolfgang_Fahl)
+
