@@ -130,3 +130,6 @@ dmypy.json
 
 # autodoc
 docs
+# jena
+data
+lib

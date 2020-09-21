@@ -1,0 +1,210 @@
+#!/bin/bash
+# WF 2020-06-25
+# Jena Fuseki server installation
+# see https://jena.apache.org/documentation/fuseki2/fuseki-run.html
+version=3.16.0
+fuseki=apache-jena-fuseki-$version
+jena=apache-jena-$version
+
+#
+# get the absolute filename
+#
+get_abs_filename() {
+  # $1 : relative filename
+  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+}
+
+pwd=$(pwd)
+scriptPath=$(get_abs_filename $(dirname $0))
+libPath=$(get_abs_filename $scriptPath/../lib)
+binPath=$libPath/$jena/bin
+dataPath=$(get_abs_filename $scriptPath/../data)
+
+#ansi colors
+#http://www.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+blue='\033[0;34m'
+red='\033[0;31m'
+green='\033[0;32m' # '\e[1;32m' is too bright for white bg.
+endColor='\033[0m'
+
+#
+# a colored message
+#   params:
+#     1: l_color - the color of the message
+#     2: l_msg - the message to display
+#
+color_msg() {
+  local l_color="$1"
+  local l_msg="$2"
+  echo -e "${l_color}$l_msg${endColor}"
+}
+
+#
+# error
+#
+# show the given error message on stderr and exit
+#
+#   params:
+#     1: l_msg - the error message to display
+#
+error() {
+  local l_msg="$1"
+  # use ansi red for error
+  color_msg $red "Error:" 1>&2
+  color_msg $red "\t$l_msg" 1>&2
+  exit 1
+}
+
+
+# show usage
+#
+usage() {
+  echo "$0 [-b|--backup|-f|--fuseki|-h|--help|-k|--kill|-l|--load]"
+  echo ""
+  echo "-b | --backup: create a backup"
+  echo "-f | --fuseki [dataset]: download and start fuseki server with the given dataset"
+  echo "-h | --help: show this usage"
+  echo "-k | --kill: kill the running fuseki server"
+  echo "-l | --load [ttl file]: download jena / tdbloader and load given ttl file"
+  exit 1
+}
+
+#
+#  get all parts of jena
+#
+checkOrGetJenaParts() {
+  for part in lib data
+  do
+    path=$scriptPath/../$part
+    if [ ! -d $path ]
+    then
+      color_msg $blue "creating $path"
+      mkdir -p $path
+    fi
+  done
+  cd $libPath
+  for jpart in $fuseki $jena
+  do
+    if [ ! -d $jpart ]
+    then
+      tgz=$jpart.tar.gz
+     if [ ! -f $tgz ]
+     then
+       color_msg $blue "downloading $tgz"
+       curl  http://archive.apache.org/dist/jena/binaries/$tgz -o $tgz
+     else
+     color_msg $green $tgz already downloaded
+     fi
+     color_msg $blue "unpacking $tgz"
+     tar xvfz $tgz
+    else
+     color_msg $green $jpart already downloaded and unpacked
+    fi
+  done
+}
+
+#
+# show the given timestamp
+#
+timestamp() {
+ local msg="$1"
+ local ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+ echo "$msg at $ts"
+}
+
+#
+# load data for the given data dir and input
+#
+loaddata() {
+  cd "$pwd" # go back to original directory so that releative path will work
+  local data="$1"
+  local input="$2"
+  if [ ! -f $input ]
+  then
+    error "$input is not readable"
+  fi
+  tdbloader=$libPath/$jena/bin/tdb2.tdbloader
+  timestamp "start loading $input to $data"
+  outlog=$dataPath/tdb2-out.log
+  errlog=$dataPath/tdb2-err.log
+  $tdbloader --loc "$data" "$input" > $outlog 2> $errlog
+	timestamp "finished loading $input to $data"
+  tail $outlog
+  tail $errlog
+}
+
+#
+# start the Apache Jena Fuseki server
+#
+startFuseki() {
+  cd $dataPath
+  local l_dataset="$1"
+  color_msg $blue "starting fuseki server"
+  cd $libPath/$fuseki
+  log=$dataPath/fuseki.log
+  nohup java -jar $libPath/$fuseki/fuseki-server.jar --tdb2 --loc=$dataPath /$l_dataset >$log 2>&1 &
+  sleep 2
+  tail $log
+}
+
+#
+# create a backup
+#
+backup() {
+  tdbbackup=$binPath/tdb2.tdbbackup
+  $tdbbackup --loc $dataPath
+}
+
+# commandline option
+while [  "$1" != ""  ]
+do
+  option="$1"
+  case $option in
+    -b|--backup)
+      backup
+      ;;
+    -f|--fuseki)
+      shift
+      if [ $# -lt 1 ]
+      then
+        usage
+      else
+        checkOrGetJenaParts
+        startFuseki $1
+      fi
+      ;;
+    -k|--kill)
+      pgrep -fla fuseki-server.jar
+      if [ $? -eq 0 ]
+      then
+        os=$(uname)
+        case $os in
+          Linux)
+            pkill="pkill --full"
+            ;;
+          Darwin)
+            pkill="pkill -fla"
+            ;;
+          *)
+            error "unsupported operating system $os"
+        esac
+        color_msg $blue "killing running fuseki server"
+        $pkill fuseki-server.jar
+      else
+        color_msg $green "no running fuseki server found"
+      fi
+      ;;
+    -l|--load)
+        shift
+        if [ $# -lt 1 ]
+        then
+          usage
+        else
+          checkOrGetJenaParts
+          loaddata $dataPath "$1"
+        fi
+       ;;
+    -h|--help) usage;;
+  esac
+  shift
+done

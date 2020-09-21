@@ -1,2 +1,6 @@
 # libaries needed by pyLoDStorage
-# none for a start ...
+# https://pypi.org/project/SPARQLWrapper/
+# 321 stars, 95 forks
+# https://github.com/RDFLib/sparqlwrapper
+# https://stackoverflow.com/questions/tagged/sparqlwrapper
+SPARQLWrapper
