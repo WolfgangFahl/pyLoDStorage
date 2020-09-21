@@ -198,6 +198,14 @@ WHERE {
         listOfDicts=jena.queryAsListOfDicts(query)
         # check round trip equality
         self.assertEqual(helpListOfDicts,listOfDicts)
+        
+    def testIssue7(self):
+        '''
+        test conversion of dates with timezone info
+        '''
+        value="2020-01-01T00:00:00Z"
+        dt=SPARQL.strToDatetime(value)
+        self.assertEqual(dt.year,2020)
    
     def testListOfDictSpeed(self):
         '''

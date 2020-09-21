@@ -281,6 +281,21 @@ class SPARQL(object):
         listOfDicts=self.asListOfDicts(records)
         return listOfDicts
     
+    @staticmethod
+    def strToDatetime(value):
+        '''
+        convert a string to a datetime
+        Args:
+            value(str): the value to convert
+        Returns:
+            datetime: the datetime
+        '''
+        dateFormat="%Y-%m-%d %H:%M:%S.%f"
+        if "T" in value and "Z" in value:
+            dateFormat="%Y-%m-%dT%H:%M:%SZ"
+        dt=datetime.datetime.strptime(value,dateFormat)              
+        return dt
+    
     def asListOfDicts(self,records):
         '''
         convert SPARQL result back to python native
@@ -308,7 +323,7 @@ class SPARQL(object):
                         dt=datetime.datetime.strptime(value.value,"%Y-%m-%d")  
                         resultValue=dt.date()  
                     elif datatype=="http://www.w3.org/2001/XMLSchema#dateTime":
-                        dt=datetime.datetime.strptime(value.value,"%Y-%m-%d %H:%M:%S.%f")  
+                        dt=SPARQL.strToDatetime(value.value) 
                         resultValue=dt
                     else:
                         # unsupported datatype
