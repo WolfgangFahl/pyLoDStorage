@@ -254,6 +254,16 @@ class SPARQL(object):
             list: list of bindings
         '''
         queryResult=self.rawQuery(queryString,method=method) 
+        if self.debug:
+            print(queryString)
+        if hasattr(queryResult, "info"):
+            if "content-type" in queryResult.info():
+                ct = queryResult.info()["content-type"] 
+                if "text/html" in ct:
+                    response=queryResult.response.read().decode()
+                    if not "Success" in response:
+                        raise("%s failed: %s", response)
+                return None 
         jsonResult=queryResult.convert()
         return self.getResults(jsonResult)
     

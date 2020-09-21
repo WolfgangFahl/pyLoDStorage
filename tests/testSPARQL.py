@@ -106,36 +106,38 @@ class TestSPARQL(unittest.TestCase):
         prefixes='PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>'
         for typedLiteralMode in typedLiteralModes:
             jena=self.getJena(mode='update',typedLiterals=typedLiteralMode,debug=True)
+            deleteString= """
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>
+            DELETE WHERE {  
+              ?person a 'foafo:Person'.
+              ?person ?p ?o. 
+            }
+            """
+            jena.query(deleteString)
             errors=jena.insertListOfDicts(listofDicts,entityType,primaryKey,prefixes)
             self.checkErrors(errors)
             
-        jena=self.getJena(mode="query")    
-        # does not work ...
-        deleteString= """
-        PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>
-        DELETE {
-            ?person a foafo:Person 
-        }
-        """
-        #jena.query(deleteString)
-        queryString = """
-        PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>
-        SELECT ?name ?born ?numberInLine ?wikidataurl ?age ?ofAge ?lastmodified WHERE { 
-            ?person foafo:Person_name ?name.
-            ?person foafo:Person_born ?born.
-            ?person foafo:Person_numberInLine ?numberInLine.
-            ?person foafo:Person_wikidataurl ?wikidataurl.
-            ?person foafo:Person_age ?age.
-            ?person foafo:Person_ofAge ?ofAge.
-            ?person foafo:Person_lastmodified ?lastmodified. 
-        }"""
-        personResults=jena.query(queryString)
-        self.assertEqual(len(listofDicts),len(personResults))
-        personList=jena.asListOfDicts(personResults)   
-        for index,person in enumerate(personList):
-            print("%d: %s" %(index,person))
-        # check the correct round-trip behavior
-        self.assertEqual(listofDicts,personList)
+            jena=self.getJena(mode="query",debug=True)
+            queryString = """
+            PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>
+            SELECT ?name ?born ?numberInLine ?wikidataurl ?age ?ofAge ?lastmodified WHERE { 
+                ?person a 'foafo:Person'.
+                ?person foafo:Person_name ?name.
+                ?person foafo:Person_born ?born.
+                ?person foafo:Person_numberInLine ?numberInLine.
+                ?person foafo:Person_wikidataurl ?wikidataurl.
+                ?person foafo:Person_age ?age.
+                ?person foafo:Person_ofAge ?ofAge.
+                ?person foafo:Person_lastmodified ?lastmodified. 
+            }"""
+            personResults=jena.query(queryString)
+            self.assertEqual(len(listofDicts),len(personResults))
+            personList=jena.asListOfDicts(personResults)   
+            for index,person in enumerate(personList):
+                print("%d: %s" %(index,person))
+            # check the correct round-trip behavior
+            self.assertEqual(listofDicts,personList)
         
     def testControlEscape(self):
         '''
