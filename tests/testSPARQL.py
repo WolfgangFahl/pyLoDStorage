@@ -10,7 +10,7 @@ from lodstorage.sample import Sample
 import time
 
 class TestSPARQL(unittest.TestCase):
-    ''' Test Apache Jena access via Wrapper'''
+    ''' Test SPARQL access e.g. Apache Jena via Wrapper'''
 
     def setUp(self):
         self.debug=False
