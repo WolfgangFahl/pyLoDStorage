@@ -10,7 +10,11 @@ python List of Dict (Table) Storage library
 
 What it is
 ==========
-pyLoDStorage allows to store table like data (List of Dicts) via Sqlite3
+pyLoDStorage allows to store table like data (List of Dicts) via  
+
+- Sqlite3
+- JSON
+- SPARQL
 
 Installation
 ============
