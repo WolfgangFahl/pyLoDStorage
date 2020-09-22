@@ -8,6 +8,7 @@ import getpass
 from lodstorage.sparql import SPARQL
 from lodstorage.sample import Sample
 import time
+import datetime
 
 class TestSPARQL(unittest.TestCase):
     ''' Test SPARQL access e.g. Apache Jena via Wrapper'''
@@ -203,9 +204,11 @@ WHERE {
         '''
         test conversion of dates with timezone info
         '''
-        value="2020-01-01T00:00:00Z"
-        dt=SPARQL.strToDatetime(value)
-        self.assertEqual(dt.year,2020)
+        values=["2020-01-01T00:00:00Z","42000-01-01T00:00:00Z"]
+        expected=[datetime.datetime(2020,1,1,0,0),None]
+        for index,value in enumerate(values):
+            dt=SPARQL.strToDatetime(value,debug=True)
+            self.assertEqual(expected[index],dt)
    
     def testListOfDictSpeed(self):
         '''
