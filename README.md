@@ -1,6 +1,6 @@
 # pyLoDStorage
 python List of Dict (Table) Storage library
-
+[![Documentation Status](https://readthedocs.org/projects/pylodstorage/badge/?version=latest)](https://pylodstorage.readthedocs.io/en/latest/?badge=latest)
 [![pypi](https://img.shields.io/pypi/pyversions/pyLoDStorage)](https://pypi.org/project/pyLoDStorage/)
 [![Github Actions Build](https://github.com/WolfgangFahl/pyLoDStorage/workflows/Build/badge.svg?branch=master)](https://github.com/WolfgangFahl/pyLoDStorage/actions?query=workflow%3ABuild+branch%3Amaster)
 [![PyPI Status](https://img.shields.io/pypi/v/pyLoDStorage.svg)](https://pypi.python.org/pypi/pyLoDStorage/)
