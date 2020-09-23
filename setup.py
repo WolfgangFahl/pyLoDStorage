@@ -11,7 +11,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pylodstorage',
-    version='0.0.15',
+    version='0.0.16',
 
     packages=['lodstorage',],
     author='Wolfgang Fahl',
@@ -27,6 +27,9 @@ setup(
     ),
     license='Apache License',
     description='python List of Dict (Table) Storage library',
+    install_requires=[
+          'SPARQLWrapper'
+    ],
     classifiers=[
             'Programming Language :: Python',
             'Programming Language :: Python :: 3.6',
