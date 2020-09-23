@@ -6,8 +6,7 @@ Created on 2020-09-12
 import unittest
 import json
 from lodstorage.sample import Royals,Cities
-from lodstorage.jsonable import JSONAble
-from lodstorage.types import Types
+from lodstorage.jsonable import JSONAble, Types
 import time
 
 class TestJsonAble(unittest.TestCase):
@@ -125,7 +124,7 @@ class TestJsonAble(unittest.TestCase):
         self.assertEqual(4,len(royals1.royals))
         json=royals1.toJSON()
         print(json)
-        types=Types.forClass(royals1, "royals")
+        types=Types.forTable(royals1, "royals",debug=True)
         royals2=Royals()
         royals2.fromJson(json,types=types)
         self.assertEqual(4,len(royals2.royals))
@@ -133,7 +132,28 @@ class TestJsonAble(unittest.TestCase):
         print(royals2.royals)
         self.assertEqual(royals1.royals,royals2.royals)
     
-
+    def testTypes(self):
+        '''
+        test the given types
+        '''
+        royals1=Royals(load=True)
+        types1=Types.forTable(royals1, "royals")
+        json=types1.toJSON()
+        print(json)
+        types2=Types("Royals")
+        types2.fromJson(json)
+        self.assertEqual(types1.typeMap,types2.typeMap)
+        
+    def testStoreAndRestore(self):
+        '''
+        test storing and restoring from a JSON file
+        '''
+        royals1=Royals(load=True)
+        storeFilePrefix="/tmp/royals-pylodstorage"
+        royals1.storeToJsonFile(storeFilePrefix,"royals")
+        royals2=Royals()
+        royals2.restoreFromJsonFile(storeFilePrefix)
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

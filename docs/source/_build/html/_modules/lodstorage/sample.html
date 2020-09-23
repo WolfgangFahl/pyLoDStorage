@@ -222,12 +222,18 @@
         <span class="k">return</span> <span class="n">listOfDicts</span></div></div>
         
 <div class="viewcode-block" id="Royals"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Royals">[docs]</a><span class="k">class</span> <span class="nc">Royals</span><span class="p">(</span><span class="n">JSONAble</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyals</span><span class="p">()</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyals</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="kc">None</span></div>
         
 <div class="viewcode-block" id="Cities"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Cities">[docs]</a><span class="k">class</span> <span class="nc">Cities</span><span class="p">(</span><span class="n">JSONAble</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getCities</span><span class="p">()</span>        </div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getCities</span><span class="p">()</span>      
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">=</span><span class="kc">None</span>  </div>
 </pre></div>
 
            </div>

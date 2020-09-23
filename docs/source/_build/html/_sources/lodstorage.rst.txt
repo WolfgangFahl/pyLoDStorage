@@ -36,14 +36,6 @@ lodstorage.sql module
    :undoc-members:
    :show-inheritance:
 
-lodstorage.types module
------------------------
-
-.. automodule:: lodstorage.types
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 lodstorage.uml module
 ---------------------
 

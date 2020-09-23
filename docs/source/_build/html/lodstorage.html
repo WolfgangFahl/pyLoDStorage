@@ -90,7 +90,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-lodstorage.sample">lodstorage.sample module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lodstorage.sparql">lodstorage.sparql module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lodstorage.sql">lodstorage.sql module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-lodstorage.types">lodstorage.types module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lodstorage.uml">lodstorage.uml module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-lodstorage">Module contents</a></li>
 </ul>
@@ -199,7 +198,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>jsonStr</strong> (<em>str</em>) – the JSON string</p></li>
-<li><p><strong>fixType</strong> (<a class="reference internal" href="#lodstorage.types.Types" title="lodstorage.types.Types"><em>Types</em></a>) – the types to be fixed</p></li>
+<li><p><strong>fixType</strong> (<a class="reference internal" href="#lodstorage.jsonable.Types" title="lodstorage.jsonable.Types"><em>Types</em></a>) – the types to be fixed</p></li>
 </ul>
 </dd>
 </dl>
@@ -227,6 +226,20 @@ see <a class="reference external" href="https://stackoverflow.com/a/50257217/149
 </dd></dl>
 
 <dl class="py method">
+<dt id="lodstorage.jsonable.JSONAble.readJsonFromFile">
+<em class="property">static </em><code class="sig-name descname">readJsonFromFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">jsonFilePath</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAble.readJsonFromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAble.readJsonFromFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>read json string from the given jsonFilePath</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>jsonFilePath</strong> (<em>string</em>) – the path of the file where to read the result from</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the JSON string read from the file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="lodstorage.jsonable.JSONAble.reprDict">
 <code class="sig-name descname">reprDict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">srcDict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAble.reprDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAble.reprDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the given srcDict as new dict with fields being converted with getJSONValue</p>
@@ -237,6 +250,17 @@ see <a class="reference external" href="https://stackoverflow.com/a/50257217/149
 </dl>
 <dl class="simple">
 <dt>Returns</dt><dd><p>dict: the converted dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lodstorage.jsonable.JSONAble.restoreFromJsonFile">
+<code class="sig-name descname">restoreFromJsonFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">storeFilePrefix</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAble.restoreFromJsonFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAble.restoreFromJsonFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>restore me from the given storeFilePrefix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>storeFilePrefix</strong> (<em>string</em>) – the prefix for the JSON file name</p>
 </dd>
 </dl>
 </dd></dl>
@@ -322,6 +346,34 @@ see <a class="reference external" href="https://stackoverflow.com/a/50257217/149
 </dd></dl>
 
 <dl class="py method">
+<dt id="lodstorage.jsonable.JSONAble.storeJsonToFile">
+<em class="property">static </em><code class="sig-name descname">storeJsonToFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">jsonStr</span></em>, <em class="sig-param"><span class="n">jsonFilePath</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAble.storeJsonToFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAble.storeJsonToFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>store the given json string to the given jsonFilePath</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>jsonStr</strong> (<em>string</em>) – the string to store</p></li>
+<li><p><strong>jsonFilePath</strong> (<em>string</em>) – the path of the file where to store the result</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lodstorage.jsonable.JSONAble.storeToJsonFile">
+<code class="sig-name descname">storeToJsonFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">storeFilePrefix</span></em>, <em class="sig-param"><span class="n">tableName</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAble.storeToJsonFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAble.storeToJsonFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>store me with the given storeFilePrefix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>storeFilePrefix</strong> (<em>string</em>) – the prefix for the JSON file name</p></li>
+<li><p><strong>tableName</strong> (<em>string</em>) – the name of the attribute for which to store the type information</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="lodstorage.jsonable.JSONAble.toJSON">
 <code class="sig-name descname">toJSON</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAble.toJSON"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAble.toJSON" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -341,6 +393,90 @@ see <a class="reference external" href="https://stackoverflow.com/a/50257217/149
 
 </dd></dl>
 
+<dl class="py class">
+<dt id="lodstorage.jsonable.Types">
+<em class="property">class </em><code class="sig-prename descclassname">lodstorage.jsonable.</code><code class="sig-name descname">Types</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#Types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.Types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lodstorage.jsonable.JSONAble" title="lodstorage.jsonable.JSONAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAble</span></code></a></p>
+<p>holds entity meta Info</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><strong>name</strong><strong>(</strong><strong>string</strong><strong>)</strong> – entity name = table name</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="lodstorage.jsonable.Types.addType">
+<code class="sig-name descname">addType</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listName</span></em>, <em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">valueType</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#Types.addType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.Types.addType" title="Permalink to this definition">¶</a></dt>
+<dd><p>add the python type for the given field to the typeMap</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listName</strong> (<em>string</em>) – the name of the list of the field</p></li>
+<li><p><strong>field</strong> (<em>string</em>) – the name of the field</p></li>
+<li><p><strong>valueType</strong> (<em>type</em>) – the python type of the field</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lodstorage.jsonable.Types.fixListOfDicts">
+<code class="sig-name descname">fixListOfDicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">typeMap</span></em>, <em class="sig-param"><span class="n">listOfDicts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#Types.fixListOfDicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.Types.fixListOfDicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>fix the type in the given list of Dicts</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lodstorage.jsonable.Types.fixTypes">
+<code class="sig-name descname">fixTypes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#Types.fixTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.Types.fixTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>fix the types in the given data structure</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em>) – a dict representation returned from storage</p></li>
+<li><p><strong>list of Dicts as entries</strong> (<em>with</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lodstorage.jsonable.Types.forTable">
+<em class="property">static </em><code class="sig-name descname">forTable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">listName</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#Types.forTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.Types.forTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the types for the list of Dicts (table) in the given instance with the given listName
+:param instance: the instance to inspect
+:type instance: object
+:param listName: the list of dicts to inspect
+:type listName: string
+:param debug: True if debuggin information should be shown
+:type debug: bool</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a types object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#lodstorage.jsonable.Types" title="lodstorage.jsonable.Types">Types</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lodstorage.jsonable.Types.getType">
+<code class="sig-name descname">getType</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">typeName</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#Types.getType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.Types.getType" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the type for the given type name</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lodstorage.jsonable.Types.getTypes">
+<code class="sig-name descname">getTypes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listName</span></em>, <em class="sig-param"><span class="n">sampleRecords</span></em>, <em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#Types.getTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.jsonable.Types.getTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>determine the types for the given sample records</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="lodstorage.jsonable.Types.typeName2Type">
+<code class="sig-name descname">typeName2Type</code><em class="property"> = {'bool': &lt;class 'bool'&gt;, 'date': &lt;class 'datetime.date'&gt;, 'datetime': &lt;class 'datetime.datetime'&gt;, 'float': &lt;class 'float'&gt;, 'int': &lt;class 'int'&gt;, 'str': &lt;class 'str'&gt;}</em><a class="headerlink" href="#lodstorage.jsonable.Types.typeName2Type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-lodstorage.sample">
 <span id="lodstorage-sample-module"></span><h2>lodstorage.sample module<a class="headerlink" href="#module-lodstorage.sample" title="Permalink to this headline">¶</a></h2>
@@ -348,13 +484,13 @@ see <a class="reference external" href="https://stackoverflow.com/a/50257217/149
 <p>&#64;author: wf</p>
 <dl class="py class">
 <dt id="lodstorage.sample.Cities">
-<em class="property">class </em><code class="sig-prename descclassname">lodstorage.sample.</code><code class="sig-name descname">Cities</code><a class="reference internal" href="_modules/lodstorage/sample.html#Cities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sample.Cities" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lodstorage.sample.</code><code class="sig-name descname">Cities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">load</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sample.html#Cities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sample.Cities" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.jsonable.JSONAble" title="lodstorage.jsonable.JSONAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAble</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="lodstorage.sample.Royals">
-<em class="property">class </em><code class="sig-prename descclassname">lodstorage.sample.</code><code class="sig-name descname">Royals</code><a class="reference internal" href="_modules/lodstorage/sample.html#Royals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sample.Royals" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lodstorage.sample.</code><code class="sig-name descname">Royals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">load</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sample.html#Royals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sample.Royals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.jsonable.JSONAble" title="lodstorage.jsonable.JSONAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAble</span></code></a></p>
 </dd></dl>
 
@@ -923,64 +1059,6 @@ as defining sample record and execute DDL command</p>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-lodstorage.types">
-<span id="lodstorage-types-module"></span><h2>lodstorage.types module<a class="headerlink" href="#module-lodstorage.types" title="Permalink to this headline">¶</a></h2>
-<p>Created on 2020-09-12</p>
-<p>&#64;author: wf</p>
-<dl class="py class">
-<dt id="lodstorage.types.Types">
-<em class="property">class </em><code class="sig-prename descclassname">lodstorage.types.</code><code class="sig-name descname">Types</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/types.html#Types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.types.Types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>holds entity meta Info</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables</dt>
-<dd class="field-odd"><p><strong>name</strong><strong>(</strong><strong>string</strong><strong>)</strong> – entity name = table name</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="lodstorage.types.Types.addType">
-<code class="sig-name descname">addType</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listName</span></em>, <em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">valueType</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/types.html#Types.addType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.types.Types.addType" title="Permalink to this definition">¶</a></dt>
-<dd><p>add the python type for the given field to the typeMap</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>listName</strong> (<em>string</em>) – the name of the list of the field</p></li>
-<li><p><strong>field</strong> (<em>string</em>) – the name of the field</p></li>
-<li><p><strong>valueType</strong> (<em>type</em>) – the python type of the field</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="lodstorage.types.Types.fixListOfDicts">
-<code class="sig-name descname">fixListOfDicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">typeMap</span></em>, <em class="sig-param"><span class="n">listOfDicts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/types.html#Types.fixListOfDicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.types.Types.fixListOfDicts" title="Permalink to this definition">¶</a></dt>
-<dd><p>fix the type in the given list of Dicts</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="lodstorage.types.Types.fixTypes">
-<code class="sig-name descname">fixTypes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/types.html#Types.fixTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.types.Types.fixTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>fix the types in the given data structure</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>dict</em>) – a dict representation returned from storage</p></li>
-<li><p><strong>list of Dicts as entries</strong> (<em>with</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="lodstorage.types.Types.getTypes">
-<code class="sig-name descname">getTypes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listName</span></em>, <em class="sig-param"><span class="n">sampleRecords</span></em>, <em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/types.html#Types.getTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.types.Types.getTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>determine the types for the given sample records</p>
 </dd></dl>
 
 </dd></dl>

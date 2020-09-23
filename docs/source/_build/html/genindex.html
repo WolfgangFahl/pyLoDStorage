@@ -174,10 +174,10 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="lodstorage.html#lodstorage.sql.EntityInfo.addType">addType() (lodstorage.sql.EntityInfo method)</a>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types.addType">addType() (lodstorage.jsonable.Types method)</a>
 
       <ul>
-        <li><a href="lodstorage.html#lodstorage.types.Types.addType">(lodstorage.types.Types method)</a>
+        <li><a href="lodstorage.html#lodstorage.sql.EntityInfo.addType">(lodstorage.sql.EntityInfo method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -252,11 +252,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.sql.EntityInfo.fixDates">fixDates() (lodstorage.sql.EntityInfo method)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.types.Types.fixListOfDicts">fixListOfDicts() (lodstorage.types.Types method)</a>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types.fixListOfDicts">fixListOfDicts() (lodstorage.jsonable.Types method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="lodstorage.html#lodstorage.types.Types.fixTypes">fixTypes() (lodstorage.types.Types method)</a>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types.fixTypes">fixTypes() (lodstorage.jsonable.Types method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types.forTable">forTable() (lodstorage.jsonable.Types static method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.fromJson">fromJson() (lodstorage.jsonable.JSONAble method)</a>
 </li>
@@ -280,10 +282,10 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.sql.EntityInfo.getInsertCmd">getInsertCmd() (lodstorage.sql.EntityInfo method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.getJena">getJena() (tests.testSPARQL.TestSPARQL method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.getJSONValue">getJSONValue() (lodstorage.jsonable.JSONAble method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.getLocalName">getLocalName() (lodstorage.sparql.SPARQL method)</a>
@@ -296,7 +298,9 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.getTableList">getTableList() (lodstorage.sql.SQLDB method)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.types.Types.getTypes">getTypes() (lodstorage.types.Types method)</a>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types.getType">getType() (lodstorage.jsonable.Types method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types.getTypes">getTypes() (lodstorage.jsonable.Types method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -349,6 +353,8 @@
         <li><a href="lodstorage.html#module-lodstorage.sample">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     lodstorage.sparql
 
@@ -356,20 +362,11 @@
         <li><a href="lodstorage.html#module-lodstorage.sparql">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     lodstorage.sql
 
       <ul>
         <li><a href="lodstorage.html#module-lodstorage.sql">module</a>
-</li>
-      </ul></li>
-      <li>
-    lodstorage.types
-
-      <ul>
-        <li><a href="lodstorage.html#module-lodstorage.types">module</a>
 </li>
       </ul></li>
       <li>
@@ -400,8 +397,6 @@
         <li><a href="lodstorage.html#module-lodstorage.sparql">lodstorage.sparql</a>
 </li>
         <li><a href="lodstorage.html#module-lodstorage.sql">lodstorage.sql</a>
-</li>
-        <li><a href="lodstorage.html#module-lodstorage.types">lodstorage.types</a>
 </li>
         <li><a href="lodstorage.html#module-lodstorage.uml">lodstorage.uml</a>
 </li>
@@ -454,11 +449,15 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.rawQuery">rawQuery() (lodstorage.sparql.SPARQL method)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.readJsonFromFile">readJsonFromFile() (lodstorage.jsonable.JSONAble static method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.reprDict">reprDict() (lodstorage.jsonable.JSONAble method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.restore">restore() (lodstorage.sql.SQLDB static method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.restoreFromJsonFile">restoreFromJsonFile() (lodstorage.jsonable.JSONAble method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.sample.Royals">Royals (class in lodstorage.sample)</a>
 </li>
@@ -484,10 +483,10 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuote">singleQuoteToDoubleQuote() (lodstorage.jsonable.JSONAble static method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuoteUsingBracketLoop">singleQuoteToDoubleQuoteUsingBracketLoop() (lodstorage.jsonable.JSONAble static method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuoteUsingRegex">singleQuoteToDoubleQuoteUsingRegex() (lodstorage.jsonable.JSONAble static method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.uml.UML.skinparams">skinparams (lodstorage.uml.UML attribute)</a>
@@ -497,6 +496,10 @@
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB">SQLDB (class in lodstorage.sql)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.store">store() (lodstorage.sql.SQLDB method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.storeJsonToFile">storeJsonToFile() (lodstorage.jsonable.JSONAble static method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.storeToJsonFile">storeToJsonFile() (lodstorage.jsonable.JSONAble method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.strToDatetime">strToDatetime() (lodstorage.sparql.SPARQL static method)</a>
 </li>
@@ -548,8 +551,8 @@
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testQueryParams">testQueryParams() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tests.html#tests.testJson.TestJsonAble.testRoyals">testRoyals() (tests.testJson.TestJsonAble method)</a>
+</li>
       <li>
     tests
 
@@ -557,6 +560,8 @@
         <li><a href="tests.html#module-tests">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     tests.testJson
 
@@ -592,6 +597,10 @@
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testSqllite3Speed">testSqllite3Speed() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
+      <li><a href="tests.html#tests.testJson.TestJsonAble.testStoreAndRestore">testStoreAndRestore() (tests.testJson.TestJsonAble method)</a>
+</li>
+      <li><a href="tests.html#tests.testJson.TestJsonAble.testTypes">testTypes() (tests.testJson.TestJsonAble method)</a>
+</li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testUniqueConstraint">testUniqueConstraint() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testWikdata">testWikdata() (tests.testSPARQL.TestSPARQL method)</a>
@@ -600,7 +609,9 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.toJsonAbleValue">toJsonAbleValue() (lodstorage.jsonable.JSONAble method)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.types.Types">Types (class in lodstorage.types)</a>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types.typeName2Type">typeName2Type (lodstorage.jsonable.Types attribute)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types">Types (class in lodstorage.jsonable)</a>
 </li>
   </ul></td>
 </tr></table>
