@@ -227,16 +227,17 @@ WHERE {
             elapsed=time.time()-startTime
             print ("adding %d records took %5.3f s => %5.f records/s" % (limit,elapsed,limit/elapsed))
         
-    def testLocalWikdata(self):
+    def testWikdata(self):
         '''
-        check local wikidata
+        check wikidata
         '''
         # check we have local wikidata copy:
-        if getpass.getuser()=="wf":
-            # use 2018 wikidata copy
-            endpoint="http://jena.zeus.bitplan.com/wikidata/"
-            wd=SPARQL(endpoint)
-            queryString="""# get a list of whisky distilleries
+        #if getpass.getuser()=="wf":
+        #    # use 2018 wikidata copy
+        #    endpoint="http://jena.zeus.bitplan.com/wikidata/"
+        endpoint="https://query.wikidata.org/sparql"
+        wd=SPARQL(endpoint)
+        queryString="""# get a list of whisky distilleries
 PREFIX wd: <http://www.wikidata.org/entity/>            
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?item ?coord 
@@ -248,8 +249,8 @@ WHERE
   ?item wdt:P625 ?coord.
 }
 """
-            results=wd.query(queryString)
-            self.assertTrue(238<=len(results))
+        results=wd.query(queryString)
+        self.assertTrue(238<=len(results))
 
 
 if __name__ == "__main__":
