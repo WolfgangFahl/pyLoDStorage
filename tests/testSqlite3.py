@@ -25,7 +25,7 @@ class TestSQLDB(unittest.TestCase):
     def tearDown(self):
         pass
     
-    def checkListOfRecords(self,listOfRecords,entityName,primaryKey=None,executeMany=True,fixDates=False,debug=False,doClose=True):
+    def checkListOfRecords(self,listOfRecords,entityName,primaryKey=None,executeMany=True,fixNone=False,fixDates=False,debug=False,doClose=True):
         '''
         check the handling of the given list of Records
         
@@ -35,16 +35,17 @@ class TestSQLDB(unittest.TestCase):
            entityName(string): the name of the entity type to be used as a table name
            primaryKey(string): the name of the key / column to be used as a primary key
            executeMany(boolean): True if executeMany mode of sqlite3 should be used
+           fixNone(boolean): fix dict entries that are undefined to have a "None" entry
            debug(boolean): True if debug information e.g. CREATE TABLE and INSERT INTO commands should be shown
            doClose(boolean): True if the connection should be closed
       
         '''     
         size=len(listOfRecords)
-        print("%s size is %d fixDates is: %r" % (entityName,size,fixDates))
+        print("%s size is %d fixNone is %r fixDates is: %r" % (entityName,size,fixNone,fixDates))
         self.sqlDB=SQLDB(debug=debug,errorDebug=True)
         entityInfo=self.sqlDB.createTable(listOfRecords[:10],entityName,primaryKey)
         startTime=time.time()
-        self.sqlDB.store(listOfRecords,entityInfo,executeMany=executeMany)
+        self.sqlDB.store(listOfRecords,entityInfo,executeMany=executeMany,fixNone=fixNone)
         elapsed=time.time()-startTime
         print ("adding %d %s records took %5.3f s => %5.f records/s" % (size,entityName,elapsed,size/elapsed)) 
         resultList=self.sqlDB.queryAll(entityInfo,fixDates=fixDates)    
@@ -146,7 +147,22 @@ record  #3={'name': 'John Doe'}"""
         if self.debug:
             print(resultList)
         self.assertEqual(listOfRecords,resultList)
-        
+       
+    def testIssue13(self):
+        '''
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/13
+        set None value for undefined LoD entries
+        '''
+        listOfRecords=[
+            { 'make': 'Ford','model':'Model T', 'color':'black'},
+            { 'make': 'VW', 'model':'beetle'}
+        ]
+        entityName="Car"
+        primaryKey="Model"
+        resultList=self.checkListOfRecords(listOfRecords, entityName, primaryKey,fixNone=True)
+        if self.debug:
+            print (resultList)
+         
     def testBindingError(self):
         '''
         test list of Records with incomplete record leading to

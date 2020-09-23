@@ -1034,6 +1034,27 @@ as defining sample record and execute DDL command</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="lodstorage.sql.SQLDB.setNone">
+<em class="property">static </em><code class="sig-name descname">setNone</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record</span></em>, <em class="sig-param"><span class="n">fields</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sql.html#SQLDB.setNone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sql.SQLDB.setNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>make sure the given fields in the given record are set to none
+:param record: the record to work on
+:type record: dict
+:param fields: the list of fields to set to None
+:type fields: list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lodstorage.sql.SQLDB.setNone4List">
+<em class="property">static </em><code class="sig-name descname">setNone4List</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listOfDicts</span></em>, <em class="sig-param"><span class="n">fields</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sql.html#SQLDB.setNone4List"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sql.SQLDB.setNone4List" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the given fields to None for the records in the given listOfDicts
+if they are not set
+:param listOfDicts: the list of records to work on
+:type listOfDicts: list
+:param fields: the list of fields to set to None
+:type fields: list</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="lodstorage.sql.SQLDB.showDump">
 <code class="sig-name descname">showDump</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dump</span></em>, <em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sql.html#SQLDB.showDump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sql.SQLDB.showDump" title="Permalink to this definition">¶</a></dt>
 <dd><p>show the given dump up to the given limit</p>
@@ -1049,7 +1070,7 @@ as defining sample record and execute DDL command</p>
 
 <dl class="py method">
 <dt id="lodstorage.sql.SQLDB.store">
-<code class="sig-name descname">store</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listOfRecords</span></em>, <em class="sig-param"><span class="n">entityInfo</span></em>, <em class="sig-param"><span class="n">executeMany</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sql.html#SQLDB.store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sql.SQLDB.store" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">store</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listOfRecords</span></em>, <em class="sig-param"><span class="n">entityInfo</span></em>, <em class="sig-param"><span class="n">executeMany</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixNone</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sql.html#SQLDB.store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lodstorage.sql.SQLDB.store" title="Permalink to this definition">¶</a></dt>
 <dd><p>store the given list of records based on the given entityInfo</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

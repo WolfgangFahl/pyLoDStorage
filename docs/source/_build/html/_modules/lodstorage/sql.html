@@ -195,6 +195,30 @@
 <div class="viewcode-block" id="SQLDB.close"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; close my connection &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>    </div>
+    
+<div class="viewcode-block" id="SQLDB.setNone4List"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.setNone4List">[docs]</a>    <span class="nd">@staticmethod</span>    
+    <span class="k">def</span> <span class="nf">setNone4List</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">,</span><span class="n">fields</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        set the given fields to None for the records in the given listOfDicts</span>
+<span class="sd">        if they are not set</span>
+<span class="sd">        Args:</span>
+<span class="sd">            listOfDicts(list): the list of records to work on</span>
+<span class="sd">            fields(list): the list of fields to set to None </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">listOfDicts</span><span class="p">:</span>
+            <span class="n">SQLDB</span><span class="o">.</span><span class="n">setNone</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="SQLDB.setNone"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.setNone">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">setNone</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">fields</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        make sure the given fields in the given record are set to none</span>
+<span class="sd">        Args:</span>
+<span class="sd">            record(dict): the record to work on</span>
+<span class="sd">            fields(list): the list of fields to set to None </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">record</span><span class="p">:</span>
+                <span class="n">record</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span></div>
         
 <div class="viewcode-block" id="SQLDB.createTable"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.createTable">[docs]</a>    <span class="k">def</span> <span class="nf">createTable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">listOfRecords</span><span class="p">,</span><span class="n">entityName</span><span class="p">,</span><span class="n">primaryKey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">withDrop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">sampleRecordCount</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -243,7 +267,7 @@
         <span class="k">return</span> <span class="n">debugInfo</span></div>
         
        
-<div class="viewcode-block" id="SQLDB.store"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">listOfRecords</span><span class="p">,</span><span class="n">entityInfo</span><span class="p">,</span><span class="n">executeMany</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLDB.store"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">listOfRecords</span><span class="p">,</span><span class="n">entityInfo</span><span class="p">,</span><span class="n">executeMany</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        store the given list of records based on the given entityInfo</span>
 <span class="sd">        </span>
@@ -257,10 +281,14 @@
         <span class="n">index</span><span class="o">=</span><span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">executeMany</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fixNone</span><span class="p">:</span>
+                    <span class="n">SQLDB</span><span class="o">.</span><span class="n">setNone4List</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span> <span class="n">entityInfo</span><span class="o">.</span><span class="n">typeMap</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="n">insertCmd</span><span class="p">,</span><span class="n">listOfRecords</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">listOfRecords</span><span class="p">:</span>
                     <span class="n">index</span><span class="o">+=</span><span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">fixNone</span><span class="p">:</span>
+                        <span class="n">SQLDB</span><span class="o">.</span><span class="n">setNone</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">entityInfo</span><span class="o">.</span><span class="n">typeMap</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">insertCmd</span><span class="p">,</span><span class="n">record</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">ProgrammingError</span> <span class="k">as</span> <span class="n">pe</span><span class="p">:</span>

@@ -44,6 +44,30 @@ class SQLDB(object):
     def close(self):
         ''' close my connection '''
         self.c.close()    
+    
+    @staticmethod    
+    def setNone4List(listOfDicts,fields):
+        '''
+        set the given fields to None for the records in the given listOfDicts
+        if they are not set
+        Args:
+            listOfDicts(list): the list of records to work on
+            fields(list): the list of fields to set to None 
+        '''
+        for record in listOfDicts:
+            SQLDB.setNone(record, fields)
+    
+    @staticmethod
+    def setNone(record,fields):
+        '''
+        make sure the given fields in the given record are set to none
+        Args:
+            record(dict): the record to work on
+            fields(list): the list of fields to set to None 
+        '''
+        for field in fields:
+            if not field in record:
+                record[field]=None
         
     def createTable(self,listOfRecords,entityName,primaryKey=None,withDrop=False,sampleRecordCount=1):
         '''
@@ -92,7 +116,7 @@ class SQLDB(object):
         return debugInfo
         
        
-    def store(self,listOfRecords,entityInfo,executeMany=False):
+    def store(self,listOfRecords,entityInfo,executeMany=False,fixNone=False):
         '''
         store the given list of records based on the given entityInfo
         
@@ -106,10 +130,14 @@ class SQLDB(object):
         index=0
         try:
             if executeMany:
+                if fixNone:
+                    SQLDB.setNone4List(listOfRecords, entityInfo.typeMap.keys())
                 self.c.executemany(insertCmd,listOfRecords)
             else:
                 for record in listOfRecords:
                     index+=1
+                    if fixNone:
+                        SQLDB.setNone(record, entityInfo.typeMap.keys())
                     self.c.execute(insertCmd,record)
             self.c.commit()
         except sqlite3.ProgrammingError as pe:
