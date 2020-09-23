@@ -8,8 +8,6 @@ import json
 import datetime
 import sys
 import re
-from lxml.cssselect import ns
-
 
 class JSONAble(object):
     '''
