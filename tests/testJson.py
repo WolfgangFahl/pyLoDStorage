@@ -22,6 +22,7 @@ class TestJsonAble(unittest.TestCase):
 
     def tearDown(self):
         pass
+        
     
     def testSingleToDoubleQuote(self):
         jsonStr='''
@@ -68,17 +69,17 @@ class TestJsonAble(unittest.TestCase):
     def check(self,manager,manager1,listName,debugLimit):
         self.dumpListOfDicts(manager.__dict__[listName], debugLimit)
         self.dumpListOfDicts(manager1.__dict__[listName], debugLimit)
-        #self.assertEqual(manager.__dict__,manager1.__dict__)    
+        self.assertEqual(manager.__dict__,manager1.__dict__)    
             
     def testJsonAble(self):
         '''
         test JSONAble
         '''
         examples=[{
-            'manager': Royals(),
+            'manager': Royals(load=True),
             'listName': 'royals'
         }, {
-            'manager': Cities(),
+            'manager': Cities(load=True),
             'listName': 'cities'
         }
         ]
@@ -115,6 +116,23 @@ class TestJsonAble(unittest.TestCase):
                 manager1.fromJson(jsonStr,types=types)
                 self.check(manager,manager1,listName,debugLimit=debugLimit)
         pass
+    
+    def testRoyals(self):
+        '''
+        test Royals example
+        '''
+        royals1=Royals(load=True)
+        self.assertEqual(4,len(royals1.royals))
+        json=royals1.toJSON()
+        print(json)
+        types=Types.forClass(royals1, "royals")
+        royals2=Royals()
+        royals2.fromJson(json,types=types)
+        self.assertEqual(4,len(royals2.royals))
+        print(royals1.royals)
+        print(royals2.royals)
+        self.assertEqual(royals1.royals,royals2.royals)
+    
 
 
 if __name__ == "__main__":

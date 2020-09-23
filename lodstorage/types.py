@@ -21,6 +21,22 @@ class Types(object):
         self.name=name
         self.typeMap={}
         
+    @staticmethod
+    def forClass(instance,listName):
+        '''
+        get the types for the list of Dicts in the given clazz with the given listName
+        Args:
+            instance(object): the instance to inspect
+            listName(string): the list of dicts to inspect
+        
+        Returns:
+            Types: a types object 
+        '''
+        clazz=type(instance)
+        types=Types(clazz.__name__)
+        types.getTypes(listName,instance.__dict__[listName])
+        return types
+        
     def addType(self,listName,field,valueType):
         '''
         add the python type for the given field to the typeMap
@@ -91,7 +107,10 @@ class Types(object):
                 if key in typeMap:
                     valueType=typeMap[key]
                     if valueType==bool:
-                        b= value in ['True','TRUE','true']
+                        if type(value)==str:
+                            b=value in ['True','TRUE','true']
+                        else:
+                            b= value 
                         record[key]=b
                     elif valueType==datetime.date:
                         dt=datetime.datetime.strptime(value,"%Y-%m-%d") 

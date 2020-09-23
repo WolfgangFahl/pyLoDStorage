@@ -71,9 +71,15 @@ class Sample(object):
         return listOfDicts
         
 class Royals(JSONAble):
-    def __init__(self):
-        self.royals=Sample.getRoyals()
+    def __init__(self,load=False):
+        if load:
+            self.royals=Sample.getRoyals()
+        else:
+            self.royals=None
         
 class Cities(JSONAble):
-    def __init__(self):
-        self.cities=Sample.getCities()        
+    def __init__(self,load=False):
+        if load:
+            self.cities=Sample.getCities()      
+        else:
+            self.cities=None  
