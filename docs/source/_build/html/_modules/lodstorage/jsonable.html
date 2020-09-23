@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>lodstorage.jsonable &mdash; pyLoDStorage  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pyLoDStorage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyLoDStorage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>lodstorage.jsonable</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for lodstorage.jsonable</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;This module has a class JSONAble for serialization of tables/list of dicts to and from JSON encoding</span>
+
+<span class="sd">Created on 2020-09-03</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<div class="viewcode-block" id="JSONAble"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble">[docs]</a><span class="k">class</span> <span class="nc">JSONAble</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    mixin to allow classes to be JSON serializable see</span>
+<span class="sd">    </span>
+<span class="sd">    - https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">indent</span><span class="o">=</span><span class="mi">4</span>
+    
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    regular expression to be used for conversion from singleQuote to doubleQuote</span>
+<span class="sd">    see https://stackoverflow.com/a/50257217/1497139</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">singleQuoteRegex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;(?&lt;!</span><span class="se">\\\\</span><span class="s1">)</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+ 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Constructor</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+<div class="viewcode-block" id="JSONAble.singleQuoteToDoubleQuote"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuote">[docs]</a>    <span class="nd">@staticmethod</span> 
+    <span class="k">def</span> <span class="nf">singleQuoteToDoubleQuote</span><span class="p">(</span><span class="n">singleQuoted</span><span class="p">,</span><span class="n">useRegex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        convert a single quoted string to a double quoted one</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            singleQuoted (str): a single quoted string e.g.</span>
+<span class="sd">            </span>
+<span class="sd">                .. highlight:: json</span>
+<span class="sd">                </span>
+<span class="sd">                {&#39;cities&#39;: [{&#39;name&#39;: &quot;Upper Hell&#39;s Gate&quot;}]}</span>
+<span class="sd">                </span>
+<span class="sd">            useRegex (boolean): True if a regular expression shall be used for matching</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            string: the double quoted version of the string </span>
+<span class="sd">        </span>
+<span class="sd">        Note:</span>
+<span class="sd">            see</span>
+<span class="sd">            - https://stackoverflow.com/questions/55600788/python-replace-single-quotes-with-double-quotes-but-leave-ones-within-double-q </span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">useRegex</span><span class="p">:</span>
+            <span class="n">doubleQuoted</span><span class="o">=</span><span class="n">JSONAble</span><span class="o">.</span><span class="n">singleQuoteToDoubleQuoteUsingRegex</span><span class="p">(</span><span class="n">singleQuoted</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">doubleQuoted</span><span class="o">=</span><span class="n">JSONAble</span><span class="o">.</span><span class="n">singleQuoteToDoubleQuoteUsingBracketLoop</span><span class="p">(</span><span class="n">singleQuoted</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">doubleQuoted</span></div>
+    
+<div class="viewcode-block" id="JSONAble.singleQuoteToDoubleQuoteUsingRegex"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuoteUsingRegex">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">singleQuoteToDoubleQuoteUsingRegex</span><span class="p">(</span><span class="n">singleQuoted</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convert a single quoted string to a double quoted one using a regular expression</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            singleQuoted(string): a single quoted string e.g. {&#39;cities&#39;: [{&#39;name&#39;: &quot;Upper Hell&#39;s Gate&quot;}]}</span>
+<span class="sd">            useRegex(boolean): True if a regular expression shall be used for matching</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            string: the double quoted version of the string e.g. </span>
+<span class="sd">        Note:</span>
+<span class="sd">            see https://stackoverflow.com/a/50257217/1497139</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">doubleQuoted</span><span class="o">=</span><span class="n">JSONAble</span><span class="o">.</span><span class="n">singleQuoteRegex</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">singleQuoted</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">doubleQuoted</span></div>
+    
+<div class="viewcode-block" id="JSONAble.singleQuoteToDoubleQuoteUsingBracketLoop"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuoteUsingBracketLoop">[docs]</a>    <span class="nd">@staticmethod</span>    
+    <span class="k">def</span> <span class="nf">singleQuoteToDoubleQuoteUsingBracketLoop</span><span class="p">(</span><span class="n">singleQuoted</span><span class="p">):</span>  
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convert a single quoted string to a double quoted one using a regular expression</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            singleQuoted(string): a single quoted string e.g. {&#39;cities&#39;: [{&#39;name&#39;: &quot;Upper Hell&#39;s Gate&quot;}]}</span>
+<span class="sd">            useRegex(boolean): True if a regular expression shall be used for matching</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            string: the double quoted version of the string e.g. </span>
+<span class="sd">        Note:</span>
+<span class="sd">            see https://stackoverflow.com/a/63862387/1497139</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cList</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">singleQuoted</span><span class="p">)</span>
+        <span class="n">inDouble</span><span class="o">=</span><span class="kc">False</span><span class="p">;</span>
+        <span class="n">inSingle</span><span class="o">=</span><span class="kc">False</span><span class="p">;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cList</span><span class="p">):</span>
+            <span class="c1">#print (&quot;%d:%s %r %r&quot; %(i,c,inSingle,inDouble))</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">==</span><span class="s2">&quot;&#39;&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">inDouble</span><span class="p">:</span>
+                    <span class="n">inSingle</span><span class="o">=</span><span class="ow">not</span> <span class="n">inSingle</span>
+                    <span class="n">cList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span>
+            <span class="k">elif</span> <span class="n">c</span><span class="o">==</span><span class="s1">&#39;&quot;&#39;</span><span class="p">:</span>
+                <span class="n">inDouble</span><span class="o">=</span><span class="ow">not</span> <span class="n">inDouble</span>
+                <span class="n">inSingle</span><span class="o">=</span><span class="kc">False</span>
+        <span class="n">doubleQuoted</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cList</span><span class="p">)</span>    
+        <span class="k">return</span> <span class="n">doubleQuoted</span></div>
+    
+<div class="viewcode-block" id="JSONAble.fromJson"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.fromJson">[docs]</a>    <span class="k">def</span> <span class="nf">fromJson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">jsonStr</span><span class="p">,</span><span class="n">types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        initialize me from the given JSON string</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            jsonStr(str): the JSON string</span>
+<span class="sd">            fixType(Types): the types to be fixed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonStr</span><span class="p">)</span>       
+        <span class="k">if</span> <span class="n">types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">types</span><span class="o">.</span><span class="n">fixTypes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>                      
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">=</span><span class="n">data</span></div>
+    
+<div class="viewcode-block" id="JSONAble.toJsonAbleValue"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.toJsonAbleValue">[docs]</a>    <span class="k">def</span> <span class="nf">toJsonAbleValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return the JSON able value of the given value v</span>
+<span class="sd">        Args:</span>
+<span class="sd">            v(object): the value to convert</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># objects have __dict__ hash tables which can be JSON-converted</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;__dict__&quot;</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+        
+<div class="viewcode-block" id="JSONAble.toJSON"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.toJSON">[docs]</a>    <span class="k">def</span> <span class="nf">toJSON</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            a recursive JSON dump of the dicts of my objects</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">jsonStr</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">toJsonAbleValue</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> 
+            <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">JSONAble</span><span class="o">.</span><span class="n">indent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jsonStr</span></div>
+        
+<div class="viewcode-block" id="JSONAble.getJSONValue"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.getJSONValue">[docs]</a>    <span class="k">def</span> <span class="nf">getJSONValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get the value of the given v as JSON</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            v(object): the value to get</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            the the value making sure objects are return as dicts</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;asJSON&quot;</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">asJSON</span><span class="p">(</span><span class="n">asString</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reprDict</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="n">vlist</span><span class="o">=</span><span class="p">[]</span>
+            <span class="k">for</span> <span class="n">vitem</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">vlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getJSONValue</span><span class="p">(</span><span class="n">vitem</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">vlist</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="nb">bool</span><span class="p">):</span>
+            <span class="c1"># convert True,False to -&gt; true,false</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>   
+            <span class="k">return</span> <span class="n">v</span></div>
+    
+<div class="viewcode-block" id="JSONAble.reprDict"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.reprDict">[docs]</a>    <span class="k">def</span> <span class="nf">reprDict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">srcDict</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get the given srcDict as new dict with fields being converted with getJSONValue</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            scrcDict(dict): the source dictionary</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">            dict: the converted dictionary</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">srcDict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJSONValue</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+    
+<div class="viewcode-block" id="JSONAble.asJSON"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.jsonable.JSONAble.asJSON">[docs]</a>    <span class="k">def</span> <span class="nf">asJSON</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">asString</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        recursively return my dict elements</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            asString(boolean): if True return my result as a string</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">jsonDict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reprDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asString</span><span class="p">:</span>
+            <span class="n">jsonStr</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">jsonDict</span><span class="p">)</span>
+            <span class="n">jsonStr</span> <span class="o">=</span> <span class="n">JSONAble</span><span class="o">.</span><span class="n">singleQuoteToDoubleQuote</span><span class="p">(</span><span class="n">jsonStr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">jsonStr</span>
+        <span class="k">return</span> <span class="n">jsonDict</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Wolfgang Fahl
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

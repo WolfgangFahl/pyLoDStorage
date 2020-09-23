@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # autodoc
-docs
+#docs
 # jena
 data
 lib

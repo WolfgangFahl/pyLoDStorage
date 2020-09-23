@@ -1,0 +1,500 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tests package &mdash; pyLoDStorage  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="setup module" href="setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pyLoDStorage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.testJson">tests.testJson module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.testSPARQL">tests.testSPARQL module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.testSqlite3">tests.testSqlite3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyLoDStorage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>tests package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tests-package">
+<h1>tests package<a class="headerlink" href="#tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tests.testJson">
+<span id="tests-testjson-module"></span><h2>tests.testJson module<a class="headerlink" href="#module-tests.testJson" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2020-09-12</p>
+<p>&#64;author: wf</p>
+<dl class="py class">
+<dt id="tests.testJson.TestJsonAble">
+<em class="property">class </em><code class="sig-prename descclassname">tests.testJson.</code><code class="sig-name descname">TestJsonAble</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>test JSON serialization with JsonAble mixin</p>
+<dl class="py method">
+<dt id="tests.testJson.TestJsonAble.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">manager</span></em>, <em class="sig-param"><span class="n">manager1</span></em>, <em class="sig-param"><span class="n">listName</span></em>, <em class="sig-param"><span class="n">debugLimit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tests.testJson.TestJsonAble.dumpListOfDicts">
+<code class="sig-name descname">dumpListOfDicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listOfDicts</span></em>, <em class="sig-param"><span class="n">limit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.dumpListOfDicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.dumpListOfDicts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tests.testJson.TestJsonAble.setUp">
+<code class="sig-name descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testJson.TestJsonAble.tearDown">
+<code class="sig-name descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testJson.TestJsonAble.testJsonAble">
+<code class="sig-name descname">testJsonAble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testJsonAble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testJsonAble" title="Permalink to this definition">¶</a></dt>
+<dd><p>test JSONAble</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testJson.TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow">
+<code class="sig-name descname">testSingleQuoteToDoubleQuoteStackoverflow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>see</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://stackoverflow.com/a/63862387/1497139">https://stackoverflow.com/a/63862387/1497139</a></p></li>
+<li><p><a class="reference external" href="https://stackoverflow.com/a/50257217/1497139">https://stackoverflow.com/a/50257217/1497139</a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testJson.TestJsonAble.testSingleToDoubleQuote">
+<code class="sig-name descname">testSingleToDoubleQuote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testSingleToDoubleQuote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testSingleToDoubleQuote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.testSPARQL">
+<span id="tests-testsparql-module"></span><h2>tests.testSPARQL module<a class="headerlink" href="#module-tests.testSPARQL" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2020-08-14</p>
+<p>&#64;author: wf</p>
+<dl class="py class">
+<dt id="tests.testSPARQL.TestSPARQL">
+<em class="property">class </em><code class="sig-prename descclassname">tests.testSPARQL.</code><code class="sig-name descname">TestSPARQL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Test SPARQL access e.g. Apache Jena via Wrapper</p>
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.checkErrors">
+<code class="sig-name descname">checkErrors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">errors</span></em>, <em class="sig-param"><span class="n">expected</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.checkErrors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.checkErrors" title="Permalink to this definition">¶</a></dt>
+<dd><p>check the given list of errors - print any errors if there are some
+and after that assert that the length of the list of errors is zero</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>errors</strong> (<em>list</em>) – the list of errors to check</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.getJena">
+<code class="sig-name descname">getJena</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'query'</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">typedLiterals</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">profile</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.getJena"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.getJena" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the jena endpoint for the given mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>string</em>) – query or update</p></li>
+<li><p><strong>debug</strong> (<em>boolean</em>) – True if debug information should be output</p></li>
+<li><p><strong>typedLiterals</strong> (<em>boolean</em>) – True if INSERT DATA SPARQL commands should use typed literals</p></li>
+<li><p><strong>profile</strong> (<em>boolean</em>) – True if profile/timing information should be shown</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.setUp">
+<code class="sig-name descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.tearDown">
+<code class="sig-name descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testControlEscape">
+<code class="sig-name descname">testControlEscape</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testControlEscape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testControlEscape" title="Permalink to this definition">¶</a></dt>
+<dd><p>check the control-escaped version of an UTF-8 string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testDob">
+<code class="sig-name descname">testDob</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testDob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testDob" title="Permalink to this definition">¶</a></dt>
+<dd><p>test the DOB (date of birth) function that converts from ISO-Date to
+datetime.date</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testEscapeStringContent">
+<code class="sig-name descname">testEscapeStringContent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testEscapeStringContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testEscapeStringContent" title="Permalink to this definition">¶</a></dt>
+<dd><p>test handling of double quoted strings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testIssue7">
+<code class="sig-name descname">testIssue7</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testIssue7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testIssue7" title="Permalink to this definition">¶</a></dt>
+<dd><p>test conversion of dates with timezone info</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testJenaInsert">
+<code class="sig-name descname">testJenaInsert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testJenaInsert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testJenaInsert" title="Permalink to this definition">¶</a></dt>
+<dd><p>test a Jena INSERT DATA</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testJenaQuery">
+<code class="sig-name descname">testJenaQuery</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testJenaQuery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testJenaQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>test Apache Jena Fuseki SPARQL endpoint with example SELECT query</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testListOfDictInsert">
+<code class="sig-name descname">testListOfDictInsert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testListOfDictInsert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testListOfDictInsert" title="Permalink to this definition">¶</a></dt>
+<dd><p>test inserting a list of Dicts and retrieving the values again
+using a person based example
+instead of
+<a class="reference external" href="https://en.wikipedia.org/wiki/FOAF_(ontology">https://en.wikipedia.org/wiki/FOAF_(ontology</a>)</p>
+<p>we use an object oriented derivate of FOAF with a focus on datatypes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testListOfDictSpeed">
+<code class="sig-name descname">testListOfDictSpeed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testListOfDictSpeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testListOfDictSpeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>test the speed of adding data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testSPARQLErrorMessage">
+<code class="sig-name descname">testSPARQLErrorMessage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testSPARQLErrorMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testSPARQLErrorMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>test error handling
+see <a class="reference external" href="https://stackoverflow.com/questions/63486767/how-can-i-get-the-fuseki-api-via-sparqlwrapper-to-properly-report-a-detailed-err">https://stackoverflow.com/questions/63486767/how-can-i-get-the-fuseki-api-via-sparqlwrapper-to-properly-report-a-detailed-err</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSPARQL.TestSPARQL.testWikdata">
+<code class="sig-name descname">testWikdata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testWikdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testWikdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>check wikidata</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.testSqlite3">
+<span id="tests-testsqlite3-module"></span><h2>tests.testSqlite3 module<a class="headerlink" href="#module-tests.testSqlite3" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2020-08-24</p>
+<p>&#64;author: wf</p>
+<dl class="py class">
+<dt id="tests.testSqlite3.TestSQLDB">
+<em class="property">class </em><code class="sig-prename descclassname">tests.testSqlite3.</code><code class="sig-name descname">TestSQLDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Test the SQLDB database wrapper</p>
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.checkListOfRecords">
+<code class="sig-name descname">checkListOfRecords</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listOfRecords</span></em>, <em class="sig-param"><span class="n">entityName</span></em>, <em class="sig-param"><span class="n">primaryKey</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">executeMany</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">fixDates</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">doClose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.checkListOfRecords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.checkListOfRecords" title="Permalink to this definition">¶</a></dt>
+<dd><p>check the handling of the given list of Records</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listOfRecords</strong> (<em>list</em>) – a list of dicts that contain the data to be stored</p></li>
+<li><p><strong>entityName</strong> (<em>string</em>) – the name of the entity type to be used as a table name</p></li>
+<li><p><strong>primaryKey</strong> (<em>string</em>) – the name of the key / column to be used as a primary key</p></li>
+<li><p><strong>executeMany</strong> (<em>boolean</em>) – True if executeMany mode of sqlite3 should be used</p></li>
+<li><p><strong>debug</strong> (<em>boolean</em>) – True if debug information e.g. CREATE TABLE and INSERT INTO commands should be shown</p></li>
+<li><p><strong>doClose</strong> (<em>boolean</em>) – True if the connection should be closed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.setUp">
+<code class="sig-name descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.tearDown">
+<code class="sig-name descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testBackup">
+<code class="sig-name descname">testBackup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testBackup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testBackup" title="Permalink to this definition">¶</a></dt>
+<dd><p>test creating a backup of the SQL database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testBindingError">
+<code class="sig-name descname">testBindingError</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testBindingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testBindingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>test list of Records with incomplete record leading to
+“You did not supply a value for binding 2”
+see <a class="reference external" href="https://bugs.python.org/issue41638">https://bugs.python.org/issue41638</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testCopy">
+<code class="sig-name descname">testCopy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testCopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testCopy" title="Permalink to this definition">¶</a></dt>
+<dd><p>test copying databases into another database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testEntityInfo">
+<code class="sig-name descname">testEntityInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testEntityInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testEntityInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>test creating entityInfo from the sample record</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testListOfCities">
+<code class="sig-name descname">testListOfCities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testListOfCities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testListOfCities" title="Permalink to this definition">¶</a></dt>
+<dd><p>test sqlite3 with some 120000 city records</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testQueryParams">
+<code class="sig-name descname">testQueryParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testQueryParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testQueryParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>test Query Params</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testSqlite3">
+<code class="sig-name descname">testSqlite3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testSqlite3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testSqlite3" title="Permalink to this definition">¶</a></dt>
+<dd><p>test sqlite3 with a few records from the royal family</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testSqllite3Speed">
+<code class="sig-name descname">testSqllite3Speed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testSqllite3Speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testSqllite3Speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>test sqlite3 speed with some 100000 artificial sample records
+consisting of two columns with a running index</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tests.testSqlite3.TestSQLDB.testUniqueConstraint">
+<code class="sig-name descname">testUniqueConstraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testUniqueConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testUniqueConstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>test for <a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/4">https://github.com/WolfgangFahl/pyLoDStorage/issues/4</a>
+sqlite3.IntegrityError: UNIQUE constraint failed: … show debug info</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tests" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="setup.html" class="btn btn-neutral float-left" title="setup module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Wolfgang Fahl
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
