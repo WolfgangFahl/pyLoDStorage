@@ -148,7 +148,7 @@ record  #3={'name': 'John Doe'}"""
             print(resultList)
         self.assertEqual(listOfRecords,resultList)
        
-    def testIssue13(self):
+    def testIssue13_setNoneValue(self):
         '''
         https://github.com/WolfgangFahl/pyLoDStorage/issues/13
         set None value for undefined LoD entries
@@ -162,6 +162,27 @@ record  #3={'name': 'John Doe'}"""
         resultList=self.checkListOfRecords(listOfRecords, entityName, primaryKey,fixNone=True)
         if self.debug:
             print (resultList)
+            
+    def testIssue14_execute(self):
+        '''
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/14
+        
+        offer execute wrapper directly via sqlDB
+        '''
+        sqlDB=SQLDB()
+        ddl="""
+        CREATE TABLE contacts (
+            contact_id INTEGER PRIMARY KEY,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL
+        )
+        """
+        sqlDB.execute(ddl)
+        tableList=sqlDB.getTableList()
+        if self.debug:
+            print(tableList)
+        self.assertEqual(1,len(tableList))
+        self.assertEqual("contacts",tableList[0]['name'])
          
     def testBindingError(self):
         '''

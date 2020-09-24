@@ -68,6 +68,15 @@ class SQLDB(object):
         for field in fields:
             if not field in record:
                 record[field]=None
+                
+    def execute(self,ddlCmd):
+        '''
+        execute the given Data Definition Command
+        
+        Args:
+            ddlCmd(string): e.g. a CREATE TABLE or CREATE View command
+        '''
+        self.c.execute(ddlCmd)
         
     def createTable(self,listOfRecords,entityName,primaryKey=None,withDrop=False,sampleRecordCount=1):
         '''
