@@ -272,6 +272,9 @@ record  #3={'name': 'John Doe'}"""
         print(tableList)
         for sampleNo in range(3):
             self.assertEqual('Sample_%d_1000' %sampleNo,tableList[sampleNo]['name'])
+        # check that database is writable
+        # https://stackoverflow.com/a/44707371/1497139
+        copyDB.execute("pragma user_version=0")
         
         
 if __name__ == "__main__":
