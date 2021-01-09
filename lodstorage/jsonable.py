@@ -165,7 +165,8 @@ class JSONAble(object):
         '''
         data=json.loads(jsonStr)       
         if types is not None:
-            types.fixTypes(data)                      
+            types.fixTypes(data)     
+        # https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python-taking-union-o                 
         self.__dict__=data
     
     def toJsonAbleValue(self,v):
