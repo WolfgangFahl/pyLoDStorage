@@ -82,7 +82,7 @@ class TestSPARQL(unittest.TestCase):
                 print("ERRORS:")
                 for error in errors:
                     print(error)
-        self.assertEquals(expected,len(errors)) 
+        self.assertEqual(expected,len(errors)) 
     
     def testDob(self):
         '''
