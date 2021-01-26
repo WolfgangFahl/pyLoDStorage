@@ -15,6 +15,7 @@ class TestSPARQL(unittest.TestCase):
 
     def setUp(self):
         self.debug=False
+        self.profile=False
         pass
 
 
@@ -60,7 +61,8 @@ class TestSPARQL(unittest.TestCase):
             result,ex=jena.insert(insertCommand)
             if index==0:
                 self.assertTrue(ex is None)
-                print(result)
+                if self.debug:
+                    print(result)
             else:
                 msg=ex.args[0]
                 self.assertTrue("QueryBadFormed" in msg)
@@ -75,10 +77,11 @@ class TestSPARQL(unittest.TestCase):
         Args:
             errors(list): the list of errors to check
         '''
-        if len(errors)>0:
-            print("ERRORS:")
-            for error in errors:
-                print(error)
+        if self.debug:
+            if len(errors)>0:
+                print("ERRORS:")
+                for error in errors:
+                    print(error)
         self.assertEquals(expected,len(errors)) 
     
     def testDob(self):
@@ -106,7 +109,7 @@ class TestSPARQL(unittest.TestCase):
         primaryKey='name'
         prefixes='PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>'
         for typedLiteralMode in typedLiteralModes:
-            jena=self.getJena(mode='update',typedLiterals=typedLiteralMode,debug=True)
+            jena=self.getJena(mode='update',typedLiterals=typedLiteralMode,debug=self.debug)
             deleteString= """
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>
@@ -119,7 +122,7 @@ class TestSPARQL(unittest.TestCase):
             errors=jena.insertListOfDicts(listofDicts,entityType,primaryKey,prefixes)
             self.checkErrors(errors)
             
-            jena=self.getJena(mode="query",debug=True)
+            jena=self.getJena(mode="query",debug=self.debug)
             queryString = """
             PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>
             SELECT ?name ?born ?numberInLine ?wikidataurl ?age ?ofAge ?lastmodified WHERE { 
@@ -136,7 +139,8 @@ class TestSPARQL(unittest.TestCase):
             self.assertEqual(len(listofDicts),len(personResults))
             personList=jena.asListOfDicts(personResults)   
             for index,person in enumerate(personList):
-                print("%d: %s" %(index,person))
+                if self.debug:
+                    print("%d: %s" %(index,person))
             # check the correct round-trip behavior
             self.assertEqual(listofDicts,personList)
         
@@ -160,7 +164,7 @@ class TestSPARQL(unittest.TestCase):
         entityType="cr:Event"   
         primaryKey='title'
         prefixes="PREFIX cr: <http://cr.bitplan.com/Event/0.1/>"
-        jena=self.getJena(mode='update',typedLiterals=False,debug=True)
+        jena=self.getJena(mode='update',typedLiterals=False,debug=self.debug)
         errors=jena.insertListOfDicts(listOfDicts,entityType,primaryKey,prefixes)
         self.checkErrors(errors,1)
         error=errors[0]
@@ -184,8 +188,8 @@ as escape characters
         entityType='help:Topic'
         primaryKey='topic'
         prefixes='PREFIX help: <http://help.bitplan.com/help/0.0.1/>'    
-        jena=self.getJena(mode='update',debug=True)
-        errors=jena.insertListOfDicts(helpListOfDicts, entityType, primaryKey, prefixes, profile=True)
+        jena=self.getJena(mode='update',debug=self.debug)
+        errors=jena.insertListOfDicts(helpListOfDicts, entityType, primaryKey, prefixes, profile=self.profile)
         self.checkErrors(errors)
         query="""
 PREFIX help: <http://help.bitplan.com/help/0.0.1/>
@@ -207,7 +211,7 @@ WHERE {
         values=["2020-01-01T00:00:00Z","42000-01-01T00:00:00Z"]
         expected=[datetime.datetime(2020,1,1,0,0),None]
         for index,value in enumerate(values):
-            dt=SPARQL.strToDatetime(value,debug=True)
+            dt=SPARQL.strToDatetime(value,debug=self.debug)
             self.assertEqual(expected[index],dt)
    
     def testListOfDictSpeed(self):
@@ -217,7 +221,7 @@ WHERE {
         limit=5000
         for batchSize in [None,1000]:
             listOfDicts=Sample.getSample(limit)
-            jena=self.getJena(mode='update',profile=True)
+            jena=self.getJena(mode='update',profile=self.profile)
             entityType="ex:TestRecord"
             primaryKey='pkey'
             prefixes='PREFIX ex: <http://example.com/>'
@@ -225,7 +229,8 @@ WHERE {
             errors=jena.insertListOfDicts(listOfDicts, entityType, primaryKey, prefixes,batchSize=batchSize)   
             self.checkErrors(errors)
             elapsed=time.time()-startTime
-            print ("adding %d records took %5.3f s => %5.f records/s" % (limit,elapsed,limit/elapsed))
+            if self.profile:
+                print ("adding %d records took %5.3f s => %5.f records/s" % (limit,elapsed,limit/elapsed))
         
     def testWikdata(self):
         '''

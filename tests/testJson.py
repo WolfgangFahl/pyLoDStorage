@@ -15,8 +15,8 @@ class TestJsonAble(unittest.TestCase):
     '''
 
     def setUp(self):
-        self.profile=True
-        self.debug=True
+        self.profile=False
+        self.debug=False
         pass
 
     def tearDown(self):
@@ -54,11 +54,14 @@ class TestJsonAble(unittest.TestCase):
         singleQuotedExamples=[
             '''{'cities': [{'name': "Upper Hell's Gate"}, {'name': "N'zeto"}]''']
         for example in singleQuotedExamples:
-            print (example)
+            if self.debug:
+                print (example)
             for useRegex in [False,True]:
                 doubleQuoted=JSONAble.singleQuoteToDoubleQuote(example,useRegex=useRegex)
-                print(doubleQuoted)
-            print
+                if self.debug:
+                    print(doubleQuoted)
+            if self.debug:
+                print
             
     def dumpListOfDicts(self,listOfDicts,limit):
         if self.debug:
@@ -123,13 +126,15 @@ class TestJsonAble(unittest.TestCase):
         royals1=Royals(load=True)
         self.assertEqual(4,len(royals1.royals))
         json=royals1.toJSON()
-        print(json)
+        if self.debug:
+            print(json)
         types=Types.forTable(royals1, "royals",debug=True)
         royals2=Royals()
         royals2.fromJson(json,types=types)
         self.assertEqual(4,len(royals2.royals))
-        print(royals1.royals)
-        print(royals2.royals)
+        if self.debug:
+            print(royals1.royals)
+            print(royals2.royals)
         self.assertEqual(royals1.royals,royals2.royals)
     
     def testTypes(self):
@@ -139,7 +144,8 @@ class TestJsonAble(unittest.TestCase):
         royals1=Royals(load=True)
         types1=Types.forTable(royals1, "royals")
         json=types1.toJSON()
-        print(json)
+        if self.debug:
+            print(json)
         types2=Types("Royals")
         types2.fromJson(json)
         self.assertEqual(types1.typeMap,types2.typeMap)

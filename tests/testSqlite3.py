@@ -10,6 +10,7 @@ import os
 import sys
 from lodstorage.sample import Sample
 from lodstorage.uml import UML
+from lodstorage.schema import Schema
 from lodstorage.sql import SQLDB, EntityInfo
 
 
@@ -19,7 +20,7 @@ class TestSQLDB(unittest.TestCase):
     '''
 
     def setUp(self):
-        self.debug=True
+        self.debug=False
         pass
 
     def tearDown(self):
@@ -41,15 +42,18 @@ class TestSQLDB(unittest.TestCase):
       
         '''     
         size=len(listOfRecords)
-        print("%s size is %d fixNone is %r fixDates is: %r" % (entityName,size,fixNone,fixDates))
+        if self.debug:
+            print("%s size is %d fixNone is %r fixDates is: %r" % (entityName,size,fixNone,fixDates))
         self.sqlDB=SQLDB(debug=debug,errorDebug=True)
         entityInfo=self.sqlDB.createTable(listOfRecords[:10],entityName,primaryKey)
         startTime=time.time()
         self.sqlDB.store(listOfRecords,entityInfo,executeMany=executeMany,fixNone=fixNone)
         elapsed=time.time()-startTime
-        print ("adding %d %s records took %5.3f s => %5.f records/s" % (size,entityName,elapsed,size/elapsed)) 
+        if self.debug:
+            print ("adding %d %s records took %5.3f s => %5.f records/s" % (size,entityName,elapsed,size/elapsed)) 
         resultList=self.sqlDB.queryAll(entityInfo,fixDates=fixDates)    
-        print ("selecting %d %s records took %5.3f s => %5.f records/s" % (len(resultList),entityName,elapsed,len(resultList)/elapsed)) 
+        if self.debug:
+            print ("selecting %d %s records took %5.3f s => %5.f records/s" % (len(resultList),entityName,elapsed,len(resultList)/elapsed)) 
         if doClose:
             self.sqlDB.close()
         return resultList
@@ -96,7 +100,8 @@ class TestSQLDB(unittest.TestCase):
         self.assertEqual(2,len(tableList))
         uml=UML()
         plantUml=uml.tableListToPlantUml(tableList,generalizeTo="PersonBase",withSkin=False)
-        print(plantUml)
+        if self.debug:
+            print(plantUml)
         expected='''class PersonBase << Entity >> {
  lastmodified : TIMESTAMP 
  name : TEXT <<PK>>
@@ -115,6 +120,30 @@ PersonBase <|-- Person
 PersonBase <|-- Family
 '''
         self.assertEqual(expected,plantUml)
+        
+    def testIssue15(self):
+        '''
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/15
+        
+        auto create view ddl in mergeschema
+        
+        '''
+        self.sqlDB=SQLDB(debug=self.debug,errorDebug=True)
+        listOfRecords=Sample.getRoyals()
+        entityInfo=EntityInfo(listOfRecords[:3],'Person','name',debug=True)
+        entityInfo=self.sqlDB.createTable(listOfRecords[:10],entityInfo.name,entityInfo.primaryKey)
+        listOfRecords=[{'name': 'Royal family', 'country': 'UK', 'lastmodified':datetime.now()}]
+        entityInfo=self.sqlDB.createTable(listOfRecords[:10],'Family','name')
+        tableList=self.sqlDB.getTableList()
+        viewDDL=Schema.getGeneralViewDDL(tableList,"PersonBase")
+        if self.debug:
+            print (viewDDL)
+        expected="""CREATE VIEW PersonBase AS 
+  SELECT name,lastmodified FROM Person
+UNION
+  SELECT name,lastmodified FROM Family"""
+        self.assertEqual(expected,viewDDL)
+        pass
         
     def testUniqueConstraint(self):
         '''
@@ -244,14 +273,16 @@ record  #3={'name': 'John Doe'}"""
             listOfRecords=Sample.getCities()
             self.checkListOfRecords(listOfRecords,'City',fixDates=True,doClose=False)
             backupDB="/tmp/testSqlite.db"
-            self.sqlDB.backup(backupDB,profile=True,showProgress=200)
+            showProgress=200 if self.debug else 0
+            self.sqlDB.backup(backupDB,profile=self.debug,showProgress=showProgress)
             size=os.stat(backupDB).st_size
-            print ("size of backup DB is %d" % size)
+            if self.debug:
+                print ("size of backup DB is %d" % size)
             self.assertTrue(size>600000)
             self.sqlDB.close()
             # restore
-            ramDB=SQLDB.restore(backupDB, SQLDB.RAM, profile=True)
-            entityInfo=EntityInfo(listOfRecords[:50],'City',debug=True)
+            ramDB=SQLDB.restore(backupDB, SQLDB.RAM, profile=self.debug,showProgress=showProgress)
+            entityInfo=EntityInfo(listOfRecords[:50],'City',debug=self.debug)
             allCities=ramDB.queryAll(entityInfo)
             self.assertEqual(len(allCities),len(listOfRecords))
             
@@ -266,10 +297,12 @@ record  #3={'name': 'John Doe'}"""
             self.checkListOfRecords(listOfRecords, 'Sample_%d_1000' %sampleNo, 'pKey',doClose=False)  
             self.sqlDB.copyTo(copyDB)
         size=os.stat(dbFile).st_size
-        print ("size of copy DB is %d" % size)
+        if self.debug:
+            print ("size of copy DB is %d" % size)
         self.assertTrue(size>70000)
         tableList=copyDB.getTableList()
-        print(tableList)
+        if self.debug:
+            print(tableList)
         for sampleNo in range(3):
             self.assertEqual('Sample_%d_1000' %sampleNo,tableList[sampleNo]['name'])
         # check that database is writable

@@ -227,14 +227,20 @@ class SQLDB(object):
             columns=self.query(columnQuery)
             table['columns']=columns
         return tableList
+    
+    def restoreProgress(self,status,remaining,total):
+        self.progress("Restore",status,remaining,total)
+        
+    def backupProgress(self,status,remaining,total):
+        self.progress("Backup",status,remaining,total)
               
-    def progress(self,status, remaining, total):
+    def progress(self,action,status, remaining, total):
         '''
         show progress
         '''
-        print('Backup %s at %5.0f%%' % ("... " if status==0 else "done",(total-remaining)/total*100)) 
+        print('%s %s at %5.0f%%' % (action,"... " if status==0 else "done",(total-remaining)/total*100)) 
     
-    def backup(self,backupDB,action="Backup",profile=False,showProgress=200,doClose=True):
+    def backup(self,backupDB,action="Backup",profile=False,showProgress:int=200,doClose=True):
         '''
         create backup of this SQLDB to the given backup db
         
@@ -251,7 +257,10 @@ class SQLDB(object):
         startTime=time.time()
         bck=sqlite3.connect(backupDB)
         if showProgress>0:
-            progress=self.progress
+            if action=="Restore":
+                progress=self.restoreProgress
+            else:
+                progress=self.backupProgress
         else:
             progress=None
         with bck:
