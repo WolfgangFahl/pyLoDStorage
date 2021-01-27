@@ -22,14 +22,15 @@ class SQLDB(object):
     '''
     RAM=":memory:"
 
-    def __init__(self,dbname=':memory:',connection=None,debug=False, errorDebug=False):
+    def __init__(self,dbname:str=':memory:',connection=None,check_same_thread=True,debug=False, errorDebug=False):
         '''
         Construct me for the given dbname and debug
         
         Args:
         
            dbname(string): name of the database - default is a RAM based database
-           connection(Connection): an optional connectio to be reused 
+           connection(Connection): an optional connection to be reused 
+           check_same_thread(boolean): True if object handling needs to be on the same thread see https://stackoverflow.com/a/48234567/1497139
            debug(boolean): if True switch on debug
            errorDebug(boolean): True if debug info should be provided on errors (should not be used for production since it might reveal data)
         '''
@@ -37,7 +38,7 @@ class SQLDB(object):
         self.debug=debug
         self.errorDebug=errorDebug
         if connection is None:
-            self.c=sqlite3.connect(dbname,detect_types=sqlite3.PARSE_DECLTYPES)
+            self.c=sqlite3.connect(dbname,detect_types=sqlite3.PARSE_DECLTYPES,check_same_thread=check_same_thread)
         else:
             self.c=connection
         
