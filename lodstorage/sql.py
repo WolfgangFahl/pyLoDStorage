@@ -78,7 +78,7 @@ class SQLDB(object):
         '''
         self.c.execute(ddlCmd)
         
-    def createTable(self,listOfRecords,entityName,primaryKey=None,withDrop=False,sampleRecordCount=1):
+    def createTable(self,listOfRecords,entityName,primaryKey=None,withDrop=False,sampleRecordCount=1,failIfToFew=True):
         '''
         derive  Data Definition Language CREATE TABLE command from list of Records by examining first recorda
         as defining sample record and execute DDL command
@@ -91,12 +91,18 @@ class SQLDB(object):
            primaryKey(string): the key/column to use as a  primary key
            withDrop(boolean): true if the existing Table should be dropped
            sampleRecords(int): number of sampleRecords expected and to be inspected
-           
+           failIftoFew(boolean): raise an Exception if to few sampleRecords else warn only
         Returns:
            EntityInfo: meta data information for the created table
         '''
-        if len(listOfRecords)<sampleRecordCount:
-            raise Exception("Need %d sample records to createTable" % (sampleRecordCount))
+        l= len(listOfRecords)
+        if l<sampleRecordCount:
+            msg="only %d/%d of needed sample records to createTable available" % (l,sampleRecordCount)
+            if failIfToFew:
+                raise Exception(msg)
+            else:
+                if self.debug:
+                    print(msg,file=sys.stderr,flush=True)
         sampleRecords=listOfRecords[:sampleRecordCount]
         entityInfo=EntityInfo(sampleRecords,entityName,primaryKey,debug=self.debug)
         if withDrop:

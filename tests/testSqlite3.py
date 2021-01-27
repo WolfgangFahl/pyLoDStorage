@@ -309,6 +309,26 @@ record  #3={'name': 'John Doe'}"""
         # https://stackoverflow.com/a/44707371/1497139
         copyDB.execute("pragma user_version=0")
         
+    def testIssue16(self):
+        '''
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/16
+        allow to only warn if samplerecordcount is higher than number of available records
+        '''
+        listOfRecords=Sample.getSample(1000)
+        sqlDB=SQLDB()
+        entityName="sample"
+        primaryKey='pKey'
+        withDrop=False
+        sampleRecordCount=10000
+        sqlDB.debug=True
+        sqlDB.createTable(listOfRecords, entityName, primaryKey, withDrop, sampleRecordCount,failIfToFew=False)
+        withDrop=True
+        try:
+            sqlDB.createTable(listOfRecords, entityName, primaryKey, withDrop, sampleRecordCount)
+            self.fail("There should be an exception that too few sample records where provided")
+        except Exception as ex:
+            self.assertTrue("only 1000/10000 of needed sample records to createTable available" in str(ex))
+        
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testSqllit3']
