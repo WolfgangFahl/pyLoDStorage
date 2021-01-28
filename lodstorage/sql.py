@@ -78,7 +78,7 @@ class SQLDB(object):
         '''
         self.c.execute(ddlCmd)
         
-    def createTable(self,listOfRecords,entityName,primaryKey=None,withDrop=False,sampleRecordCount=1,failIfToFew=True):
+    def createTable(self,listOfRecords,entityName,primaryKey=None,withDrop=False,sampleRecordCount=1,failIfTooFew=True):
         '''
         derive  Data Definition Language CREATE TABLE command from list of Records by examining first recorda
         as defining sample record and execute DDL command
@@ -91,14 +91,14 @@ class SQLDB(object):
            primaryKey(string): the key/column to use as a  primary key
            withDrop(boolean): true if the existing Table should be dropped
            sampleRecords(int): number of sampleRecords expected and to be inspected
-           failIftoFew(boolean): raise an Exception if to few sampleRecords else warn only
+           failIfTooFew(boolean): raise an Exception if to few sampleRecords else warn only
         Returns:
            EntityInfo: meta data information for the created table
         '''
         l= len(listOfRecords)
         if l<sampleRecordCount:
             msg="only %d/%d of needed sample records to createTable available" % (l,sampleRecordCount)
-            if failIfToFew:
+            if failIfTooFew:
                 raise Exception(msg)
             else:
                 if self.debug:
@@ -239,10 +239,14 @@ class SQLDB(object):
         get the schema information from this database as a dict
         
         Returns:
-            dict: Lookup map of tables 
+            dict: Lookup map of tables with columns also being converted to dict
         '''
         tableDict={}
         for table in self.getTableList():
+            colDict={}
+            for col in table["columns"]:
+                colDict[col['name']]=col
+            table["columns"]=colDict
             tableDict[table['name']]=table
         return tableDict
     
