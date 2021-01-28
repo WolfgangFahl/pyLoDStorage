@@ -11,7 +11,6 @@ import time
 import sys
 import re
 
-
 class SQLDB(object):
     '''
     Structured Query Language Database wrapper
@@ -234,6 +233,18 @@ class SQLDB(object):
             columns=self.query(columnQuery)
             table['columns']=columns
         return tableList
+    
+    def getTableDict(self):
+        '''
+        get the schema information from this database as a dict
+        
+        Returns:
+            dict: Lookup map of tables 
+        '''
+        tableDict={}
+        for table in self.getTableList():
+            tableDict[table['name']]=table
+        return tableDict
     
     def restoreProgress(self,status,remaining,total):
         self.progress("Restore",status,remaining,total)
