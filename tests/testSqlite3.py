@@ -309,14 +309,18 @@ record  #3={'name': 'John Doe'}"""
         # https://stackoverflow.com/a/44707371/1497139
         copyDB.execute("pragma user_version=0")
         
-    def getSampleTableDB(self,withDrop=False,debug=False,failIfTooFew=False):
-        listOfRecords=Sample.getSample(1000)
+    @staticmethod
+    def getSampleTableDB(withDrop=False,debug=False,failIfTooFew=False,sampleSize=1000):
+        listOfRecords=Sample.getSample(sampleSize)
         sqlDB=SQLDB()
         entityName="sample"
         primaryKey='pKey'
-        sampleRecordCount=10000
+        sampleRecordCount=sampleSize*10
         sqlDB.debug=debug
-        sqlDB.createTable(listOfRecords, entityName, primaryKey, withDrop, sampleRecordCount,failIfTooFew=failIfTooFew)
+        entityInfo=sqlDB.createTable(listOfRecords, entityName, primaryKey, withDrop, sampleRecordCount,failIfTooFew=failIfTooFew)
+        executeMany=True
+        fixNone=True
+        sqlDB.store(listOfRecords,entityInfo,executeMany=executeMany,fixNone=fixNone)
         return sqlDB
         
     def testIssue16(self):

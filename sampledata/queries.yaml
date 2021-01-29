@@ -1,0 +1,31 @@
+#
+# Sample Queries for pyLodStorage library
+#
+# WF 2020-08-22                         
+'Predicate usage': 
+    sparql: |
+        SELECT ?p (count(?p) as ?numberOfPredicates) 
+        WHERE {
+            ?s ?p ?o .
+        }
+        group by ?p
+        order by desc(?numberOfPredicates)    
+'Predicate usage grouped by source':
+    sparql: |
+        PREFIX cr: <http://cr.bitplan.com/>
+        SELECT ?p (count(?p) as ?numberOfPredicates) ?source
+        WHERE {
+            ?s ?p ?o ;
+            cr:Event_source ?source.
+        }
+        group by ?p ?source
+        order by ?source desc(?numberOfPredicates)
+'Sample Count':
+    sql: |
+        SELECT count(*) FROM sample
+'Samples':
+    sql: |
+        SELECT * FROM sample
+        LIMIT 5
+
+
