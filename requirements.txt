@@ -4,3 +4,5 @@
 # https://github.com/RDFLib/sparqlwrapper
 # https://stackoverflow.com/questions/tagged/sparqlwrapper
 SPARQLWrapper
+# https://pypi.org/project/PyYAML/
+PyYAML
