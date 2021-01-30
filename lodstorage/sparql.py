@@ -5,6 +5,7 @@ Created on 2020-08-14
 '''
 from SPARQLWrapper import SPARQLWrapper2
 from SPARQLWrapper.Wrapper import POSTDIRECTLY, POST
+from lodstorage.lod import LOD
 import datetime
 import time
 from sys import stderr
@@ -303,17 +304,22 @@ class SPARQL(object):
                 print(str(ve))
         return dt
     
-    def asListOfDicts(self,records):
+    def asListOfDicts(self,records,fixNone:bool=False,sampleCount:int=None):
         '''
         convert SPARQL result back to python native
         
         Args:
             record(list): the list of bindings
+            fixNone(bool): if True add None values for empty columns in Dict
+            sampleCount(int): the number of samples to check
             
         Returns:
             list: a list of Dicts
         '''
         resultList=[]
+        fields=None
+        if fixNone:
+            fields=LOD.getFields(records, sampleCount)
         for record in records:
             resultDict={}
             for keyValue in record.items():
@@ -338,6 +344,10 @@ class SPARQL(object):
                 else:
                     resultValue=value.value  
                 resultDict[key]=resultValue
+            if fixNone:
+                for field in fields:
+                    if not field in resultDict:
+                        resultDict[field]=None
             resultList.append(resultDict)
         return resultList
     

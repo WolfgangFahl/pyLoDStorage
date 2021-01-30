@@ -10,6 +10,7 @@ import io
 import time
 import sys
 import re
+from lodstorage.lod import LOD
 
 class SQLDB(object):
     '''
@@ -43,31 +44,7 @@ class SQLDB(object):
         
     def close(self):
         ''' close my connection '''
-        self.c.close()    
-    
-    @staticmethod    
-    def setNone4List(listOfDicts,fields):
-        '''
-        set the given fields to None for the records in the given listOfDicts
-        if they are not set
-        Args:
-            listOfDicts(list): the list of records to work on
-            fields(list): the list of fields to set to None 
-        '''
-        for record in listOfDicts:
-            SQLDB.setNone(record, fields)
-    
-    @staticmethod
-    def setNone(record,fields):
-        '''
-        make sure the given fields in the given record are set to none
-        Args:
-            record(dict): the record to work on
-            fields(list): the list of fields to set to None 
-        '''
-        for field in fields:
-            if not field in record:
-                record[field]=None
+        self.c.close()
                 
     def execute(self,ddlCmd):
         '''
@@ -139,6 +116,8 @@ class SQLDB(object):
           
            listOfRecords(list): the list of Dicts to be stored
            entityInfo(EntityInfo): the meta data to be used for storing
+           executeMany(bool): if True the insert command is done with many/all records at once
+           fixNone(bool): if True make sure empty columns in the listOfDict are filled with "None" values
         '''
         insertCmd=entityInfo.insertCmd
         record=None
@@ -146,7 +125,7 @@ class SQLDB(object):
         try:
             if executeMany:
                 if fixNone:
-                    SQLDB.setNone4List(listOfRecords, entityInfo.typeMap.keys())
+                    LOD.setNone4List(listOfRecords, entityInfo.typeMap.keys())
                 self.c.executemany(insertCmd,listOfRecords)
             else:
                 for record in listOfRecords:

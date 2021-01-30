@@ -7,6 +7,7 @@ import unittest
 import getpass
 from lodstorage.sparql import SPARQL
 from lodstorage.sample import Sample
+from lodstorage.lod import LOD
 import time
 import datetime
 
@@ -256,7 +257,41 @@ WHERE
 """
         results=wd.query(queryString)
         self.assertTrue(238<=len(results))
-
+        
+    def testIssue20(self):
+        '''
+        see https://github.com/WolfgangFahl/pyLoDStorage/issues/20
+        add fixNone option to SPARQL results (same functionality as in SQL)
+        '''
+        endpoint="https://query.wikidata.org/sparql"
+        wd=SPARQL(endpoint)
+        queryString="""
+        # Conference Series wikidata query
+# see https://confident.dbis.rwth-aachen.de/dblpconf/wikidata
+# WF 2021-01-30
+SELECT ?confSeries ?short_name ?official_website
+WHERE 
+{
+  #  scientific conference series (Q47258130) 
+  ?confSeries wdt:P31 wd:Q47258130.
+  OPTIONAL { 
+    ?confSeries wdt:P1813 ?short_name . 
+  }
+  #  official website (P856) 
+  OPTIONAL {
+    ?confSeries wdt:P856 ?official_website
+  } 
+}
+LIMIT 200
+"""
+        results=wd.query(queryString)
+        lod=wd.asListOfDicts(results, fixNone=True)
+        fields=LOD.getFields(lod)
+        if self.debug:
+            print(fields)
+        for row in lod:
+            for field in fields:
+                self.assertTrue(field in row)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
