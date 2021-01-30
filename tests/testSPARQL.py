@@ -284,8 +284,7 @@ WHERE
 }
 LIMIT 200
 """
-        results=wd.query(queryString)
-        lod=wd.asListOfDicts(results, fixNone=True)
+        lod=wd.queryAsListOfDicts(queryString,fixNone=True)
         fields=LOD.getFields(lod)
         if self.debug:
             print(fields)

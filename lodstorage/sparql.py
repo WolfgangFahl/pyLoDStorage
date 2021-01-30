@@ -270,18 +270,20 @@ class SPARQL(object):
         jsonResult=queryResult.convert()
         return self.getResults(jsonResult)
     
-    def queryAsListOfDicts(self,queryString):
+    def queryAsListOfDicts(self,queryString,fixNone:bool=False,sampleCount:int=None):
         '''
         get a list of dicts for the given query (to allow round-trip results for insertListOfDicts)
         
         Args:
             queryString(string): the SPARQL query to execute
+            fixNone(bool): if True add None values for empty columns in Dict
+            sampleCount(int): the number of samples to check
             
         Returns:
             list: a list ofDicts
         '''
         records=self.query(queryString)
-        listOfDicts=self.asListOfDicts(records)
+        listOfDicts=self.asListOfDicts(records,fixNone=fixNone,sampleCount=sampleCount)
         return listOfDicts
     
     @staticmethod
