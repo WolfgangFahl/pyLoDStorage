@@ -17,6 +17,7 @@ class TestJsonAble(unittest.TestCase):
     def setUp(self):
         self.profile=False
         self.debug=False
+        self.maxDiff=None
         pass
 
     def tearDown(self):
@@ -69,9 +70,14 @@ class TestJsonAble(unittest.TestCase):
                 print("%2d:%s" % (index,record))
                 
     def check(self,manager,manager1,listName,debugLimit):
-        self.dumpListOfDicts(manager.__dict__[listName], debugLimit)
-        self.dumpListOfDicts(manager1.__dict__[listName], debugLimit)
-        self.assertEqual(manager.__dict__,manager1.__dict__)    
+        '''
+        check that the list of the two managers are the same
+        '''
+        d1=manager.__dict__[listName]
+        d2=manager1.__dict__[listName]
+        self.dumpListOfDicts(d1, debugLimit)
+        self.dumpListOfDicts(d2, debugLimit)
+        self.assertEqual(d1,d2)    
             
     def testJsonAble(self):
         '''

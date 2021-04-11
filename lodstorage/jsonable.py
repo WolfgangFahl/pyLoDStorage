@@ -252,14 +252,16 @@ class JSONAble(object):
             d[a]=self.getJSONValue(v)
         return d
     
-    def asJSON(self,asString=True):
+    def asJSON(self,asString=True,data=None):
         '''
         recursively return my dict elements
         
         Args:
             asString(boolean): if True return my result as a string
         '''
-        jsonDict=self.reprDict(self.__dict__)
+        if data is None: 
+            data=self.__dict__
+        jsonDict=self.reprDict(data)
         if asString:
             jsonStr=str(jsonDict)
             jsonStr = JSONAble.singleQuoteToDoubleQuote(jsonStr)
@@ -292,18 +294,29 @@ class JSONAbleList(JSONAble):
         else:
             self.tableName=tableName
             
+    def getJsonData(self):    
+        '''
+        get my Jsondata
+        '''
+        jsonData={
+                self.listName:self.__dict__[self.listName]
+            }
+        return jsonData    
+            
     def toJsonAbleValue(self,v):
         '''
         make sure we don't store our meta information
         clazz, tableName and listName but just the list we are holding
         '''
         if v==self:
-            jsonData={
-                self.listName:self.__dict__[self.listName]
-            }
-            return jsonData
+            
+            return self.getJsonData()
         else:
-            return super().toJsonAbleValue(v)        
+            return super().toJsonAbleValue(v)     
+        
+    def asJSON(self,asString=True):
+        jsonData=self.getJsonData()
+        return super().asJSON(asString, data=jsonData)
         
         
     def storeToJsonFile(self,storeFilePrefix):
