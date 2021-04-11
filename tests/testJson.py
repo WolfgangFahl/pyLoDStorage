@@ -168,8 +168,6 @@ class TestJsonAble(unittest.TestCase):
         for royal in royals2.royals:
             self.assertTrue(isinstance(royal,Royal))
             self.assertEqual("float",type(royal.age).__name__)
-            
-        
         
 
 if __name__ == "__main__":

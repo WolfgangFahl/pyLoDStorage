@@ -8,7 +8,6 @@ import json
 import datetime
 import sys
 import re
-from pickle import NONE
 
 class JSONAbleSettings():
     indent=4
@@ -292,6 +291,19 @@ class JSONAbleList(JSONAble):
             self.tableName=listName
         else:
             self.tableName=tableName
+            
+    def toJsonAbleValue(self,v):
+        '''
+        make sure we don't store our meta information
+        clazz, tableName and listName but just the list we are holding
+        '''
+        if v==self:
+            jsonData={
+                self.listName:self.__dict__[self.listName]
+            }
+            return jsonData
+        else:
+            return super().toJsonAbleValue(v)        
         
         
     def storeToJsonFile(self,storeFilePrefix):
