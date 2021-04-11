@@ -131,7 +131,7 @@ class SQLDB(object):
                 for record in listOfRecords:
                     index+=1
                     if fixNone:
-                        SQLDB.setNone(record, entityInfo.typeMap.keys())
+                        LOD.setNone(record, entityInfo.typeMap.keys())
                     self.c.execute(insertCmd,record)
             self.c.commit()
         except sqlite3.ProgrammingError as pe:

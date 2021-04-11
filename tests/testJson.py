@@ -5,7 +5,7 @@ Created on 2020-09-12
 '''
 import unittest
 import json
-from lodstorage.sample import Royals,Cities
+from lodstorage.sample import Royals,RoyalsORMList,Royal,Cities
 from lodstorage.jsonable import JSONAble, Types
 import time
 
@@ -150,15 +150,26 @@ class TestJsonAble(unittest.TestCase):
         types2.fromJson(json)
         self.assertEqual(types1.typeMap,types2.typeMap)
         
+    def testPluralName(self):
+        royal=Royal()
+        self.assertEqual("Royals",royal.getPluralname())
+        
     def testStoreAndRestore(self):
         '''
         test storing and restoring from a JSON file
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/21
         '''
-        royals1=Royals(load=True)
+        royals1=RoyalsORMList(load=True)
         storeFilePrefix="/tmp/royals-pylodstorage"
-        royals1.storeToJsonFile(storeFilePrefix,"royals")
-        royals2=Royals()
+        royals1.storeToJsonFile(storeFilePrefix)
+        royals2=RoyalsORMList()
         royals2.restoreFromJsonFile(storeFilePrefix)
+        self.assertEqual(4,len(royals2.royals))
+        for royal in royals2.royals:
+            self.assertTrue(isinstance(royal,Royal))
+            self.assertEqual("float",type(royal.age).__name__)
+            
+        
         
 
 if __name__ == "__main__":

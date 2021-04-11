@@ -8,26 +8,32 @@ import json
 import datetime
 import sys
 import re
+from pickle import NONE
 
+class JSONAbleSettings():
+    indent=4
+    '''
+    regular expression to be used for conversion from singleQuote to doubleQuote
+    see https://stackoverflow.com/a/50257217/1497139
+    '''
+    singleQuoteRegex = re.compile('(?<!\\\\)\'')
+    
 class JSONAble(object):
     '''
     mixin to allow classes to be JSON serializable see
     
     - https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
     
-    '''
-    indent=4
-    
-    '''
-    regular expression to be used for conversion from singleQuote to doubleQuote
-    see https://stackoverflow.com/a/50257217/1497139
-    '''
-    singleQuoteRegex = re.compile('(?<!\\\\)\'')
+    '''    
  
     def __init__(self):
         '''
         Constructor
         '''
+        
+    @classmethod
+    def getPluralname(cls):
+        return "%ss" % cls.__name__  
         
     @staticmethod 
     def singleQuoteToDoubleQuote(singleQuoted,useRegex=False):
@@ -70,7 +76,7 @@ class JSONAble(object):
         Note:
             see https://stackoverflow.com/a/50257217/1497139
         """
-        doubleQuoted=JSONAble.singleQuoteRegex.sub('\"', singleQuoted)
+        doubleQuoted=JSONAbleSettings.singleQuoteRegex.sub('\"', singleQuoted)
         return doubleQuoted
     
     @staticmethod    
@@ -102,30 +108,17 @@ class JSONAble(object):
         doubleQuoted="".join(cList)    
         return doubleQuoted
     
-    def storeToJsonFile(self,storeFilePrefix,tableName):
+    def getJsonTypeSamples(self):
         '''
-        store me with the given storeFilePrefix
-        
-        Args:
-            storeFilePrefix(string): the prefix for the JSON file name
-            tableName(string): the name of the attribute for which to store the type information
+        does my class provide a "getSamples" method?
         '''
-        JSONAble.storeJsonToFile(self.toJSON(), "%s.json" % storeFilePrefix)
-        types=Types.forTable(self, tableName)
-        JSONAble.storeJsonToFile(types.toJSON(), "%s-types.json" % storeFilePrefix)
-       
-    def restoreFromJsonFile(self,storeFilePrefix):
-        '''
-        restore me from the given storeFilePrefix
-        
-        Args:
-            storeFilePrefix(string): the prefix for the JSON file name
-        '''
-        jsonStr=JSONAble.readJsonFromFile("%s.json" % storeFilePrefix)
-        typesJson=JSONAble.readJsonFromFile("%s-types.json" % storeFilePrefix)
-        types=Types(type(self).__name__)
-        types.fromJson(typesJson)
-        self.fromJson(jsonStr, types)
+        if hasattr(self, '__class__'):
+            cls=self.__class__
+            if hasattr(cls, 'getSamples'):
+                getSamples=getattr(cls,'getSamples');
+                if callable(getSamples):
+                    return getSamples()
+        return None
     
     @staticmethod
     def readJsonFromFile(jsonFilePath):
@@ -163,9 +156,31 @@ class JSONAble(object):
             jsonStr(str): the JSON string
             fixType(Types): the types to be fixed
         '''
-        data=json.loads(jsonStr)       
+        lod=self.getLoDfromJson(jsonStr, types)
+        self.fromDict(lod) 
+        
+    def getLoDfromJson(self,jsonStr,types=None):
+        '''
+        get a list of Dicts form the given JSON String
+        
+        Args:
+            jsonStr(str): the JSON string
+            fixType(Types): the types to be fixed
+        Returns:
+            list: a list of dicts
+        '''
+        lod=json.loads(jsonStr)       
         if types is not None:
-            types.fixTypes(data)     
+            types.fixTypes(lod)   
+        return lod 
+            
+    def fromDict(self,data):
+        '''
+        initialize me from the given data
+        
+        Args:
+            data: the dictionary to initalize me from
+        '''        
         # https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python-taking-union-o                 
         self.__dict__=data
     
@@ -191,7 +206,7 @@ class JSONAble(object):
             a recursive JSON dump of the dicts of my objects
         '''
         jsonStr=json.dumps(self, default=lambda v: self.toJsonAbleValue(v), 
-            sort_keys=True, indent=JSONAble.indent)
+            sort_keys=True, indent=JSONAbleSettings.indent)
         return jsonStr
         
     def getJSONValue(self,v):
@@ -251,6 +266,73 @@ class JSONAble(object):
             jsonStr = JSONAble.singleQuoteToDoubleQuote(jsonStr)
             return jsonStr
         return jsonDict
+    
+class JSONAbleList(JSONAble):
+    '''
+    Container class 
+    '''
+    
+    def __init__(self,listName:str=None,clazz=None,tableName:str=None,):
+        '''
+        Constructor
+        
+        Args:
+            listName(str): the name of the list attribute to be used for storing the List
+            clazz(class): a class to be used for Object relational mapping (if any) 
+            tableName(str): the name of the "table" to be used
+        '''
+        self.clazz=clazz
+        if listName is None:
+            if self.clazz is not None:
+                listName=self.clazz.getPluralname()
+            else:
+                listName=self.__class__.name.lower()
+        self.listName=listName
+        if tableName is None:
+            self.tableName=listName
+        else:
+            self.tableName=tableName
+        
+        
+    def storeToJsonFile(self,storeFilePrefix):
+        '''
+        store me with the given storeFilePrefix
+        
+        Args:
+            storeFilePrefix(string): the prefix for the JSON file name
+        '''
+        JSONAble.storeJsonToFile(self.toJSON(), "%s.json" % storeFilePrefix)
+       
+    def restoreFromJsonFile(self,storeFilePrefix):
+        '''
+        restore me from the given storeFilePrefix
+        
+        Args:
+            storeFilePrefix(string): the prefix for the JSON file name
+        '''
+        jsonStr=JSONAble.readJsonFromFile("%s.json" % storeFilePrefix)
+        if self.clazz is None:
+            typeSamples=self.getJsonTypeSamples()
+        else:
+            typeSamples=self.clazz.getSamples()
+        if typeSamples is None:
+            types=None
+        else:
+            types=Types(self.listName)
+            types.getTypes(self.listName, typeSamples, len(typeSamples))
+        lod=self.getLoDfromJson(jsonStr, types)
+        
+        if self.clazz is None:
+            result=lod
+        else:
+            instanceList=[]
+            for record in lod[self.listName]:
+                instance=self.clazz()
+                instance.fromDict(record)
+                instanceList.append(instance)
+            result=instanceList
+        self.__dict__[self.listName]=result
+        return result
     
 class Types(JSONAble):
     '''
@@ -320,10 +402,14 @@ class Types(JSONAble):
         determine the types for the given sample records
         '''     
         for sampleRecord in sampleRecords[:limit]:
-            for key,value in sampleRecord.items():
+            items=sampleRecord.items()
+            self.getTypesForItems(listName,items,warnOnNone=len(sampleRecords)==1)
+          
+    def getTypesForItems(self,listName,items,warnOnNone=False):  
+            for key,value in items:
                 valueType=None
                 if value is None:
-                    if len(sampleRecords)==1:
+                    if warnOnNone:
                         print("Warning sampleRecord field %s is None - using string as type" % key)
                         valueType=str
                 else:

@@ -5,7 +5,7 @@ Created on 2020-08-24
 '''
 import urllib.request
 import json
-from lodstorage.jsonable import JSONAble
+from lodstorage.jsonable import JSONAble, JSONAbleList
 from datetime import date, datetime
 
 class Sample(object):
@@ -55,6 +55,41 @@ class Sample(object):
     
     @staticmethod
     def getRoyals():
+        return Royal.getSamples()
+    
+    @staticmethod
+    def getRoyalsInstances():
+        lod=Royal.getSamples()
+        royals=[]
+        for record in lod:
+            royal=Royal()
+            royal.fromDict(record)
+            royals.append(royal)
+        return royals
+    
+class Royals(JSONAbleList):
+    def __init__(self,load=False):
+        super(Royals, self).__init__("royals",clazz=None)
+        if load:
+            self.royals=Royal.getSamples()
+        else:
+            self.royals=None
+        
+class RoyalsORMList(JSONAbleList):
+    def __init__(self,load=False):
+        super(RoyalsORMList, self).__init__("royals",Royal)
+        if load:
+            self.royals=Sample.getRoyalsInstances()
+        else:
+            self.royals=None
+            
+class Royal(JSONAble):
+    '''
+    i am a single Royal
+    '''
+    
+    @classmethod
+    def getSamples(cls):
         listOfDicts=[
             {'name': 'Elizabeth Alexandra Mary Windsor', 'born': Sample.dob('1926-04-21'), 'numberInLine': 0, 'wikidataurl': 'https://www.wikidata.org/wiki/Q9682' },
             {'name': 'Charles, Prince of Wales',         'born': Sample.dob('1948-11-14'), 'numberInLine': 1, 'wikidataurl': 'https://www.wikidata.org/wiki/Q43274' },
@@ -69,16 +104,10 @@ class Sample(object):
             person['ofAge']=age>=18
             person['lastmodified']=datetime.now()
         return listOfDicts
-        
-class Royals(JSONAble):
+    
+class Cities(JSONAbleList):
     def __init__(self,load=False):
-        if load:
-            self.royals=Sample.getRoyals()
-        else:
-            self.royals=None
-        
-class Cities(JSONAble):
-    def __init__(self,load=False):
+        super(Cities, self).__init__("cities",clazz=None)
         if load:
             self.cities=Sample.getCities()      
         else:
