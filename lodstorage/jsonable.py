@@ -10,6 +10,10 @@ import sys
 import re
 
 class JSONAbleSettings():
+    '''
+    settings for JSONAble - put in a separate class so they would not be
+    serialized
+    '''
     indent=4
     '''
     regular expression to be used for conversion from singleQuote to doubleQuote
@@ -146,6 +150,27 @@ class JSONAble(object):
         '''
         with open(jsonFilePath,"w") as jsonFile:
             jsonFile.write(jsonStr) 
+            
+    def storeToJsonFile(self,storeFilePrefix):
+        '''
+        store me with the given storeFilePrefix
+        
+        Args:
+            storeFilePrefix(string): the prefix for the JSON file name
+        '''
+        JSONAble.storeJsonToFile(self.toJSON(), "%s.json" % storeFilePrefix)
+
+    def restoreFromJsonFile(self,storeFilePrefix):
+        '''
+        restore me from the given storeFilePrefix
+        
+        Args:
+            storeFilePrefix(string): the prefix for the JSON file name
+        '''
+        jsonStr=JSONAble.readJsonFromFile("%s.json" % storeFilePrefix)
+        types=None
+        self.fromJson(jsonStr, types)
+        
     
     def fromJson(self,jsonStr,types=None):
         '''
@@ -309,7 +334,6 @@ class JSONAbleList(JSONAble):
         clazz, tableName and listName but just the list we are holding
         '''
         if v==self:
-            
             return self.getJsonData()
         else:
             return super().toJsonAbleValue(v)     
@@ -317,17 +341,7 @@ class JSONAbleList(JSONAble):
     def asJSON(self,asString=True):
         jsonData=self.getJsonData()
         return super().asJSON(asString, data=jsonData)
-        
-        
-    def storeToJsonFile(self,storeFilePrefix):
-        '''
-        store me with the given storeFilePrefix
-        
-        Args:
-            storeFilePrefix(string): the prefix for the JSON file name
-        '''
-        JSONAble.storeJsonToFile(self.toJSON(), "%s.json" % storeFilePrefix)
-       
+               
     def restoreFromJsonFile(self,storeFilePrefix):
         '''
         restore me from the given storeFilePrefix

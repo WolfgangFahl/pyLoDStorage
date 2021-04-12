@@ -128,9 +128,9 @@ PersonBase <|-- Family
         auto create view ddl in mergeschema
         
         '''
-        self.sqlDB=SQLDB(debug=self.debug,errorDebug=True)
+        self.sqlDB=SQLDB(debug=self.debug,errorDebug=self.debug)
         listOfRecords=Sample.getRoyals()
-        entityInfo=EntityInfo(listOfRecords[:3],'Person','name',debug=True)
+        entityInfo=EntityInfo(listOfRecords[:3],'Person','name',debug=self.debug)
         entityInfo=self.sqlDB.createTable(listOfRecords[:10],entityInfo.name,entityInfo.primaryKey)
         listOfRecords=[{'name': 'Royal family', 'country': 'UK', 'lastmodified':datetime.now()}]
         entityInfo=self.sqlDB.createTable(listOfRecords[:10],'Family','name')

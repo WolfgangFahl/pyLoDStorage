@@ -8,7 +8,12 @@ import json
 from lodstorage.sample import Royals,RoyalsORMList,Royal,Cities
 from lodstorage.jsonable import JSONAble, Types
 import time
+import tempfile
 
+class ServerConfig(JSONAble):
+        def __init__(self):
+            pass
+        
 class TestJsonAble(unittest.TestCase):
     '''
     test JSON serialization with JsonAble mixin
@@ -174,6 +179,53 @@ class TestJsonAble(unittest.TestCase):
         for royal in royals2.royals:
             self.assertTrue(isinstance(royal,Royal))
             self.assertEqual("float",type(royal.age).__name__)
+            
+    def testIssue22(self):
+        '''
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/22
+        Regression: storeToJsonFile and restoreFromJsonFile missing in JSONAble
+        '''
+        jsonStr="""{
+    "adminPassword": "tiger2021",
+    "adminUser": "scott",
+    "credentials": [
+        {
+            "dbname": "doedb",
+            "password": "doesSecret!",
+            "user": "john"
+        }
+    ],
+    "frontendConfigs": [
+        {
+            "defaultPage": "Frontend",
+            "site": "or",
+            "template": "bootstrap.html",
+            "wikiId": "or"
+        },
+        {
+            "defaultPage": "Main Page",
+            "site": "cr",
+            "template": "bootstrap.html",
+            "wikiId": "cr"
+        }
+    ],
+    "logo": "https://commons.wikimedia.org/wiki/Category:Mona_Lisa#/media/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg"
+}"""
+        storeFilePrefix='%s/serverConfig' % tempfile.gettempdir()
+        jsonFilePath='%s.json' % storeFilePrefix
+        JSONAble.storeJsonToFile(jsonStr, jsonFilePath)
+        serverConfig=ServerConfig()
+        serverConfig.restoreFromJsonFile(storeFilePrefix)
+        self.assertTrue(serverConfig.logo.endswith("_retouched.jpg"))
+        self.assertTrue(isinstance(serverConfig.frontendConfigs,list))
+        self.assertEqual(2,len(serverConfig.frontendConfigs))
+        serverConfig.storeToJsonFile(storeFilePrefix)
+        jsonStr2=JSONAble.readJsonFromFile(jsonFilePath)
+        if self.debug:
+            print(jsonStr2)
+        self.assertEqual(jsonStr,jsonStr2)
+    
+    
         
 
 if __name__ == "__main__":
