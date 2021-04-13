@@ -298,7 +298,7 @@ class JSONAbleList(JSONAble):
     Container class 
     '''
     
-    def __init__(self,listName:str=None,clazz=None,tableName:str=None,):
+    def __init__(self,listName:str=None,clazz=None,tableName:str=None):
         '''
         Constructor
         
