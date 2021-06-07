@@ -7,4 +7,4 @@ SPARQLWrapper
 # https://pypi.org/project/PyYAML/
 PyYAML
 # https://pypi.org/project/pandas/
-pandas>=1.2
+pandas
