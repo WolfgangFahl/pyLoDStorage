@@ -6,7 +6,7 @@ Created on 2020-09-12
 import unittest
 import json
 from lodstorage.sample import Royals,RoyalsORMList,Royal,Cities
-from lodstorage.jsonable import JSONAble, Types
+from lodstorage.jsonable import JSONAble, Types, JSONAbleList
 import time
 import tempfile
 
@@ -224,6 +224,66 @@ class TestJsonAble(unittest.TestCase):
         if self.debug:
             print(jsonStr2)
         self.assertEqual(jsonStr,jsonStr2)
+
+
+    def testRestoreFromJsonStr(self):
+        '''
+        Tests restoring a JsonAbleList form a json string
+        '''
+        samples = """
+                {
+                    "countries": [
+                        {
+                            "name": "Afghanistan",
+                            "wikidataid": "Q889",
+                            "coordinates": "34,66",
+                            "partOf": null,
+                            "level": 3,
+                            "locationKind": "Country",
+                            "comment": null,
+                            "iso": "AF"
+                        },
+                        {
+                            "name": "United States of America",
+                            "wikidataid": "Q30",
+                            "coordinates": "39.828175,-98.5795",
+                            "partOf": null,
+                            "level": 3,
+                            "locationKind": "Country",
+                            "comment": null,
+                            "labels": [
+                                "America",
+                                "UNITED STATES OF AMERICA",
+                                "USA",
+                                "United States",
+                                "United States of America (the)"
+                            ],
+                            "iso": "US"
+                        },
+                        {
+                            "name": "Australia",
+                            "wikidataid": "Q408",
+                            "coordinates": "-28,137",
+                            "partOf": null,
+                            "level": 3,
+                            "locationKind": "Country",
+                            "comment": null,
+                            "labels": [
+                                "AUS"
+                            ],
+                            "iso": "AU"
+                        }
+                    ]
+                }
+                """
+        result=JSONAbleList("Test").restoreFromJsonStr(samples)
+        self.assertTrue("countries" in result)
+        countries=result['countries']
+        self.assertTrue(len(countries)==3)
+        countryIds=[x['wikidataid'] for x in countries]
+        self.assertTrue("Q30" in countryIds)
+
+
     
     
         

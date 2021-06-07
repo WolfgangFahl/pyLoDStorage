@@ -350,27 +350,37 @@ class JSONAbleList(JSONAble):
             storeFilePrefix(string): the prefix for the JSON file name
         '''
         jsonStr=JSONAble.readJsonFromFile("%s.json" % storeFilePrefix)
+        result=self.restoreFromJsonStr(jsonStr)
+        return result
+
+    def restoreFromJsonStr(self, jsonStr):
+        '''
+        restore me from the given jsonStr
+
+        Args:
+            storeFilePrefix(string): the prefix for the JSON file name
+        '''
         if self.clazz is None:
-            typeSamples=self.getJsonTypeSamples()
+            typeSamples = self.getJsonTypeSamples()
         else:
-            typeSamples=self.clazz.getSamples()
+            typeSamples = self.clazz.getSamples()
         if typeSamples is None:
-            types=None
+            types = None
         else:
-            types=Types(self.listName)
+            types = Types(self.listName)
             types.getTypes(self.listName, typeSamples, len(typeSamples))
-        lod=self.getLoDfromJson(jsonStr, types)
-        
+        lod = self.getLoDfromJson(jsonStr, types)
+
         if self.clazz is None:
-            result=lod
+            result = lod
         else:
-            instanceList=[]
+            instanceList = []
             for record in lod[self.listName]:
-                instance=self.clazz()
+                instance = self.clazz()
                 instance.fromDict(record)
                 instanceList.append(instance)
-            result=instanceList
-        self.__dict__[self.listName]=result
+            result = instanceList
+        self.__dict__[self.listName] = result
         return result
     
 class Types(JSONAble):
