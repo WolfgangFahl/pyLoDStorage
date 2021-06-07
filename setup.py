@@ -29,7 +29,8 @@ setup(
     description='python List of Dict (Table) Storage library',
     install_requires=[
           'SPARQLWrapper',
-          'PyYAML'
+          'PyYAML',
+          'pandas'
     ],
     classifiers=[
             'Programming Language :: Python',
