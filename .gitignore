@@ -133,3 +133,6 @@ dmypy.json
 # jena
 data
 lib
+
+# plots
+plots
