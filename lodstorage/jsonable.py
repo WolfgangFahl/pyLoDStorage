@@ -298,7 +298,7 @@ class JSONAbleList(JSONAble):
     Container class 
     '''
     
-    def __init__(self,listName:str=None,clazz=None,tableName:str=None):
+    def __init__(self,listName:str=None,clazz=None,tableName:str=None,initList:bool=True):
         '''
         Constructor
         
@@ -306,6 +306,7 @@ class JSONAbleList(JSONAble):
             listName(str): the name of the list attribute to be used for storing the List
             clazz(class): a class to be used for Object relational mapping (if any) 
             tableName(str): the name of the "table" to be used
+            initList(bool): True if the list should be initialized
         '''
         self.clazz=clazz
         if listName is None:
@@ -318,6 +319,54 @@ class JSONAbleList(JSONAble):
             self.tableName=listName
         else:
             self.tableName=tableName
+        if initList:
+            self.__dict__[self.listName]=[]
+            
+    def getList(self):
+        '''
+        get my list
+        '''
+        return self.__dict__[self.listName]
+    
+    def getLookup(self,attrName:str,withDuplicates:bool=False):
+        '''
+        create a lookup dictionary by the given attribute name
+        
+        Args:
+            attrName(str): the attribute to lookup
+            withDuplicates(bool): whether to retain single values or lists
+        
+        Return:
+            a dictionary for lookup
+        '''
+        lookup={}
+        duplicates=[]
+        for entity in self.getList():
+            value=None
+            if isinstance(entity,dict):
+                if attrName in entity:
+                    value=entity[attrName]
+            else:
+                if hasattr(entity, attrName):
+                    value=getattr(entity,attrName)
+            if value is not None:
+                if value in lookup:
+                    if withDuplicates:
+                        lookupResult=lookup[value]
+                        lookupResult.append(entity)
+                    else:
+                        duplicates.append(entity)
+                else:
+                    if withDuplicates:
+                        lookupResult=[entity]
+                    else:
+                        lookupResult=entity
+                lookup[value]=lookupResult  
+        if withDuplicates:
+            return lookup  
+        else:
+            return lookup,duplicates
+
             
     def getJsonData(self):    
         '''

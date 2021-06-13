@@ -282,11 +282,19 @@ class TestJsonAble(unittest.TestCase):
         self.assertTrue(len(countries)==3)
         countryIds=[x['wikidataid'] for x in countries]
         self.assertTrue("Q30" in countryIds)
-
-
     
-    
-        
+    def testIssue27_Lookup(self):
+        '''
+        add Lookup map option
+        '''
+        royals=Royals(load=True)
+        #print(len(royals.royals))
+        #print(royals.royals)
+        royalsByNumberInLine,duplicates=royals.getLookup("numberInLine", withDuplicates=False)
+        #print(royalsByNumberInLine)
+        self.assertEquals(0,len(duplicates))
+        self.assertEqual(4,len(royalsByNumberInLine))
+        self.assertEqual("Charles, Prince of Wales",royalsByNumberInLine[1]["name"])
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
