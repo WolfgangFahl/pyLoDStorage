@@ -287,6 +287,7 @@ class TestJsonAble(unittest.TestCase):
         '''
         add Lookup map option
         '''
+        # first try with List of Dicts
         royals=Royals(load=True)
         #print(len(royals.royals))
         #print(royals.royals)
@@ -295,6 +296,13 @@ class TestJsonAble(unittest.TestCase):
         self.assertEquals(0,len(duplicates))
         self.assertEqual(4,len(royalsByNumberInLine))
         self.assertEqual("Charles, Prince of Wales",royalsByNumberInLine[1]["name"])
+        # then with list of Entities
+        royalsORM=RoyalsORMList(load=True)
+        royalsByNumberInLine,duplicates=royalsORM.getLookup("numberInLine", withDuplicates=False)
+        self.assertEquals(0,len(duplicates))
+        self.assertEqual(4,len(royalsByNumberInLine))
+        self.assertEqual("Charles, Prince of Wales",royalsByNumberInLine[1].name)
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

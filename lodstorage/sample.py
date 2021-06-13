@@ -12,6 +12,7 @@ class Sample(object):
     '''
     Sample dataset generator
     '''
+    cityList=None
 
     def __init__(self):
         '''
@@ -37,12 +38,13 @@ class Sample(object):
         '''
         get a list of cities
         '''
-        cityJsonUrl="https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json"
-        with urllib.request.urlopen(cityJsonUrl) as url:
-            cityList=json.loads(url.read().decode())
-        for city in cityList:
-            city['cityId']="%s-%s" % (city['country'],city['name'])    
-        return cityList
+        if Sample.cityList is None:
+            cityJsonUrl="https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json"
+            with urllib.request.urlopen(cityJsonUrl) as url:
+                Sample.cityList=json.loads(url.read().decode())
+            for city in Sample.cityList:
+                city['cityId']="%s-%s" % (city['country'],city['name'])    
+        return Sample.cityList
     
     @staticmethod
     def dob(isoDateString):
