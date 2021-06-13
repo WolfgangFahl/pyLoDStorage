@@ -4,6 +4,8 @@
 # install apache jena and load example data
 scripts/jena -l sampledata/example.ttl
 # command to run tests
+# kill running jena
+scripts/jena -k
 # run apache jena fuseki server
 scripts/jena -f example
 # command to install dependencies
