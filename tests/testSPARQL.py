@@ -66,8 +66,10 @@ class TestSPARQL(unittest.TestCase):
                     print(result)
             else:
                 msg=ex.args[0]
+                if self.debug:
+                    print(msg)
                 self.assertTrue("QueryBadFormed" in msg)
-                self.assertTrue("Error 400" in msg)
+                #self.assertTrue("Error 400" in msg)
                 pass
             
     def checkErrors(self,errors,expected=0):      
