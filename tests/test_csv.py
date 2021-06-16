@@ -92,3 +92,12 @@ class TestCSV(TestCase):
         headerNames=["pageTitle", "name", "label"]
         actualLOD=CSV.fromCSV(csvStr, headerNames)
         self.assertEqual(self.csvLOD, actualLOD)
+
+    def test_to_csv_delimiter_in_value(self):
+        '''tests if delimiter in dict value will not result in incorrect values'''
+        csvLOD = [
+            {"pageTitle": "page_1", "name": "Test Page 1, delimiter in value", "label": "1,000"}
+        ]
+        actualCSVStr=CSV.toCSV(csvLOD)
+        actualLOD=CSV.fromCSV(actualCSVStr)
+        self.assertEqual(csvLOD, actualLOD)
