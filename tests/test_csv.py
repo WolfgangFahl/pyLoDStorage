@@ -2,6 +2,7 @@ import tempfile
 from unittest import TestCase
 
 from lodstorage.csv import CSV
+from lodstorage.jsonable import JSONAbleList
 from lodstorage.lod import LOD
 
 

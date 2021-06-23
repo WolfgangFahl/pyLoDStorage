@@ -3,7 +3,6 @@ Created on 2021-01-31
 
 @author: wf
 '''
-from lodstorage.jsonable import JSONAbleList
 
 class LOD(object):
     '''

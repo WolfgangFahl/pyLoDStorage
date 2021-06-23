@@ -9,6 +9,9 @@ import datetime
 import sys
 import re
 
+from lodstorage.lod import LOD
+
+
 class JSONAbleSettings():
     '''
     settings for JSONAble - put in a separate class so they would not be
@@ -151,14 +154,15 @@ class JSONAble(object):
         with open(jsonFilePath,"w") as jsonFile:
             jsonFile.write(jsonStr) 
             
-    def storeToJsonFile(self,storeFilePrefix):
+    def storeToJsonFile(self,storeFilePrefix, limitToSampleFields:bool=False):
         '''
         store me with the given storeFilePrefix
         
         Args:
             storeFilePrefix(string): the prefix for the JSON file name
+            limitToSampleFields(bool): If True the returned JSON is limited to the attributes/fields that are present in the samples. Otherwise all attributes of the object will be included. Default is False.
         '''
-        JSONAble.storeJsonToFile(self.toJSON(), "%s.json" % storeFilePrefix)
+        JSONAble.storeJsonToFile(self.toJSON(limitToSampleFields), "%s.json" % storeFilePrefix)
 
     def restoreFromJsonFile(self,storeFilePrefix):
         '''
@@ -224,12 +228,25 @@ class JSONAble(object):
         else:
             return ""
         
-    def toJSON(self):
+    def toJSON(self, limitToSampleFields:bool=False):
         '''
+
+        Args:
+            limitToSampleFields(bool): If True the returned JSON is limited to the attributes/fields that are present in the samples. Otherwise all attributes of the object will be included. Default is False.
+
         Returns:
             a recursive JSON dump of the dicts of my objects
         '''
-        jsonStr=json.dumps(self, default=lambda v: self.toJsonAbleValue(v), 
+        data={}
+        if limitToSampleFields:
+            samples=self.getJsonTypeSamples()
+            sampleFields = LOD.getFields(samples)
+            for key,value in self.__dict__.items():
+                if key in sampleFields:
+                    data[key]=value
+        else:
+            data=self.__dict__
+        jsonStr=json.dumps(data, default=lambda v: self.toJsonAbleValue(v),
             sort_keys=True, indent=JSONAbleSettings.indent)
         return jsonStr
         
@@ -292,6 +309,7 @@ class JSONAble(object):
             jsonStr = JSONAble.singleQuoteToDoubleQuote(jsonStr)
             return jsonStr
         return jsonDict
+
     
 class JSONAbleList(JSONAble):
     '''

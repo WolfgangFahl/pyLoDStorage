@@ -293,15 +293,31 @@ class TestJsonAble(unittest.TestCase):
         #print(royals.royals)
         royalsByNumberInLine,duplicates=royals.getLookup("numberInLine", withDuplicates=False)
         #print(royalsByNumberInLine)
-        self.assertEquals(0,len(duplicates))
+        self.assertEqual(0,len(duplicates))
         self.assertEqual(4,len(royalsByNumberInLine))
         self.assertEqual("Charles, Prince of Wales",royalsByNumberInLine[1]["name"])
         # then with list of Entities
         royalsORM=RoyalsORMList(load=True)
         royalsByNumberInLine,duplicates=royalsORM.getLookup("numberInLine", withDuplicates=False)
-        self.assertEquals(0,len(duplicates))
+        self.assertEqual(0,len(duplicates))
         self.assertEqual(4,len(royalsByNumberInLine))
         self.assertEqual("Charles, Prince of Wales",royalsByNumberInLine[1].name)
+
+
+    def testIssue30_SampleLimited(self):
+        '''
+        tests if the json export is correctly limited to the fields that are used in the samples
+        '''
+        royalDict={"name":"Test royal"}
+        royal=Royal()
+        royal.fromDict(royalDict)
+        # add attributes that are not in the samples
+        royal.__dict__["not_in_samples"]="test"
+        expectedJSON="""{
+    "name": "Test royal"
+}"""
+        actualJSON=royal.toJSON(limitToSampleFields=True)
+        self.assertEqual(actualJSON, expectedJSON)
         
 
 if __name__ == "__main__":
