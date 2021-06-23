@@ -508,7 +508,8 @@ class Types(JSONAble):
                 valueType=None
                 if value is None:
                     if warnOnNone:
-                        print("Warning sampleRecord field %s is None - using string as type" % key)
+                        if self.debug:
+                            print("Warning sampleRecord field %s is None - using string as type" % key)
                         valueType=str
                 else:
                     valueType=type(value)
