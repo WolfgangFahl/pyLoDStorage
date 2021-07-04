@@ -19,6 +19,8 @@ class LOD(object):
     @staticmethod
     def getFields(listOfDicts,sampleCount:int=None):
         if sampleCount is None:
+            if listOfDicts is None:
+                return None
             sampleCount=len(listOfDicts)
         fields=[]
         for row in listOfDicts:

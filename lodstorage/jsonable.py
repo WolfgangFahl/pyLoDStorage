@@ -120,6 +120,8 @@ class JSONAble(object):
         '''
         if hasattr(self, '__class__'):
             cls=self.__class__
+            if isinstance(self, JSONAbleList) and not hasattr(cls, 'getSamples'):
+                cls=self.clazz
             if hasattr(cls, 'getSamples'):
                 getSamples=getattr(cls,'getSamples');
                 if callable(getSamples):
@@ -241,9 +243,19 @@ class JSONAble(object):
         if limitToSampleFields:
             samples=self.getJsonTypeSamples()
             sampleFields = LOD.getFields(samples)
-            for key,value in self.__dict__.items():
-                if key in sampleFields:
-                    data[key]=value
+            if isinstance(self, JSONAbleList):
+                limitedRecords=[]
+                for record in self.__dict__[self.listName]:
+                    limitedRecord={}
+                    for key, value in record.__dict__.items():
+                        if key in sampleFields:
+                            limitedRecord[key] = value
+                    limitedRecords.append(limitedRecord)
+                data[self.listName]=limitedRecords
+            else:
+                for key,value in self.__dict__.items():
+                    if key in sampleFields:
+                        data[key]=value
         else:
             data=self.__dict__
         jsonStr=json.dumps(data, default=lambda v: self.toJsonAbleValue(v),
