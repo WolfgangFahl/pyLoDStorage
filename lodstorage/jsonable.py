@@ -257,7 +257,7 @@ class JSONAble(object):
                     if key in sampleFields:
                         data[key]=value
         else:
-            data=self.__dict__
+            data=self
         jsonStr=json.dumps(data, default=lambda v: self.toJsonAbleValue(v),
             sort_keys=True, indent=JSONAbleSettings.indent)
         return jsonStr
