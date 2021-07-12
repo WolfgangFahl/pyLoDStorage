@@ -93,7 +93,7 @@ class LOD(object):
         return lr    
     
     @staticmethod
-    def getLookup(self,lod:list,attrName:str,withDuplicates:bool=False):
+    def getLookup(lod:list,attrName:str,withDuplicates:bool=False):
         '''
         create a lookup dictionary by the given attribute name for the given list of dicts
         

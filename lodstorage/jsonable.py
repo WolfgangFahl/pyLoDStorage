@@ -370,7 +370,7 @@ class JSONAbleList(JSONAble):
         Return:
             a dictionary for lookup or a tuple dictionary,list of duplicates depending on withDuplicates
         '''
-        return LOD.getLookup(self, self.getList(), attrName, withDuplicates)  
+        return LOD.getLookup(self.getList(), attrName, withDuplicates)  
             
     def getJsonData(self):    
         '''
