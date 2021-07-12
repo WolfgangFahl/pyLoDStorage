@@ -91,3 +91,44 @@ class LOD(object):
             except StopIteration:
                 break     
         return lr    
+    
+    @staticmethod
+    def getLookup(self,lod:list,attrName:str,withDuplicates:bool=False):
+        '''
+        create a lookup dictionary by the given attribute name for the given list of dicts
+        
+        Args:
+            lod(list): the list of dicts to get the lookup dictionary for
+            attrName(str): the attribute to lookup
+            withDuplicates(bool): whether to retain single values or lists
+        
+        Return:
+            a dictionary for lookup
+        '''
+        lookup={}
+        duplicates=[]
+        for record in lod:
+            value=None
+            if isinstance(record,dict):
+                if attrName in record:
+                    value=record[attrName]
+            else:
+                if hasattr(record, attrName):
+                    value=getattr(record,attrName)
+            if value is not None:
+                if value in lookup:
+                    if withDuplicates:
+                        lookupResult=lookup[value]
+                        lookupResult.append(record)
+                    else:
+                        duplicates.append(record)
+                else:
+                    if withDuplicates:
+                        lookupResult=[record]
+                    else:
+                        lookupResult=record
+                lookup[value]=lookupResult  
+        if withDuplicates:
+            return lookup  
+        else:
+            return lookup,duplicates

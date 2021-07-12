@@ -358,6 +358,7 @@ class JSONAbleList(JSONAble):
         '''
         return self.__dict__[self.listName]
     
+    
     def getLookup(self,attrName:str,withDuplicates:bool=False):
         '''
         create a lookup dictionary by the given attribute name
@@ -367,36 +368,9 @@ class JSONAbleList(JSONAble):
             withDuplicates(bool): whether to retain single values or lists
         
         Return:
-            a dictionary for lookup
+            a dictionary for lookup or a tuple dictionary,list of duplicates depending on withDuplicates
         '''
-        lookup={}
-        duplicates=[]
-        for entity in self.getList():
-            value=None
-            if isinstance(entity,dict):
-                if attrName in entity:
-                    value=entity[attrName]
-            else:
-                if hasattr(entity, attrName):
-                    value=getattr(entity,attrName)
-            if value is not None:
-                if value in lookup:
-                    if withDuplicates:
-                        lookupResult=lookup[value]
-                        lookupResult.append(entity)
-                    else:
-                        duplicates.append(entity)
-                else:
-                    if withDuplicates:
-                        lookupResult=[entity]
-                    else:
-                        lookupResult=entity
-                lookup[value]=lookupResult  
-        if withDuplicates:
-            return lookup  
-        else:
-            return lookup,duplicates
-
+        return LOD.getLookup(self, self.getList(), attrName, withDuplicates)  
             
     def getJsonData(self):    
         '''
