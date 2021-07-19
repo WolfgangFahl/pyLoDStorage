@@ -566,7 +566,9 @@ class Types(JSONAble):
         for record in listOfDicts:
             for keyValue in record.items():
                 key,value=keyValue
-                if key in typeMap:
+                if value is None:
+                    record[key]=None
+                elif key in typeMap:
                     valueType=self.getType(typeMap[key])
                     if valueType==bool:
                         if type(value)==str:
@@ -579,8 +581,12 @@ class Types(JSONAble):
                         record[key]=dt.date()
                     elif valueType==datetime.datetime:
                         # see https://stackoverflow.com/questions/127803/how-do-i-parse-an-iso-8601-formatted-date
-                        if sys.version_info >= (3, 7):
-                            dtime=datetime.datetime.fromisoformat(value)
+                        if isinstance(value,str):
+                            if sys.version_info >= (3, 7):
+                                dtime=datetime.datetime.fromisoformat(value)
+                            else:
+                                dtime=datetime.datetime.strptime(value,"%Y-%m-%dT%H:%M:%S.%f")  
                         else:
-                            dtime=datetime.datetime.strptime(value,"%Y-%m-%dT%H:%M:%S.%f")  
+                            # TODO: error handling
+                            dtime=None    
                         record[key]=dtime
