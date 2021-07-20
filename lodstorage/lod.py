@@ -93,6 +93,21 @@ class LOD(object):
         return lr    
     
     @staticmethod
+    def addLookup(lookup,duplicates,record,value,withDuplicates:bool):
+        if value in lookup:
+            if withDuplicates:
+                lookupResult=lookup[value]
+                lookupResult.append(record)
+            else:
+                duplicates.append(record)
+        else:
+            if withDuplicates:
+                lookupResult=[record]
+            else:
+                lookupResult=record
+        lookup[value]=lookupResult  
+    
+    @staticmethod
     def getLookup(lod:list,attrName:str,withDuplicates:bool=False):
         '''
         create a lookup dictionary by the given attribute name for the given list of dicts
@@ -116,18 +131,11 @@ class LOD(object):
                 if hasattr(record, attrName):
                     value=getattr(record,attrName)
             if value is not None:
-                if value in lookup:
-                    if withDuplicates:
-                        lookupResult=lookup[value]
-                        lookupResult.append(record)
-                    else:
-                        duplicates.append(record)
+                if isinstance(value,list):
+                    for listValue in value:
+                        LOD.addLookup(lookup,duplicates,record,listValue,withDuplicates)    
                 else:
-                    if withDuplicates:
-                        lookupResult=[record]
-                    else:
-                        lookupResult=record
-                lookup[value]=lookupResult  
+                    LOD.addLookup(lookup,duplicates,record,value,withDuplicates)    
         if withDuplicates:
             return lookup  
         else:
