@@ -94,12 +94,24 @@ class LOD(object):
     
     @staticmethod
     def addLookup(lookup,duplicates,record,value,withDuplicates:bool):
+        '''
+        add a single lookup result
+        
+        Args:
+            lookup(dict): the lookup map
+            duplicates(list): the list of duplicates
+            record(dict): the current record
+            value(object): the current value to lookup
+            withDuplicates(bool): if True duplicates should be allowed and lists returned if False a separate duplicates
+            list is created 
+        '''
         if value in lookup:
             if withDuplicates:
                 lookupResult=lookup[value]
                 lookupResult.append(record)
             else:
                 duplicates.append(record)
+                return
         else:
             if withDuplicates:
                 lookupResult=[record]

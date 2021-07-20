@@ -36,22 +36,25 @@ class TestLOD(unittest.TestCase):
         self.assertEqual("Athens", lodi[0]["name"])
         pass
     
-    def testGetLookupIssue31(self):
+    def testGetLookupIssue31And32(self):
         '''
         test for https://github.com/WolfgangFahl/pyLoDStorage/issues/31
+        test for https://github.com/WolfgangFahl/pyLoDStorage/issues/32
         '''
         lod = [
                 { "name": "Athens",              "Q": 1524},
                 { "name": "Paris",               "Q": 90},
-                { "name": ["München", "Munich"], "Q": 1726}
+                { "name": ["München", "Munich"], "Q": 1726},
+                { "name": "Athens",              "Q": 1524},
             
             ]
         cityMap,duplicates = LOD.getLookup(lod, "name")
         if self.debug:
             print(cityMap)
-        self.assertEqual(0,len(duplicates))
+        self.assertEqual(1,len(duplicates))
         self.assertEqual(4,len(cityMap))
         self.assertEqual(cityMap["München"],cityMap["Munich"])
+            
     
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
