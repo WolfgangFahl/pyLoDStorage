@@ -152,3 +152,29 @@ class LOD(object):
             return lookup  
         else:
             return lookup,duplicates
+    
+    @classmethod
+    def handleListTypes(cls,lod,doFilter=False,separator=","):
+        '''
+        handle list types in the given list of dicts
+        
+        Args:
+            cls: this class
+            lod(list): a list of dicts
+            doFilter(bool): True if records containing lists value items should be filtered
+            separator(str): the separator to use when converting lists
+        '''
+        # see https://stackoverflow.com/a/1207485/1497139
+        for i in range(len(lod) - 1, -1, -1):
+            record=lod[i]
+            if isinstance(record,dict):
+                for key in record:
+                    value=record[key]
+                    if isinstance(value,list):
+                        if doFilter:
+                            del lod[i]
+                            continue
+                        else:
+                            newValue=separator.join(value)   
+                            record[key]=newValue
+        

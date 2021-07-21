@@ -5,7 +5,7 @@ Created on 2021-06-11
 '''
 import unittest
 from lodstorage.lod import LOD
-
+import copy
 
 class TestLOD(unittest.TestCase):
     '''
@@ -54,7 +54,50 @@ class TestLOD(unittest.TestCase):
         self.assertEqual(1,len(duplicates))
         self.assertEqual(4,len(cityMap))
         self.assertEqual(cityMap["München"],cityMap["Munich"])
+        
+    def checkHandleListTypeResult(self,lod,expectedLen,expected):
+        '''
+        check the result of the handleListType function
+        
+        Args:
+            lod(list): the list of dicts to check
+            expectedLen(int): the expected Length
+            expected(str): the expected entry for the München,Munich Q1524 record with a list
+        '''
+        if self.debug:
+            print(lod)
+        self.assertEqual(expectedLen,len(lod))  
+        cityByQ,_duplicates=LOD.getLookup(lod, "Q")
+        if self.debug:
+            print(cityByQ)  
+        if expected is not None:
+            munichRecord=cityByQ[1726]
+            self.assertEqual(expected,munichRecord["name"])
+        else:
+            self.assertFalse(1726 in cityByQ)
             
+        
+    def testListHandlingIssue33(self):
+        '''
+        test for handling list
+        '''
+        exampleLod = [
+                { "name": "Athens",              "Q": 1524},
+                { "name": "Paris",               "Q": 90},
+                { "name": ["München", "Munich"], "Q": 1726},
+                { "name": "Athens",              "Q": 1524},
+            
+            ]
+        #self.debug=True
+        lod=copy.deepcopy(exampleLod)
+        LOD.handleListTypes(lod)
+        self.checkHandleListTypeResult(lod, 4, "München,Munich")
+        lod=copy.deepcopy(exampleLod)   
+        LOD.handleListTypes(lod,doFilter=True)
+        self.checkHandleListTypeResult(lod, 3, None)
+        lod=copy.deepcopy(exampleLod)
+        LOD.handleListTypes(lod,separator=";")
+        self.checkHandleListTypeResult(lod, 4, "München;Munich")    
     
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
