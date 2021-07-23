@@ -4,7 +4,6 @@ Created on 2020-08-29
 @author: wf
 '''
 from enum import Enum
-import os
 from pathlib import Path
 
 class StoreMode(Enum):
@@ -21,9 +20,8 @@ class StorageConfig(object):
     '''
     a storage configuration
     '''
-    
-    @classmethod        
-    def getCachePath(cls,name:str)->str:
+           
+    def getCachePath(self)->str:
         '''
         get the path to the default cache
         
@@ -31,10 +29,10 @@ class StorageConfig(object):
             name(str): the name of the cache to use
         '''
         home = str(Path.home())
-        cachedir=f"{home}/{name}"
+        cachedir=f"{home}/.{self.cacheDirName}"
         return cachedir
 
-    def __init__(self, mode=StoreMode.SQL,cacheFile=None,withShowProgress=True,profile=True,debug=False,errorDebug=True):
+    def __init__(self, mode=StoreMode.SQL,cacheDirName="lodstorage",cacheFile=None,withShowProgress=True,profile=True,debug=False,errorDebug=True):
         '''
         Constructor
         
@@ -46,6 +44,7 @@ class StorageConfig(object):
             debug(boolean): True if debugging information should be shown
             errorDebug(boolean): True if debug info should be provided on errors (should not be used for production since it might reveal data)
         '''
+        self.cacheDirName=cacheDirName
         self.mode=mode
         self.cacheFile=cacheFile
         self.profile=profile

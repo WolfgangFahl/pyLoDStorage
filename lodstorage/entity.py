@@ -70,9 +70,10 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin):
             config(StorageConfig): if None get the cache for my mode
             mode(StoreMode): the storeMode to use
         '''
-        cachedir=EntityManager.getCachePath()
-        if config is not None and config.cacheFile is not None:
-            return config.cacheFile
+        if config is not None:
+            cachedir=config.getCachePath() 
+            if config.cacheFile is not None:
+                return config.cacheFile
         ''' get the path to the file for my cached data '''  
         if mode is StoreMode.JSON:  
             cachepath="%s/%s-%s.%s" % (cachedir,self.name,"events",'json')
@@ -83,6 +84,14 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin):
         else:
             cachepath="undefined cachepath for %s" % (mode)
         return cachepath     
+    
+    def removeCacheFile(self):
+        '''  remove my cache file '''
+        mode=self.config.mode
+        if mode is StoreMode.JSON:
+            cacheFile=self.getCacheFile(mode=mode)
+            if os.path.isfile(cacheFile):
+                os.remove(cacheFile)
     
     def getSQLDB(self,cacheFile):
         '''
@@ -227,11 +236,6 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
                 cacheFile=self.getCacheFile(config=self.config,mode=StoreMode.JSON)
             self.showProgress ("storing %d events for %s to cache %s" % (len(self.events),self.name,cacheFile))
             self.writeJson(cacheFile)
-        elif mode is StoreMode.DGRAPH:
-            startTime=time.time()
-            self.showProgress ("storing %d %s for %s to %s" % (len(self.events),self.entityPluralName,self.name,self.mode))    
-            self.dgraph.addData(listOfDicts,limit=limit,batchSize=batchSize)
-            self.showProgress ("store for %s done after %5.1f secs" % (self.name,time.time()-startTime))
         elif mode is StoreMode.SPARQL:
             startTime=time.time()
             # @ FIXME make abstract 
