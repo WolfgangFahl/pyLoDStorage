@@ -14,3 +14,5 @@ matplotlib
 tabulate
 # https://pypi.org/project/numpy/
 numpy
+# https://pypi.org/project/jsonpickle/
+jsonpickle==1.5.2
