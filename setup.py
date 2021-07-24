@@ -30,7 +30,8 @@ setup(
     install_requires=[
           'SPARQLWrapper',
           'PyYAML',
-          'pandas'
+          'pandas',
+          'jsonpickle',
     ],
     classifiers=[
             'Programming Language :: Python',
