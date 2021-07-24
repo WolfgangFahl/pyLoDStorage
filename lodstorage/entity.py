@@ -75,12 +75,15 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin):
             if config.cacheFile is not None:
                 return config.cacheFile
         ''' get the path to the file for my cached data '''  
-        if mode is StoreMode.JSON:  
-            cachepath="%s/%s-%s.%s" % (cachedir,self.name,"events",'json')
+        if mode is StoreMode.JSON or mode is StoreMode.JSONABLE:  
+            cachepath="%s/%s-%s.%s" % (cachedir,self.name,self.entityPluralName,'json')
         elif mode is StoreMode.SPARQL:
             cachepath="%s %s" % ('SPARQL',config.endpoint)    
         elif mode is StoreMode.SQL:
-            cachepath="%s/%s.db" % (cachedir,config.tableName)
+            tableName=config.tableName
+            if tableName is None:
+                tableName=self.name
+            cachepath="%s/%s.db" % (cachedir,tableName)
         else:
             cachepath="undefined cachepath for %s" % (mode)
         return cachepath     
@@ -88,7 +91,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin):
     def removeCacheFile(self):
         '''  remove my cache file '''
         mode=self.config.mode
-        if mode is StoreMode.JSON:
+        if mode is StoreMode.JSON or mode is StoreMode.JSONABLE:
             cacheFile=self.getCacheFile(mode=mode)
             if os.path.isfile(cacheFile):
                 os.remove(cacheFile)
@@ -119,8 +122,8 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin):
         result=False
         config=self.config
         mode=self.config.mode
-        if mode is StoreMode.JSON:
-            result=os.path.isfile(self.getCacheFile(config=self.config,mode=StoreMode.JSON))
+        if mode is StoreMode.JSON or mode is StoreMode.JSONABLE:
+            result=os.path.isfile(self.getCacheFile(config=self.config,mode=mode))
         elif mode is StoreMode.SPARQL:
             # @FIXME - make abstract
             query=config.prefix+"""
@@ -164,7 +167,7 @@ GROUP by ?source
             self.cacheFile=self.store(listOfDicts)
         else:
             # fromStore also sets self.cacheFile
-            listOfDicts=self.fromStore()
+            self.fromStore()
         return listOfDicts      
         
     def fromStore(self,cacheFile=None):
@@ -184,6 +187,9 @@ GROUP by ?source
         mode=self.config.mode
         if mode is StoreMode.JSON:   
             JSONem=JsonPickleMixin.readJson(cacheFile)    
+        elif mode is StoreMode.JSONABLE:
+            # TODO: implement
+            pass
         elif mode is StoreMode.SPARQL:
             # @FIXME make abstract
             eventQuery="""
@@ -213,6 +219,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             raise Exception("unsupported store mode %s" % self.mode)
           
         if JSONem is not None:
+            # TODO FIXME
             return JSONem
         else:
             self.showProgress("read %d %s from %s in %5.1f s" % (len(listOfDicts),self.entityPluralName,self.name,time.time()-startTime))     
@@ -231,10 +238,10 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
         '''
         config=self.config
         mode=config.mode
-        if mode is StoreMode.JSON:    
+        if mode is StoreMode.JSON or mode is StoreMode.JSONABLE:    
             if cacheFile is None:
                 cacheFile=self.getCacheFile(config=self.config,mode=StoreMode.JSON)
-            self.showProgress ("storing %d events for %s to cache %s" % (len(self.events),self.name,cacheFile))
+            self.showProgress (f"storing {len(listOfDicts)} {self.entityPluralName} for {self.name} to cache {cacheFile}")
             self.writeJson(cacheFile)
         elif mode is StoreMode.SPARQL:
             startTime=time.time()

@@ -10,7 +10,7 @@ class StoreMode(Enum):
     '''
     possible supported storage modes
     '''
-    JSON = 1
+    JSON = 1      # JSON Pickle
     JSONABLE = 2
     SQL = 3
     SPARQL = 4
@@ -20,17 +20,6 @@ class StorageConfig(object):
     '''
     a storage configuration
     '''
-    
-    def ensureDirectoryExists(self,file_path:str):
-        '''
-        check that the given path exists and otherwise create it
-        
-        Args
-            file_path(str): the path to check
-        '''
-        directory = os.path.dirname(file_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
            
     def getCachePath(self,ensureExists=True)->str:
         '''
@@ -41,8 +30,10 @@ class StorageConfig(object):
         '''
         home = str(Path.home())
         cachedir=f"{home}/.{self.cacheDirName}"
+        
         if ensureExists:
-            self.ensureDirectoryExists(cachedir)
+            if not os.path.exists(cachedir):
+                os.makedirs(cachedir)
         return cachedir
 
     def __init__(self, mode=StoreMode.SQL,cacheDirName="lodstorage",cacheFile=None,withShowProgress=True,profile=True,debug=False,errorDebug=True):
