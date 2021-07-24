@@ -5,7 +5,7 @@ Created on 2020-08-29
 '''
 from enum import Enum
 from pathlib import Path
-
+import os
 class StoreMode(Enum):
     '''
     possible supported storage modes
@@ -20,8 +20,19 @@ class StorageConfig(object):
     '''
     a storage configuration
     '''
+    
+    def ensureDirectoryExists(self,file_path:str):
+        '''
+        check that the given path exists and otherwise create it
+        
+        Args
+            file_path(str): the path to check
+        '''
+        directory = os.path.dirname(file_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
            
-    def getCachePath(self)->str:
+    def getCachePath(self,ensureExists=True)->str:
         '''
         get the path to the default cache
         
@@ -30,6 +41,8 @@ class StorageConfig(object):
         '''
         home = str(Path.home())
         cachedir=f"{home}/.{self.cacheDirName}"
+        if ensureExists:
+            self.ensureDirectoryExists(cachedir)
         return cachedir
 
     def __init__(self, mode=StoreMode.SQL,cacheDirName="lodstorage",cacheFile=None,withShowProgress=True,profile=True,debug=False,errorDebug=True):
