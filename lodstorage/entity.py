@@ -225,7 +225,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             self.showProgress("read %d %s from %s in %5.1f s" % (len(listOfDicts),self.entityPluralName,self.name,time.time()-startTime))     
             return listOfDicts
         
-    def store(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,sampleRecordCount=1):
+    def store(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,fixNone=True,sampleRecordCount=1):
         ''' 
         store my entities 
         
@@ -259,7 +259,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             sqldb=self.getSQLDB(cacheFile)
             self.showProgress ("storing %d %s for %s to %s:%s" % (len(listOfDicts),self.entityPluralName,self.name,config.mode,cacheFile)) 
             entityInfo=sqldb.createTable(listOfDicts, config.tableName, "eventId",withDrop=True,sampleRecordCount=sampleRecordCount)   
-            self.sqldb.store(listOfDicts, entityInfo,executeMany=self.executeMany)
+            self.sqldb.store(listOfDicts, entityInfo,executeMany=self.executeMany,fixNone=fixNone)
             self.showProgress ("store for %s done after %5.1f secs" % (self.name,time.time()-startTime))
         else:
             raise Exception("unsupported store mode %s" % self.mode)  
