@@ -156,53 +156,53 @@ class JSONAble(object):
         with open(jsonFilePath,"w") as jsonFile:
             jsonFile.write(jsonStr) 
             
-    def storeToJsonFile(self,storeFilePrefix, limitToSampleFields:bool=False):
+    def checkExtension(self,jsonFile:str,extension:str=".json")->str:
         '''
-        store me with the given storeFilePrefix
+        make sure the jsonFile has the given extension e.g. ".json"
         
         Args:
-            storeFilePrefix(string): the prefix for the JSON file name
+            jsonFile(str): the jsonFile name - potentially without ".json" suffix
+        
+        Returns:
+            str: the jsonFile name with ".json" as an extension guaranteed
+        '''
+        if not jsonFile.endswith(extension):
+            jsonFile=f"{jsonFile}{extension}" 
+        return jsonFile    
+            
+    def storeToJsonFile(self,jsonFile:str,extension:str=".json",limitToSampleFields:bool=False):
+        '''
+        store me to the given jsonFile
+        
+        Args:
+            jsonFile(str): the JSON file name (optionally without extension)
+            exension(str): the extension to use if not part of the jsonFile name
             limitToSampleFields(bool): If True the returned JSON is limited to the attributes/fields that are present in the samples. Otherwise all attributes of the object will be included. Default is False.
         '''
-        JSONAble.storeJsonToFile(self.toJSON(limitToSampleFields), "%s.json" % storeFilePrefix)
+        jsonFile=self.checkExtension(jsonFile,extension)
+        JSONAble.storeJsonToFile(self.toJSON(limitToSampleFields), jsonFile)
 
-    def restoreFromJsonFile(self,storeFilePrefix):
+    def restoreFromJsonFile(self,jsonFile:str):
         '''
-        restore me from the given storeFilePrefix
+        restore me from the given jsonFile
         
         Args:
-            storeFilePrefix(string): the prefix for the JSON file name
+            jsonFile(string): the jsonFile to restore me from
         '''
-        jsonStr=JSONAble.readJsonFromFile("%s.json" % storeFilePrefix)
-        types=None
-        self.fromJson(jsonStr, types)
+        jsonFile=self.checkExtension(jsonFile)
+        jsonStr=JSONAble.readJsonFromFile(jsonFile)
+        self.fromJson(jsonStr)
         
-    
-    def fromJson(self,jsonStr,types=None):
+    def fromJson(self,jsonStr):
         '''
         initialize me from the given JSON string
         
         Args:
             jsonStr(str): the JSON string
-            fixType(Types): the types to be fixed
         '''
-        lod=self.getLoDfromJson(jsonStr, types)
-        self.fromDict(lod) 
-        
-    def getLoDfromJson(self,jsonStr,types=None):
-        '''
-        get a list of Dicts form the given JSON String
-        
-        Args:
-            jsonStr(str): the JSON string
-            fixType(Types): the types to be fixed
-        Returns:
-            list: a list of dicts
-        '''
-        lod=json.loads(jsonStr)       
-        if types is not None:
-            types.fixTypes(lod)   
-        return lod 
+        jsonMap=json.loads(jsonStr) 
+        self.fromDict(jsonMap) 
+    
             
     def fromDict(self,data):
         '''
@@ -358,6 +358,85 @@ class JSONAbleList(JSONAble):
         '''
         return self.__dict__[self.listName]
     
+    def setListFromLoD(self,lod:list)->list:
+        '''
+        set my list from the given list of dicts
+        
+        Args:
+            lod(list) a raw record list of dicts
+            
+        Returns:
+            list: a list of dicts if no clazz is set
+                otherwise a list of objects
+        '''
+        # non OO mode
+        if self.clazz is None:
+            result = lod
+            self.__dict__[self.listName] = result
+        else:
+            # ORM mode
+            self.fromLoD(lod)
+        return self.getList()
+    
+    def getLoDfromJson(self,jsonStr:str,types=None,listName:str=None):
+        '''
+        get a list of Dicts form the given JSON String
+        
+        Args:
+            jsonStr(str): the JSON string
+            fixType(Types): the types to be fixed
+        Returns:
+            list: a list of dicts
+        '''
+        # read a data structe from the given JSON string
+        lodOrDict=json.loads(jsonStr)       
+        # it should be a list only of dict with my list
+        if not isinstance(lodOrDict,dict) and listName is not None:
+            lod=lodOrDict
+        else:
+            if self.listName in lodOrDict:
+                # get the relevant list of dicts
+                lod=lodOrDict[self.listName]
+            else:
+                msg=f"invalid JSON for getLoD from Json\nexpecting a list of dicts or a dict with {self.listName} as list\nfound a dict with keys: {dict.keys()} instead"
+                raise Exception(msg)
+        if types is not None:
+            types.fixTypes(lod,self.listName)   
+        return lod 
+
+    def fromLoD(self,lod,append:bool=True,filterInvalidListTypes:bool=True,debug:bool=False):
+        '''
+        load my entityList from the given list of dicts
+        
+        Args:
+            lod(list): the list of dicts to load
+            append(bool): if True append to my existing entries
+            filterInvalidListTypes(bool): ignore records containing list entries
+        
+        '''
+        errors=[]
+        if append:
+            entityList=self.getList()
+        else:
+            entityList=[]
+        if filterInvalidListTypes:
+            LOD.handleListTypes(lod=lod,doFilter=True)
+
+        for record in lod:
+            # call the constructor to get a new instance
+            try:
+                entity=self.clazz()
+                entity.fromDict(record)
+                entityList.append(entity)
+            except Exception as ex:
+                error={
+                    self.listName:record,
+                    "error": ex
+                }
+                errors.append(error)
+                if debug:
+                    print(error)
+        return errors
     
     def getLookup(self,attrName:str,withDuplicates:bool=False):
         '''
@@ -389,24 +468,59 @@ class JSONAbleList(JSONAble):
         if v==self:
             return self.getJsonData()
         else:
-            return super().toJsonAbleValue(v)     
+            return super().toJsonAbleValue(v)   
+        
+        
+    def fromJson(self,jsonStr,types=None):
+        '''
+        initialize me from the given JSON string
+        
+        Args:
+            jsonStr(str): the JSON string
+            fixType(Types): the types to be fixed
+        '''    
+        lod=self.getLoDfromJson(jsonStr, types,listName=self.listName)
+        self.setListFromLoD(lod)
+          
         
     def asJSON(self,asString=True):
         jsonData=self.getJsonData()
         return super().asJSON(asString, data=jsonData)
-               
-    def restoreFromJsonFile(self,storeFilePrefix):
+    
+    def restoreFromJsonFile(self,jsonFile:str):
         '''
-        restore me from the given storeFilePrefix
+        read my list of dicts and restore it
+        '''
+        lod=self.readLodFromJsonFile(jsonFile)
+        self.setListFromLoD(lod)
+        
+    def restoreFromJsonStr(self,jsonStr:str):
+        '''
+        restore me from the given jsonStr
         
         Args:
-            storeFilePrefix(string): the prefix for the JSON file name
+            jsonStr(str): the json string to restore me from
         '''
-        jsonStr=JSONAble.readJsonFromFile("%s.json" % storeFilePrefix)
-        result=self.restoreFromJsonStr(jsonStr)
-        return result
+        lod=self.readLodFromJsonStr(jsonStr)
+        self.setListFromLoD(lod)
+        
+               
+    def readLodFromJsonFile(self,jsonFile:str,extension:str=".json"):
+        '''
+        read the list of dicts from the given jsonFile
+        
+        Args:
+            jsonFile(string): the jsonFile to read from
+            
+        Returns:
+            list: a list of dicts
+        '''
+        jsonFile=self.checkExtension(jsonFile,extension)
+        jsonStr=JSONAble.readJsonFromFile(jsonFile)
+        lod=self.readLodFromJsonStr(jsonStr)
+        return lod
 
-    def restoreFromJsonStr(self, jsonStr):
+    def readLodFromJsonStr(self, jsonStr)->list:
         '''
         restore me from the given jsonStr
 
@@ -422,19 +536,9 @@ class JSONAbleList(JSONAble):
         else:
             types = Types(self.listName)
             types.getTypes(self.listName, typeSamples, len(typeSamples))
-        lod = self.getLoDfromJson(jsonStr, types)
+        lod = self.getLoDfromJson(jsonStr, types,listName=self.listName)
+        return lod
 
-        if self.clazz is None:
-            result = lod
-        else:
-            instanceList = []
-            for record in lod[self.listName]:
-                instance = self.clazz()
-                instance.fromDict(record)
-                instanceList.append(instance)
-            result = instanceList
-        self.__dict__[self.listName] = result
-        return result
     
 class Types(JSONAble):
     '''
@@ -536,17 +640,16 @@ class Types(JSONAble):
                 if valueType is not None:
                     self.addType(listName,key,valueType.__name__) 
                     
-    def fixTypes(self,data):
+    def fixTypes(self,lod:list,listName:str):
         '''
         fix the types in the given data structure
         
         Args:
-            data(dict): a dict representation returned from storage
-            with list of Dicts as entries
+            lod(list): a list of dicts
+            listName(str): the types to lookup by list name
         '''
         for listName in self.typeMap:
-            if listName in data:
-                self.fixListOfDicts(self.typeMap[listName],data[listName])
+            self.fixListOfDicts(self.typeMap[listName],lod)
     
     def getType(self,typeName):
         '''

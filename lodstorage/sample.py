@@ -70,6 +70,9 @@ class Sample(object):
         return royals
     
 class Royals(JSONAbleList):
+    '''
+    a non ORM Royals list
+    '''
     def __init__(self,load=False):
         super(Royals, self).__init__("royals",clazz=None)
         if load:
@@ -82,8 +85,6 @@ class RoyalsORMList(JSONAbleList):
         super(RoyalsORMList, self).__init__("royals",Royal)
         if load:
             self.royals=Sample.getRoyalsInstances()
-        else:
-            self.royals=None
             
 class Royal(JSONAble):
     '''

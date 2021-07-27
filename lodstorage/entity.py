@@ -9,15 +9,16 @@ from lodstorage.storageconfig import StorageConfig, StoreMode
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
 from lodstorage.lod import LOD
+from lodstorage.jsonable import JSONAbleList
 import os
 import time
 
-class EntityManager(YamlAbleMixin, JsonPickleMixin):
+class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
     '''
     generic entity manager
     '''
 
-    def __init__(self,name,entityName,entityPluralName,config=None,debug=False):
+    def __init__(self,name,entityName,entityPluralName:str,listName:str=None,clazz=None,tableName:str=None,primaryKey:str=None,config=None,debug=False):
         '''
         Constructor
         
@@ -31,13 +32,17 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin):
         self.name=name
         self.entityName=entityName
         self.entityPluralName=entityPluralName
+        if listName is None:
+            listName=entityPluralName
+        if tableName is None:
+            tableName=entityName
+        self.primaryKey=primaryKey
+        self.config=config
         if config is None:
             config=StorageConfig.getDefault()
-            if config.tableName is None:
-                config.tableName=entityName
             if debug:
                 config.debug=debug
-        self.config=config
+        super(EntityManager, self).__init__(listName,clazz,tableName)
         cacheFile=self.getCacheFile(config=config,mode=config.mode)
         self.showProgress ("Creating %smanager(%s) for %s using cache %s" % (self.entityName,config.mode,self.name,cacheFile))
         if config.mode is StoreMode.SPARQL:
@@ -75,23 +80,21 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin):
             if config.cacheFile is not None:
                 return config.cacheFile
         ''' get the path to the file for my cached data '''  
-        if mode is StoreMode.JSON or mode is StoreMode.JSONABLE:  
-            cachepath="%s/%s-%s.%s" % (cachedir,self.name,self.entityPluralName,'json')
+        if mode is StoreMode.JSON or mode is StoreMode.JSONPICKLE:  
+            extension=f".{mode.name.lower()}"
+            cachepath=f"{cachedir}/{self.name}-{self.listName}{extension}" 
         elif mode is StoreMode.SPARQL:
-            cachepath="%s %s" % ('SPARQL',config.endpoint)    
+            cachepath=f"SPQRL {config.endpoint}"    
         elif mode is StoreMode.SQL:
-            tableName=config.tableName
-            if tableName is None:
-                tableName=self.name
-            cachepath="%s/%s.db" % (cachedir,tableName)
+            cachepath=f"{cachedir}/{self.tableName}.db"
         else:
-            cachepath="undefined cachepath for %s" % (mode)
+            cachepath=f"undefined cachepath for StoreMode {mode}"
         return cachepath     
     
     def removeCacheFile(self):
         '''  remove my cache file '''
         mode=self.config.mode
-        if mode is StoreMode.JSON or mode is StoreMode.JSONABLE:
+        if mode is StoreMode.JSON or mode is StoreMode.JSONPICKLE:
             cacheFile=self.getCacheFile(mode=mode)
             if os.path.isfile(cacheFile):
                 os.remove(cacheFile)
@@ -122,7 +125,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin):
         result=False
         config=self.config
         mode=self.config.mode
-        if mode is StoreMode.JSON or mode is StoreMode.JSONABLE:
+        if mode is StoreMode.JSON or mode is StoreMode.JSONPICKLE:
             result=os.path.isfile(self.getCacheFile(config=self.config,mode=mode))
         elif mode is StoreMode.SPARQL:
             # @FIXME - make abstract
@@ -168,13 +171,15 @@ GROUP by ?source
         else:
             # fromStore also sets self.cacheFile
             self.fromStore()
-        return listOfDicts      
+        return listOfDicts
         
-    def fromStore(self,cacheFile=None):
+    def fromStore(self,cacheFile=None,setList:bool=True)->list:
         '''
         restore me from the store
         Args:
-            cacheFile(String): the cacheFile to use if None use the preconfigured Cachefile
+            cacheFile(String): the cacheFile to use if None use the pre configured cachefile
+            setList(bool): if True set my list with the data from the cache file
+            
         Returns:
             list: list of dicts or JSON entitymanager
         '''
@@ -183,12 +188,12 @@ GROUP by ?source
             cacheFile=self.getCacheFile(config=self.config,mode=self.config.mode)
         self.cacheFile=cacheFile
         self.showProgress("reading %s for %s from cache %s" % (self.entityPluralName,self.name,cacheFile))
-        JSONem=None
         mode=self.config.mode
-        if mode is StoreMode.JSON:   
-            JSONem=JsonPickleMixin.readJson(cacheFile)    
-        elif mode is StoreMode.JSONABLE:
-            # TODO: implement
+        if mode is StoreMode.JSONPICKLE:   
+            JSONem=JsonPickleMixin.readJsonPickle(cacheFile)
+            listOfDicts=JSONem.getList()
+        elif mode is StoreMode.JSON:
+            listOfDicts=self.readLodFromJsonFile(cacheFile)
             pass
         elif mode is StoreMode.SPARQL:
             # @FIXME make abstract
@@ -210,7 +215,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
 """ % self.name        
             listOfDicts=self.sparql.queryAsListOfDicts(eventQuery)
         elif mode is StoreMode.SQL:
-            sqlQuery="SELECT * FROM %s" % self.config.tableName
+            sqlQuery="SELECT * FROM %s" % self.tableName
             sqlDB=self.getSQLDB(cacheFile)
             listOfDicts=sqlDB.query(sqlQuery)
             sqlDB.close()
@@ -218,12 +223,10 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
         else:
             raise Exception("unsupported store mode %s" % self.mode)
           
-        if JSONem is not None:
-            # TODO FIXME
-            return JSONem
-        else:
-            self.showProgress("read %d %s from %s in %5.1f s" % (len(listOfDicts),self.entityPluralName,self.name,time.time()-startTime))     
-            return listOfDicts
+        self.showProgress("read %d %s from %s in %5.1f s" % (len(listOfDicts),self.entityPluralName,self.name,time.time()-startTime))
+        if setList:
+            self.setListFromLoD(listOfDicts)
+        return listOfDicts
         
     def store(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,fixNone=True,sampleRecordCount=1):
         ''' 
@@ -238,11 +241,15 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
         '''
         config=self.config
         mode=config.mode
-        if mode is StoreMode.JSON or mode is StoreMode.JSONABLE:    
+        if mode is StoreMode.JSON or mode is StoreMode.JSONPICKLE:    
             if cacheFile is None:
-                cacheFile=self.getCacheFile(config=self.config,mode=StoreMode.JSON)
+                cacheFile=self.getCacheFile(config=self.config,mode=mode)
             self.showProgress (f"storing {len(listOfDicts)} {self.entityPluralName} for {self.name} to cache {cacheFile}")
-            self.writeJson(cacheFile)
+            if mode is StoreMode.JSONPICKLE:
+                self.writeJsonPickle(cacheFile)
+            if mode is StoreMode.JSON:
+                self.storeToJsonFile(cacheFile)
+                pass
         elif mode is StoreMode.SPARQL:
             startTime=time.time()
             # @ FIXME make abstract 
@@ -258,7 +265,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
                 cacheFile=self.getCacheFile(config=self.config,mode=self.config.mode)
             sqldb=self.getSQLDB(cacheFile)
             self.showProgress ("storing %d %s for %s to %s:%s" % (len(listOfDicts),self.entityPluralName,self.name,config.mode,cacheFile)) 
-            entityInfo=sqldb.createTable(listOfDicts, config.tableName, "eventId",withDrop=True,sampleRecordCount=sampleRecordCount)   
+            entityInfo=sqldb.createTable(listOfDicts, self.tableName, primaryKey=self.primaryKey,withDrop=True,sampleRecordCount=sampleRecordCount)   
             self.sqldb.store(listOfDicts, entityInfo,executeMany=self.executeMany,fixNone=fixNone)
             self.showProgress ("store for %s done after %5.1f secs" % (self.name,time.time()-startTime))
         else:

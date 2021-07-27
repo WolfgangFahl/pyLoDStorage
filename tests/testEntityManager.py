@@ -7,7 +7,7 @@ import unittest
 from lodstorage.sample import Sample
 from lodstorage.entity import EntityManager
 from lodstorage.storageconfig import StoreMode, StorageConfig
-
+import os
 
 class TestEntityManager(unittest.TestCase):
     '''
@@ -36,16 +36,20 @@ class TestEntityManager(unittest.TestCase):
         '''
         test the entity Manager handling
         '''
-        for config in [StorageConfig.getJSON(debug=self.debug),StorageConfig.getDefault(debug=self.debug)]:
-            em=EntityManager("royal","Royal","Royals",config=config)
-            listOfDicts=Sample.getRoyals()
-            em.store(listOfDicts)
+        self.debug=True
+        royalsLoD=Sample.getRoyals()
+        if self.debug:
+            print(royalsLoD)
+        for config in [StorageConfig.getDefault(debug=self.debug),StorageConfig.getJSON(debug=self.debug),StorageConfig.getJsonPickle(self.debug)]:
+            em=EntityManager("royal","Royal","royals",config=config)
+            em.royals=royalsLoD
+            cacheFile=em.store(royalsLoD)
+            self.assertTrue(os.path.isfile(cacheFile))
             result=em.fromStore()
             if isinstance(result,list):
                 lod2=result
-                self.assertEqual(len(listOfDicts),len(lod2))        
+                self.assertEqual(len(royalsLoD),len(lod2))        
             pass
-
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

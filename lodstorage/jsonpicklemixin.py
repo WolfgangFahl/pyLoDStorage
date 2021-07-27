@@ -8,13 +8,31 @@ class JsonPickleMixin(object):
     allow reading and writing derived objects from a jsonpickle file
     '''
     debug = False
-
-    # read me from a yaml file
+    
     @staticmethod
-    def readJson(name, postfix=".json"):
-        jsonFileName = name
-        if not name.endswith(postfix):
-            jsonFileName = name + postfix
+    def checkExtension(jsonFile:str,extension:str=".json")->str:
+        '''
+        make sure the jsonFile has the given extension e.g. ".json"
+        
+        Args:
+            jsonFile(str): the jsonFile name - potentially without ".json" suffix
+        
+        Returns:
+            str: the jsonFile name with ".json" as an extension guaranteed
+        '''
+        if not jsonFile.endswith(extension):
+            jsonFile=f"{jsonFile}{extension}" 
+        return jsonFile    
+
+    # read me from a json pickle file
+    @staticmethod
+    def readJsonPickle(jsonFileName,extension=".jsonpickle"):
+        '''
+        Args:
+            jsonFileName(str): name of the file (optionally without ".json" postfix)
+            extension(str): default file extension
+        '''
+        jsonFileName=JsonPickleMixin.checkExtension(jsonFileName, extension)
         # is there a jsonFile for the given name
         if os.path.isfile(jsonFileName):
             if JsonPickleMixin.debug:
@@ -29,7 +47,7 @@ class JsonPickleMixin(object):
         else:
             return None
         
-    def asJson(self)->str:
+    def asJsonPickle(self)->str:
         '''
         convert me to JSON
         
@@ -39,18 +57,16 @@ class JsonPickleMixin(object):
         json = jsonpickle.encode(self)
         return json    
 
-    def writeJson(self, name:str, postfix:str=".json"):
+    def writeJsonPickle(self, jsonFileName:str, extension:str=".jsonpickle"):
         '''
         write me to the json file with the given name (optionally without postfix)
         
-        name(str): name of the file (optionally without ".json" postfix)
-        postfix(str): default file extension
+        Args:
+            jsonFileName(str): name of the file (optionally without ".json" postfix)
+            extension(str): default file extension
         '''
-        if not name.endswith(postfix):
-            jsonFileName = name + postfix
-        else:
-            jsonFileName = name    
-        json = self.asJson()
+        jsonFileName=JsonPickleMixin.checkExtension(jsonFileName, extension)  
+        json = self.asJsonPickle()
         if JsonPickleMixin.debug:
             print("writing %s" % (jsonFileName))
             print(json)

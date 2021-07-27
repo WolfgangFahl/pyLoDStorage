@@ -10,8 +10,8 @@ class StoreMode(Enum):
     '''
     possible supported storage modes
     '''
-    JSON = 1      # JSON Pickle
-    JSONABLE = 2
+    JSONPICKLE = 1      # JSON Pickle
+    JSON = 2
     SQL = 3
     SPARQL = 4
     YAML = 5    
@@ -72,8 +72,8 @@ class StorageConfig(object):
         return config
     
     @staticmethod
-    def getJsonAble(debug=False):
-        config=StorageConfig(mode=StoreMode.JSONABLE,debug=debug)
+    def getJsonPickle(debug=False):
+        config=StorageConfig(mode=StoreMode.JSONPICKLE,debug=debug)
         return config
     
     @staticmethod

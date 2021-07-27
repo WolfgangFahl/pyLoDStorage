@@ -147,20 +147,7 @@ class TestJsonAble(unittest.TestCase):
             print(royals1.royals)
             print(royals2.royals)
         self.assertEqual(royals1.royals,royals2.royals)
-    
-    def testTypes(self):
-        '''
-        test the given types
-        '''
-        royals1=Royals(load=True)
-        types1=Types.forTable(royals1, "royals")
-        json=types1.toJSON()
-        if self.debug:
-            print(json)
-        types2=Types("Royals")
-        types2.fromJson(json)
-        self.assertEqual(types1.typeMap,types2.typeMap)
-        
+          
     def testPluralName(self):
         royal=Royal()
         self.assertEqual("Royals",royal.getPluralname())
@@ -171,10 +158,10 @@ class TestJsonAble(unittest.TestCase):
         https://github.com/WolfgangFahl/pyLoDStorage/issues/21
         '''
         royals1=RoyalsORMList(load=True)
-        storeFilePrefix="/tmp/royals-pylodstorage"
-        royals1.storeToJsonFile(storeFilePrefix)
+        jsonFile="/tmp/royals-pylodstorage.json"
+        royals1.storeToJsonFile(jsonFile)
         royals2=RoyalsORMList()
-        royals2.restoreFromJsonFile(storeFilePrefix)
+        royals2.restoreFromJsonFile(jsonFile)
         self.assertEqual(4,len(royals2.royals))
         for royal in royals2.royals:
             self.assertTrue(isinstance(royal,Royal))
@@ -211,15 +198,14 @@ class TestJsonAble(unittest.TestCase):
     ],
     "logo": "https://commons.wikimedia.org/wiki/Category:Mona_Lisa#/media/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg"
 }"""
-        storeFilePrefix='%s/serverConfig' % tempfile.gettempdir()
-        jsonFilePath='%s.json' % storeFilePrefix
+        jsonFilePath=f'{tempfile.gettempdir()}/serverConfig.json'
         JSONAble.storeJsonToFile(jsonStr, jsonFilePath)
         serverConfig=ServerConfig()
-        serverConfig.restoreFromJsonFile(storeFilePrefix)
+        serverConfig.restoreFromJsonFile(jsonFilePath)
         self.assertTrue(serverConfig.logo.endswith("_retouched.jpg"))
         self.assertTrue(isinstance(serverConfig.frontendConfigs,list))
         self.assertEqual(2,len(serverConfig.frontendConfigs))
-        serverConfig.storeToJsonFile(storeFilePrefix)
+        serverConfig.storeToJsonFile(jsonFilePath)
         jsonStr2=JSONAble.readJsonFromFile(jsonFilePath)
         if self.debug:
             print(jsonStr2)
@@ -276,9 +262,9 @@ class TestJsonAble(unittest.TestCase):
                     ]
                 }
                 """
-        result=JSONAbleList("Test").restoreFromJsonStr(samples)
-        self.assertTrue("countries" in result)
-        countries=result['countries']
+        countryList=JSONAbleList("countries")
+        countryList.restoreFromJsonStr(samples)
+        countries=countryList.countries
         self.assertTrue(len(countries)==3)
         countryIds=[x['wikidataid'] for x in countries]
         self.assertTrue("Q30" in countryIds)
