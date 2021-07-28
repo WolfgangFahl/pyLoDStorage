@@ -108,6 +108,18 @@ class Royal(JSONAble):
             person['lastmodified']=datetime.now()
         return listOfDicts
     
+    def __repr__(self):
+        text=self.__class__.__name__
+        attrs=["name","born"]
+        delim=":"
+        for attr in attrs:
+            if hasattr(self, attr):
+                value=getattr(self,attr)
+                text+=f"{delim}{value}"
+                delim=":" 
+        return text
+         
+    
 class Cities(JSONAbleList):
     def __init__(self,load=False):
         super(Cities, self).__init__("cities",clazz=None)

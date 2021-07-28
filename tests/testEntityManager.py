@@ -4,9 +4,10 @@ Created on 2021-07-23
 @author: wf
 '''
 import unittest
-from lodstorage.sample import Sample
+from lodstorage.sample import Sample, Royal
 from lodstorage.entity import EntityManager
 from lodstorage.storageconfig import StoreMode, StorageConfig
+from pathlib import Path
 import os
 
 class TestEntityManager(unittest.TestCase):
@@ -17,6 +18,14 @@ class TestEntityManager(unittest.TestCase):
     def setUp(self):
         self.debug=False
         pass
+      
+    def getCachePath(self):
+        home = str(Path.home())
+        cachedir=f"{home}/.lodstorage-test"
+        return cachedir
+    
+    def configure(self,config:StorageConfig):
+        config.cacheDirName=self.getCachePath()
 
 
     def tearDown(self):
@@ -27,28 +36,64 @@ class TestEntityManager(unittest.TestCase):
         test store mode display
         '''
         config=StorageConfig.getDefault()
+        self.configure(config)
         em=EntityManager("tst","Test","Tests",config=config)
         if self.debug:
             print (em.storeMode().name)
         self.assertEqual(StoreMode.SQL,em.storeMode())
+        
+    def checkItem(self,item1,item2,attrs,msg):
+        # check mode
+        isDict=False
+        if isinstance(item1,dict):
+            self.assertTrue(isinstance(item2,dict))
+            isDict=True
+        else:
+            self.assertFalse(isinstance(item2,dict))
+        for attr in attrs:
+            if isDict:
+                value1=item1[attr]
+                value2=item2[attr]
+            else:
+                value1=getattr(item1,attr)
+                value2=getattr(item2,attr)
+            #if not value1==value2:
+            #    print(f"{value1}!={value2} for {attr}-{msg}")    
+            self.assertEqual(value1,value2,f"{attr}-{msg}")
         
     def testEntityManager(self):
         '''
         test the entity Manager handling
         '''
         self.debug=True
-        royalsLoD=Sample.getRoyals()
-        if self.debug:
-            print(royalsLoD)
-        for config in [StorageConfig.getDefault(debug=self.debug),StorageConfig.getJSON(debug=self.debug),StorageConfig.getJsonPickle(self.debug)]:
-            em=EntityManager("royal","Royal","royals",config=config)
-            em.royals=royalsLoD
-            cacheFile=em.store(royalsLoD)
-            self.assertTrue(os.path.isfile(cacheFile))
-            result=em.fromStore()
-            if isinstance(result,list):
-                lod2=result
-                self.assertEqual(len(royalsLoD),len(lod2))        
+        for i,royals in enumerate([Sample.getRoyals(),Sample.getRoyalsInstances()]):
+            if self.debug:
+                print(f"{i+1}:{royals}")
+            for config in [StorageConfig.getDefault(debug=self.debug),StorageConfig.getJSON(debug=self.debug),StorageConfig.getJsonPickle(self.debug)]:
+                self.configure(config)
+                name="royal" if i==0 else "royalorm"
+                clazz=None if i==0 else Royal  
+                em=EntityManager(name=name,entityName="Royal",entityPluralName="Royals",clazz=clazz,listName="royals",config=config)
+                em.royals=royals
+                if i==0:
+                    cacheFile=em.storeLoD(royals)
+                else:
+                    cacheFile=em.store()
+                self.assertTrue(os.path.isfile(cacheFile))
+                royalsLod=em.fromStore()
+                self.assertTrue(isinstance(royalsLod,list))
+                hint=f"{i}({config.mode}):{name}"
+                for item in royalsLod:
+                    if not isinstance(item,dict):
+                        print(item)
+                    self.assertTrue(isinstance(item,dict),f"{hint}:expecting dict")
+                royalsList=em.getList()
+                self.assertEqual(len(royals),len(royalsList)) 
+                for j,item in enumerate(royalsList):
+                    hint=f"{hint}/{j}"
+                    royal=royals[j]
+                    # TODO check type handling e.g. "born"
+                    self.checkItem(royal, item, ["name","age","numberInLine","wikidataurl"],hint)     
             pass
 
 if __name__ == "__main__":

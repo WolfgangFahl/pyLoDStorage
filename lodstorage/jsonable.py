@@ -375,7 +375,7 @@ class JSONAbleList(JSONAble):
             self.__dict__[self.listName] = result
         else:
             # ORM mode
-            self.fromLoD(lod)
+            self.fromLoD(lod,append=False)
         return self.getList()
     
     def getLoDfromJson(self,jsonStr:str,types=None,listName:str=None):
@@ -415,10 +415,9 @@ class JSONAbleList(JSONAble):
         
         '''
         errors=[]
-        if append:
-            entityList=self.getList()
-        else:
-            entityList=[]
+        entityList=self.getList()
+        if not append:
+            del entityList[:]
         if filterInvalidListTypes:
             LOD.handleListTypes(lod=lod,doFilter=True)
 

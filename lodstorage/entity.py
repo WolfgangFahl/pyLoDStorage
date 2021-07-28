@@ -84,9 +84,9 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
             extension=f".{mode.name.lower()}"
             cachepath=f"{cachedir}/{self.name}-{self.listName}{extension}" 
         elif mode is StoreMode.SPARQL:
-            cachepath=f"SPQRL {config.endpoint}"    
+            cachepath=f"SPAQRL {self.name}:{config.endpoint}"    
         elif mode is StoreMode.SQL:
-            cachepath=f"{cachedir}/{self.tableName}.db"
+            cachepath=f"{cachedir}/{self.name}.db"
         else:
             cachepath=f"undefined cachepath for StoreMode {mode}"
         return cachepath     
@@ -191,7 +191,10 @@ GROUP by ?source
         mode=self.config.mode
         if mode is StoreMode.JSONPICKLE:   
             JSONem=JsonPickleMixin.readJsonPickle(cacheFile)
-            listOfDicts=JSONem.getList()
+            if self.clazz is not None:
+                listOfDicts=JSONem.getLoD()
+            else:
+                listOfDicts=JSONem.getList()
         elif mode is StoreMode.JSON:
             listOfDicts=self.readLodFromJsonFile(cacheFile)
             pass
@@ -227,8 +230,32 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
         if setList:
             self.setListFromLoD(listOfDicts)
         return listOfDicts
+    
+    def getLoD(self):
+        """
+        Return the LoD of the entities in the list
         
-    def store(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,fixNone=True,sampleRecordCount=1):
+        Return:
+            list: a list of Dicts
+            
+        """
+        lod= []
+        for entity in self.getList():
+            # TODO - optionally filter by samples
+            lod.append(entity.__dict__)
+        return lod
+    
+    def store(self)->str:
+        '''
+        store my list of dicts
+        
+        Return:
+            str: The cachefile being used
+        '''
+        lod=self.getLoD()
+        return self.storeLoD(lod)
+        
+    def storeLoD(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,fixNone=True,sampleRecordCount=1)->str:
         ''' 
         store my entities 
         
@@ -238,6 +265,9 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             batchSize(int): size of batch for storing
             cacheFile(string): the name of the storage e.g path to JSON or sqlite3 file
             sampleRecordCount(int): the number of records to analyze for type information
+            
+        Return:
+            str: The cachefile being used
         '''
         config=self.config
         mode=config.mode
