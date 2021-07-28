@@ -145,7 +145,7 @@ GROUP by ?source
         elif mode is StoreMode.SQL:
             cacheFile=self.getCacheFile(config=self.config,mode=StoreMode.SQL)
             if os.path.isfile(cacheFile):
-                sqlQuery="SELECT COUNT(*) AS count FROM %s" % config.tableName
+                sqlQuery="SELECT COUNT(*) AS count FROM %s" % self.tableName
                 try:
                     sqlDB=self.getSQLDB(cacheFile)
                     countResult=sqlDB.query(sqlQuery)
@@ -158,19 +158,30 @@ GROUP by ?source
             raise Exception("unsupported mode %s" % self.mode)            
         return result     
     
-    def fromCache(self):
+    def fromCache(self,force:bool=False,getListOfDicts=None):
         '''
-        get my entries from the cache
+        get my entries from the cache or from the callback provide
         
+        Args:
+            force(bool): force ignoring the cache
+            getListOfDicts(callable): a function to call for getting the data 
+            
         Returns:
             the list of Dicts and as a side effect setting self.cacheFile
         '''
-        if not self.isCached():
-            listOfDicts=self.getListOfDicts()
-            self.cacheFile=self.store(listOfDicts)
+        if not self.isCached() or force:
+            startTime=time.time()
+            self.showProgress(f"getting {self.entityPluralName} for {self.name} ...")
+            if getListOfDicts is None:
+                getListOfDicts=self.getListOfDicts()
+            listOfDicts=getListOfDicts()
+            duration=time.time()-startTime
+            self.showProgress(f"got {len(listOfDicts)} {self.entityPluralName} in {duration:5.1f} s")   
+            self.cacheFile=self.storeLoD(listOfDicts)
+            self.setListFromLoD(listOfDicts)
         else:
             # fromStore also sets self.cacheFile
-            self.fromStore()
+            listOfDicts=self.fromStore()
         return listOfDicts
         
     def fromStore(self,cacheFile=None,setList:bool=True)->list:
