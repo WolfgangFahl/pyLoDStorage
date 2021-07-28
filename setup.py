@@ -11,7 +11,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pylodstorage',
-    version='0.0.49',
+    version='0.0.50',
 
     packages=['lodstorage',],
     author='Wolfgang Fahl',

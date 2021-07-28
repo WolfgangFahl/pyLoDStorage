@@ -18,14 +18,9 @@ class TestEntityManager(unittest.TestCase):
     def setUp(self):
         self.debug=False
         pass
-      
-    def getCachePath(self):
-        home = str(Path.home())
-        cachedir=f"{home}/.lodstorage-test"
-        return cachedir
     
     def configure(self,config:StorageConfig):
-        config.cacheDirName=self.getCachePath()
+        config.cacheDirName="lodstorage-test"
 
 
     def tearDown(self):
@@ -84,8 +79,6 @@ class TestEntityManager(unittest.TestCase):
                 self.assertTrue(isinstance(royalsLod,list))
                 hint=f"{i}({config.mode}):{name}"
                 for item in royalsLod:
-                    if not isinstance(item,dict):
-                        print(item)
                     self.assertTrue(isinstance(item,dict),f"{hint}:expecting dict")
                 royalsList=em.getList()
                 self.assertEqual(len(royals),len(royalsList)) 
