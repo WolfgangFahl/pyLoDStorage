@@ -328,7 +328,7 @@ class JSONAbleList(JSONAble):
     Container class 
     '''
     
-    def __init__(self,listName:str=None,clazz=None,tableName:str=None,initList:bool=True):
+    def __init__(self,listName:str=None,clazz=None,tableName:str=None,initList:bool=True,handleInvalidListTypes=False,filterInvalidListTypes=False):
         '''
         Constructor
         
@@ -337,8 +337,12 @@ class JSONAbleList(JSONAble):
             clazz(class): a class to be used for Object relational mapping (if any) 
             tableName(str): the name of the "table" to be used
             initList(bool): True if the list should be initialized
+            handleInvalidListTypes(bool): True if invalidListTypes should be converted or filtered
+            filterInvalidListTypes(bool): True if invalidListTypes should be deleted
         '''
         self.clazz=clazz
+        self.handleInvalidListTypes=handleInvalidListTypes
+        self.filterInvalidListTypes=filterInvalidListTypes
         if listName is None:
             if self.clazz is not None:
                 listName=self.clazz.getPluralname()
@@ -404,22 +408,21 @@ class JSONAbleList(JSONAble):
             types.fixTypes(lod,self.listName)   
         return lod 
 
-    def fromLoD(self,lod,append:bool=True,filterInvalidListTypes:bool=True,debug:bool=False):
+    def fromLoD(self,lod,append:bool=True,debug:bool=False):
         '''
         load my entityList from the given list of dicts
         
         Args:
             lod(list): the list of dicts to load
             append(bool): if True append to my existing entries
-            filterInvalidListTypes(bool): ignore records containing list entries
         
         '''
         errors=[]
         entityList=self.getList()
         if not append:
             del entityList[:]
-        if filterInvalidListTypes:
-            LOD.handleListTypes(lod=lod,doFilter=True)
+        if self.handleInvalidListTypes:
+            LOD.handleListTypes(lod=lod,doFilter=self.filterInvalidListTypes)
 
         for record in lod:
             # call the constructor to get a new instance
