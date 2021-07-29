@@ -37,11 +37,11 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
         if tableName is None:
             tableName=entityName
         self.primaryKey=primaryKey
-        self.config=config
         if config is None:
             config=StorageConfig.getDefault()
             if debug:
                 config.debug=debug
+        self.config=config
         super(EntityManager, self).__init__(listName,clazz,tableName)
         cacheFile=self.getCacheFile(config=config,mode=config.mode)
         self.showProgress ("Creating %smanager(%s) for %s using cache %s" % (self.entityName,config.mode,self.name,cacheFile))
