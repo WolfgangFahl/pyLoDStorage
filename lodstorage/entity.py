@@ -173,7 +173,7 @@ GROUP by ?source
             startTime=time.time()
             self.showProgress(f"getting {self.entityPluralName} for {self.name} ...")
             if getListOfDicts is None:
-                getListOfDicts=self.getListOfDicts()
+                getListOfDicts=self.getListOfDicts
             listOfDicts=getListOfDicts()
             duration=time.time()-startTime
             self.showProgress(f"got {len(listOfDicts)} {self.entityPluralName} in {duration:5.1f} s")   
