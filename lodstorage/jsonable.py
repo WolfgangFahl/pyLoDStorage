@@ -489,14 +489,15 @@ class JSONAbleList(JSONAble):
         jsonData=self.getJsonData()
         return super().asJSON(asString, data=jsonData)
     
-    def restoreFromJsonFile(self,jsonFile:str):
+    def restoreFromJsonFile(self,jsonFile:str)->list:
         '''
         read my list of dicts and restore it
         '''
         lod=self.readLodFromJsonFile(jsonFile)
-        self.setListFromLoD(lod)
+        return self.setListFromLoD(lod)
         
-    def restoreFromJsonStr(self,jsonStr:str):
+        
+    def restoreFromJsonStr(self,jsonStr:str)->list:
         '''
         restore me from the given jsonStr
         
@@ -504,7 +505,7 @@ class JSONAbleList(JSONAble):
             jsonStr(str): the json string to restore me from
         '''
         lod=self.readLodFromJsonStr(jsonStr)
-        self.setListFromLoD(lod)
+        return self.setListFromLoD(lod)
         
                
     def readLodFromJsonFile(self,jsonFile:str,extension:str=".json"):
