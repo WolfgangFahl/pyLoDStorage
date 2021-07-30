@@ -18,7 +18,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
     generic entity manager
     '''
 
-    def __init__(self,name,entityName,entityPluralName:str,listName:str=None,clazz=None,tableName:str=None,primaryKey:str=None,config=None,debug=False):
+    def __init__(self,name,entityName,entityPluralName:str,listName:str=None,clazz=None,tableName:str=None,primaryKey:str=None,config=None,handleInvalidListTypes=False,filterInvalidListTypes=False,debug=False):
         '''
         Constructor
         
@@ -27,6 +27,8 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
             entityName(string): entityType to be managed e.g. Country
             entityPluralName(string): plural of the the entityType e.g. Countries
             config(StorageConfig): the configuration to be used if None a default configuration will be used
+            handleInvalidListTypes(bool): True if invalidListTypes should be converted or filtered
+            filterInvalidListTypes(bool): True if invalidListTypes should be deleted
             debug(boolean): override debug setting when default of config is used via config=None
         '''
         self.name=name
@@ -42,7 +44,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
             if debug:
                 config.debug=debug
         self.config=config
-        super(EntityManager, self).__init__(listName,clazz,tableName)
+        super(EntityManager, self).__init__(listName=listName,clazz=clazz,tableName=tableName,debug=debug,handleInvalidListTypes=handleInvalidListTypes,filterInvalidListTypes=filterInvalidListTypes)
         cacheFile=self.getCacheFile(config=config,mode=config.mode)
         self.showProgress ("Creating %smanager(%s) for %s using cache %s" % (self.entityName,config.mode,self.name,cacheFile))
         if config.mode is StoreMode.SPARQL:
