@@ -73,6 +73,8 @@ class SQLDB(object):
            EntityInfo: meta data information for the created table
         '''
         l= len(listOfRecords)
+        if sampleRecordCount<0:
+            sampleRecordCount=l
         if l<sampleRecordCount:
             msg="only %d/%d of needed sample records to createTable available" % (l,sampleRecordCount)
             if failIfTooFew:

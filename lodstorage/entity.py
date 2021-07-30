@@ -161,7 +161,7 @@ GROUP by ?source
             raise Exception("unsupported mode %s" % self.mode)            
         return result     
     
-    def fromCache(self,force:bool=False,getListOfDicts=None):
+    def fromCache(self,force:bool=False,getListOfDicts=None,sampleRecordCount=-1):
         '''
         get my entries from the cache or from the callback provide
         
@@ -180,7 +180,7 @@ GROUP by ?source
             listOfDicts=getListOfDicts()
             duration=time.time()-startTime
             self.showProgress(f"got {len(listOfDicts)} {self.entityPluralName} in {duration:5.1f} s")   
-            self.cacheFile=self.storeLoD(listOfDicts)
+            self.cacheFile=self.storeLoD(listOfDicts,sampleRecordCount=sampleRecordCount)
             self.setListFromLoD(listOfDicts)
         else:
             # fromStore also sets self.cacheFile
@@ -275,7 +275,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
         
         Args:
             listOfDicts(list): the list of dicts to store
-            limit(int): maximumn number of records to store
+            limit(int): maximum number of records to store
             batchSize(int): size of batch for storing
             cacheFile(string): the name of the storage e.g path to JSON or sqlite3 file
             sampleRecordCount(int): the number of records to analyze for type information
