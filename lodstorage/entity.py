@@ -285,6 +285,8 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
         '''
         config=self.config
         mode=config.mode
+        if self.handleInvalidListTypes:
+            LOD.handleListTypes(lod=listOfDicts,doFilter=self.filterInvalidListTypes)
         if mode is StoreMode.JSON or mode is StoreMode.JSONPICKLE:    
             if cacheFile is None:
                 cacheFile=self.getCacheFile(config=self.config,mode=mode)
