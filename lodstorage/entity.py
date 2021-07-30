@@ -44,7 +44,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
             if debug:
                 config.debug=debug
         self.config=config
-        super(EntityManager, self).__init__(listName=listName,clazz=clazz,tableName=tableName,debug=debug,handleInvalidListTypes=handleInvalidListTypes,filterInvalidListTypes=filterInvalidListTypes)
+        super(EntityManager, self).__init__(listName=listName,clazz=clazz,tableName=tableName,handleInvalidListTypes=handleInvalidListTypes,filterInvalidListTypes=filterInvalidListTypes)
         cacheFile=self.getCacheFile(config=config,mode=config.mode)
         self.showProgress ("Creating %smanager(%s) for %s using cache %s" % (self.entityName,config.mode,self.name,cacheFile))
         if config.mode is StoreMode.SPARQL:
