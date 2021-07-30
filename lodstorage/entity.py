@@ -75,10 +75,11 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
             config(StorageConfig): if None get the cache for my mode
             mode(StoreMode): the storeMode to use
         '''
-        if config is not None:
-            cachedir=config.getCachePath() 
-            if config.cacheFile is not None:
-                return config.cacheFile
+        if config is None:
+            config=self.config
+        cachedir=config.getCachePath() 
+        if config.cacheFile is not None:
+            return config.cacheFile
         ''' get the path to the file for my cached data '''  
         if mode is StoreMode.JSON or mode is StoreMode.JSONPICKLE:  
             extension=f".{mode.name.lower()}"
