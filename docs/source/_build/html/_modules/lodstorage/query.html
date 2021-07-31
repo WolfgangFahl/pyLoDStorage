@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>lodstorage.query &mdash; pyLoDStorage  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyLoDStorage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyLoDStorage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>lodstorage.query</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for lodstorage.query</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Created on 2020-08-22</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="c1">#from wikibot.mwTable import MediaWikiTable</span>
+<span class="c1"># redundant copy in this library to avoid dependency issues</span>
+<span class="c1"># original is at </span>
+<span class="kn">from</span> <span class="nn">lodstorage.mwTable</span> <span class="kn">import</span> <span class="n">MediaWikiTable</span>
+<div class="viewcode-block" id="Query"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query">[docs]</a><span class="k">class</span> <span class="nc">Query</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; a Query e.g. for SPAQRL &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">query</span><span class="p">,</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;sparql&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        constructor </span>
+<span class="sd">        Args:</span>
+<span class="sd">            name(string): the name of the query</span>
+<span class="sd">            query(string): the native Query text e.g. in SPARQL</span>
+<span class="sd">            lang(string): the language of the query e.g. SPARQL</span>
+<span class="sd">            debug(boolean): true if debug mode should be switched on</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="o">=</span><span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">=</span><span class="n">query</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span>
+        
+<div class="viewcode-block" id="Query.asWikiSourceMarkup"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.asWikiSourceMarkup">[docs]</a>    <span class="k">def</span> <span class="nf">asWikiSourceMarkup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        convert me to Mediawiki markup for syntax highlighting using the &quot;source&quot; tag</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            string: the Markup</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">markup</span><span class="o">=</span><span class="s2">&quot;&lt;source lang=&#39;</span><span class="si">%s</span><span class="s2">&#39;&gt;</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&lt;/source&gt;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">markup</span></div>
+        
+<div class="viewcode-block" id="Query.asWikiMarkup"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.asWikiMarkup">[docs]</a>    <span class="k">def</span> <span class="nf">asWikiMarkup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">listOfDicts</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        convert the given listOfDicts result to MediaWiki markup</span>
+<span class="sd">        Args:</span>
+<span class="sd">            listOfDicts(list): the list of Dicts to convert to MediaWiki markup</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            string: the markup</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>
+        <span class="n">mwTable</span><span class="o">=</span><span class="n">MediaWikiTable</span><span class="p">()</span>
+        <span class="n">mwTable</span><span class="o">.</span><span class="n">fromListOfDicts</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>
+        <span class="n">markup</span><span class="o">=</span><span class="n">mwTable</span><span class="o">.</span><span class="n">asWikiMarkup</span><span class="p">()</span>        
+        <span class="k">return</span> <span class="n">markup</span></div></div>
+
+<div class="viewcode-block" id="QueryManager"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QueryManager">[docs]</a><span class="k">class</span> <span class="nc">QueryManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    manages prepackaged Queries</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;sql&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Constructor</span>
+<span class="sd">        Args:</span>
+<span class="sd">            lang(string): the language to use for the queries sql or sparql</span>
+<span class="sd">            debug(boolean): True if debug information should be shown</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queriesByName</span><span class="o">=</span><span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="o">=</span><span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span>
+        <span class="n">queries</span><span class="o">=</span><span class="n">QueryManager</span><span class="o">.</span><span class="n">getQueries</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">queryDict</span> <span class="ow">in</span> <span class="n">queries</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="ow">in</span> <span class="n">queryDict</span><span class="p">:</span>
+                <span class="n">queryText</span><span class="o">=</span><span class="n">queryDict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">]</span>
+                <span class="n">query</span><span class="o">=</span><span class="n">Query</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">queryText</span><span class="p">,</span><span class="n">lang</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">queriesByName</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">=</span><span class="n">query</span>
+    
+<div class="viewcode-block" id="QueryManager.getQueries"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QueryManager.getQueries">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getQueries</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/..&quot;</span>
+        <span class="n">queriesPath</span><span class="o">=</span><span class="n">path</span><span class="o">+</span><span class="s2">&quot;/queries.yaml&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">queriesPath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="n">examples</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">examples</span></div></div>
+        
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, Wolfgang Fahl.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

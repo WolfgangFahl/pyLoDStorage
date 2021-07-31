@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>tests.testEntityManager &mdash; pyLoDStorage  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyLoDStorage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyLoDStorage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>tests.testEntityManager</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for tests.testEntityManager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Created on 2021-07-23</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">Royal</span>
+<span class="kn">from</span> <span class="nn">lodstorage.entity</span> <span class="kn">import</span> <span class="n">EntityManager</span>
+<span class="kn">from</span> <span class="nn">lodstorage.storageconfig</span> <span class="kn">import</span> <span class="n">StoreMode</span><span class="p">,</span> <span class="n">StorageConfig</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="TestEntityManager"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager">[docs]</a><span class="k">class</span> <span class="nc">TestEntityManager</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    test the entity manager wrapper</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="TestEntityManager.setUp"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
+        <span class="k">pass</span></div>
+    
+<div class="viewcode-block" id="TestEntityManager.configure"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.configure">[docs]</a>    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">:</span><span class="n">StorageConfig</span><span class="p">):</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">cacheDirName</span><span class="o">=</span><span class="s2">&quot;lodstorage-test&quot;</span></div>
+
+
+<div class="viewcode-block" id="TestEntityManager.tearDown"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestEntityManager.testStoreMode"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.testStoreMode">[docs]</a>    <span class="k">def</span> <span class="nf">testStoreMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test store mode display</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">StorageConfig</span><span class="o">.</span><span class="n">getDefault</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">em</span><span class="o">=</span><span class="n">EntityManager</span><span class="p">(</span><span class="s2">&quot;tst&quot;</span><span class="p">,</span><span class="s2">&quot;Test&quot;</span><span class="p">,</span><span class="s2">&quot;Tests&quot;</span><span class="p">,</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="n">em</span><span class="o">.</span><span class="n">storeMode</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">,</span><span class="n">em</span><span class="o">.</span><span class="n">storeMode</span><span class="p">())</span></div>
+        
+<div class="viewcode-block" id="TestEntityManager.checkItem"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.checkItem">[docs]</a>    <span class="k">def</span> <span class="nf">checkItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">item1</span><span class="p">,</span><span class="n">item2</span><span class="p">,</span><span class="n">attrs</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
+        <span class="c1"># check mode</span>
+        <span class="n">isDict</span><span class="o">=</span><span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item2</span><span class="p">,</span><span class="nb">dict</span><span class="p">))</span>
+            <span class="n">isDict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item2</span><span class="p">,</span><span class="nb">dict</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">isDict</span><span class="p">:</span>
+                <span class="n">value1</span><span class="o">=</span><span class="n">item1</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+                <span class="n">value2</span><span class="o">=</span><span class="n">item2</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value1</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span><span class="n">attr</span><span class="p">)</span>
+                <span class="n">value2</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">item2</span><span class="p">,</span><span class="n">attr</span><span class="p">)</span>
+            <span class="c1">#if not value1==value2:</span>
+            <span class="c1">#    print(f&quot;{value1}!={value2} for {attr}-{msg}&quot;)    </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">value1</span><span class="p">,</span><span class="n">value2</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestEntityManager.testEntityManager"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.testEntityManager">[docs]</a>    <span class="k">def</span> <span class="nf">testEntityManager</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test the entity Manager handling</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">royals</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyals</span><span class="p">(),</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyalsInstances</span><span class="p">()]):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">royals</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="p">[</span><span class="n">StorageConfig</span><span class="o">.</span><span class="n">getDefault</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">),</span><span class="n">StorageConfig</span><span class="o">.</span><span class="n">getJSON</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">),</span><span class="n">StorageConfig</span><span class="o">.</span><span class="n">getJsonPickle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;royal&quot;</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;royalorm&quot;</span>
+                <span class="n">clazz</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="n">Royal</span>  
+                <span class="n">em</span><span class="o">=</span><span class="n">EntityManager</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span><span class="n">entityName</span><span class="o">=</span><span class="s2">&quot;Royal&quot;</span><span class="p">,</span><span class="n">entityPluralName</span><span class="o">=</span><span class="s2">&quot;Royals&quot;</span><span class="p">,</span><span class="n">clazz</span><span class="o">=</span><span class="n">clazz</span><span class="p">,</span><span class="n">listName</span><span class="o">=</span><span class="s2">&quot;royals&quot;</span><span class="p">,</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+                <span class="n">em</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="n">royals</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">cacheFile</span><span class="o">=</span><span class="n">em</span><span class="o">.</span><span class="n">storeLoD</span><span class="p">(</span><span class="n">royals</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cacheFile</span><span class="o">=</span><span class="n">em</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">))</span>
+                <span class="n">royalsLod</span><span class="o">=</span><span class="n">em</span><span class="o">.</span><span class="n">fromStore</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">royalsLod</span><span class="p">,</span><span class="nb">list</span><span class="p">))</span>
+                <span class="n">hint</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">):</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">royalsLod</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="nb">dict</span><span class="p">),</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">:expecting dict&quot;</span><span class="p">)</span>
+                <span class="n">royalsList</span><span class="o">=</span><span class="n">em</span><span class="o">.</span><span class="n">getList</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">royals</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">royalsList</span><span class="p">))</span> 
+                <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">royalsList</span><span class="p">):</span>
+                    <span class="n">hint</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">royal</span><span class="o">=</span><span class="n">royals</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                    <span class="c1"># TODO check type handling e.g. &quot;born&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span><span class="n">royal</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span><span class="s2">&quot;age&quot;</span><span class="p">,</span><span class="s2">&quot;numberInLine&quot;</span><span class="p">,</span><span class="s2">&quot;wikidataurl&quot;</span><span class="p">],</span><span class="n">hint</span><span class="p">)</span>     
+            <span class="k">pass</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1">#import sys;sys.argv = [&#39;&#39;, &#39;Test.testName&#39;]</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, Wolfgang Fahl.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
