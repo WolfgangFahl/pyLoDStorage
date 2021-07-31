@@ -23,7 +23,7 @@ print('sys.path is now: %s' % (sys.path))
 # -- Project information -----------------------------------------------------
 
 project = 'pyLoDStorage'
-copyright = '2020, Wolfgang Fahl'
+copyright = '2020-2021, Wolfgang Fahl'
 author = 'Wolfgang Fahl'
 
 
@@ -76,3 +76,6 @@ html_static_path = ['_static']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+#additional settings
+#https://stackoverflow.com/a/5599712/1497139
+autoclass_content = 'both'

@@ -417,15 +417,21 @@
             <span class="n">lod</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">lod</span></div>
     
-<div class="viewcode-block" id="EntityManager.store"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="EntityManager.store"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">10000000</span><span class="p">,</span><span class="n">batchSize</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">sampleRecordCount</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        store my list of dicts</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            limit(int): maximum number of records to store</span>
+<span class="sd">            batchSize(int): size of batch for storing</span>
+<span class="sd">            fixNone(bool): if True make sure the dicts are filled with None references for each record</span>
+<span class="sd">            sampleRecordCount(int): the number of records to analyze for type information</span>
 <span class="sd">        </span>
 <span class="sd">        Return:</span>
 <span class="sd">            str: The cachefile being used</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">lod</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getLoD</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storeLoD</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storeLoD</span><span class="p">(</span><span class="n">lod</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span><span class="n">batchSize</span><span class="o">=</span><span class="n">batchSize</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="n">fixNone</span><span class="p">,</span><span class="n">sampleRecordCount</span><span class="o">=</span><span class="n">sampleRecordCount</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="EntityManager.storeLoD"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.storeLoD">[docs]</a>    <span class="k">def</span> <span class="nf">storeLoD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">listOfDicts</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">10000000</span><span class="p">,</span><span class="n">batchSize</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span><span class="n">cacheFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">sampleRecordCount</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
         <span class="sd">&#39;&#39;&#39; </span>
@@ -436,6 +442,7 @@
 <span class="sd">            limit(int): maximum number of records to store</span>
 <span class="sd">            batchSize(int): size of batch for storing</span>
 <span class="sd">            cacheFile(string): the name of the storage e.g path to JSON or sqlite3 file</span>
+<span class="sd">            fixNone(bool): if True make sure the dicts are filled with None references for each record</span>
 <span class="sd">            sampleRecordCount(int): the number of records to analyze for type information</span>
 <span class="sd">            </span>
 <span class="sd">        Return:</span>
@@ -486,7 +493,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Wolfgang Fahl.
+        &#169; Copyright 2020-2021, Wolfgang Fahl.
 
     </p>
   </div>

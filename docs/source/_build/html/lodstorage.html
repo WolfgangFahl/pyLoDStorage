@@ -191,6 +191,7 @@
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.csv.</span></span><span class="sig-name descname"><span class="pre">CSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/csv.html#CSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.csv.CSV" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.lod.LOD" title="lodstorage.lod.LOD"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.lod.LOD</span></code></a></p>
 <p>helper for converting data in csv format to list of dicts (LoD) and vice versa</p>
+<p>Constructor</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.csv.CSV.fixTypes">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">fixTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lod</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/csv.html#CSV.fixTypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.csv.CSV.fixTypes" title="Permalink to this definition">¶</a></dt>
@@ -302,6 +303,20 @@
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.entity.</span></span><span class="sig-name descname"><span class="pre">EntityManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entityName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entityPluralName</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listName</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clazz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tableName</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primaryKey</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handleInvalidListTypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterInvalidListTypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/entity.html#EntityManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.entity.EntityManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.yamlablemixin.YamlAbleMixin" title="lodstorage.yamlablemixin.YamlAbleMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.yamlablemixin.YamlAbleMixin</span></code></a>, <a class="reference internal" href="#lodstorage.jsonpicklemixin.JsonPickleMixin" title="lodstorage.jsonpicklemixin.JsonPickleMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonpicklemixin.JsonPickleMixin</span></code></a>, <a class="reference internal" href="#lodstorage.jsonable.JSONAbleList" title="lodstorage.jsonable.JSONAbleList"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAbleList</span></code></a></p>
 <p>generic entity manager</p>
+<p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>string</em>) – name of this eventManager</p></li>
+<li><p><strong>entityName</strong> (<em>string</em>) – entityType to be managed e.g. Country</p></li>
+<li><p><strong>entityPluralName</strong> (<em>string</em>) – plural of the the entityType e.g. Countries</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="#lodstorage.storageconfig.StorageConfig" title="lodstorage.storageconfig.StorageConfig"><em>StorageConfig</em></a>) – the configuration to be used if None a default configuration will be used</p></li>
+<li><p><strong>handleInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be converted or filtered</p></li>
+<li><p><strong>filterInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be deleted</p></li>
+<li><p><strong>debug</strong> (<em>boolean</em>) – override debug setting when default of config is used via config=None</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.entity.EntityManager.fromCache">
 <span class="sig-name descname"><span class="pre">fromCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getListOfDicts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampleRecordCount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/entity.html#EntityManager.fromCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.entity.EntityManager.fromCache" title="Permalink to this definition">¶</a></dt>
@@ -408,14 +423,22 @@ data for me</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.entity.EntityManager.store">
-<span class="sig-name descname"><span class="pre">store</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/lodstorage/entity.html#EntityManager.store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.entity.EntityManager.store" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batchSize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixNone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampleRecordCount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/lodstorage/entity.html#EntityManager.store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.entity.EntityManager.store" title="Permalink to this definition">¶</a></dt>
 <dd><p>store my list of dicts</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The cachefile being used</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>limit</strong> (<em>int</em>) – maximum number of records to store</p></li>
+<li><p><strong>batchSize</strong> (<em>int</em>) – size of batch for storing</p></li>
+<li><p><strong>fixNone</strong> (<em>bool</em>) – if True make sure the dicts are filled with None references for each record</p></li>
+<li><p><strong>sampleRecordCount</strong> (<em>int</em>) – the number of records to analyze for type information</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The cachefile being used</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,6 +454,7 @@ data for me</p>
 <li><p><strong>limit</strong> (<em>int</em>) – maximum number of records to store</p></li>
 <li><p><strong>batchSize</strong> (<em>int</em>) – size of batch for storing</p></li>
 <li><p><strong>cacheFile</strong> (<em>string</em>) – the name of the storage e.g path to JSON or sqlite3 file</p></li>
+<li><p><strong>fixNone</strong> (<em>bool</em>) – if True make sure the dicts are filled with None references for each record</p></li>
 <li><p><strong>sampleRecordCount</strong> (<em>int</em>) – the number of records to analyze for type information</p></li>
 </ul>
 </dd>
@@ -465,6 +489,7 @@ data for me</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable">https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable</a></p></li>
 </ul>
+<p>Constructor</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.jsonable.JSONAble.asJSON">
 <span class="sig-name descname"><span class="pre">asJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asString</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAble.asJSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAble.asJSON" title="Permalink to this definition">¶</a></dt>
@@ -712,6 +737,19 @@ data for me</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.jsonable.</span></span><span class="sig-name descname"><span class="pre">JSONAbleList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listName</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clazz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tableName</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initList</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handleInvalidListTypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterInvalidListTypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAbleList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAbleList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.jsonable.JSONAble" title="lodstorage.jsonable.JSONAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAble</span></code></a></p>
 <p>Container class</p>
+<p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listName</strong> (<em>str</em>) – the name of the list attribute to be used for storing the List</p></li>
+<li><p><strong>clazz</strong> (<em>class</em>) – a class to be used for Object relational mapping (if any)</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – the name of the “table” to be used</p></li>
+<li><p><strong>initList</strong> (<em>bool</em>) – True if the list should be initialized</p></li>
+<li><p><strong>handleInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be converted or filtered</p></li>
+<li><p><strong>filterInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be deleted</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.jsonable.JSONAbleList.asJSON">
 <span class="sig-name descname"><span class="pre">asJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asString</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#JSONAbleList.asJSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.jsonable.JSONAbleList.asJSON" title="Permalink to this definition">¶</a></dt>
@@ -905,6 +943,12 @@ see <a class="reference external" href="https://stackoverflow.com/a/50257217/149
 <dd class="field-odd"><p><strong>name</strong><strong>(</strong><strong>string</strong><strong>)</strong> – entity name = table name</p>
 </dd>
 </dl>
+<p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – the name of the type map</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.jsonable.Types.addType">
 <span class="sig-name descname"><span class="pre">addType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valueType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/jsonable.html#Types.addType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.jsonable.Types.addType" title="Permalink to this definition">¶</a></dt>
@@ -1067,6 +1111,7 @@ see <a class="reference external" href="https://stackoverflow.com/a/50257217/149
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.lod.</span></span><span class="sig-name descname"><span class="pre">LOD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/lod.html#LOD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.lod.LOD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>list of Dict aka Table</p>
+<p>Constructor</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.lod.LOD.addLookup">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">addLookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lookup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withDuplicates</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/lod.html#LOD.addLookup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.lod.LOD.addLookup" title="Permalink to this definition">¶</a></dt>
@@ -1169,6 +1214,7 @@ if they are not set
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.mwTable.</span></span><span class="sig-name descname"><span class="pre">MediaWikiTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wikiTable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colFormats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withNewLines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/mwTable.html#MediaWikiTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.mwTable.MediaWikiTable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>helper for <a class="reference external" href="https://www.mediawiki.org/wiki/Help:Tables">https://www.mediawiki.org/wiki/Help:Tables</a></p>
+<p>Constructor</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.mwTable.MediaWikiTable.addHeader">
 <span class="sig-name descname"><span class="pre">addHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/mwTable.html#MediaWikiTable.addHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.mwTable.MediaWikiTable.addHeader" title="Permalink to this definition">¶</a></dt>
@@ -1217,6 +1263,7 @@ if they are not set
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>create Plot based on counters
 see <a class="reference external" href="https://stackoverflow.com/questions/19198920/using-counter-in-python-to-build-histogram">https://stackoverflow.com/questions/19198920/using-counter-in-python-to-build-histogram</a></p>
+<p>Constructor</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.plot.Plot.barchart">
 <span class="sig-name descname"><span class="pre">barchart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'show'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/plot.html#Plot.barchart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.plot.Plot.barchart" title="Permalink to this definition">¶</a></dt>
@@ -1258,6 +1305,15 @@ see <a class="reference external" href="https://stackoverflow.com/questions/1919
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.query.</span></span><span class="sig-name descname"><span class="pre">Query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sparql'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/query.html#Query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.query.Query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>a Query e.g. for SPAQRL</p>
+<p>constructor
+:param name: the name of the query
+:type name: string
+:param query: the native Query text e.g. in SPARQL
+:type query: string
+:param lang: the language of the query e.g. SPARQL
+:type lang: string
+:param debug: true if debug mode should be switched on
+:type debug: boolean</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.query.Query.asWikiMarkup">
 <span class="sig-name descname"><span class="pre">asWikiMarkup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listOfDicts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/query.html#Query.asWikiMarkup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.query.Query.asWikiMarkup" title="Permalink to this definition">¶</a></dt>
@@ -1295,6 +1351,11 @@ see <a class="reference external" href="https://stackoverflow.com/questions/1919
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.query.</span></span><span class="sig-name descname"><span class="pre">QueryManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sql'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/query.html#QueryManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.query.QueryManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>manages prepackaged Queries</p>
+<p>Constructor
+:param lang: the language to use for the queries sql or sparql
+:type lang: string
+:param debug: True if debug information should be shown
+:type debug: boolean</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.query.QueryManager.getQueries">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">getQueries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/query.html#QueryManager.getQueries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.query.QueryManager.getQueries" title="Permalink to this definition">¶</a></dt>
@@ -1311,6 +1372,19 @@ see <a class="reference external" href="https://stackoverflow.com/questions/1919
 <dt class="sig sig-object py" id="lodstorage.sample.Cities">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.sample.</span></span><span class="sig-name descname"><span class="pre">Cities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sample.html#Cities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.sample.Cities" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.jsonable.JSONAbleList" title="lodstorage.jsonable.JSONAbleList"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAbleList</span></code></a></p>
+<p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listName</strong> (<em>str</em>) – the name of the list attribute to be used for storing the List</p></li>
+<li><p><strong>clazz</strong> (<em>class</em>) – a class to be used for Object relational mapping (if any)</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – the name of the “table” to be used</p></li>
+<li><p><strong>initList</strong> (<em>bool</em>) – True if the list should be initialized</p></li>
+<li><p><strong>handleInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be converted or filtered</p></li>
+<li><p><strong>filterInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be deleted</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
@@ -1318,6 +1392,7 @@ see <a class="reference external" href="https://stackoverflow.com/questions/1919
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.sample.</span></span><span class="sig-name descname"><span class="pre">Royal</span></span><a class="reference internal" href="_modules/lodstorage/sample.html#Royal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.sample.Royal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.jsonable.JSONAble" title="lodstorage.jsonable.JSONAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAble</span></code></a></p>
 <p>i am a single Royal</p>
+<p>Constructor</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.sample.Royal.getSamples">
 <em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">getSamples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sample.html#Royal.getSamples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.sample.Royal.getSamples" title="Permalink to this definition">¶</a></dt>
@@ -1330,12 +1405,38 @@ see <a class="reference external" href="https://stackoverflow.com/questions/1919
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.sample.</span></span><span class="sig-name descname"><span class="pre">Royals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sample.html#Royals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.sample.Royals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.jsonable.JSONAbleList" title="lodstorage.jsonable.JSONAbleList"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAbleList</span></code></a></p>
 <p>a non ORM Royals list</p>
+<p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listName</strong> (<em>str</em>) – the name of the list attribute to be used for storing the List</p></li>
+<li><p><strong>clazz</strong> (<em>class</em>) – a class to be used for Object relational mapping (if any)</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – the name of the “table” to be used</p></li>
+<li><p><strong>initList</strong> (<em>bool</em>) – True if the list should be initialized</p></li>
+<li><p><strong>handleInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be converted or filtered</p></li>
+<li><p><strong>filterInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be deleted</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lodstorage.sample.RoyalsORMList">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.sample.</span></span><span class="sig-name descname"><span class="pre">RoyalsORMList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sample.html#RoyalsORMList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.sample.RoyalsORMList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lodstorage.jsonable.JSONAbleList" title="lodstorage.jsonable.JSONAbleList"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAbleList</span></code></a></p>
+<p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listName</strong> (<em>str</em>) – the name of the list attribute to be used for storing the List</p></li>
+<li><p><strong>clazz</strong> (<em>class</em>) – a class to be used for Object relational mapping (if any)</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – the name of the “table” to be used</p></li>
+<li><p><strong>initList</strong> (<em>bool</em>) – True if the list should be initialized</p></li>
+<li><p><strong>handleInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be converted or filtered</p></li>
+<li><p><strong>filterInvalidListTypes</strong> (<em>bool</em>) – True if invalidListTypes should be deleted</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
@@ -1343,6 +1444,7 @@ see <a class="reference external" href="https://stackoverflow.com/questions/1919
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.sample.</span></span><span class="sig-name descname"><span class="pre">Sample</span></span><a class="reference internal" href="_modules/lodstorage/sample.html#Sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.sample.Sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Sample dataset generator</p>
+<p>Constructor</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lodstorage.sample.Sample.cityList">
 <span class="sig-name descname"><span class="pre">cityList</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#lodstorage.sample.Sample.cityList" title="Permalink to this definition">¶</a></dt>
@@ -1392,6 +1494,15 @@ see <a class="reference external" href="https://stackoverflow.com/questions/1919
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.schema.</span></span><span class="sig-name descname"><span class="pre">Schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/schema.html#Schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.schema.Schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>a relational Schema</p>
+<p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the name of the schema</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – the title of the schema</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.schema.Schema.generalizeColumn">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">generalizeColumn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tableList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colName</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/schema.html#Schema.generalizeColumn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.schema.Schema.generalizeColumn" title="Permalink to this definition">¶</a></dt>
@@ -1452,6 +1563,14 @@ return it</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.schema.</span></span><span class="sig-name descname"><span class="pre">SchemaManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schemaDefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseUrl</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/schema.html#SchemaManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.schema.SchemaManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>a manager for schemas</p>
+<dl class="simple">
+<dt>constructor</dt><dd><dl class="simple">
+<dt>Args:</dt><dd><p>schemaDefs(dict): a dictionary of schema names
+baseUrl(str): the base url to use for links</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -1473,6 +1592,19 @@ return it</p>
 <li><p><strong>typedLiterals</strong> – True if INSERT should be done with typedLiterals</p></li>
 <li><p><strong>profile</strong><strong>(</strong><strong>boolean</strong><strong>)</strong> – True if profiling / timing information should be displayed</p></li>
 <li><p><strong>sparql</strong> – the SPARQLWrapper2 instance to be used</p></li>
+</ul>
+</dd>
+</dl>
+<p>Constructor a SPARQL wrapper</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>string</em>) – the base URL of the endpoint - the mode query/update is going to be appended</p></li>
+<li><p><strong>mode</strong> (<em>string</em>) – ‘query’ or ‘update’</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – True if debugging is to be activated</p></li>
+<li><p><strong>typedLiterals</strong> (<em>bool</em>) – True if INSERT should be done with typedLiterals</p></li>
+<li><p><strong>profile</strong> (<em>boolean</em>) – True if profiling / timing information should be displayed</p></li>
+<li><p><strong>agent</strong> (<em>string</em>) – the User agent to use</p></li>
 </ul>
 </dd>
 </dl>
@@ -1725,6 +1857,16 @@ return it</p>
 </ul>
 </dd>
 </dl>
+<p>construct me from the given name and primary key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>string</em>) – the name of the entity</p></li>
+<li><p><strong>primaryKey</strong> (<em>string</em>) – the name of the primary key column</p></li>
+<li><p><strong>debug</strong> (<em>boolean</em>) – True if debug information should be shown</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.sql.EntityInfo.addType">
 <span class="sig-name descname"><span class="pre">addType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valueType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqlType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/sql.html#EntityInfo.addType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.sql.EntityInfo.addType" title="Permalink to this definition">¶</a></dt>
@@ -1800,6 +1942,18 @@ converting ‘1926-04-21’ back to datetime.date(1926, 4, 21)</p>
 <li><p><strong>dbname</strong><strong>(</strong><strong>string</strong><strong>)</strong> – name of the database</p></li>
 <li><p><strong>debug</strong><strong>(</strong><strong>boolean</strong><strong>)</strong> – True if debug info should be provided</p></li>
 <li><p><strong>errorDebug</strong><strong>(</strong><strong>boolean</strong><strong>)</strong> – True if debug info should be provided on errors (should not be used for production since it might reveal data)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Construct me for the given dbname and debug</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dbname</strong> (<em>string</em>) – name of the database - default is a RAM based database</p></li>
+<li><p><strong>connection</strong> (<em>Connection</em>) – an optional connection to be reused</p></li>
+<li><p><strong>check_same_thread</strong> (<em>boolean</em>) – True if object handling needs to be on the same thread see <a class="reference external" href="https://stackoverflow.com/a/48234567/1497139">https://stackoverflow.com/a/48234567/1497139</a></p></li>
+<li><p><strong>debug</strong> (<em>boolean</em>) – if True switch on debug</p></li>
+<li><p><strong>errorDebug</strong> (<em>boolean</em>) – True if debug info should be provided on errors (should not be used for production since it might reveal data)</p></li>
 </ul>
 </dd>
 </dl>
@@ -2045,6 +2199,19 @@ as defining sample record and execute DDL command</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.storageconfig.</span></span><span class="sig-name descname"><span class="pre">StorageConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">StoreMode.SQL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cacheDirName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lodstorage'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cacheFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withShowProgress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errorDebug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/storageconfig.html#StorageConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.storageconfig.StorageConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>a storage configuration</p>
+<p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<a class="reference internal" href="#lodstorage.storageconfig.StoreMode" title="lodstorage.storageconfig.StoreMode"><em>StoreMode</em></a>) – the storage mode e.g. sql</p></li>
+<li><p><strong>cacheFile</strong> (<em>string</em>) – the common cacheFile to use (if any)</p></li>
+<li><p><strong>withShowProgress</strong> (<em>boolean</em>) – True if progress should be shown</p></li>
+<li><p><strong>profile</strong> (<em>boolean</em>) – True if timing / profiling information should be shown</p></li>
+<li><p><strong>debug</strong> (<em>boolean</em>) – True if debugging information should be shown</p></li>
+<li><p><strong>errorDebug</strong> (<em>boolean</em>) – True if debug info should be provided on errors (should not be used for production since it might reveal data)</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.storageconfig.StorageConfig.getCachePath">
 <span class="sig-name descname"><span class="pre">getCachePath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensureExists</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/lodstorage/storageconfig.html#StorageConfig.getCachePath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.storageconfig.StorageConfig.getCachePath" title="Permalink to this definition">¶</a></dt>
@@ -2130,6 +2297,7 @@ as defining sample record and execute DDL command</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.tabulateCounter.</span></span><span class="sig-name descname"><span class="pre">TabulateCounter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/tabulateCounter.html#TabulateCounter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.tabulateCounter.TabulateCounter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>helper for tabulating Counters</p>
+<p>Constructor</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.tabulateCounter.TabulateCounter.mostCommonTable">
 <span class="sig-name descname"><span class="pre">mostCommonTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['#',</span> <span class="pre">'key',</span> <span class="pre">'count',</span> <span class="pre">'%']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tablefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pretty'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/tabulateCounter.html#TabulateCounter.mostCommonTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.tabulateCounter.TabulateCounter.mostCommonTable" title="Permalink to this definition">¶</a></dt>
@@ -2148,6 +2316,9 @@ as defining sample record and execute DDL command</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">lodstorage.uml.</span></span><span class="sig-name descname"><span class="pre">UML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/uml.html#UML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.uml.UML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>UML diagrams via plantuml</p>
+<p>Constructor
+:param debug: True if debug information should be shown
+:type debug: boolean</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lodstorage.uml.UML.mergeSchema">
 <span class="sig-name descname"><span class="pre">mergeSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schemaManager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tableList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">packageName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generalizeTo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withSkin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lodstorage/uml.html#UML.mergeSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lodstorage.uml.UML.mergeSchema" title="Permalink to this definition">¶</a></dt>
@@ -2247,7 +2418,7 @@ as defining sample record and execute DDL command</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Wolfgang Fahl.
+        &#169; Copyright 2020-2021, Wolfgang Fahl.
 
     </p>
   </div>

@@ -63,7 +63,12 @@ fixconf() {
       printf("print(%ssys.path is now: %%s%s %% (sys.path))\n",squote,squote)
       next
     }
-    { print}' > $tmpconf
+    { print }
+    END {
+      print ("#additional settings")
+      print ("#https://stackoverflow.com/a/5599712/1497139")
+      print ("autoclass_content = '\''both'\''")
+    }' > $tmpconf
     #diff $tmpconf $conf
     mv $tmpconf $conf
     echo "$src/conf.py has been fixed"
@@ -72,11 +77,10 @@ fixconf() {
 
 src=docs/source
 checkinstalled  sphinx-apidoc
-# use sphinx-api-doc to create the documentation
 sphinx-apidoc --full -f -o $src .
 cd $src
 
-fixconf 2020 "Wolfgang Fahl"
+fixconf 2020-2021 "Wolfgang Fahl"
 make clean html
 if [ "$GHACTIONS" != "ACTIVE" ]
 then
