@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>lodstorage.sparql &mdash; pyLoDStorage  documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -49,7 +54,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pyLoDStorage
+            <a href="../../index.html" class="icon icon-home"> pyLoDStorage
           
 
           
@@ -80,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
@@ -110,6 +115,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -156,6 +163,7 @@
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">from</span> <span class="nn">SPARQLWrapper</span> <span class="kn">import</span> <span class="n">SPARQLWrapper2</span>
 <span class="kn">from</span> <span class="nn">SPARQLWrapper.Wrapper</span> <span class="kn">import</span> <span class="n">POSTDIRECTLY</span><span class="p">,</span> <span class="n">POST</span>
+<span class="kn">from</span> <span class="nn">lodstorage.lod</span> <span class="kn">import</span> <span class="n">LOD</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span>
@@ -420,18 +428,20 @@
         <span class="n">jsonResult</span><span class="o">=</span><span class="n">queryResult</span><span class="o">.</span><span class="n">convert</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getResults</span><span class="p">(</span><span class="n">jsonResult</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="SPARQL.queryAsListOfDicts"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.queryAsListOfDicts">[docs]</a>    <span class="k">def</span> <span class="nf">queryAsListOfDicts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">queryString</span><span class="p">):</span>
+<div class="viewcode-block" id="SPARQL.queryAsListOfDicts"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.queryAsListOfDicts">[docs]</a>    <span class="k">def</span> <span class="nf">queryAsListOfDicts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">queryString</span><span class="p">,</span><span class="n">fixNone</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">sampleCount</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        get a list of dicts for the given query (to allow round-trip results for insertListOfDicts)</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            queryString(string): the SPARQL query to execute</span>
+<span class="sd">            fixNone(bool): if True add None values for empty columns in Dict</span>
+<span class="sd">            sampleCount(int): the number of samples to check</span>
 <span class="sd">            </span>
 <span class="sd">        Returns:</span>
 <span class="sd">            list: a list ofDicts</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">records</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span>
-        <span class="n">listOfDicts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">asListOfDicts</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+        <span class="n">listOfDicts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">asListOfDicts</span><span class="p">(</span><span class="n">records</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="n">fixNone</span><span class="p">,</span><span class="n">sampleCount</span><span class="o">=</span><span class="n">sampleCount</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">listOfDicts</span></div>
     
 <div class="viewcode-block" id="SPARQL.strToDatetime"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.strToDatetime">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -454,17 +464,22 @@
                 <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ve</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dt</span></div>
     
-<div class="viewcode-block" id="SPARQL.asListOfDicts"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.asListOfDicts">[docs]</a>    <span class="k">def</span> <span class="nf">asListOfDicts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">records</span><span class="p">):</span>
+<div class="viewcode-block" id="SPARQL.asListOfDicts"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.asListOfDicts">[docs]</a>    <span class="k">def</span> <span class="nf">asListOfDicts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">records</span><span class="p">,</span><span class="n">fixNone</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">sampleCount</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        convert SPARQL result back to python native</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            record(list): the list of bindings</span>
+<span class="sd">            fixNone(bool): if True add None values for empty columns in Dict</span>
+<span class="sd">            sampleCount(int): the number of samples to check</span>
 <span class="sd">            </span>
 <span class="sd">        Returns:</span>
 <span class="sd">            list: a list of Dicts</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">resultList</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">fields</span><span class="o">=</span><span class="kc">None</span>
+        <span class="k">if</span> <span class="n">fixNone</span><span class="p">:</span>
+            <span class="n">fields</span><span class="o">=</span><span class="n">LOD</span><span class="o">.</span><span class="n">getFields</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">sampleCount</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
             <span class="n">resultDict</span><span class="o">=</span><span class="p">{}</span>
             <span class="k">for</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -489,6 +504,10 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">resultValue</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">value</span>  
                 <span class="n">resultDict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">resultValue</span>
+            <span class="k">if</span> <span class="n">fixNone</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">resultDict</span><span class="p">:</span>
+                        <span class="n">resultDict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
             <span class="n">resultList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resultDict</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">resultList</span></div>
     
@@ -515,28 +534,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Wolfgang Fahl
+        &#169; Copyright 2020, Wolfgang Fahl.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

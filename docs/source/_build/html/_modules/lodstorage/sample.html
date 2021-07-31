@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>lodstorage.sample &mdash; pyLoDStorage  documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -49,7 +54,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pyLoDStorage
+            <a href="../../index.html" class="icon icon-home"> pyLoDStorage
           
 
           
@@ -80,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
@@ -110,6 +115,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -156,13 +163,14 @@
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span>
+<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span><span class="p">,</span> <span class="n">JSONAbleList</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
 
 <div class="viewcode-block" id="Sample"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample">[docs]</a><span class="k">class</span> <span class="nc">Sample</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Sample dataset generator</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">cityList</span><span class="o">=</span><span class="kc">None</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -188,12 +196,13 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        get a list of cities</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">cityJsonUrl</span><span class="o">=</span><span class="s2">&quot;https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json&quot;</span>
-        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">cityJsonUrl</span><span class="p">)</span> <span class="k">as</span> <span class="n">url</span><span class="p">:</span>
-            <span class="n">cityList</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
-        <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">cityList</span><span class="p">:</span>
-            <span class="n">city</span><span class="p">[</span><span class="s1">&#39;cityId&#39;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">city</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">],</span><span class="n">city</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>    
-        <span class="k">return</span> <span class="n">cityList</span></div>
+        <span class="k">if</span> <span class="n">Sample</span><span class="o">.</span><span class="n">cityList</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cityJsonUrl</span><span class="o">=</span><span class="s2">&quot;https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json&quot;</span>
+            <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">cityJsonUrl</span><span class="p">)</span> <span class="k">as</span> <span class="n">url</span><span class="p">:</span>
+                <span class="n">Sample</span><span class="o">.</span><span class="n">cityList</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">Sample</span><span class="o">.</span><span class="n">cityList</span><span class="p">:</span>
+                <span class="n">city</span><span class="p">[</span><span class="s1">&#39;cityId&#39;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">city</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">],</span><span class="n">city</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>    
+        <span class="k">return</span> <span class="n">Sample</span><span class="o">.</span><span class="n">cityList</span></div>
     
 <div class="viewcode-block" id="Sample.dob"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.dob">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">dob</span><span class="p">(</span><span class="n">isoDateString</span><span class="p">):</span>
@@ -206,6 +215,42 @@
     
 <div class="viewcode-block" id="Sample.getRoyals"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.getRoyals">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">getRoyals</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Royal</span><span class="o">.</span><span class="n">getSamples</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="Sample.getRoyalsInstances"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.getRoyalsInstances">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getRoyalsInstances</span><span class="p">():</span>
+        <span class="n">lod</span><span class="o">=</span><span class="n">Royal</span><span class="o">.</span><span class="n">getSamples</span><span class="p">()</span>
+        <span class="n">royals</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+            <span class="n">royal</span><span class="o">=</span><span class="n">Royal</span><span class="p">()</span>
+            <span class="n">royal</span><span class="o">.</span><span class="n">fromDict</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+            <span class="n">royals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">royal</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">royals</span></div></div>
+    
+<div class="viewcode-block" id="Royals"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Royals">[docs]</a><span class="k">class</span> <span class="nc">Royals</span><span class="p">(</span><span class="n">JSONAbleList</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    a non ORM Royals list</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Royals</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;royals&quot;</span><span class="p">,</span><span class="n">clazz</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="n">Royal</span><span class="o">.</span><span class="n">getSamples</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="kc">None</span></div>
+        
+<div class="viewcode-block" id="RoyalsORMList"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.RoyalsORMList">[docs]</a><span class="k">class</span> <span class="nc">RoyalsORMList</span><span class="p">(</span><span class="n">JSONAbleList</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RoyalsORMList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;royals&quot;</span><span class="p">,</span><span class="n">Royal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyalsInstances</span><span class="p">()</span></div>
+            
+<div class="viewcode-block" id="Royal"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Royal">[docs]</a><span class="k">class</span> <span class="nc">Royal</span><span class="p">(</span><span class="n">JSONAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    i am a single Royal</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+<div class="viewcode-block" id="Royal.getSamples"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Royal.getSamples">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getSamples</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="n">listOfDicts</span><span class="o">=</span><span class="p">[</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Elizabeth Alexandra Mary Windsor&#39;</span><span class="p">,</span> <span class="s1">&#39;born&#39;</span><span class="p">:</span> <span class="n">Sample</span><span class="o">.</span><span class="n">dob</span><span class="p">(</span><span class="s1">&#39;1926-04-21&#39;</span><span class="p">),</span> <span class="s1">&#39;numberInLine&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;wikidataurl&#39;</span><span class="p">:</span> <span class="s1">&#39;https://www.wikidata.org/wiki/Q9682&#39;</span> <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Charles, Prince of Wales&#39;</span><span class="p">,</span>         <span class="s1">&#39;born&#39;</span><span class="p">:</span> <span class="n">Sample</span><span class="o">.</span><span class="n">dob</span><span class="p">(</span><span class="s1">&#39;1948-11-14&#39;</span><span class="p">),</span> <span class="s1">&#39;numberInLine&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;wikidataurl&#39;</span><span class="p">:</span> <span class="s1">&#39;https://www.wikidata.org/wiki/Q43274&#39;</span> <span class="p">},</span>
@@ -219,17 +264,23 @@
             <span class="n">person</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">age</span>
             <span class="n">person</span><span class="p">[</span><span class="s1">&#39;ofAge&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">age</span><span class="o">&gt;=</span><span class="mi">18</span>
             <span class="n">person</span><span class="p">[</span><span class="s1">&#39;lastmodified&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">listOfDicts</span></div></div>
-        
-<div class="viewcode-block" id="Royals"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Royals">[docs]</a><span class="k">class</span> <span class="nc">Royals</span><span class="p">(</span><span class="n">JSONAble</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">listOfDicts</span></div>
+    
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">attrs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span><span class="s2">&quot;born&quot;</span><span class="p">]</span>
+        <span class="n">delim</span><span class="o">=</span><span class="s2">&quot;:&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                <span class="n">value</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">)</span>
+                <span class="n">text</span><span class="o">+=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">delim</span><span class="si">}{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">delim</span><span class="o">=</span><span class="s2">&quot;:&quot;</span> 
+        <span class="k">return</span> <span class="n">text</span></div>
+         
+    
+<div class="viewcode-block" id="Cities"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Cities">[docs]</a><span class="k">class</span> <span class="nc">Cities</span><span class="p">(</span><span class="n">JSONAbleList</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyals</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span><span class="o">=</span><span class="kc">None</span></div>
-        
-<div class="viewcode-block" id="Cities"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Cities">[docs]</a><span class="k">class</span> <span class="nc">Cities</span><span class="p">(</span><span class="n">JSONAble</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Cities</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;cities&quot;</span><span class="p">,</span><span class="n">clazz</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getCities</span><span class="p">()</span>      
         <span class="k">else</span><span class="p">:</span>
@@ -240,28 +291,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Wolfgang Fahl
+        &#169; Copyright 2020, Wolfgang Fahl.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

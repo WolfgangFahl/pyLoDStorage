@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>tests.testSqlite3 &mdash; pyLoDStorage  documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -49,7 +54,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pyLoDStorage
+            <a href="../../index.html" class="icon icon-home"> pyLoDStorage
           
 
           
@@ -80,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
@@ -110,6 +115,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -161,6 +168,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Sample</span>
 <span class="kn">from</span> <span class="nn">lodstorage.uml</span> <span class="kn">import</span> <span class="n">UML</span>
+<span class="kn">from</span> <span class="nn">lodstorage.schema</span> <span class="kn">import</span> <span class="n">Schema</span>
 <span class="kn">from</span> <span class="nn">lodstorage.sql</span> <span class="kn">import</span> <span class="n">SQLDB</span><span class="p">,</span> <span class="n">EntityInfo</span>
 
 
@@ -170,7 +178,7 @@
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="TestSQLDB.setUp"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="TestSQLDB.tearDown"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -192,15 +200,18 @@
 <span class="sd">      </span>
 <span class="sd">        &#39;&#39;&#39;</span>     
         <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> size is </span><span class="si">%d</span><span class="s2"> fixNone is </span><span class="si">%r</span><span class="s2"> fixDates is: </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">entityName</span><span class="p">,</span><span class="n">size</span><span class="p">,</span><span class="n">fixNone</span><span class="p">,</span><span class="n">fixDates</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> size is </span><span class="si">%d</span><span class="s2"> fixNone is </span><span class="si">%r</span><span class="s2"> fixDates is: </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">entityName</span><span class="p">,</span><span class="n">size</span><span class="p">,</span><span class="n">fixNone</span><span class="p">,</span><span class="n">fixDates</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">=</span><span class="n">SQLDB</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span><span class="n">errorDebug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">entityInfo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">createTable</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span><span class="n">entityName</span><span class="p">,</span><span class="n">primaryKey</span><span class="p">)</span>
         <span class="n">startTime</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span><span class="n">entityInfo</span><span class="p">,</span><span class="n">executeMany</span><span class="o">=</span><span class="n">executeMany</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="n">fixNone</span><span class="p">)</span>
         <span class="n">elapsed</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">startTime</span>
-        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;adding </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> records took </span><span class="si">%5.3f</span><span class="s2"> s =&gt; %5.f records/s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="n">entityName</span><span class="p">,</span><span class="n">elapsed</span><span class="p">,</span><span class="n">size</span><span class="o">/</span><span class="n">elapsed</span><span class="p">))</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;adding </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> records took </span><span class="si">%5.3f</span><span class="s2"> s =&gt; %5.f records/s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="n">entityName</span><span class="p">,</span><span class="n">elapsed</span><span class="p">,</span><span class="n">size</span><span class="o">/</span><span class="n">elapsed</span><span class="p">))</span> 
         <span class="n">resultList</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">queryAll</span><span class="p">(</span><span class="n">entityInfo</span><span class="p">,</span><span class="n">fixDates</span><span class="o">=</span><span class="n">fixDates</span><span class="p">)</span>    
-        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;selecting </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> records took </span><span class="si">%5.3f</span><span class="s2"> s =&gt; %5.f records/s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">resultList</span><span class="p">),</span><span class="n">entityName</span><span class="p">,</span><span class="n">elapsed</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">resultList</span><span class="p">)</span><span class="o">/</span><span class="n">elapsed</span><span class="p">))</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;selecting </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> records took </span><span class="si">%5.3f</span><span class="s2"> s =&gt; %5.f records/s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">resultList</span><span class="p">),</span><span class="n">entityName</span><span class="p">,</span><span class="n">elapsed</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">resultList</span><span class="p">)</span><span class="o">/</span><span class="n">elapsed</span><span class="p">))</span> 
         <span class="k">if</span> <span class="n">doClose</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">resultList</span></div>
@@ -247,7 +258,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">tableList</span><span class="p">))</span>
         <span class="n">uml</span><span class="o">=</span><span class="n">UML</span><span class="p">()</span>
         <span class="n">plantUml</span><span class="o">=</span><span class="n">uml</span><span class="o">.</span><span class="n">tableListToPlantUml</span><span class="p">(</span><span class="n">tableList</span><span class="p">,</span><span class="n">generalizeTo</span><span class="o">=</span><span class="s2">&quot;PersonBase&quot;</span><span class="p">,</span><span class="n">withSkin</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">plantUml</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">plantUml</span><span class="p">)</span>
         <span class="n">expected</span><span class="o">=</span><span class="s1">&#39;&#39;&#39;class PersonBase &lt;&lt; Entity &gt;&gt; {</span>
 <span class="s1"> lastmodified : TIMESTAMP </span>
 <span class="s1"> name : TEXT &lt;&lt;PK&gt;&gt;</span>
@@ -266,6 +278,30 @@
 <span class="s1">PersonBase &lt;|-- Family</span>
 <span class="s1">&#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span><span class="n">plantUml</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestSQLDB.testIssue15"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.testIssue15">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue15</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/15</span>
+<span class="sd">        </span>
+<span class="sd">        auto create view ddl in mergeschema</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">=</span><span class="n">SQLDB</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="n">errorDebug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">listOfRecords</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyals</span><span class="p">()</span>
+        <span class="n">entityInfo</span><span class="o">=</span><span class="n">EntityInfo</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span><span class="s1">&#39;Person&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">entityInfo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">createTable</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span><span class="n">entityInfo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">entityInfo</span><span class="o">.</span><span class="n">primaryKey</span><span class="p">)</span>
+        <span class="n">listOfRecords</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Royal family&#39;</span><span class="p">,</span> <span class="s1">&#39;country&#39;</span><span class="p">:</span> <span class="s1">&#39;UK&#39;</span><span class="p">,</span> <span class="s1">&#39;lastmodified&#39;</span><span class="p">:</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()}]</span>
+        <span class="n">entityInfo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">createTable</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span><span class="s1">&#39;Family&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="n">tableList</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">getTableList</span><span class="p">()</span>
+        <span class="n">viewDDL</span><span class="o">=</span><span class="n">Schema</span><span class="o">.</span><span class="n">getGeneralViewDDL</span><span class="p">(</span><span class="n">tableList</span><span class="p">,</span><span class="s2">&quot;PersonBase&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="n">viewDDL</span><span class="p">)</span>
+        <span class="n">expected</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;CREATE VIEW PersonBase AS </span>
+<span class="s2">  SELECT name,lastmodified FROM Person</span>
+<span class="s2">UNION</span>
+<span class="s2">  SELECT name,lastmodified FROM Family&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span><span class="n">viewDDL</span><span class="p">)</span>
+        <span class="k">pass</span></div>
         
 <div class="viewcode-block" id="TestSQLDB.testUniqueConstraint"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.testUniqueConstraint">[docs]</a>    <span class="k">def</span> <span class="nf">testUniqueConstraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -299,7 +335,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">resultList</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span><span class="n">resultList</span><span class="p">)</span></div>
        
-<div class="viewcode-block" id="TestSQLDB.testIssue13"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.testIssue13">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue13</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSQLDB.testIssue13_setNoneValue"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.testIssue13_setNoneValue">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue13_setNoneValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/13</span>
 <span class="sd">        set None value for undefined LoD entries</span>
@@ -313,6 +349,27 @@
         <span class="n">resultList</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">checkListOfRecords</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">primaryKey</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
             <span class="nb">print</span> <span class="p">(</span><span class="n">resultList</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="TestSQLDB.testIssue14_execute"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.testIssue14_execute">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue14_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/14</span>
+<span class="sd">        </span>
+<span class="sd">        offer execute wrapper directly via sqlDB</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">sqlDB</span><span class="o">=</span><span class="n">SQLDB</span><span class="p">()</span>
+        <span class="n">ddl</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        CREATE TABLE contacts (</span>
+<span class="s2">            contact_id INTEGER PRIMARY KEY,</span>
+<span class="s2">            first_name TEXT NOT NULL,</span>
+<span class="s2">            last_name TEXT NOT NULL</span>
+<span class="s2">        )</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">sqlDB</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">ddl</span><span class="p">)</span>
+        <span class="n">tableList</span><span class="o">=</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">getTableList</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tableList</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">tableList</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;contacts&quot;</span><span class="p">,</span><span class="n">tableList</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span></div>
          
 <div class="viewcode-block" id="TestSQLDB.testBindingError"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.testBindingError">[docs]</a>    <span class="k">def</span> <span class="nf">testBindingError</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -374,14 +431,16 @@
             <span class="n">listOfRecords</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getCities</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">checkListOfRecords</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span><span class="s1">&#39;City&#39;</span><span class="p">,</span><span class="n">fixDates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">doClose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">backupDB</span><span class="o">=</span><span class="s2">&quot;/tmp/testSqlite.db&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="n">backupDB</span><span class="p">,</span><span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">showProgress</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+            <span class="n">showProgress</span><span class="o">=</span><span class="mi">200</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="n">backupDB</span><span class="p">,</span><span class="n">profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="n">showProgress</span><span class="o">=</span><span class="n">showProgress</span><span class="p">)</span>
             <span class="n">size</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">backupDB</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;size of backup DB is </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">size</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;size of backup DB is </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">size</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">size</span><span class="o">&gt;</span><span class="mi">600000</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="c1"># restore</span>
-            <span class="n">ramDB</span><span class="o">=</span><span class="n">SQLDB</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">backupDB</span><span class="p">,</span> <span class="n">SQLDB</span><span class="o">.</span><span class="n">RAM</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">entityInfo</span><span class="o">=</span><span class="n">EntityInfo</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">[:</span><span class="mi">50</span><span class="p">],</span><span class="s1">&#39;City&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ramDB</span><span class="o">=</span><span class="n">SQLDB</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">backupDB</span><span class="p">,</span> <span class="n">SQLDB</span><span class="o">.</span><span class="n">RAM</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="n">showProgress</span><span class="o">=</span><span class="n">showProgress</span><span class="p">)</span>
+            <span class="n">entityInfo</span><span class="o">=</span><span class="n">EntityInfo</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">[:</span><span class="mi">50</span><span class="p">],</span><span class="s1">&#39;City&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
             <span class="n">allCities</span><span class="o">=</span><span class="n">ramDB</span><span class="o">.</span><span class="n">queryAll</span><span class="p">(</span><span class="n">entityInfo</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">allCities</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">))</span></div>
             
@@ -396,12 +455,56 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">checkListOfRecords</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span> <span class="s1">&#39;Sample_</span><span class="si">%d</span><span class="s1">_1000&#39;</span> <span class="o">%</span><span class="n">sampleNo</span><span class="p">,</span> <span class="s1">&#39;pKey&#39;</span><span class="p">,</span><span class="n">doClose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  
             <span class="bp">self</span><span class="o">.</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">copyTo</span><span class="p">(</span><span class="n">copyDB</span><span class="p">)</span>
         <span class="n">size</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">dbFile</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
-        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;size of copy DB is </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;size of copy DB is </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">size</span><span class="o">&gt;</span><span class="mi">70000</span><span class="p">)</span>
         <span class="n">tableList</span><span class="o">=</span><span class="n">copyDB</span><span class="o">.</span><span class="n">getTableList</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">tableList</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tableList</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">sampleNo</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s1">&#39;Sample_</span><span class="si">%d</span><span class="s1">_1000&#39;</span> <span class="o">%</span><span class="n">sampleNo</span><span class="p">,</span><span class="n">tableList</span><span class="p">[</span><span class="n">sampleNo</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s1">&#39;Sample_</span><span class="si">%d</span><span class="s1">_1000&#39;</span> <span class="o">%</span><span class="n">sampleNo</span><span class="p">,</span><span class="n">tableList</span><span class="p">[</span><span class="n">sampleNo</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+        <span class="c1"># check that database is writable</span>
+        <span class="c1"># https://stackoverflow.com/a/44707371/1497139</span>
+        <span class="n">copyDB</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;pragma user_version=0&quot;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestSQLDB.getSampleTableDB"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.getSampleTableDB">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getSampleTableDB</span><span class="p">(</span><span class="n">withDrop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">failIfTooFew</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">sampleSize</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="n">listOfRecords</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getSample</span><span class="p">(</span><span class="n">sampleSize</span><span class="p">)</span>
+        <span class="n">sqlDB</span><span class="o">=</span><span class="n">SQLDB</span><span class="p">()</span>
+        <span class="n">entityName</span><span class="o">=</span><span class="s2">&quot;sample&quot;</span>
+        <span class="n">primaryKey</span><span class="o">=</span><span class="s1">&#39;pKey&#39;</span>
+        <span class="n">sampleRecordCount</span><span class="o">=</span><span class="n">sampleSize</span><span class="o">*</span><span class="mi">10</span>
+        <span class="n">sqlDB</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span>
+        <span class="n">entityInfo</span><span class="o">=</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">createTable</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">primaryKey</span><span class="p">,</span> <span class="n">withDrop</span><span class="p">,</span> <span class="n">sampleRecordCount</span><span class="p">,</span><span class="n">failIfTooFew</span><span class="o">=</span><span class="n">failIfTooFew</span><span class="p">)</span>
+        <span class="n">executeMany</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">sqlDB</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span><span class="n">entityInfo</span><span class="p">,</span><span class="n">executeMany</span><span class="o">=</span><span class="n">executeMany</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="n">fixNone</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sqlDB</span></div>
+        
+<div class="viewcode-block" id="TestSQLDB.testIssue16"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.testIssue16">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue16</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/16</span>
+<span class="sd">        allow to only warn if samplerecordcount is higher than number of available records</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getSampleTableDB</span><span class="p">(</span><span class="n">withDrop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">failIfTooFew</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getSampleTableDB</span><span class="p">(</span><span class="n">withDrop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">failIfTooFew</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="s2">&quot;There should be an exception that too few sample records where provided&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;only 1000/10000 of needed sample records to createTable available&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span></div>
+        
+<div class="viewcode-block" id="TestSQLDB.testIssue18"><a class="viewcode-back" href="../../tests.html#tests.testSqlite3.TestSQLDB.testIssue18">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue18</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/18</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">sqlDB</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getSampleTableDB</span><span class="p">()</span>
+        <span class="n">tableDict</span><span class="o">=</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">getTableDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="n">tableDict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;sample&quot;</span> <span class="ow">in</span> <span class="n">tableDict</span><span class="p">)</span>
+        <span class="n">cols</span><span class="o">=</span><span class="n">tableDict</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="p">][</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;pkey&quot;</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">)</span></div></div>
+       
         
         
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -413,28 +516,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Wolfgang Fahl
+        &#169; Copyright 2020, Wolfgang Fahl.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

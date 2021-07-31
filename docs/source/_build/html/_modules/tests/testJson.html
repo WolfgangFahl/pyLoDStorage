@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>tests.testJson &mdash; pyLoDStorage  documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -49,7 +54,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pyLoDStorage
+            <a href="../../index.html" class="icon icon-home"> pyLoDStorage
           
 
           
@@ -80,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
@@ -110,6 +115,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -156,18 +163,24 @@
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Royals</span><span class="p">,</span><span class="n">Cities</span>
-<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span><span class="p">,</span> <span class="n">Types</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Royals</span><span class="p">,</span><span class="n">RoyalsORMList</span><span class="p">,</span><span class="n">Royal</span><span class="p">,</span><span class="n">Cities</span>
+<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span><span class="p">,</span> <span class="n">Types</span><span class="p">,</span> <span class="n">JSONAbleList</span>
 <span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
 
+<div class="viewcode-block" id="ServerConfig"><a class="viewcode-back" href="../../tests.html#tests.testJson.ServerConfig">[docs]</a><span class="k">class</span> <span class="nc">ServerConfig</span><span class="p">(</span><span class="n">JSONAble</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">pass</span></div>
+        
 <div class="viewcode-block" id="TestJsonAble"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble">[docs]</a><span class="k">class</span> <span class="nc">TestJsonAble</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    test JSON serialization with JsonAble mixin</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="TestJsonAble.setUp"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">=</span><span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">=</span><span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxDiff</span><span class="o">=</span><span class="kc">None</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="TestJsonAble.tearDown"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -205,11 +218,14 @@
         <span class="n">singleQuotedExamples</span><span class="o">=</span><span class="p">[</span>
             <span class="sd">&#39;&#39;&#39;{&#39;cities&#39;: [{&#39;name&#39;: &quot;Upper Hell&#39;s Gate&quot;}, {&#39;name&#39;: &quot;N&#39;zeto&quot;}]&#39;&#39;&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">singleQuotedExamples</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="n">example</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span><span class="n">example</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">useRegex</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span><span class="kc">True</span><span class="p">]:</span>
                 <span class="n">doubleQuoted</span><span class="o">=</span><span class="n">JSONAble</span><span class="o">.</span><span class="n">singleQuoteToDoubleQuote</span><span class="p">(</span><span class="n">example</span><span class="p">,</span><span class="n">useRegex</span><span class="o">=</span><span class="n">useRegex</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">doubleQuoted</span><span class="p">)</span>
-            <span class="nb">print</span></div>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">doubleQuoted</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span></div>
             
 <div class="viewcode-block" id="TestJsonAble.dumpListOfDicts"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.dumpListOfDicts">[docs]</a>    <span class="k">def</span> <span class="nf">dumpListOfDicts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">listOfDicts</span><span class="p">,</span><span class="n">limit</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
@@ -217,9 +233,14 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%2d</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="n">record</span><span class="p">))</span></div>
                 
 <div class="viewcode-block" id="TestJsonAble.check"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">manager</span><span class="p">,</span><span class="n">manager1</span><span class="p">,</span><span class="n">listName</span><span class="p">,</span><span class="n">debugLimit</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dumpListOfDicts</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">listName</span><span class="p">],</span> <span class="n">debugLimit</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dumpListOfDicts</span><span class="p">(</span><span class="n">manager1</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">listName</span><span class="p">],</span> <span class="n">debugLimit</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="n">manager1</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>    </div>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        check that the list of the two managers are the same</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">d1</span><span class="o">=</span><span class="n">manager</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">listName</span><span class="p">]</span>
+        <span class="n">d2</span><span class="o">=</span><span class="n">manager1</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">listName</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dumpListOfDicts</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">debugLimit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dumpListOfDicts</span><span class="p">(</span><span class="n">d2</span><span class="p">,</span> <span class="n">debugLimit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span><span class="n">d2</span><span class="p">)</span>    </div>
             
 <div class="viewcode-block" id="TestJsonAble.testJsonAble"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.testJsonAble">[docs]</a>    <span class="k">def</span> <span class="nf">testJsonAble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -274,36 +295,173 @@
         <span class="n">royals1</span><span class="o">=</span><span class="n">Royals</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">royals1</span><span class="o">.</span><span class="n">royals</span><span class="p">))</span>
         <span class="n">json</span><span class="o">=</span><span class="n">royals1</span><span class="o">.</span><span class="n">toJSON</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
         <span class="n">types</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">forTable</span><span class="p">(</span><span class="n">royals1</span><span class="p">,</span> <span class="s2">&quot;royals&quot;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">royals2</span><span class="o">=</span><span class="n">Royals</span><span class="p">()</span>
         <span class="n">royals2</span><span class="o">.</span><span class="n">fromJson</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">types</span><span class="o">=</span><span class="n">types</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">royals2</span><span class="o">.</span><span class="n">royals</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">royals1</span><span class="o">.</span><span class="n">royals</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">royals2</span><span class="o">.</span><span class="n">royals</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">royals1</span><span class="o">.</span><span class="n">royals</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">royals2</span><span class="o">.</span><span class="n">royals</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">royals1</span><span class="o">.</span><span class="n">royals</span><span class="p">,</span><span class="n">royals2</span><span class="o">.</span><span class="n">royals</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="TestJsonAble.testTypes"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.testTypes">[docs]</a>    <span class="k">def</span> <span class="nf">testTypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        test the given types</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">royals1</span><span class="o">=</span><span class="n">Royals</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">types1</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">forTable</span><span class="p">(</span><span class="n">royals1</span><span class="p">,</span> <span class="s2">&quot;royals&quot;</span><span class="p">)</span>
-        <span class="n">json</span><span class="o">=</span><span class="n">types1</span><span class="o">.</span><span class="n">toJSON</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
-        <span class="n">types2</span><span class="o">=</span><span class="n">Types</span><span class="p">(</span><span class="s2">&quot;Royals&quot;</span><span class="p">)</span>
-        <span class="n">types2</span><span class="o">.</span><span class="n">fromJson</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">types1</span><span class="o">.</span><span class="n">typeMap</span><span class="p">,</span><span class="n">types2</span><span class="o">.</span><span class="n">typeMap</span><span class="p">)</span></div>
+          
+<div class="viewcode-block" id="TestJsonAble.testPluralName"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.testPluralName">[docs]</a>    <span class="k">def</span> <span class="nf">testPluralName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">royal</span><span class="o">=</span><span class="n">Royal</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Royals&quot;</span><span class="p">,</span><span class="n">royal</span><span class="o">.</span><span class="n">getPluralname</span><span class="p">())</span></div>
         
 <div class="viewcode-block" id="TestJsonAble.testStoreAndRestore"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.testStoreAndRestore">[docs]</a>    <span class="k">def</span> <span class="nf">testStoreAndRestore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        test storing and restoring from a JSON file</span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/21</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">royals1</span><span class="o">=</span><span class="n">Royals</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">storeFilePrefix</span><span class="o">=</span><span class="s2">&quot;/tmp/royals-pylodstorage&quot;</span>
-        <span class="n">royals1</span><span class="o">.</span><span class="n">storeToJsonFile</span><span class="p">(</span><span class="n">storeFilePrefix</span><span class="p">,</span><span class="s2">&quot;royals&quot;</span><span class="p">)</span>
-        <span class="n">royals2</span><span class="o">=</span><span class="n">Royals</span><span class="p">()</span>
-        <span class="n">royals2</span><span class="o">.</span><span class="n">restoreFromJsonFile</span><span class="p">(</span><span class="n">storeFilePrefix</span><span class="p">)</span></div></div>
+        <span class="n">royals1</span><span class="o">=</span><span class="n">RoyalsORMList</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">jsonFile</span><span class="o">=</span><span class="s2">&quot;/tmp/royals-pylodstorage.json&quot;</span>
+        <span class="n">royals1</span><span class="o">.</span><span class="n">storeToJsonFile</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">)</span>
+        <span class="n">royals2</span><span class="o">=</span><span class="n">RoyalsORMList</span><span class="p">()</span>
+        <span class="n">royals2</span><span class="o">.</span><span class="n">restoreFromJsonFile</span><span class="p">(</span><span class="n">jsonFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">royals2</span><span class="o">.</span><span class="n">royals</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">royal</span> <span class="ow">in</span> <span class="n">royals2</span><span class="o">.</span><span class="n">royals</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">royal</span><span class="p">,</span><span class="n">Royal</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span><span class="nb">type</span><span class="p">(</span><span class="n">royal</span><span class="o">.</span><span class="n">age</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="TestJsonAble.testIssue22"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.testIssue22">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue22</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/22</span>
+<span class="sd">        Regression: storeToJsonFile and restoreFromJsonFile missing in JSONAble</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">jsonStr</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;{</span>
+<span class="s2">    &quot;adminPassword&quot;: &quot;tiger2021&quot;,</span>
+<span class="s2">    &quot;adminUser&quot;: &quot;scott&quot;,</span>
+<span class="s2">    &quot;credentials&quot;: [</span>
+<span class="s2">        {</span>
+<span class="s2">            &quot;dbname&quot;: &quot;doedb&quot;,</span>
+<span class="s2">            &quot;password&quot;: &quot;doesSecret!&quot;,</span>
+<span class="s2">            &quot;user&quot;: &quot;john&quot;</span>
+<span class="s2">        }</span>
+<span class="s2">    ],</span>
+<span class="s2">    &quot;frontendConfigs&quot;: [</span>
+<span class="s2">        {</span>
+<span class="s2">            &quot;defaultPage&quot;: &quot;Frontend&quot;,</span>
+<span class="s2">            &quot;site&quot;: &quot;or&quot;,</span>
+<span class="s2">            &quot;template&quot;: &quot;bootstrap.html&quot;,</span>
+<span class="s2">            &quot;wikiId&quot;: &quot;or&quot;</span>
+<span class="s2">        },</span>
+<span class="s2">        {</span>
+<span class="s2">            &quot;defaultPage&quot;: &quot;Main Page&quot;,</span>
+<span class="s2">            &quot;site&quot;: &quot;cr&quot;,</span>
+<span class="s2">            &quot;template&quot;: &quot;bootstrap.html&quot;,</span>
+<span class="s2">            &quot;wikiId&quot;: &quot;cr&quot;</span>
+<span class="s2">        }</span>
+<span class="s2">    ],</span>
+<span class="s2">    &quot;logo&quot;: &quot;https://commons.wikimedia.org/wiki/Category:Mona_Lisa#/media/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg&quot;</span>
+<span class="s2">}&quot;&quot;&quot;</span>
+        <span class="n">jsonFilePath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span><span class="si">}</span><span class="s1">/serverConfig.json&#39;</span>
+        <span class="n">JSONAble</span><span class="o">.</span><span class="n">storeJsonToFile</span><span class="p">(</span><span class="n">jsonStr</span><span class="p">,</span> <span class="n">jsonFilePath</span><span class="p">)</span>
+        <span class="n">serverConfig</span><span class="o">=</span><span class="n">ServerConfig</span><span class="p">()</span>
+        <span class="n">serverConfig</span><span class="o">.</span><span class="n">restoreFromJsonFile</span><span class="p">(</span><span class="n">jsonFilePath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">serverConfig</span><span class="o">.</span><span class="n">logo</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_retouched.jpg&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">serverConfig</span><span class="o">.</span><span class="n">frontendConfigs</span><span class="p">,</span><span class="nb">list</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">serverConfig</span><span class="o">.</span><span class="n">frontendConfigs</span><span class="p">))</span>
+        <span class="n">serverConfig</span><span class="o">.</span><span class="n">storeToJsonFile</span><span class="p">(</span><span class="n">jsonFilePath</span><span class="p">)</span>
+        <span class="n">jsonStr2</span><span class="o">=</span><span class="n">JSONAble</span><span class="o">.</span><span class="n">readJsonFromFile</span><span class="p">(</span><span class="n">jsonFilePath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">jsonStr2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">jsonStr</span><span class="p">,</span><span class="n">jsonStr2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestJsonAble.testRestoreFromJsonStr"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.testRestoreFromJsonStr">[docs]</a>    <span class="k">def</span> <span class="nf">testRestoreFromJsonStr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Tests restoring a JsonAbleList form a json string</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                {</span>
+<span class="s2">                    &quot;countries&quot;: [</span>
+<span class="s2">                        {</span>
+<span class="s2">                            &quot;name&quot;: &quot;Afghanistan&quot;,</span>
+<span class="s2">                            &quot;wikidataid&quot;: &quot;Q889&quot;,</span>
+<span class="s2">                            &quot;coordinates&quot;: &quot;34,66&quot;,</span>
+<span class="s2">                            &quot;partOf&quot;: null,</span>
+<span class="s2">                            &quot;level&quot;: 3,</span>
+<span class="s2">                            &quot;locationKind&quot;: &quot;Country&quot;,</span>
+<span class="s2">                            &quot;comment&quot;: null,</span>
+<span class="s2">                            &quot;iso&quot;: &quot;AF&quot;</span>
+<span class="s2">                        },</span>
+<span class="s2">                        {</span>
+<span class="s2">                            &quot;name&quot;: &quot;United States of America&quot;,</span>
+<span class="s2">                            &quot;wikidataid&quot;: &quot;Q30&quot;,</span>
+<span class="s2">                            &quot;coordinates&quot;: &quot;39.828175,-98.5795&quot;,</span>
+<span class="s2">                            &quot;partOf&quot;: null,</span>
+<span class="s2">                            &quot;level&quot;: 3,</span>
+<span class="s2">                            &quot;locationKind&quot;: &quot;Country&quot;,</span>
+<span class="s2">                            &quot;comment&quot;: null,</span>
+<span class="s2">                            &quot;labels&quot;: [</span>
+<span class="s2">                                &quot;America&quot;,</span>
+<span class="s2">                                &quot;UNITED STATES OF AMERICA&quot;,</span>
+<span class="s2">                                &quot;USA&quot;,</span>
+<span class="s2">                                &quot;United States&quot;,</span>
+<span class="s2">                                &quot;United States of America (the)&quot;</span>
+<span class="s2">                            ],</span>
+<span class="s2">                            &quot;iso&quot;: &quot;US&quot;</span>
+<span class="s2">                        },</span>
+<span class="s2">                        {</span>
+<span class="s2">                            &quot;name&quot;: &quot;Australia&quot;,</span>
+<span class="s2">                            &quot;wikidataid&quot;: &quot;Q408&quot;,</span>
+<span class="s2">                            &quot;coordinates&quot;: &quot;-28,137&quot;,</span>
+<span class="s2">                            &quot;partOf&quot;: null,</span>
+<span class="s2">                            &quot;level&quot;: 3,</span>
+<span class="s2">                            &quot;locationKind&quot;: &quot;Country&quot;,</span>
+<span class="s2">                            &quot;comment&quot;: null,</span>
+<span class="s2">                            &quot;labels&quot;: [</span>
+<span class="s2">                                &quot;AUS&quot;</span>
+<span class="s2">                            ],</span>
+<span class="s2">                            &quot;iso&quot;: &quot;AU&quot;</span>
+<span class="s2">                        }</span>
+<span class="s2">                    ]</span>
+<span class="s2">                }</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+        <span class="n">countryList</span><span class="o">=</span><span class="n">JSONAbleList</span><span class="p">(</span><span class="s2">&quot;countries&quot;</span><span class="p">)</span>
+        <span class="n">countryList</span><span class="o">.</span><span class="n">restoreFromJsonStr</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        <span class="n">countries</span><span class="o">=</span><span class="n">countryList</span><span class="o">.</span><span class="n">countries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">countries</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">countryIds</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;wikidataid&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">countries</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;Q30&quot;</span> <span class="ow">in</span> <span class="n">countryIds</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TestJsonAble.testIssue27_Lookup"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.testIssue27_Lookup">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue27_Lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        add Lookup map option</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># first try with List of Dicts</span>
+        <span class="n">royals</span><span class="o">=</span><span class="n">Royals</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#print(len(royals.royals))</span>
+        <span class="c1">#print(royals.royals)</span>
+        <span class="n">royalsByNumberInLine</span><span class="p">,</span><span class="n">duplicates</span><span class="o">=</span><span class="n">royals</span><span class="o">.</span><span class="n">getLookup</span><span class="p">(</span><span class="s2">&quot;numberInLine&quot;</span><span class="p">,</span> <span class="n">withDuplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1">#print(royalsByNumberInLine)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">duplicates</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">royalsByNumberInLine</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Charles, Prince of Wales&quot;</span><span class="p">,</span><span class="n">royalsByNumberInLine</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="c1"># then with list of Entities</span>
+        <span class="n">royalsORM</span><span class="o">=</span><span class="n">RoyalsORMList</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">royalsByNumberInLine</span><span class="p">,</span><span class="n">duplicates</span><span class="o">=</span><span class="n">royalsORM</span><span class="o">.</span><span class="n">getLookup</span><span class="p">(</span><span class="s2">&quot;numberInLine&quot;</span><span class="p">,</span> <span class="n">withDuplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">duplicates</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">royalsByNumberInLine</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Charles, Prince of Wales&quot;</span><span class="p">,</span><span class="n">royalsByNumberInLine</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestJsonAble.testIssue30_SampleLimited"><a class="viewcode-back" href="../../tests.html#tests.testJson.TestJsonAble.testIssue30_SampleLimited">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue30_SampleLimited</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        tests if the json export is correctly limited to the fields that are used in the samples</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">royalDict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Test royal&quot;</span><span class="p">}</span>
+        <span class="n">royal</span><span class="o">=</span><span class="n">Royal</span><span class="p">()</span>
+        <span class="n">royal</span><span class="o">.</span><span class="n">fromDict</span><span class="p">(</span><span class="n">royalDict</span><span class="p">)</span>
+        <span class="c1"># add attributes that are not in the samples</span>
+        <span class="n">royal</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;not_in_samples&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;test&quot;</span>
+        <span class="n">expectedJSON</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;{</span>
+<span class="s2">    &quot;name&quot;: &quot;Test royal&quot;</span>
+<span class="s2">}&quot;&quot;&quot;</span>
+        <span class="n">actualJSON</span><span class="o">=</span><span class="n">royal</span><span class="o">.</span><span class="n">toJSON</span><span class="p">(</span><span class="n">limitToSampleFields</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">actualJSON</span><span class="p">,</span> <span class="n">expectedJSON</span><span class="p">)</span></div></div>
         
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -315,28 +473,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Wolfgang Fahl
+        &#169; Copyright 2020, Wolfgang Fahl.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

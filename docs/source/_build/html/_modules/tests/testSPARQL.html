@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>tests.testSPARQL &mdash; pyLoDStorage  documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -49,7 +54,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pyLoDStorage
+            <a href="../../index.html" class="icon icon-home"> pyLoDStorage
           
 
           
@@ -80,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
@@ -110,6 +115,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -158,6 +165,7 @@
 <span class="kn">import</span> <span class="nn">getpass</span>
 <span class="kn">from</span> <span class="nn">lodstorage.sparql</span> <span class="kn">import</span> <span class="n">SPARQL</span>
 <span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Sample</span>
+<span class="kn">from</span> <span class="nn">lodstorage.lod</span> <span class="kn">import</span> <span class="n">LOD</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 
@@ -166,6 +174,7 @@
 
 <div class="viewcode-block" id="TestSPARQL.setUp"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">=</span><span class="kc">False</span>
         <span class="k">pass</span></div>
 
 
@@ -211,11 +220,14 @@
             <span class="n">result</span><span class="p">,</span><span class="n">ex</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">insertCommand</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">msg</span><span class="o">=</span><span class="n">ex</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;QueryBadFormed&quot;</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;Error 400&quot;</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">)</span>
+                <span class="c1">#self.assertTrue(&quot;Error 400&quot; in msg)</span>
                 <span class="k">pass</span></div>
             
 <div class="viewcode-block" id="TestSPARQL.checkErrors"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.checkErrors">[docs]</a>    <span class="k">def</span> <span class="nf">checkErrors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">errors</span><span class="p">,</span><span class="n">expected</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>      
@@ -226,11 +238,12 @@
 <span class="sd">        Args:</span>
 <span class="sd">            errors(list): the list of errors to check</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERRORS:&quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span> </div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERRORS:&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span> </div>
     
 <div class="viewcode-block" id="TestSPARQL.testDob"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.testDob">[docs]</a>    <span class="k">def</span> <span class="nf">testDob</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -257,7 +270,7 @@
         <span class="n">primaryKey</span><span class="o">=</span><span class="s1">&#39;name&#39;</span>
         <span class="n">prefixes</span><span class="o">=</span><span class="s1">&#39;PREFIX foafo: &lt;http://foafo.bitplan.com/foafo/0.1/&gt;&#39;</span>
         <span class="k">for</span> <span class="n">typedLiteralMode</span> <span class="ow">in</span> <span class="n">typedLiteralModes</span><span class="p">:</span>
-            <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">,</span><span class="n">typedLiterals</span><span class="o">=</span><span class="n">typedLiteralMode</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">,</span><span class="n">typedLiterals</span><span class="o">=</span><span class="n">typedLiteralMode</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
             <span class="n">deleteString</span><span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span>
 <span class="s2">            PREFIX foafo: &lt;http://foafo.bitplan.com/foafo/0.1/&gt;</span>
@@ -270,7 +283,7 @@
             <span class="n">errors</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">insertListOfDicts</span><span class="p">(</span><span class="n">listofDicts</span><span class="p">,</span><span class="n">entityType</span><span class="p">,</span><span class="n">primaryKey</span><span class="p">,</span><span class="n">prefixes</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">checkErrors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
             
-            <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;query&quot;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;query&quot;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
             <span class="n">queryString</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            PREFIX foafo: &lt;http://foafo.bitplan.com/foafo/0.1/&gt;</span>
 <span class="s2">            SELECT ?name ?born ?numberInLine ?wikidataurl ?age ?ofAge ?lastmodified WHERE { </span>
@@ -287,7 +300,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">listofDicts</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">personResults</span><span class="p">))</span>
             <span class="n">personList</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">asListOfDicts</span><span class="p">(</span><span class="n">personResults</span><span class="p">)</span>   
             <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">person</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">personList</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="n">person</span><span class="p">))</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="n">person</span><span class="p">))</span>
             <span class="c1"># check the correct round-trip behavior</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">listofDicts</span><span class="p">,</span><span class="n">personList</span><span class="p">)</span></div>
         
@@ -311,7 +325,7 @@
         <span class="n">entityType</span><span class="o">=</span><span class="s2">&quot;cr:Event&quot;</span>   
         <span class="n">primaryKey</span><span class="o">=</span><span class="s1">&#39;title&#39;</span>
         <span class="n">prefixes</span><span class="o">=</span><span class="s2">&quot;PREFIX cr: &lt;http://cr.bitplan.com/Event/0.1/&gt;&quot;</span>
-        <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">,</span><span class="n">typedLiterals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">,</span><span class="n">typedLiterals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
         <span class="n">errors</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">insertListOfDicts</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">,</span><span class="n">entityType</span><span class="p">,</span><span class="n">primaryKey</span><span class="p">,</span><span class="n">prefixes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checkErrors</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">error</span><span class="o">=</span><span class="n">errors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -335,8 +349,8 @@
         <span class="n">entityType</span><span class="o">=</span><span class="s1">&#39;help:Topic&#39;</span>
         <span class="n">primaryKey</span><span class="o">=</span><span class="s1">&#39;topic&#39;</span>
         <span class="n">prefixes</span><span class="o">=</span><span class="s1">&#39;PREFIX help: &lt;http://help.bitplan.com/help/0.0.1/&gt;&#39;</span>    
-        <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">errors</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">insertListOfDicts</span><span class="p">(</span><span class="n">helpListOfDicts</span><span class="p">,</span> <span class="n">entityType</span><span class="p">,</span> <span class="n">primaryKey</span><span class="p">,</span> <span class="n">prefixes</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">errors</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">insertListOfDicts</span><span class="p">(</span><span class="n">helpListOfDicts</span><span class="p">,</span> <span class="n">entityType</span><span class="p">,</span> <span class="n">primaryKey</span><span class="p">,</span> <span class="n">prefixes</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checkErrors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
         <span class="n">query</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">PREFIX help: &lt;http://help.bitplan.com/help/0.0.1/&gt;</span>
@@ -358,7 +372,7 @@
         <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2020-01-01T00:00:00Z&quot;</span><span class="p">,</span><span class="s2">&quot;42000-01-01T00:00:00Z&quot;</span><span class="p">]</span>
         <span class="n">expected</span><span class="o">=</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="kc">None</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-            <span class="n">dt</span><span class="o">=</span><span class="n">SPARQL</span><span class="o">.</span><span class="n">strToDatetime</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">dt</span><span class="o">=</span><span class="n">SPARQL</span><span class="o">.</span><span class="n">strToDatetime</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">[</span><span class="n">index</span><span class="p">],</span><span class="n">dt</span><span class="p">)</span></div>
    
 <div class="viewcode-block" id="TestSPARQL.testListOfDictSpeed"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.testListOfDictSpeed">[docs]</a>    <span class="k">def</span> <span class="nf">testListOfDictSpeed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -368,7 +382,7 @@
         <span class="n">limit</span><span class="o">=</span><span class="mi">5000</span>
         <span class="k">for</span> <span class="n">batchSize</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="mi">1000</span><span class="p">]:</span>
             <span class="n">listOfDicts</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getSample</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-            <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">,</span><span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">jena</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getJena</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">,</span><span class="n">profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="p">)</span>
             <span class="n">entityType</span><span class="o">=</span><span class="s2">&quot;ex:TestRecord&quot;</span>
             <span class="n">primaryKey</span><span class="o">=</span><span class="s1">&#39;pkey&#39;</span>
             <span class="n">prefixes</span><span class="o">=</span><span class="s1">&#39;PREFIX ex: &lt;http://example.com/&gt;&#39;</span>
@@ -376,7 +390,8 @@
             <span class="n">errors</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">insertListOfDicts</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">,</span> <span class="n">entityType</span><span class="p">,</span> <span class="n">primaryKey</span><span class="p">,</span> <span class="n">prefixes</span><span class="p">,</span><span class="n">batchSize</span><span class="o">=</span><span class="n">batchSize</span><span class="p">)</span>   
             <span class="bp">self</span><span class="o">.</span><span class="n">checkErrors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
             <span class="n">elapsed</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">startTime</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;adding </span><span class="si">%d</span><span class="s2"> records took </span><span class="si">%5.3f</span><span class="s2"> s =&gt; %5.f records/s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">limit</span><span class="p">,</span><span class="n">elapsed</span><span class="p">,</span><span class="n">limit</span><span class="o">/</span><span class="n">elapsed</span><span class="p">))</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;adding </span><span class="si">%d</span><span class="s2"> records took </span><span class="si">%5.3f</span><span class="s2"> s =&gt; %5.f records/s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">limit</span><span class="p">,</span><span class="n">elapsed</span><span class="p">,</span><span class="n">limit</span><span class="o">/</span><span class="n">elapsed</span><span class="p">))</span></div>
         
 <div class="viewcode-block" id="TestSPARQL.testWikdata"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.testWikdata">[docs]</a>    <span class="k">def</span> <span class="nf">testWikdata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -401,8 +416,41 @@
 <span class="s2">}</span>
 <span class="s2">&quot;&quot;&quot;</span>
         <span class="n">results</span><span class="o">=</span><span class="n">wd</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="mi">238</span><span class="o">&lt;=</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">))</span></div></div>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="mi">238</span><span class="o">&lt;=</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">))</span></div>
+        
+<div class="viewcode-block" id="TestSPARQL.testIssue20"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.testIssue20">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue20</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        see https://github.com/WolfgangFahl/pyLoDStorage/issues/20</span>
+<span class="sd">        add fixNone option to SPARQL results (same functionality as in SQL)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;https://query.wikidata.org/sparql&quot;</span>
+        <span class="n">wd</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="n">endpoint</span><span class="p">)</span>
+        <span class="n">queryString</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        # Conference Series wikidata query</span>
+<span class="s2"># see https://confident.dbis.rwth-aachen.de/dblpconf/wikidata</span>
+<span class="s2"># WF 2021-01-30</span>
+<span class="s2">SELECT ?confSeries ?short_name ?official_website</span>
+<span class="s2">WHERE </span>
+<span class="s2">{</span>
+<span class="s2">  #  scientific conference series (Q47258130) </span>
+<span class="s2">  ?confSeries wdt:P31 wd:Q47258130.</span>
+<span class="s2">  OPTIONAL { </span>
+<span class="s2">    ?confSeries wdt:P1813 ?short_name . </span>
+<span class="s2">  }</span>
+<span class="s2">  #  official website (P856) </span>
+<span class="s2">  OPTIONAL {</span>
+<span class="s2">    ?confSeries wdt:P856 ?official_website</span>
+<span class="s2">  } </span>
+<span class="s2">}</span>
+<span class="s2">LIMIT 200</span>
+<span class="s2">&quot;&quot;&quot;</span>
+        <span class="n">lod</span><span class="o">=</span><span class="n">wd</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">queryString</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">fields</span><span class="o">=</span><span class="n">LOD</span><span class="o">.</span><span class="n">getFields</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span></div></div>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="c1">#import sys;sys.argv = [&#39;&#39;, &#39;Test.testName&#39;]</span>
@@ -413,28 +461,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Wolfgang Fahl
+        &#169; Copyright 2020, Wolfgang Fahl.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>tests package &mdash; pyLoDStorage  documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -50,7 +55,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pyLoDStorage
+            <a href="index.html" class="icon icon-home"> pyLoDStorage
           
 
           
@@ -81,15 +86,22 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="lodstorage.html">lodstorage package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">setup module</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">tests package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.testEntityManager">tests.testEntityManager module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-tests.testJson">tests.testJson module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.testPandas">tests.testPandas module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-tests.testSPARQL">tests.testSPARQL module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-tests.testSqlite3">tests.testSqlite3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_Plot">tests.test_Plot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_Tabulate">tests.test_Tabulate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_csv">tests.test_csv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_lod">tests.test_lod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_queries">tests.test_queries module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-tests">Module contents</a></li>
 </ul>
 </li>
@@ -133,6 +145,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -144,7 +158,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/tests.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -163,52 +177,135 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-tests.testEntityManager">
+<span id="tests-testentitymanager-module"></span><h2>tests.testEntityManager module<a class="headerlink" href="#module-tests.testEntityManager" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2021-07-23</p>
+<p>&#64;author: wf</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.testEntityManager.TestEntityManager">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.testEntityManager.</span></span><span class="sig-name descname"><span class="pre">TestEntityManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testEntityManager.html#TestEntityManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testEntityManager.TestEntityManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>test the entity manager wrapper</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testEntityManager.TestEntityManager.checkItem">
+<span class="sig-name descname"><span class="pre">checkItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testEntityManager.html#TestEntityManager.checkItem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testEntityManager.TestEntityManager.checkItem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testEntityManager.TestEntityManager.configure">
+<span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig" title="lodstorage.storageconfig.StorageConfig"><span class="pre">lodstorage.storageconfig.StorageConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testEntityManager.html#TestEntityManager.configure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testEntityManager.TestEntityManager.configure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testEntityManager.TestEntityManager.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testEntityManager.html#TestEntityManager.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testEntityManager.TestEntityManager.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testEntityManager.TestEntityManager.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testEntityManager.html#TestEntityManager.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testEntityManager.TestEntityManager.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testEntityManager.TestEntityManager.testEntityManager">
+<span class="sig-name descname"><span class="pre">testEntityManager</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testEntityManager.html#TestEntityManager.testEntityManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testEntityManager.TestEntityManager.testEntityManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>test the entity Manager handling</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testEntityManager.TestEntityManager.testStoreMode">
+<span class="sig-name descname"><span class="pre">testStoreMode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testEntityManager.html#TestEntityManager.testStoreMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testEntityManager.TestEntityManager.testStoreMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>test store mode display</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-tests.testJson">
 <span id="tests-testjson-module"></span><h2>tests.testJson module<a class="headerlink" href="#module-tests.testJson" title="Permalink to this headline">¶</a></h2>
 <p>Created on 2020-09-12</p>
 <p>&#64;author: wf</p>
 <dl class="py class">
-<dt id="tests.testJson.TestJsonAble">
-<em class="property">class </em><code class="sig-prename descclassname">tests.testJson.</code><code class="sig-name descname">TestJsonAble</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testJson.ServerConfig">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.testJson.</span></span><span class="sig-name descname"><span class="pre">ServerConfig</span></span><a class="reference internal" href="_modules/tests/testJson.html#ServerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.ServerConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble" title="lodstorage.jsonable.JSONAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">lodstorage.jsonable.JSONAble</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.testJson.</span></span><span class="sig-name descname"><span class="pre">TestJsonAble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
 <p>test JSON serialization with JsonAble mixin</p>
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.check">
-<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">manager</span></em>, <em class="sig-param"><span class="n">manager1</span></em>, <em class="sig-param"><span class="n">listName</span></em>, <em class="sig-param"><span class="n">debugLimit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.check" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugLimit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>check that the list of the two managers are the same</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.dumpListOfDicts">
+<span class="sig-name descname"><span class="pre">dumpListOfDicts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listOfDicts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.dumpListOfDicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.dumpListOfDicts" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.dumpListOfDicts">
-<code class="sig-name descname">dumpListOfDicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listOfDicts</span></em>, <em class="sig-param"><span class="n">limit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.dumpListOfDicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.dumpListOfDicts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="tests.testJson.TestJsonAble.setUp">
-<code class="sig-name descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.setUp" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.setUp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method for setting up the test fixture before exercising it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.tearDown">
-<code class="sig-name descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.tearDown" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.tearDown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method for deconstructing the test fixture after testing it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.testJsonAble">
-<code class="sig-name descname">testJsonAble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testJsonAble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testJsonAble" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testIssue22">
+<span class="sig-name descname"><span class="pre">testIssue22</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testIssue22"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testIssue22" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/22">https://github.com/WolfgangFahl/pyLoDStorage/issues/22</a>
+Regression: storeToJsonFile and restoreFromJsonFile missing in JSONAble</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testIssue27_Lookup">
+<span class="sig-name descname"><span class="pre">testIssue27_Lookup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testIssue27_Lookup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testIssue27_Lookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>add Lookup map option</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testIssue30_SampleLimited">
+<span class="sig-name descname"><span class="pre">testIssue30_SampleLimited</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testIssue30_SampleLimited"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testIssue30_SampleLimited" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if the json export is correctly limited to the fields that are used in the samples</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testJsonAble">
+<span class="sig-name descname"><span class="pre">testJsonAble</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testJsonAble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testJsonAble" title="Permalink to this definition">¶</a></dt>
 <dd><p>test JSONAble</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.testRoyals">
-<code class="sig-name descname">testRoyals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testRoyals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testRoyals" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testPluralName">
+<span class="sig-name descname"><span class="pre">testPluralName</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testPluralName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testPluralName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testRestoreFromJsonStr">
+<span class="sig-name descname"><span class="pre">testRestoreFromJsonStr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testRestoreFromJsonStr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testRestoreFromJsonStr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests restoring a JsonAbleList form a json string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testRoyals">
+<span class="sig-name descname"><span class="pre">testRoyals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testRoyals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testRoyals" title="Permalink to this definition">¶</a></dt>
 <dd><p>test Royals example</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow">
-<code class="sig-name descname">testSingleQuoteToDoubleQuoteStackoverflow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow">
+<span class="sig-name descname"><span class="pre">testSingleQuoteToDoubleQuoteStackoverflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>see</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://stackoverflow.com/a/63862387/1497139">https://stackoverflow.com/a/63862387/1497139</a></p></li>
@@ -219,20 +316,44 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.testSingleToDoubleQuote">
-<code class="sig-name descname">testSingleToDoubleQuote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testSingleToDoubleQuote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testSingleToDoubleQuote" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testSingleToDoubleQuote">
+<span class="sig-name descname"><span class="pre">testSingleToDoubleQuote</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testSingleToDoubleQuote"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testSingleToDoubleQuote" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.testStoreAndRestore">
-<code class="sig-name descname">testStoreAndRestore</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testStoreAndRestore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testStoreAndRestore" title="Permalink to this definition">¶</a></dt>
-<dd><p>test storing and restoring from a JSON file</p>
+<dt class="sig sig-object py" id="tests.testJson.TestJsonAble.testStoreAndRestore">
+<span class="sig-name descname"><span class="pre">testStoreAndRestore</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testStoreAndRestore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testStoreAndRestore" title="Permalink to this definition">¶</a></dt>
+<dd><p>test storing and restoring from a JSON file
+<a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/21">https://github.com/WolfgangFahl/pyLoDStorage/issues/21</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.testPandas">
+<span id="tests-testpandas-module"></span><h2>tests.testPandas module<a class="headerlink" href="#module-tests.testPandas" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2021-06-07</p>
+<p>&#64;author: mk</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.testPandas.TestPandas">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.testPandas.</span></span><span class="sig-name descname"><span class="pre">TestPandas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testPandas.html#TestPandas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testPandas.TestPandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testPandas.TestPandas.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testPandas.html#TestPandas.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testPandas.TestPandas.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testJson.TestJsonAble.testTypes">
-<code class="sig-name descname">testTypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testJson.html#TestJsonAble.testTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testJson.TestJsonAble.testTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>test the given types</p>
+<dt class="sig sig-object py" id="tests.testPandas.TestPandas.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testPandas.html#TestPandas.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testPandas.TestPandas.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testPandas.TestPandas.testIssue25">
+<span class="sig-name descname"><span class="pre">testIssue25</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testPandas.html#TestPandas.testIssue25"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testPandas.TestPandas.testIssue25" title="Permalink to this definition">¶</a></dt>
+<dd><p>see <a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/25">https://github.com/WolfgangFahl/pyLoDStorage/issues/25</a></p>
 </dd></dl>
 
 </dd></dl>
@@ -243,13 +364,13 @@
 <p>Created on 2020-08-14</p>
 <p>&#64;author: wf</p>
 <dl class="py class">
-<dt id="tests.testSPARQL.TestSPARQL">
-<em class="property">class </em><code class="sig-prename descclassname">tests.testSPARQL.</code><code class="sig-name descname">TestSPARQL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.testSPARQL.</span></span><span class="sig-name descname"><span class="pre">TestSPARQL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
 <p>Test SPARQL access e.g. Apache Jena via Wrapper</p>
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.checkErrors">
-<code class="sig-name descname">checkErrors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">errors</span></em>, <em class="sig-param"><span class="n">expected</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.checkErrors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.checkErrors" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.checkErrors">
+<span class="sig-name descname"><span class="pre">checkErrors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.checkErrors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.checkErrors" title="Permalink to this definition">¶</a></dt>
 <dd><p>check the given list of errors - print any errors if there are some
 and after that assert that the length of the list of errors is zero</p>
 <dl class="field-list simple">
@@ -260,8 +381,8 @@ and after that assert that the length of the list of errors is zero</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.getJena">
-<code class="sig-name descname">getJena</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'query'</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">typedLiterals</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">profile</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.getJena"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.getJena" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.getJena">
+<span class="sig-name descname"><span class="pre">getJena</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'query'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">typedLiterals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.getJena"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.getJena" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the jena endpoint for the given mode</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -276,57 +397,64 @@ and after that assert that the length of the list of errors is zero</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.setUp">
-<code class="sig-name descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.setUp" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.setUp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method for setting up the test fixture before exercising it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.tearDown">
-<code class="sig-name descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.tearDown" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.tearDown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method for deconstructing the test fixture after testing it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testControlEscape">
-<code class="sig-name descname">testControlEscape</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testControlEscape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testControlEscape" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testControlEscape">
+<span class="sig-name descname"><span class="pre">testControlEscape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testControlEscape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testControlEscape" title="Permalink to this definition">¶</a></dt>
 <dd><p>check the control-escaped version of an UTF-8 string</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testDob">
-<code class="sig-name descname">testDob</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testDob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testDob" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testDob">
+<span class="sig-name descname"><span class="pre">testDob</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testDob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testDob" title="Permalink to this definition">¶</a></dt>
 <dd><p>test the DOB (date of birth) function that converts from ISO-Date to
 datetime.date</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testEscapeStringContent">
-<code class="sig-name descname">testEscapeStringContent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testEscapeStringContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testEscapeStringContent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testEscapeStringContent">
+<span class="sig-name descname"><span class="pre">testEscapeStringContent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testEscapeStringContent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testEscapeStringContent" title="Permalink to this definition">¶</a></dt>
 <dd><p>test handling of double quoted strings</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testIssue7">
-<code class="sig-name descname">testIssue7</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testIssue7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testIssue7" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testIssue20">
+<span class="sig-name descname"><span class="pre">testIssue20</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testIssue20"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testIssue20" title="Permalink to this definition">¶</a></dt>
+<dd><p>see <a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/20">https://github.com/WolfgangFahl/pyLoDStorage/issues/20</a>
+add fixNone option to SPARQL results (same functionality as in SQL)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testIssue7">
+<span class="sig-name descname"><span class="pre">testIssue7</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testIssue7"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testIssue7" title="Permalink to this definition">¶</a></dt>
 <dd><p>test conversion of dates with timezone info</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testJenaInsert">
-<code class="sig-name descname">testJenaInsert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testJenaInsert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testJenaInsert" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testJenaInsert">
+<span class="sig-name descname"><span class="pre">testJenaInsert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testJenaInsert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testJenaInsert" title="Permalink to this definition">¶</a></dt>
 <dd><p>test a Jena INSERT DATA</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testJenaQuery">
-<code class="sig-name descname">testJenaQuery</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testJenaQuery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testJenaQuery" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testJenaQuery">
+<span class="sig-name descname"><span class="pre">testJenaQuery</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testJenaQuery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testJenaQuery" title="Permalink to this definition">¶</a></dt>
 <dd><p>test Apache Jena Fuseki SPARQL endpoint with example SELECT query</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testListOfDictInsert">
-<code class="sig-name descname">testListOfDictInsert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testListOfDictInsert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testListOfDictInsert" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testListOfDictInsert">
+<span class="sig-name descname"><span class="pre">testListOfDictInsert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testListOfDictInsert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testListOfDictInsert" title="Permalink to this definition">¶</a></dt>
 <dd><p>test inserting a list of Dicts and retrieving the values again
 using a person based example
 instead of
@@ -335,21 +463,21 @@ instead of
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testListOfDictSpeed">
-<code class="sig-name descname">testListOfDictSpeed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testListOfDictSpeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testListOfDictSpeed" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testListOfDictSpeed">
+<span class="sig-name descname"><span class="pre">testListOfDictSpeed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testListOfDictSpeed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testListOfDictSpeed" title="Permalink to this definition">¶</a></dt>
 <dd><p>test the speed of adding data</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testSPARQLErrorMessage">
-<code class="sig-name descname">testSPARQLErrorMessage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testSPARQLErrorMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testSPARQLErrorMessage" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testSPARQLErrorMessage">
+<span class="sig-name descname"><span class="pre">testSPARQLErrorMessage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testSPARQLErrorMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testSPARQLErrorMessage" title="Permalink to this definition">¶</a></dt>
 <dd><p>test error handling
 see <a class="reference external" href="https://stackoverflow.com/questions/63486767/how-can-i-get-the-fuseki-api-via-sparqlwrapper-to-properly-report-a-detailed-err">https://stackoverflow.com/questions/63486767/how-can-i-get-the-fuseki-api-via-sparqlwrapper-to-properly-report-a-detailed-err</a></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSPARQL.TestSPARQL.testWikdata">
-<code class="sig-name descname">testWikdata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testWikdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testWikdata" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSPARQL.TestSPARQL.testWikdata">
+<span class="sig-name descname"><span class="pre">testWikdata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSPARQL.html#TestSPARQL.testWikdata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSPARQL.TestSPARQL.testWikdata" title="Permalink to this definition">¶</a></dt>
 <dd><p>check wikidata</p>
 </dd></dl>
 
@@ -361,13 +489,13 @@ see <a class="reference external" href="https://stackoverflow.com/questions/6348
 <p>Created on 2020-08-24</p>
 <p>&#64;author: wf</p>
 <dl class="py class">
-<dt id="tests.testSqlite3.TestSQLDB">
-<em class="property">class </em><code class="sig-prename descclassname">tests.testSqlite3.</code><code class="sig-name descname">TestSQLDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.testSqlite3.</span></span><span class="sig-name descname"><span class="pre">TestSQLDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
 <p>Test the SQLDB database wrapper</p>
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.checkListOfRecords">
-<code class="sig-name descname">checkListOfRecords</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listOfRecords</span></em>, <em class="sig-param"><span class="n">entityName</span></em>, <em class="sig-param"><span class="n">primaryKey</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">executeMany</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">fixNone</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fixDates</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">doClose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.checkListOfRecords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.checkListOfRecords" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.checkListOfRecords">
+<span class="sig-name descname"><span class="pre">checkListOfRecords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listOfRecords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entityName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primaryKey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executeMany</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixNone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixDates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doClose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.checkListOfRecords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.checkListOfRecords" title="Permalink to this definition">¶</a></dt>
 <dd><p>check the handling of the given list of Records</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -385,80 +513,332 @@ see <a class="reference external" href="https://stackoverflow.com/questions/6348
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.setUp">
-<code class="sig-name descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.setUp" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.getSampleTableDB">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">getSampleTableDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">withDrop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failIfTooFew</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampleSize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.getSampleTableDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.getSampleTableDB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.setUp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method for setting up the test fixture before exercising it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.tearDown">
-<code class="sig-name descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.tearDown" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.tearDown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method for deconstructing the test fixture after testing it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testBackup">
-<code class="sig-name descname">testBackup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testBackup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testBackup" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testBackup">
+<span class="sig-name descname"><span class="pre">testBackup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testBackup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testBackup" title="Permalink to this definition">¶</a></dt>
 <dd><p>test creating a backup of the SQL database</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testBindingError">
-<code class="sig-name descname">testBindingError</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testBindingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testBindingError" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testBindingError">
+<span class="sig-name descname"><span class="pre">testBindingError</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testBindingError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testBindingError" title="Permalink to this definition">¶</a></dt>
 <dd><p>test list of Records with incomplete record leading to
 “You did not supply a value for binding 2”
 see <a class="reference external" href="https://bugs.python.org/issue41638">https://bugs.python.org/issue41638</a></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testCopy">
-<code class="sig-name descname">testCopy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testCopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testCopy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testCopy">
+<span class="sig-name descname"><span class="pre">testCopy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testCopy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testCopy" title="Permalink to this definition">¶</a></dt>
 <dd><p>test copying databases into another database</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testEntityInfo">
-<code class="sig-name descname">testEntityInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testEntityInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testEntityInfo" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testEntityInfo">
+<span class="sig-name descname"><span class="pre">testEntityInfo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testEntityInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testEntityInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>test creating entityInfo from the sample record</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testIssue13">
-<code class="sig-name descname">testIssue13</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testIssue13"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testIssue13" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testIssue13_setNoneValue">
+<span class="sig-name descname"><span class="pre">testIssue13_setNoneValue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testIssue13_setNoneValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testIssue13_setNoneValue" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/13">https://github.com/WolfgangFahl/pyLoDStorage/issues/13</a>
 set None value for undefined LoD entries</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testListOfCities">
-<code class="sig-name descname">testListOfCities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testListOfCities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testListOfCities" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testIssue14_execute">
+<span class="sig-name descname"><span class="pre">testIssue14_execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testIssue14_execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testIssue14_execute" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/14">https://github.com/WolfgangFahl/pyLoDStorage/issues/14</a></p>
+<p>offer execute wrapper directly via sqlDB</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testIssue15">
+<span class="sig-name descname"><span class="pre">testIssue15</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testIssue15"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testIssue15" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/15">https://github.com/WolfgangFahl/pyLoDStorage/issues/15</a></p>
+<p>auto create view ddl in mergeschema</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testIssue16">
+<span class="sig-name descname"><span class="pre">testIssue16</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testIssue16"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testIssue16" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/16">https://github.com/WolfgangFahl/pyLoDStorage/issues/16</a>
+allow to only warn if samplerecordcount is higher than number of available records</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testIssue18">
+<span class="sig-name descname"><span class="pre">testIssue18</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testIssue18"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testIssue18" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/18">https://github.com/WolfgangFahl/pyLoDStorage/issues/18</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testListOfCities">
+<span class="sig-name descname"><span class="pre">testListOfCities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testListOfCities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testListOfCities" title="Permalink to this definition">¶</a></dt>
 <dd><p>test sqlite3 with some 120000 city records</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testQueryParams">
-<code class="sig-name descname">testQueryParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testQueryParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testQueryParams" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testQueryParams">
+<span class="sig-name descname"><span class="pre">testQueryParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testQueryParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testQueryParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>test Query Params</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testSqlite3">
-<code class="sig-name descname">testSqlite3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testSqlite3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testSqlite3" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testSqlite3">
+<span class="sig-name descname"><span class="pre">testSqlite3</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testSqlite3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testSqlite3" title="Permalink to this definition">¶</a></dt>
 <dd><p>test sqlite3 with a few records from the royal family</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testSqllite3Speed">
-<code class="sig-name descname">testSqllite3Speed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testSqllite3Speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testSqllite3Speed" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testSqllite3Speed">
+<span class="sig-name descname"><span class="pre">testSqllite3Speed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testSqllite3Speed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testSqllite3Speed" title="Permalink to this definition">¶</a></dt>
 <dd><p>test sqlite3 speed with some 100000 artificial sample records
 consisting of two columns with a running index</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tests.testSqlite3.TestSQLDB.testUniqueConstraint">
-<code class="sig-name descname">testUniqueConstraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testUniqueConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testUniqueConstraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tests.testSqlite3.TestSQLDB.testUniqueConstraint">
+<span class="sig-name descname"><span class="pre">testUniqueConstraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/testSqlite3.html#TestSQLDB.testUniqueConstraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.testSqlite3.TestSQLDB.testUniqueConstraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>test for <a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/4">https://github.com/WolfgangFahl/pyLoDStorage/issues/4</a>
 sqlite3.IntegrityError: UNIQUE constraint failed: … show debug info</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_Plot">
+<span id="tests-test-plot-module"></span><h2>tests.test_Plot module<a class="headerlink" href="#module-tests.test_Plot" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2020-07-05</p>
+<p>&#64;author: wf</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_Plot.TestPlot">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.test_Plot.</span></span><span class="sig-name descname"><span class="pre">TestPlot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_Plot.html#TestPlot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_Plot.TestPlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>test the Plot helper class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_Plot.TestPlot.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_Plot.html#TestPlot.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_Plot.TestPlot.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_Plot.TestPlot.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_Plot.html#TestPlot.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_Plot.TestPlot.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_Plot.TestPlot.testPlot">
+<span class="sig-name descname"><span class="pre">testPlot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_Plot.html#TestPlot.testPlot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_Plot.TestPlot.testPlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>test a plot based on a Counter</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_Tabulate">
+<span id="tests-test-tabulate-module"></span><h2>tests.test_Tabulate module<a class="headerlink" href="#module-tests.test_Tabulate" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2021-06-13</p>
+<p>&#64;author: wf</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_Tabulate.TestTabulate">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.test_Tabulate.</span></span><span class="sig-name descname"><span class="pre">TestTabulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_Tabulate.html#TestTabulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_Tabulate.TestTabulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>test tabulate support/compatibility</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_Tabulate.TestTabulate.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_Tabulate.html#TestTabulate.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_Tabulate.TestTabulate.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_Tabulate.TestTabulate.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_Tabulate.html#TestTabulate.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_Tabulate.TestTabulate.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_Tabulate.TestTabulate.testIssue24_IntegrateTabulate">
+<span class="sig-name descname"><span class="pre">testIssue24_IntegrateTabulate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_Tabulate.html#TestTabulate.testIssue24_IntegrateTabulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_Tabulate.TestTabulate.testIssue24_IntegrateTabulate" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/24">https://github.com/WolfgangFahl/pyLoDStorage/issues/24</a></p>
+<p>test <a class="reference external" href="https://pypi.org/project/tabulate/">https://pypi.org/project/tabulate/</a> support</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_csv">
+<span id="tests-test-csv-module"></span><h2>tests.test_csv module<a class="headerlink" href="#module-tests.test_csv" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.test_csv.</span></span><span class="sig-name descname"><span class="pre">TestCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Tests functionalities for the conversion between csv and list od dicts (LoD)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.test_from_csv">
+<span class="sig-name descname"><span class="pre">test_from_csv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.test_from_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.test_from_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if the csv is correctly parsed to an LoD</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.test_from_csv_without_header">
+<span class="sig-name descname"><span class="pre">test_from_csv_without_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.test_from_csv_without_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.test_from_csv_without_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if csv string without embedded headers is parsed correctly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.test_restore_from_csvfile">
+<span class="sig-name descname"><span class="pre">test_restore_from_csvfile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.test_restore_from_csvfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.test_restore_from_csvfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if the lod is correctly restored from csv file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.test_round_trip">
+<span class="sig-name descname"><span class="pre">test_round_trip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.test_round_trip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.test_round_trip" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests the csv round trip: dict -&gt; csv -&gt; dict
+Note: the inital dict has missing values it is expected that the final dict has the missing keys with None as value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.test_store_to_csvfile">
+<span class="sig-name descname"><span class="pre">test_store_to_csvfile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.test_store_to_csvfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.test_store_to_csvfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if LoD is correctly stored as csv file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.test_to_csv">
+<span class="sig-name descname"><span class="pre">test_to_csv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.test_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.test_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if LoD is correctly converted to csv str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.test_to_csv_delimiter_in_value">
+<span class="sig-name descname"><span class="pre">test_to_csv_delimiter_in_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.test_to_csv_delimiter_in_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.test_to_csv_delimiter_in_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if delimiter in dict value will not result in incorrect values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_csv.TestCSV.test_to_csv_incomplete_dicts">
+<span class="sig-name descname"><span class="pre">test_to_csv_incomplete_dicts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_csv.html#TestCSV.test_to_csv_incomplete_dicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_csv.TestCSV.test_to_csv_incomplete_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests if the LoD is correctly converted to csv even if some dicts are incomplete
+Note: incomplete dicts can lead to changes of the column orders of the csv string</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_lod">
+<span id="tests-test-lod-module"></span><h2>tests.test_lod module<a class="headerlink" href="#module-tests.test_lod" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2021-06-11</p>
+<p>&#64;author: wf</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_lod.TestLOD">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.test_lod.</span></span><span class="sig-name descname"><span class="pre">TestLOD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_lod.html#TestLOD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_lod.TestLOD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>test list of dicts base functionality</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_lod.TestLOD.checkHandleListTypeResult">
+<span class="sig-name descname"><span class="pre">checkHandleListTypeResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lod</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expectedLen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_lod.html#TestLOD.checkHandleListTypeResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_lod.TestLOD.checkHandleListTypeResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>check the result of the handleListType function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lod</strong> (<em>list</em>) – the list of dicts to check</p></li>
+<li><p><strong>expectedLen</strong> (<em>int</em>) – the expected Length</p></li>
+<li><p><strong>expected</strong> (<em>str</em>) – the expected entry for the München,Munich Q1524 record with a list</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_lod.TestLOD.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_lod.html#TestLOD.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_lod.TestLOD.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_lod.TestLOD.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_lod.html#TestLOD.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_lod.TestLOD.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_lod.TestLOD.testGetLookupIssue31And32">
+<span class="sig-name descname"><span class="pre">testGetLookupIssue31And32</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_lod.html#TestLOD.testGetLookupIssue31And32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_lod.TestLOD.testGetLookupIssue31And32" title="Permalink to this definition">¶</a></dt>
+<dd><p>test for <a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/31">https://github.com/WolfgangFahl/pyLoDStorage/issues/31</a>
+test for <a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/32">https://github.com/WolfgangFahl/pyLoDStorage/issues/32</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_lod.TestLOD.testListHandlingIssue33">
+<span class="sig-name descname"><span class="pre">testListHandlingIssue33</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_lod.html#TestLOD.testListHandlingIssue33"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_lod.TestLOD.testListHandlingIssue33" title="Permalink to this definition">¶</a></dt>
+<dd><p>test for handling list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_lod.TestLOD.testListIntersect">
+<span class="sig-name descname"><span class="pre">testListIntersect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_lod.html#TestLOD.testListIntersect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_lod.TestLOD.testListIntersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>test a list intersection</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.test_queries">
+<span id="tests-test-queries-module"></span><h2>tests.test_queries module<a class="headerlink" href="#module-tests.test_queries" title="Permalink to this headline">¶</a></h2>
+<p>Created on 2021-01-29</p>
+<p>&#64;author: wf</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_queries.TestQueries">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tests.test_queries.</span></span><span class="sig-name descname"><span class="pre">TestQueries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_queries.html#TestQueries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_queries.TestQueries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_queries.TestQueries.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_queries.html#TestQueries.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_queries.TestQueries.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_queries.TestQueries.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_queries.html#TestQueries.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_queries.TestQueries.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_queries.TestQueries.testQueries">
+<span class="sig-name descname"><span class="pre">testQueries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tests/test_queries.html#TestQueries.testQueries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tests.test_queries.TestQueries.testQueries" title="Permalink to this definition">¶</a></dt>
+<dd><p>see <a class="reference external" href="https://github.com/WolfgangFahl/pyLoDStorage/issues/19">https://github.com/WolfgangFahl/pyLoDStorage/issues/19</a></p>
 </dd></dl>
 
 </dd></dl>
@@ -474,35 +854,28 @@ sqlite3.IntegrityError: UNIQUE constraint failed: … show debug info</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="setup.html" class="btn btn-neutral float-left" title="setup module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="setup.html" class="btn btn-neutral float-left" title="setup module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Wolfgang Fahl
+        &#169; Copyright 2020, Wolfgang Fahl.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
