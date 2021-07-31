@@ -259,15 +259,21 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             lod.append(entity.__dict__)
         return lod
     
-    def store(self)->str:
+    def store(self,limit=10000000,batchSize=250,fixNone=True,sampleRecordCount=-1)->str:
         '''
         store my list of dicts
+        
+        Args:
+            limit(int): maximum number of records to store
+            batchSize(int): size of batch for storing
+            fixNone(bool): if True make sure the dicts are filled with None references for each record
+            sampleRecordCount(int): the number of records to analyze for type information
         
         Return:
             str: The cachefile being used
         '''
         lod=self.getLoD()
-        return self.storeLoD(lod)
+        return self.storeLoD(lod,limit=limit,batchSize=batchSize,fixNone=fixNone,sampleRecordCount=sampleRecordCount)
         
     def storeLoD(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,fixNone=True,sampleRecordCount=1)->str:
         ''' 
@@ -278,6 +284,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             limit(int): maximum number of records to store
             batchSize(int): size of batch for storing
             cacheFile(string): the name of the storage e.g path to JSON or sqlite3 file
+            fixNone(bool): if True make sure the dicts are filled with None references for each record
             sampleRecordCount(int): the number of records to analyze for type information
             
         Return:
