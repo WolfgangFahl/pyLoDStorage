@@ -72,6 +72,7 @@ fixconf() {
 
 src=docs/source
 checkinstalled  sphinx-apidoc
+# use sphinx-api-doc to create the documentation
 sphinx-apidoc --full -f -o $src .
 cd $src
 
