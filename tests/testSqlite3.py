@@ -212,6 +212,22 @@ record  #3={'name': 'John Doe'}"""
             print(tableList)
         self.assertEqual(1,len(tableList))
         self.assertEqual("contacts",tableList[0]['name'])
+        
+    def testIssue41(self):
+        '''
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/41
+        improve error message when create table command fails
+        '''
+        listOfRecords=[{
+            'name':'value',
+            'py/object': 'datetime.time'
+        }]
+        self.sqlDB=SQLDB(debug=self.debug,errorDebug=True)
+        try:
+            _entityInfo=self.sqlDB.createTable(listOfRecords[:1],'Invalid','name')
+            self.fail("There should be an exception")
+        except Exception as ex:
+            self.assertTrue("CREATE TABLE Invalid" in str(ex))
          
     def testBindingError(self):
         '''

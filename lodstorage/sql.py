@@ -86,7 +86,10 @@ class SQLDB(object):
         entityInfo=EntityInfo(sampleRecords,entityName,primaryKey,debug=self.debug)
         if withDrop:
             self.c.execute(entityInfo.dropTableCmd) 
-        self.c.execute(entityInfo.createTableCmd)
+        try:
+            self.c.execute(entityInfo.createTableCmd)
+        except sqlite3.OperationalError as oe:
+            raise Exception(f"createTable failed with error {oe} for {entityInfo.createTableCmd}")
         return entityInfo
     
     def getDebugInfo(self,record,index,executeMany):
