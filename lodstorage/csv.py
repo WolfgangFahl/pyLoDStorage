@@ -1,6 +1,7 @@
 import csv
 import io
 
+from lodstorage.jsonable import JSONAble
 from lodstorage.lod import LOD
 
 
@@ -29,7 +30,7 @@ class CSV(LOD):
         return lod
 
     @staticmethod
-    def fromCSV(csvString:str, headerNames:list=None):
+    def fromCSV(csvString:str, fields:list=None, delimiter=",",quoting=csv.QUOTE_NONNUMERIC, **kwargs):
         '''
         convert given csv string to list of dicts (LOD)
 
@@ -40,7 +41,8 @@ class CSV(LOD):
         Returns:
             list of dicts (LoD) containing the content of the given csv string
         '''
-        reader = csv.DictReader(io.StringIO(csvString), headerNames)
+        csvStream=io.StringIO(csvString)
+        reader = csv.DictReader(csvStream, fieldnames=fields, delimiter=delimiter, quoting=quoting, **kwargs)
         lod=list(reader)
         CSV.fixTypes(lod)
         return lod
@@ -63,25 +65,33 @@ class CSV(LOD):
         CSV.writeFile(csvStr, filePath)
 
     @staticmethod
-    def toCSV(lod:list):
+    def toCSV(lod:list, includeFields:list=None, excludeFields:list=None, delimiter=",",quoting=csv.QUOTE_NONNUMERIC, **kwargs):
         '''
         converts the given lod to CSV string.
+        For details about the csv dialect parameters see https://docs.python.org/3/library/csv.html#csv-fmt-params
 
         Args:
             lod(list): lod that should be converted to csv string
-
+            includeFields(list): list of fields that should be included in the csv (positive list)
+            excludeFields(list): list of fields that should be excluded from the csv (negative list)
+            kwargs: csv dialect parameters
         Returns:
             csv string of the given lod
         '''
-        fields = LOD.getFields(lod)
-        keys=fields
-        csvString = ""
-        csvStream = io.StringIO(csvString)
-        dict_writer = csv.DictWriter(csvStream, keys)
+        if isinstance(lod[0], JSONAble):
+            lod=[vars(d) for d in lod]
+        if excludeFields is not None:
+            lod=LOD.filterFields(lod, excludeFields)
+        if includeFields is None:
+            fields = LOD.getFields(lod)
+        else:
+            fields=includeFields
+            lod=LOD.filterFields(lod, includeFields, reverse=True)
+        csvStream = io.StringIO()
+        dict_writer = csv.DictWriter(csvStream, fieldnames=fields, delimiter=delimiter, quoting=quoting, **kwargs)
         dict_writer.writeheader()
         dict_writer.writerows(lod)
-        csvStream.seek(0)
-        csvString = csvStream.read()
+        csvString = csvStream.getvalue()
         return csvString
 
     @staticmethod

@@ -2,6 +2,7 @@ import tempfile
 from unittest import TestCase
 
 from lodstorage.csv import CSV
+from lodstorage.jsonable import JSONAbleList, JSONAble
 from lodstorage.lod import LOD
 
 
@@ -13,7 +14,7 @@ class TestCSV(TestCase):
     def setUp(self) -> None:
         self.temp_dir=tempfile.TemporaryDirectory(prefix="test_pyLoDStorage_")
         self.testFolder=self.temp_dir.name
-        self.csvStr="pageTitle,name,label\r\npage_1,Test Page 1,1\r\npage_2,Test Page 2,2\r\n"   # \r\n because the csv is in excel dialect
+        self.csvStr='"pageTitle","name","label"\r\n"page_1","Test Page 1","1"\r\n"page_2","Test Page 2","2"\r\n'   # \r\n because the csv is in excel dialect
         self.csvLOD=[
             {"pageTitle": "page_1", "name": "Test Page 1", "label": "1"},
             {"pageTitle": "page_2", "name": "Test Page 2", "label": "2"}
@@ -37,7 +38,7 @@ class TestCSV(TestCase):
             {"pageTitle": "page_1", "label": "1"},
             {"pageTitle": "page_2", "name": "Test Page 2", "label": "2"}
         ]
-        expectedStr = "pageTitle,label,name\r\npage_1,1,\r\npage_2,2,Test Page 2\r\n"
+        expectedStr = '"pageTitle","label","name"\r\n"page_1","1",""\r\n"page_2","2","Test Page 2"\r\n'
         actualStr=CSV.toCSV(csvLOD)
         self.assertEqual(expectedStr, actualStr)
 
@@ -88,7 +89,7 @@ class TestCSV(TestCase):
 
     def test_from_csv_without_header(self):
         '''tests if csv string without embedded headers is parsed correctly'''
-        csvStr = "page_1,Test Page 1,1\r\npage_2,Test Page 2,2\r\n"
+        csvStr = '"page_1","Test Page 1","1"\r\n"page_2","Test Page 2","2"\r\n'
         headerNames=["pageTitle", "name", "label"]
         actualLOD=CSV.fromCSV(csvStr, headerNames)
         self.assertEqual(self.csvLOD, actualLOD)
@@ -101,3 +102,75 @@ class TestCSV(TestCase):
         actualCSVStr=CSV.toCSV(csvLOD)
         actualLOD=CSV.fromCSV(actualCSVStr)
         self.assertEqual(csvLOD, actualLOD)
+
+    def testCsvFromJSONAble(self):
+        '''
+        tests generation of csv from list of JSONAble object
+        '''
+        lod = [
+            {
+                "name": "Test",
+                "label": 1
+            },
+            {
+                "name": "Test 2",
+                "label": 2
+            },
+            {
+                "name": "Different",
+                "location": "Munich"
+            }
+        ]
+        jsonAbleList = JSONAbleList(clazz=JSONAble)
+        jsonAbleList.fromLoD(lod)
+        actualCsvString=CSV.toCSV(jsonAbleList.getList())
+        expectedCsvString='"name","label","location"\r\n"Test",1,""\r\n"Test 2",2,""\r\n"Different","","Munich"\r\n'
+        self.assertEqual(actualCsvString,expectedCsvString)
+
+    def testCsvFromJSONAbleExcludeFields(self):
+        '''
+        tests generation of csv from list of JSONAble object with excluding specific fields (negative list)
+        '''
+        lod = [
+            {
+                "name": "Test",
+                "label": 1
+            },
+            {
+                "name": "Test 2",
+                "label": 2
+            },
+            {
+                "name": "Different",
+                "location": "Munich"
+            }
+        ]
+        jsonAbleList = JSONAbleList(clazz=JSONAble)
+        jsonAbleList.fromLoD(lod)
+        actualCsvString=CSV.toCSV(jsonAbleList.getList(), excludeFields=['label'])
+        expectedCsvString='"name","location"\r\n"Test",""\r\n"Test 2",""\r\n"Different","Munich"\r\n'
+        self.assertEqual(actualCsvString,expectedCsvString)
+
+    def testCsvFromJSONAbleIncludeFields(self):
+        '''
+        tests generation of csv from list of JSONAble object with including only specified fields (positive list)
+        '''
+        lod = [
+            {
+                "name": "Test",
+                "label": 1
+            },
+            {
+                "name": "Test 2",
+                "label": 2
+            },
+            {
+                "name": "Different",
+                "location": "Munich"
+            }
+        ]
+        jsonAbleList = JSONAbleList(clazz=JSONAble)
+        jsonAbleList.fromLoD(lod)
+        actualCsvString=CSV.toCSV(jsonAbleList.getList(), includeFields=['name', 'location'])
+        expectedCsvString='"name","location"\r\n"Test",""\r\n"Test 2",""\r\n"Different","Munich"\r\n'
+        self.assertEqual(actualCsvString,expectedCsvString)

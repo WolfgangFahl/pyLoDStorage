@@ -4,6 +4,8 @@ Created on 2021-06-11
 @author: wf
 '''
 import unittest
+
+from lodstorage.jsonable import JSONAbleList, JSONAble
 from lodstorage.lod import LOD
 import copy
 
@@ -97,7 +99,35 @@ class TestLOD(unittest.TestCase):
         self.checkHandleListTypeResult(lod, 3, None)
         lod=copy.deepcopy(exampleLod)
         LOD.handleListTypes(lod,separator=";")
-        self.checkHandleListTypeResult(lod, 4, "München;Munich")    
+        self.checkHandleListTypeResult(lod, 4, "München;Munich")
+
+    def testGetFields(self):
+        '''
+        tests field extraction from list of JSONAble objects and LoD
+        '''
+        lod=[
+            {
+                "name":"Test",
+                "label":1
+            },
+            {
+                "name": "Test 2",
+                "label": 2
+            },
+            {
+                "name":"Different",
+                "location":"Munich"
+            }
+        ]
+        expectedFields=["name","label","location"]
+        actualFieldsLoD=LOD.getFields(lod)
+        self.assertEqual(actualFieldsLoD, expectedFields)
+        jsonAbleList=JSONAbleList(clazz=JSONAble)
+        jsonAbleList.fromLoD(lod)
+        loj=jsonAbleList.getList()
+        actualFieldsLoJ=LOD.getFields(loj)
+        self.assertEqual(actualFieldsLoJ, expectedFields)
+
     
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

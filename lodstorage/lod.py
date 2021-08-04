@@ -23,7 +23,10 @@ class LOD(object):
                 return None
             sampleCount=len(listOfDicts)
         fields=[]
+        from lodstorage.jsonable import JSONAble
         for row in listOfDicts:
+            if isinstance(row, JSONAble):
+                row=vars(row)
             for key in row.keys():
                 if not key in fields:
                     fields.append(key)
@@ -178,3 +181,25 @@ class LOD(object):
                             newValue=separator.join(value)   
                             record[key]=newValue
         
+    @staticmethod
+    def filterFields(lod:list, fields:list, reverse:bool=False):
+        '''
+        filter the given LoD with the given list of fields by either limiting the LoD to the fields or removing the
+        fields contained in the list depending on the state of the reverse parameter
+
+        Args:
+            lod(list): list of dicts from which the fields should be excluded
+            fields(list): list of fields that should be excluded from the lod
+            reverse(bool): If True limit dict to the list of given fields. Otherwise exclude the fields from the dict.
+
+        Returns:
+            LoD
+        '''
+        res=[]
+        for record in lod:
+            if reverse:
+                recordReduced={d: record[d] for d in record if d in fields}
+            else:
+                recordReduced = {d: record[d] for d in record if d not in fields}
+            res.append(recordReduced)
+        return res
