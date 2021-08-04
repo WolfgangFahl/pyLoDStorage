@@ -78,6 +78,8 @@ class CSV(LOD):
         Returns:
             csv string of the given lod
         '''
+        if lod is None:
+            return ''
         if isinstance(lod[0], JSONAble):
             lod=[vars(d) for d in lod]
         if excludeFields is not None:
