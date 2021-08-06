@@ -379,6 +379,7 @@ class JSONAbleList(JSONAble):
             self.__dict__[self.listName] = result
         else:
             # ORM mode
+            # TODO - handle errors
             self.fromLoD(lod,append=False)
         return self.getList()
     
@@ -415,6 +416,9 @@ class JSONAbleList(JSONAble):
         Args:
             lod(list): the list of dicts to load
             append(bool): if True append to my existing entries
+            
+        Return:
+            list: a list of errors (if any)
         
         '''
         errors=[]
