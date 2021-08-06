@@ -4,7 +4,8 @@ from unittest import TestCase
 from lodstorage.csv import CSV
 from lodstorage.jsonable import JSONAbleList, JSONAble
 from lodstorage.lod import LOD
-
+from lodstorage.sample import Sample
+  
 
 class TestCSV(TestCase):
     '''
@@ -22,6 +23,20 @@ class TestCSV(TestCase):
 
     def tearDown(self) -> None:
         self.temp_dir.cleanup()
+        
+    def testRoyals(self):
+        '''
+        test conversion of royals
+        '''
+        inlod=Sample.getRoyals()
+        csv=CSV.toCSV(inlod)
+        if self.debug:
+            print(csv)
+        # https://stackoverflow.com/questions/3717785/what-is-a-convenient-way-to-store-and-retrieve-boolean-values-in-a-csv-file
+        outlod=CSV.fromCSV(csv)    
+        if self.debug:
+            print(outlod)
+        
 
     def test_to_csv(self):
         '''tests if LoD is correctly converted to csv str'''

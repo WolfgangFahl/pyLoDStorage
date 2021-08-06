@@ -106,7 +106,6 @@ class CSV(LOD):
         Returns:
             Content of the file as string
         """
-        content = ""
         with open(filename, 'r') as file:
             content = file.read()
         return content
