@@ -15,7 +15,7 @@ class TestTabulate(unittest.TestCase):
     '''
 
     def setUp(self):
-        self.debug=True
+        self.debug=False
         pass
 
 
@@ -29,10 +29,13 @@ class TestTabulate(unittest.TestCase):
         
         test https://pypi.org/project/tabulate/ support
         '''
+        show=self.debug
+        show=True
         royals=Royals(load=True)
         for fmt in ["latex","grid","mediawiki","github"]:
             table=tabulate(royals.royals,headers="keys",tablefmt=fmt)
-            print (table)
+            if show:
+                print (table)
     
         cities=Sample.getCities()    
         counter=Counter()
@@ -41,11 +44,10 @@ class TestTabulate(unittest.TestCase):
         tabulateCounter=TabulateCounter(counter)
         for fmt in ["latex","grid","mediawiki","github"]:
             table=tabulateCounter.mostCommonTable(tablefmt=fmt,limit=7)
-            print(table)
+            if show:
+                print(table)
         pass
     
-
-
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
