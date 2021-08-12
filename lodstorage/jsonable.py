@@ -627,15 +627,15 @@ class Types(JSONAble):
             items=sampleRecord.items()
             self.getTypesForItems(listName,items,warnOnNone=len(sampleRecords)==1)
           
-    def getTypesForItems(self,listName:str, warnOnNone:bool=False,items:list):  
+    def getTypesForItems(self,listName:str, items:list, warnOnNone:bool=False):  
         '''
         get the types for the given items
         side effect is setting my types
         
         Args:
             listName(str): the name of the list
-            warnOnNone(bool): if TRUE warn if an item value is None
             items(list): a list of items 
+            warnOnNone(bool): if TRUE warn if an item value is None
             
         '''
         for key,value in items:
