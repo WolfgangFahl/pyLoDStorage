@@ -541,7 +541,7 @@ class JSONAbleList(JSONAble):
         if typeSamples is None:
             types = None
         else:
-            types = Types(self.listName)
+            types = Types(self.listName,warnOnUnsupportedTypes=not self.handleInvalidListTypes)
             types.getTypes(self.listName, typeSamples, len(typeSamples))
         lod = self.getLoDfromJson(jsonStr, types,listName=self.listName)
         return lod
@@ -566,31 +566,35 @@ class Types(JSONAble):
     
     }
     
-    def __init__(self,name,debug=False):
+    def __init__(self,name:str,warnOnUnsupportedTypes=True,debug=False):
         '''
         Constructor
         
         Args:
             name(str): the name of the type map
+            warnOnUnsupportedTypes(bool): if TRUE warn if an item value has an unsupported type
+            debug(bool): if True - debugging information should be shown
         '''
         self.name=name
+        self.warnOnUnsupportedTypes=warnOnUnsupportedTypes
         self.debug=debug
         self.typeMap={}
         
     @staticmethod
-    def forTable(instance,listName,debug=False):
+    def forTable(instance,listName:str,warnOnUnsupportedTypes:bool=True,debug=False):
         '''
         get the types for the list of Dicts (table) in the given instance with the given listName
         Args:
             instance(object): the instance to inspect
             listName(string): the list of dicts to inspect
+            warnOnUnsupportedTypes(bool): if TRUE warn if an item value has an unsupported type
             debug(bool): True if debuggin information should be shown
         
         Returns:
             Types: a types object 
         '''
         clazz=type(instance)
-        types=Types(clazz.__name__,debug=debug)
+        types=Types(clazz.__name__,warnOnUnsupportedTypes=warnOnUnsupportedTypes,debug=debug)
         types.getTypes(listName,instance.__dict__[listName])
         return types
         
@@ -610,42 +614,57 @@ class Types(JSONAble):
         if not field in typeMap:
             typeMap[field]=valueType
             
-    def getTypes(self,listName,sampleRecords,limit=10):   
+    def getTypes(self,listName:str,sampleRecords:list,limit:int=10):   
         '''
         determine the types for the given sample records
+        
+        Args:
+            listName(str): the name of the list
+            sampleRecords(list): a list of items 
+            limit(int): the maximum number of items to check
         '''     
         for sampleRecord in sampleRecords[:limit]:
             items=sampleRecord.items()
             self.getTypesForItems(listName,items,warnOnNone=len(sampleRecords)==1)
           
-    def getTypesForItems(self,listName,items,warnOnNone=False):  
-            for key,value in items:
-                valueType=None
-                if value is None:
-                    if warnOnNone:
-                        if self.debug:
-                            print("Warning sampleRecord field %s is None - using string as type" % key)
-                        valueType=str
-                else:
-                    valueType=type(value)
-                if valueType == str:
-                    pass
-                elif valueType == int:
-                    pass
-                elif valueType == float:
-                    pass
-                elif valueType == bool:
-                    pass      
-                elif valueType == datetime.date:
-                    pass    
-                elif valueType== datetime.datetime:
-                    pass
-                else:
-                    if valueType is not None:
-                        msg="warning: unsupported type %s for field %s " % (str(valueType),key)
-                        print(msg)
+    def getTypesForItems(self,listName:str, warnOnNone:bool=False,items:list):  
+        '''
+        get the types for the given items
+        side effect is setting my types
+        
+        Args:
+            listName(str): the name of the list
+            warnOnNone(bool): if TRUE warn if an item value is None
+            items(list): a list of items 
+            
+        '''
+        for key,value in items:
+            valueType=None
+            if value is None:
+                if warnOnNone and self.debug:
+                    print(f"Warning sampleRecord field {key} is None - using string as type")
+                    valueType=str
+            else:
+                valueType=type(value)
+            if valueType == str:
+                pass
+            elif valueType == int:
+                pass
+            elif valueType == float:
+                pass
+            elif valueType == bool:
+                pass      
+            elif valueType == datetime.date:
+                pass    
+            elif valueType== datetime.datetime:
+                pass
+            else:
                 if valueType is not None:
-                    self.addType(listName,key,valueType.__name__) 
+                    msg=f"warning: unsupported type {str(valueType)} for field {key}"
+                    if self.debug and self.warnOnUnsupportedTypes:
+                        print(msg)
+            if valueType is not None:
+                self.addType(listName,key,valueType.__name__) 
                     
     def fixTypes(self,lod:list,listName:str):
         '''
