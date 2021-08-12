@@ -204,15 +204,17 @@ class JSONAble(object):
         self.fromDict(jsonMap) 
     
             
-    def fromDict(self,data):
+    def fromDict(self,data:dict):
         '''
         initialize me from the given data
         
         Args:
-            data: the dictionary to initalize me from
+            data(dict): the dictionary to initialize me from
         '''        
-        # https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python-taking-union-o                 
-        self.__dict__=data
+        # https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python-taking-union-o
+        for key in data.keys():
+            value=data[key]
+            setattr(self,key,value)
     
     def toJsonAbleValue(self,v):
         '''
