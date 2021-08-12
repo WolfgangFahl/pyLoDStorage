@@ -403,7 +403,7 @@ class JSONAbleList(JSONAble):
                 # get the relevant list of dicts
                 lod=lodOrDict[self.listName]
             else:
-                msg=f"invalid JSON for getLoD from Json\nexpecting a list of dicts or a dict with {self.listName} as list\nfound a dict with keys: {dict.keys()} instead"
+                msg=f"invalid JSON for getLoD from Json\nexpecting a list of dicts or a dict with '{self.listName}' as list\nfound a dict with keys: {lodOrDict.keys()} instead"
                 raise Exception(msg)
         if types is not None:
             types.fixTypes(lod,self.listName)   
