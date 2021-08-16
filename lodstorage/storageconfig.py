@@ -28,26 +28,32 @@ class StorageConfig(object):
         Args:
             name(str): the name of the cache to use
         '''
-        home = str(Path.home())
-        cachedir=f"{home}/.{self.cacheDirName}"
+        
+        cachedir=f"{self.cacheRootDir}/.{self.cacheDirName}"
         
         if ensureExists:
             if not os.path.exists(cachedir):
                 os.makedirs(cachedir)
         return cachedir
 
-    def __init__(self, mode=StoreMode.SQL,cacheDirName="lodstorage",cacheFile=None,withShowProgress=True,profile=True,debug=False,errorDebug=True):
+    def __init__(self, mode=StoreMode.SQL,cacheRootDir:str=None,cacheDirName:str="lodstorage",cacheFile=None,withShowProgress=True,profile=True,debug=False,errorDebug=True):
         '''
         Constructor
         
         Args:
             mode(StoreMode): the storage mode e.g. sql
+            cacheRootDir(str): the cache root directory to use - if None the home directory will be used
             cacheFile(string): the common cacheFile to use (if any)
             withShowProgress(boolean): True if progress should be shown
             profile(boolean): True if timing / profiling information should be shown
             debug(boolean): True if debugging information should be shown
             errorDebug(boolean): True if debug info should be provided on errors (should not be used for production since it might reveal data)
         '''
+        if cacheRootDir is None:
+            home = str(Path.home())
+            self.cacheRootDir=f"{home}"
+        else:
+            self.cacheRootDir=cacheRootDir
         self.cacheDirName=cacheDirName
         self.mode=mode
         self.cacheFile=cacheFile
