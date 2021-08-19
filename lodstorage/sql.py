@@ -205,28 +205,37 @@ class SQLDB(object):
             entityInfo.fixDates(resultList)
         return resultList
     
-    def getTableList(self):
+    def getTableList(self,tableType='table'):
         '''
         get the schema information from this database
+        
+        Args:
+            tableType(str): table or view
+            
+        Return:
+            list: a list as derived from PRAGMA table_info
         '''
-        tableQuery="SELECT name FROM sqlite_master WHERE type='table'"
+        tableQuery=f"SELECT name FROM sqlite_master WHERE type='{tableType}'"
         tableList=self.query(tableQuery)
         for table in tableList:
             tableName=table['name']
-            columnQuery="PRAGMA table_info('%s')" % tableName
+            columnQuery=f"PRAGMA table_info('{tableName}')" 
             columns=self.query(columnQuery)
             table['columns']=columns
         return tableList
     
-    def getTableDict(self):
+    def getTableDict(self,tableType='table'):
         '''
         get the schema information from this database as a dict
+        
+        Args:
+            tableType(str): table or view
         
         Returns:
             dict: Lookup map of tables with columns also being converted to dict
         '''
         tableDict={}
-        for table in self.getTableList():
+        for table in self.getTableList(tableType=tableType):
             colDict={}
             for col in table["columns"]:
                 colDict[col['name']]=col

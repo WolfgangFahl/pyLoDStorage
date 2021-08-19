@@ -3,6 +3,7 @@ Created on 2020-08-24
 
 @author: wf
 '''
+from tests.basetest import Basetest
 import unittest
 from datetime import datetime
 import time
@@ -14,17 +15,10 @@ from lodstorage.schema import Schema
 from lodstorage.sql import SQLDB, EntityInfo
 
 
-class TestSQLDB(unittest.TestCase):
+class TestSQLDB(Basetest):
     '''
     Test the SQLDB database wrapper
     '''
-
-    def setUp(self):
-        self.debug=False
-        pass
-
-    def tearDown(self):
-        pass
     
     def checkListOfRecords(self,listOfRecords,entityName,primaryKey=None,executeMany=True,fixNone=False,fixDates=False,debug=False,doClose=True):
         '''

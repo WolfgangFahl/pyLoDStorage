@@ -4,27 +4,20 @@ Created on 2021-07-23
 @author: wf
 '''
 import unittest
+from tests.basetest import Basetest
 from lodstorage.sample import Sample, Royal
 from lodstorage.entity import EntityManager
 from lodstorage.storageconfig import StoreMode, StorageConfig
-from pathlib import Path
 import os
 
-class TestEntityManager(unittest.TestCase):
+class TestEntityManager(Basetest):
     '''
     test the entity manager wrapper
     '''
-
-    def setUp(self):
-        self.debug=False
-        pass
-    
+ 
     def configure(self,config:StorageConfig):
         config.cacheDirName="lodstorage-test"
-
-
-    def tearDown(self):
-        pass
+   
 
     def testStoreMode(self):
         '''

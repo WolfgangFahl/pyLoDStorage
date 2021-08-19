@@ -4,22 +4,13 @@ Created on 2020-07-05
 @author: wf
 '''
 import unittest
-
-
+from tests.basetest import Basetest
 from lodstorage.plot import Plot
 
-class TestPlot(unittest.TestCase):
+class TestPlot(Basetest):
     '''
     test the Plot helper class
     '''
-
-
-    def setUp(self):
-        pass
-
-
-    def tearDown(self):
-        pass
 
 
     def testPlot(self):

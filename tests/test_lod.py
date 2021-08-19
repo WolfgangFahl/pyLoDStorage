@@ -4,22 +4,15 @@ Created on 2021-06-11
 @author: wf
 '''
 import unittest
-
+from tests.basetest import Basetest
 from lodstorage.jsonable import JSONAbleList, JSONAble
 from lodstorage.lod import LOD
 import copy
 
-class TestLOD(unittest.TestCase):
+class TestLOD(Basetest):
     '''
     test list of dicts base functionality
     '''
-
-    def setUp(self):
-        self.debug=False
-        pass
-
-    def tearDown(self):
-        pass
 
     def testListIntersect(self):
         '''

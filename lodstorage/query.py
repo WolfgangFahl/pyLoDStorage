@@ -5,10 +5,36 @@ Created on 2020-08-22
 '''
 import os
 import yaml
+from tabulate import tabulate
 #from wikibot.mwTable import MediaWikiTable
 # redundant copy in this library to avoid dependency issues
 # original is at 
 from lodstorage.mwTable import MediaWikiTable
+
+
+class QueryResultDocumentation():
+    '''
+    documentation of a query result
+    '''
+    
+    def __init__(self,title,sourceCode,sourceCodeHeader,resultHeader,result):
+        '''
+        constructor
+        
+        Args:
+            title(str): the title markup
+            
+        '''
+        self.title=title
+        self.sourceCodeHeader=sourceCodeHeader
+        self.sourceCode=sourceCode
+        self.resultHeader=resultHeader
+        self.result=result
+        
+    def __str__(self):
+        text=f"{self.title}\n{self.sourceCodeHeader}\n{self.sourceCode}\n{self.resultHeader}\n{self.result}"
+        return text
+        
 class Query(object):
     ''' a Query e.g. for SPAQRL '''
     
@@ -30,6 +56,7 @@ class Query(object):
         '''
         convert me to Mediawiki markup for syntax highlighting using the "source" tag
         
+        
         Returns:
             string: the Markup
         '''
@@ -39,8 +66,10 @@ class Query(object):
     def asWikiMarkup(self,listOfDicts):
         '''
         convert the given listOfDicts result to MediaWiki markup
+        
         Args:
             listOfDicts(list): the list of Dicts to convert to MediaWiki markup
+        
         Returns:
             string: the markup
         '''
@@ -50,6 +79,41 @@ class Query(object):
         mwTable.fromListOfDicts(listOfDicts)
         markup=mwTable.asWikiMarkup()        
         return markup
+    
+    def documentQueryResult(self,lod:list,tablefmt:str="mediawiki",withSourceCode=True,**kwArgs):
+        '''
+        document the given query results
+        
+        Args:
+            lod: the list of dicts result
+            tablefmt(str): the table format to use
+            withSourceCode(bool): if True document the source code
+            
+        Return:
+            str(
+        '''
+        sourceCode=self.query
+        title=self.name
+        if withSourceCode:
+            sourceCodeHeader="**query**"
+            resultHeader="**result**"
+            if tablefmt=="github":
+                title=f"**{self.name}**"
+                sourceCode=f"""**query**
+```sql
+{self.query}
+```"""
+            if tablefmt=="mediawiki":
+                title=f"== {self.name} =="
+                sourceCodeHeader="=== query ==="
+                resultHeader="=== result ==="
+                sourceCode=f"""<source lang='sql'>
+{self.query}
+</source>
+"""
+        tab=tabulate(lod,headers="keys",tablefmt=tablefmt,**kwArgs)
+        queryResultDocumentation=QueryResultDocumentation(title=title,sourceCode=sourceCode,sourceCodeHeader=sourceCodeHeader,resultHeader=resultHeader,result=tab)
+        return queryResultDocumentation
 
 class QueryManager(object):
     '''

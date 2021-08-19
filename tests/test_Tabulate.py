@@ -8,19 +8,12 @@ from lodstorage.sample import Royals, Sample
 from tabulate import tabulate
 from collections import Counter
 from lodstorage.tabulateCounter import TabulateCounter
+from tests.basetest import Basetest
 
-class TestTabulate(unittest.TestCase):
+class TestTabulate(Basetest):
     '''
     test tabulate support/compatibility
     '''
-
-    def setUp(self):
-        self.debug=False
-        pass
-
-
-    def tearDown(self):
-        pass
 
 
     def testIssue24_IntegrateTabulate(self):

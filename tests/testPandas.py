@@ -6,18 +6,10 @@ Created on 2021-06-07
 
 from lodstorage.sample import Sample
 import unittest
+from tests.basetest import Basetest
 import pandas as pd
 
-class TestPandas(unittest.TestCase):
-
-
-    def setUp(self):
-        self.debug=False
-        pass
-
-
-    def tearDown(self):
-        pass
+class TestPandas(Basetest):
 
 
     def testIssue25(self):

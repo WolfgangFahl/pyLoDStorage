@@ -4,6 +4,7 @@ Created on 2020-09-12
 @author: wf
 '''
 import unittest
+from tests.basetest import Basetest
 import json
 from lodstorage.sample import Royals,RoyalsORMList,Royal,Cities
 from lodstorage.jsonable import JSONAble, Types, JSONAbleList
@@ -14,20 +15,16 @@ class ServerConfig(JSONAble):
         def __init__(self):
             pass
         
-class TestJsonAble(unittest.TestCase):
+class TestJsonAble(Basetest):
     '''
     test JSON serialization with JsonAble mixin
     '''
 
     def setUp(self):
-        self.profile=False
-        self.debug=False
+        super().setUp(debug=False)
+        self.doProfile=True
         self.maxDiff=None
         pass
-
-    def tearDown(self):
-        pass
-        
     
     def testSingleToDoubleQuote(self):
         jsonStr='''
@@ -112,7 +109,7 @@ class TestJsonAble(unittest.TestCase):
                     print(jsonStr[:debugChars])
                     #print(jsonStr,file=open('/tmp/example%d.json' %index,'w'))
                 index+=1
-                if self.profile:
+                if self.doProfile:
                     print("->JSON for %d took %7.3f s" % (index, (time.time()-starttime)))
                 self.assertTrue(isinstance(jsonStr,str))
                 starttime=time.time()
@@ -120,7 +117,7 @@ class TestJsonAble(unittest.TestCase):
                 self.assertTrue(isinstance(jsonDict,dict))
                 if self.debug:
                     print(str(jsonDict)[:debugChars])
-                if self.profile:
+                if self.doProfile:
                     print("<-JSON for %d took %7.3f s" % (index, time.time()-starttime))
                 cls=manager.__class__
                 types=Types(cls.__name__)

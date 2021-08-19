@@ -4,24 +4,15 @@ Created on 2020-08-14
 @author: wf
 '''
 import unittest
-import getpass
+from tests.basetest import Basetest
 from lodstorage.sparql import SPARQL
 from lodstorage.sample import Sample
 from lodstorage.lod import LOD
 import time
 import datetime
 
-class TestSPARQL(unittest.TestCase):
+class TestSPARQL(Basetest):
     ''' Test SPARQL access e.g. Apache Jena via Wrapper'''
-
-    def setUp(self):
-        self.debug=False
-        self.profile=False
-        pass
-
-
-    def tearDown(self):
-        pass
 
     def getJena(self,mode='query',debug=False,typedLiterals=False,profile=False):
         '''

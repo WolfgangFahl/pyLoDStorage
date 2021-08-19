@@ -1,18 +1,18 @@
 import tempfile
-from unittest import TestCase
 
 from lodstorage.csv import CSV
 from lodstorage.jsonable import JSONAbleList, JSONAble
 from lodstorage.lod import LOD
 from lodstorage.sample import Sample
-  
+from tests.basetest import Basetest  
 
-class TestCSV(TestCase):
+class TestCSV(Basetest):
     '''
     Tests functionalities for the conversion between csv and list od dicts (LoD)
     '''
 
-    def setUp(self) -> None:
+    def setUp(self):
+        super().setUp(debug=False)
         self.temp_dir=tempfile.TemporaryDirectory(prefix="test_pyLoDStorage_")
         self.testFolder=self.temp_dir.name
         self.csvStr='"pageTitle","name","label"\r\n"page_1","Test Page 1","1"\r\n"page_2","Test Page 2","2"\r\n'   # \r\n because the csv is in excel dialect
@@ -22,6 +22,7 @@ class TestCSV(TestCase):
         ]
 
     def tearDown(self) -> None:
+        super().tearDown()
         self.temp_dir.cleanup()
         
     def testRoyals(self):
