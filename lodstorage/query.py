@@ -93,6 +93,8 @@ class Query(object):
             title(str): the title to show
             tablefmt(str): the table format to use
         '''
+        # create a safe url
+        url=urllib.parse.quote(url)
         markup=f"{title}:{url}"
         if tablefmt=="mediawiki":
             markup=f"[{url} {title}]"
@@ -103,9 +105,15 @@ class Query(object):
         return markup
         
     
-    def prefixToLink(self,lod,prefix,tablefmt):
+    def prefixToLink(self,lod:list,prefix:str,tablefmt:str):
         '''
         convert url prefixes to link according to the given table format
+        
+        Args:
+            lod(list): the list of dicts to convert
+            prefix(str): the prefix to strip 
+            tablefmt(str): the tabulate tableformat to use
+            
         '''
         for record in lod:
             for key in record.keys():
@@ -205,7 +213,8 @@ class Query(object):
                 sourceCodeHeader="query:"
                 resultHeader="result:"
                 sourceCode=f"{self.query}"
-       
+        if self.lang is not "sparql":
+            tryItMarkup=""
         queryResultDocumentation=QueryResultDocumentation(query=self,title=title,tryItMarkup=tryItMarkup,sourceCodeHeader=sourceCodeHeader,sourceCode=sourceCode,resultHeader=resultHeader,result=result)
         return queryResultDocumentation
 
