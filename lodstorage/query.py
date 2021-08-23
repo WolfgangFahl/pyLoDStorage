@@ -105,7 +105,6 @@ class Query(object):
             markup=r"\href{%s}{%s}" % (url,title) 
         return markup
         
-    
     def prefixToLink(self,lod:list,prefix:str,tablefmt:str):
         '''
         convert url prefixes to link according to the given table format
@@ -121,7 +120,6 @@ class Query(object):
                 value=record[key]
                 if value is not None and isinstance(value,str) and value.startswith(prefix):
                     item=value.replace(prefix,"")
-                    item=urllib.parse.quote(item)
                     if tablefmt=="latex":
                         link=item
                     else:
