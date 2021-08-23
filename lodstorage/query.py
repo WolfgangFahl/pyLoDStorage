@@ -6,6 +6,7 @@ Created on 2020-08-22
 import os
 import yaml
 from tabulate import tabulate
+import urllib
 #from wikibot.mwTable import MediaWikiTable
 # redundant copy in this library to avoid dependency issues
 # original is at 
@@ -17,40 +18,106 @@ class QueryResultDocumentation():
     documentation of a query result
     '''
     
-    def __init__(self,title,sourceCode,sourceCodeHeader,resultHeader,result):
+    def __init__(self,query,title:str,tryItMarkup:str,sourceCodeHeader:str,sourceCode:str,resultHeader:str,result:str):
         '''
         constructor
         
         Args:
+            query(Query): the query to be documented
             title(str): the title markup
+            tryItMarkup: the "try it!" markup to show
+            sourceCodeHeader(str): the header title to use for the sourceCode
+            sourceCode(str): the sourceCode
+            resultCodeHeader(str): the header title to use for the result
+            result(str): the result header
             
         '''
+        self.query=query
         self.title=title
+        self.tryItMarkup=f"\n{tryItMarkup}"
         self.sourceCodeHeader=sourceCodeHeader
         self.sourceCode=sourceCode
         self.resultHeader=resultHeader
         self.result=result
         
+        
     def __str__(self):
-        text=f"{self.title}\n{self.sourceCodeHeader}\n{self.sourceCode}\n{self.resultHeader}\n{self.result}"
+        '''
+        simple string representation
+        '''
+        text=f"{self.title}\n{self.query.description}\n{self.sourceCodeHeader}\n{self.sourceCode}{self.tryItMarkup}\n{self.resultHeader}\n{self.result}"
         return text
         
 class Query(object):
     ''' a Query e.g. for SPAQRL '''
     
-    def __init__(self,name,query,lang='sparql',debug=False):
+    def __init__(self,name:str,query:str,lang='sparql',title:str=None,description:str=None,debug=False):
         '''
         constructor 
         Args:
-            name(string): the name of the query
+            name(string): the name/label of the query
             query(string): the native Query text e.g. in SPARQL
             lang(string): the language of the query e.g. SPARQL
+            title(string): the header/title of the query
+            description(string): the description of the query
             debug(boolean): true if debug mode should be switched on
         '''
         self.name=name
-        self.lang=lang
         self.query=query
+        self.lang=lang
+        self.title=title=name if title is None else title
+        self.description="" if description is None else description
         self.debug=debug
+        
+    def getTryItUrl(self,baseurl:str):
+        '''
+        return the "try it!" url for the given baseurl
+        
+        Args:
+            baseurl(str): the baseurl to used
+            
+        Returns:
+            str: the "try it!" url for the given query
+        '''
+        quoted=urllib.parse.quote(self.query)
+        quoted=f"#{quoted}"
+        url=f"{baseurl}/{quoted}"
+        return url
+    
+    def getLink(self,url,title,tablefmt):
+        '''
+        convert the given url and title to a link for the given tablefmt
+        
+        Args:
+            url(str): the url to convert
+            title(str): the title to show
+            tablefmt(str): the table format to use
+        '''
+        markup=f"{title}:{url}"
+        if tablefmt=="mediawiki":
+            markup=f"[{url} {title}]"
+        elif tablefmt=="github":
+            markup=f"[{title}]({url})"
+        elif tablefmt=="latex":
+            markup=r"\href{%s}{%s}" % (url,title) 
+        return markup
+        
+    
+    def prefixToLink(self,lod,prefix,tablefmt):
+        '''
+        convert url prefixes to link according to the given table format
+        '''
+        for record in lod:
+            for key in record.keys():
+                value=record[key]
+                if value is not None and isinstance(value,str) and value.startswith(prefix):
+                    item=value.replace(prefix,"")
+                    if tablefmt=="latex":
+                        link=item
+                    else:
+                        link=self.getLink(value,item,tablefmt)
+                    record[key]=link
+          
         
     def asWikiSourceMarkup(self):
         '''
@@ -80,44 +147,71 @@ class Query(object):
         markup=mwTable.asWikiMarkup()        
         return markup
     
-    def documentQueryResult(self,lod:list,tablefmt:str="mediawiki",withSourceCode=True,**kwArgs):
+    def documentQueryResult(self,lod:list,tablefmt:str="mediawiki",tryItUrl:str=None,withSourceCode=True,**kwArgs):
         '''
         document the given query results
         
         Args:
             lod: the list of dicts result
+            tryItUrl: the "try it!" url to show
             tablefmt(str): the table format to use
             withSourceCode(bool): if True document the source code
             
         Return:
-            str(
+            str: the documentation tabular text for the given parameters
         '''
         sourceCode=self.query
-        title=self.name
+        title=self.title
+        result=tabulate(lod,headers="keys",tablefmt=tablefmt,**kwArgs)
         if withSourceCode:
-            sourceCodeHeader="**query**"
-            resultHeader="**result**"
+            tryItMarkup=self.getLink(tryItUrl, "try it!", tablefmt)
             if tablefmt=="github":
-                title=f"**{self.name}**"
-                sourceCode=f"""**query**
-```sql
+                title=f"**{self.title}**"
+                sourceCodeHeader="**query**"
+                resultHeader="**result**"
+                sourceCode=f"""```sql
 {self.query}
 ```"""
-            if tablefmt=="mediawiki":
-                title=f"== {self.name} =="
+                
+            elif tablefmt=="mediawiki":
+                title=f"== {self.title} =="
                 sourceCodeHeader="=== query ==="
                 resultHeader="=== result ==="
-                sourceCode=f"""<source lang='sql'>
+                sourceCode=f"""<source lang='{self.lang}'>
 {self.query}
 </source>
 """
-        tab=tabulate(lod,headers="keys",tablefmt=tablefmt,**kwArgs)
-        queryResultDocumentation=QueryResultDocumentation(title=title,sourceCode=sourceCode,sourceCodeHeader=sourceCodeHeader,resultHeader=resultHeader,result=tab)
+            elif tablefmt=="latex":
+                sourceCodeHeader=r"see query listing \ref{listing:%s} and result table \ref{tab:%s}" % (self.name,self.name)
+                resultHeader=""
+                sourceCode=r"""\begin{listing}[ht]
+\caption{%s}
+\label{listing:%s}
+\begin{minted}{%s}
+%s
+\end{minted}
+%s
+\end{listing}
+""" % (self.title,self.name,self.lang.lower(),self.query,tryItMarkup)
+                tryItMarkup=""
+                result=r"""\begin{table}
+\caption{%s}
+\label{tab:%s}
+%s
+\end{table}
+""" % (self.title,self.name,result)
+            else:
+                title=f"{self.title}"
+                sourceCodeHeader="query:"
+                resultHeader="result:"
+                sourceCode=f"{self.query}"
+       
+        queryResultDocumentation=QueryResultDocumentation(query=self,title=title,tryItMarkup=tryItMarkup,sourceCodeHeader=sourceCodeHeader,sourceCode=sourceCode,resultHeader=resultHeader,result=result)
         return queryResultDocumentation
 
 class QueryManager(object):
     '''
-    manages prepackaged Queries
+    manages pre packaged Queries
     '''
 
     def __init__(self,lang='sql',debug=False,path=None):
