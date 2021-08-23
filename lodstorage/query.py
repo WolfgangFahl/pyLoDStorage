@@ -120,10 +120,11 @@ class Query(object):
                 value=record[key]
                 if value is not None and isinstance(value,str) and value.startswith(prefix):
                     item=value.replace(prefix,"")
+                    uqitem=urllib.parse.unquote(item)
                     if tablefmt=="latex":
-                        link=item
+                        link=uqitem
                     else:
-                        link=self.getLink(value,item,tablefmt)
+                        link=self.getLink(value,uqitem,tablefmt)
                     record[key]=link
           
         

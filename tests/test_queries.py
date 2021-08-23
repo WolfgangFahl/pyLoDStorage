@@ -34,14 +34,57 @@ class TestQueries(Basetest):
                 print(resultDoc)
         pass
     
+    def uniCode2Latex(self,s:str):
+        for code in range(8320,8330):
+            s=s.replace(chr(code),f"$_{code-8320}$")
+        return s
+    
+    def testUnicode(self):
+        '''
+        
+        '''
+        for code in range(8320,8330):
+            uc=chr(code)
+            print(f"{uc}:{self.uniCode2Latex(uc)}")
+            
+    def fixUnicode(self,tab:str,tableFmt):
+        if tableFmt!="latex":
+            result= tab
+        else:
+            result=self.uniCode2Latex(tab)
+        return result
+            
     def testQueryDocumentation(self):
         '''
         test QueryDocumentation
         '''
         show=self.debug
-        #show=True
-        queries=[{
+        show=True
+        queries=[
+            {
             "endpoint":"https://query.wikidata.org/sparql",
+            "prefixes": ["http://www.wikidata.org/entity/","http://commons.wikimedia.org/wiki/Special:FilePath/"],
+            "lang": "sparql",
+            "name": "CAS15",
+            "title": "15 Random substances with CAS number",
+            "description": "Wikidata SPARQL query showing the 15 random chemical substances with their CAS Number",
+            "query": """# List of 15 random chemical components with CAS-Number, formula and structure
+# see also https://github.com/WolfgangFahl/pyLoDStorage/issues/46
+# WF 2021-08-23
+SELECT ?substance ?substanceLabel ?formula ?structure ?CAS
+WHERE { 
+  ?substance wdt:P31 wd:Q11173.
+  ?substance wdt:P231 ?CAS.
+  ?substance wdt:P274 ?formula.
+  ?substance wdt:P117  ?structure.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+LIMIT 15
+"""
+            },
+            {
+            "endpoint":"https://query.wikidata.org/sparql",
+            "prefixes": ["http://www.wikidata.org/entity/"],
             "lang": "sparql",
             "name": "CityTop10",
             "title": "Ten largest cities of the world",
@@ -66,6 +109,7 @@ LIMIT 10"""
             {
             "endpoint":"https://sophox.org/sparql",
             "lang": "sparql",
+            "prefixes": [],
             "query":
         """# count osm place type instances
 # WF 2021-08-23
@@ -90,17 +134,21 @@ determines the number of instances available in the OpenStreetMap for the placeT
 """}]
         for queryMap in queries:
             endpointUrl=queryMap.pop("endpoint")
+            prefixes=queryMap.pop("prefixes")
             endpoint=SPARQL(endpointUrl)
             query=Query(**queryMap)
             try:
                 qlod=endpoint.queryAsListOfDicts(query.query)
                 for tablefmt in ["mediawiki","github","latex"]:
                     lod=copy.deepcopy(qlod)
-                    query.prefixToLink(lod,"http://www.wikidata.org/entity/",tablefmt)
+                    for prefix in prefixes:
+                        query.prefixToLink(lod,prefix,tablefmt)
                     tryItUrl=query.getTryItUrl(endpointUrl.replace("/sparql",""))
                     doc=query.documentQueryResult(lod, tablefmt=tablefmt,floatfmt=".0f",tryItUrl=tryItUrl)
                     if show:
-                        print(doc)
+                        docstr=str(doc)
+                        fixedStr=self.fixUnicode(docstr,tablefmt)
+                        print(fixedStr)
             except Exception as ex:
                 print(f"{query.title} at {endpointUrl} failed: {ex}")
 
