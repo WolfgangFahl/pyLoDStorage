@@ -39,6 +39,7 @@ class TestQueries(Basetest):
         test QueryDocumentation
         '''
         show=self.debug
+        #show=True
         queries=[{
             "endpoint":"https://query.wikidata.org/sparql",
             "lang": "sparql",
@@ -102,7 +103,6 @@ determines the number of instances available in the OpenStreetMap for the placeT
                         print(doc)
             except Exception as ex:
                 print(f"{query.title} at {endpointUrl} failed: {ex}")
-            
 
 
 if __name__ == "__main__":

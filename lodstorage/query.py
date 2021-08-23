@@ -94,7 +94,8 @@ class Query(object):
             tablefmt(str): the table format to use
         '''
         # create a safe url
-        url=urllib.parse.quote(url)
+        if url is None:
+            return ""
         markup=f"{title}:{url}"
         if tablefmt=="mediawiki":
             markup=f"[{url} {title}]"
@@ -120,6 +121,7 @@ class Query(object):
                 value=record[key]
                 if value is not None and isinstance(value,str) and value.startswith(prefix):
                     item=value.replace(prefix,"")
+                    item=urllib.parse.quote(item)
                     if tablefmt=="latex":
                         link=item
                     else:
@@ -213,7 +215,7 @@ class Query(object):
                 sourceCodeHeader="query:"
                 resultHeader="result:"
                 sourceCode=f"{self.query}"
-        if self.lang is not "sparql":
+        if self.lang!="sparql":
             tryItMarkup=""
         queryResultDocumentation=QueryResultDocumentation(query=self,title=title,tryItMarkup=tryItMarkup,sourceCodeHeader=sourceCodeHeader,sourceCode=sourceCode,resultHeader=resultHeader,result=result)
         return queryResultDocumentation
