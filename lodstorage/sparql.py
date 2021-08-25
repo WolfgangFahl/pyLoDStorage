@@ -175,18 +175,18 @@ class SPARQL(object):
         if startTime is None:
             startTime=batchStartTime
         rdfprefix="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-        insertCommand='%s%s\nINSERT DATA {\n' % (rdfprefix,prefixes)
+        insertCommand=f'{rdfprefix}{prefixes}\nINSERT DATA {{\n'
         for index,record in enumerate(listOfDicts):
             if not primaryKey in record:
-                errors.append("missing primary key %s in record %d" % (primaryKey,index))
+                errors.append(f"missing primary key {primaryKey} in record {index}")
             else:    
                 primaryValue=record[primaryKey]
                 if primaryValue is None:
-                    errors.append("primary key %s value is None in record %d" % (primaryKey,index))    
+                    errors.append(f"primary key {primaryKey} value is None in record {index}")    
                 else:    
                     encodedPrimaryValue=self.getLocalName(primaryValue)
-                    tSubject="%s__%s" %(entityType,encodedPrimaryValue)
-                    insertCommand+='  %s rdf:type "%s".\n' %(tSubject,entityType)
+                    tSubject=f"{entityType}__{encodedPrimaryValue}" 
+                    insertCommand+=f'  {tSubject} rdf:type "{entityType}".\n' 
                     for keyValue in record.items():
                         key,value=keyValue
                         # convert key if necessary
@@ -194,7 +194,7 @@ class SPARQL(object):
                         valueType=type(value)
                         if self.debug:
                             print("%s(%s)=%s" % (key,valueType,value))
-                        tPredicate="%s_%s" % (entityType,key)
+                        tPredicate=f"{entityType}_{key}" 
                         tObject=value    
                         if valueType == str:
                             escapedString=self.controlEscape(value)

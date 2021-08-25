@@ -57,6 +57,8 @@ class TestEntityManager(Basetest):
         for i,royals in enumerate([Sample.getRoyals(),Sample.getRoyalsInstances()]):
             if self.debug:
                 print(f"{i+1}:{royals}")
+            sparqlConfig=StorageConfig.getSPARQL("http://example.bitplan.com", "http://localhost:3030/example",host="localhost")
+            # TODO use sparql Config
             for config in [StorageConfig.getDefault(debug=self.debug),StorageConfig.getJSON(debug=self.debug),StorageConfig.getJsonPickle(self.debug)]:
                 self.configure(config)
                 name="royal" if i==0 else "royalorm"
@@ -67,7 +69,8 @@ class TestEntityManager(Basetest):
                     cacheFile=em.storeLoD(royals)
                 else:
                     cacheFile=em.store()
-                self.assertTrue(os.path.isfile(cacheFile))
+                if cacheFile is not None:
+                    self.assertTrue(os.path.isfile(cacheFile))
                 royalsLod=em.fromStore()
                 self.assertTrue(isinstance(royalsLod,list))
                 hint=f"{i}({config.mode}):{name}"

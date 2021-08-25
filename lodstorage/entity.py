@@ -305,12 +305,12 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
                 pass
         elif mode is StoreMode.SPARQL:
             startTime=time.time()
-            # @ FIXME make abstract 
-            self.showProgress ("storing %d events for %s to %s" % (len(self.events),self.name,self.mode))    
+            msg=f"storing {len(listOfDicts)} {self.entityPluralName} to {self.config.mode} ({self.config.endpoint})"
+            self.showProgress (msg) 
+            # @ FIXME make abstract /configurable
             entityType="cr:Event"
-            prefixes="PREFIX cr: <http://cr.bitplan.com/>"
-            primaryKey="eventId"
-            self.sparql.insertListOfDicts(listOfDicts, entityType, primaryKey, prefixes,limit=limit,batchSize=batchSize)
+            prefixes=self.config.prefix
+            self.sparql.insertListOfDicts(listOfDicts, entityType, self.primaryKey, prefixes,limit=limit,batchSize=batchSize)
             self.showProgress ("store for %s done after %5.1f secs" % (self.name,time.time()-startTime))
         elif mode is StoreMode.SQL:
             startTime=time.time()

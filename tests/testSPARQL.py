@@ -10,6 +10,7 @@ from lodstorage.sample import Sample
 from lodstorage.lod import LOD
 import time
 import datetime
+import warnings
 
 class TestSPARQL(Basetest):
     ''' Test SPARQL access e.g. Apache Jena via Wrapper'''
@@ -50,8 +51,13 @@ class TestSPARQL(Basetest):
         }
         """,'INVALID COMMAND']
         for index,insertCommand in enumerate(insertCommands):
+            if index!=0:
+                warnings.simplefilter("ignore")
+
             result,ex=jena.insert(insertCommand)
             if index==0:
+                if ex:
+                    print(f"Exception: {ex}")
                 self.assertTrue(ex is None)
                 if self.debug:
                     print(result)
