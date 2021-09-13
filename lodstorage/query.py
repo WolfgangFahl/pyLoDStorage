@@ -47,7 +47,7 @@ class QueryResultDocumentation():
         '''
         text=f"{self.title}\n{self.query.description}\n{self.sourceCodeHeader}\n{self.sourceCode}{self.tryItMarkup}\n{self.resultHeader}\n{self.result}"
         return text
-        
+
 class Query(object):
     ''' a Query e.g. for SPAQRL '''
     
@@ -175,9 +175,9 @@ class Query(object):
         if withSourceCode:
             tryItMarkup=self.getLink(tryItUrl, "try it!", tablefmt)
             if tablefmt=="github":
-                title=f"**{self.title}**"
-                sourceCodeHeader="**query**"
-                resultHeader="**result**"
+                title=f"## {self.title}"
+                sourceCodeHeader="### query"
+                resultHeader="## result"
                 sourceCode=f"""```sql
 {self.query}
 ```"""
