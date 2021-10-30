@@ -122,10 +122,21 @@ class JSONAble(object):
             cls=self.__class__
             if isinstance(self, JSONAbleList) and not hasattr(cls, 'getSamples'):
                 cls=self.clazz
-            if hasattr(cls, 'getSamples'):
-                getSamples=getattr(cls,'getSamples');
-                if callable(getSamples):
-                    return getSamples()
+            return JSONAble.getJsonTypeSamplesForClass(cls)
+        return None
+    
+    @staticmethod
+    def getJsonTypeSamplesForClass(cls):
+        '''
+        return the type samples for the given class
+        
+        Return:
+            list: a list of dict that specify the types by example
+        '''
+        if hasattr(cls, 'getSamples'):
+            getSamples=getattr(cls,'getSamples');
+            if callable(getSamples):
+                return getSamples()
         return None
     
     @staticmethod

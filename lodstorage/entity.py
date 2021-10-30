@@ -5,6 +5,7 @@ Created on 2020-08-19
 '''
 from lodstorage.yamlablemixin import YamlAbleMixin
 from lodstorage.jsonpicklemixin import JsonPickleMixin
+from lodstorage.jsonable import JSONAble
 from lodstorage.storageconfig import StorageConfig, StoreMode
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
@@ -102,7 +103,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
             cacheFile=self.getCacheFile(mode=mode)
             if os.path.isfile(cacheFile):
                 os.remove(cacheFile)
-    
+                    
     def getSQLDB(self,cacheFile):
         '''
         get the SQL database for the given cacheFile
@@ -113,6 +114,23 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
         config=self.config
         sqldb=self.sqldb=SQLDB(cacheFile,debug=config.debug,errorDebug=config.errorDebug)
         return sqldb
+    
+    def initSQLDB(self,sqldb,listOfDicts=None,withCreate:bool=True,withDrop:bool=True,sampleRecordCount=-1):
+        '''
+        initialize my sql DB  
+        
+        Args:
+            listOfDicts(list): the list of dicts to analyze for type information
+            withDrop(boolean): true if the existing Table should be dropped
+            withCreate(boolean): true if the create Table command should be executed - false if only the entityInfo should be returned
+            sampleRecordCount(int): the number of records to analyze for type information
+        Return:
+            EntityInfo: the entity information such as CREATE Table command
+        '''
+        if listOfDicts is None:
+            listOfDicts=JSONAble.getJsonTypeSamplesForClass(self.clazz)
+        entityInfo=sqldb.createTable(listOfDicts, self.tableName, primaryKey=self.primaryKey,withCreate=withCreate,withDrop=withDrop,sampleRecordCount=sampleRecordCount) 
+        return entityInfo
     
     def setNone(self,record,fields):
         '''
@@ -337,7 +355,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             else:
                 withDrop=True
                 withCreate=True
-            entityInfo=sqldb.createTable(listOfDicts, self.tableName, primaryKey=self.primaryKey,withCreate=withCreate,withDrop=withDrop,sampleRecordCount=sampleRecordCount)   
+            entityInfo=self.initSQLDB(sqldb,listOfDicts,withCreate=withCreate,withDrop=withDrop,sampleRecordCount=sampleRecordCount)
             self.sqldb.store(listOfDicts, entityInfo,executeMany=self.executeMany,fixNone=fixNone)
             self.showProgress ("store for %s done after %5.1f secs" % (self.name,time.time()-startTime))
         else:

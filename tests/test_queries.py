@@ -59,7 +59,7 @@ class TestQueries(Basetest):
         test QueryDocumentation
         '''
         show=self.debug
-        show=True
+        #show=True
         queries=[
             {
             "endpoint":"https://query.wikidata.org/sparql",
