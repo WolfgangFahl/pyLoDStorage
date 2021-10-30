@@ -10,6 +10,7 @@ from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
 from lodstorage.lod import LOD
 from lodstorage.jsonable import JSONAbleList
+import sys
 import os
 import time
 
@@ -148,26 +149,33 @@ GROUP by ?source
         elif mode is StoreMode.SQL:
             cacheFile=self.getCacheFile(config=self.config,mode=StoreMode.SQL)
             if os.path.isfile(cacheFile):
-                sqlQuery="SELECT COUNT(*) AS count FROM %s" % self.tableName
+                sqlQuery=f"SELECT COUNT(*) AS count FROM {self.tableName}" 
                 try:
                     sqlDB=self.getSQLDB(cacheFile)
-                    countResult=sqlDB.query(sqlQuery)
-                    count=countResult[0]['count']
-                    result=count>100
+                    countResults=sqlDB.query(sqlQuery)
+                    countResult=countResults[0]
+                    count=countResult['count']
+                    result=count>=0
                 except Exception as ex:
+                    msg=str(ex)
+                    if self.debug:
+                        print(msg,file=sys.stderr)
+                        sys.stderr.flush()
                     # e.g. sqlite3.OperationalError: no such table: Event_crossref
                     pass      
         else:
             raise Exception("unsupported mode %s" % self.mode)            
         return result     
     
-    def fromCache(self,force:bool=False,getListOfDicts=None,sampleRecordCount=-1):
+    def fromCache(self,force:bool=False,getListOfDicts=None,withDrop=True,sampleRecordCount=-1):
         '''
-        get my entries from the cache or from the callback provide
+        get my entries from the cache or from the callback provided
         
         Args:
             force(bool): force ignoring the cache
             getListOfDicts(callable): a function to call for getting the data 
+            withDrop(bool): True if the table should be (re) created
+            sampleRecordCount(int): the number of records to analyze for type information
             
         Returns:
             the list of Dicts and as a side effect setting self.cacheFile
@@ -176,11 +184,14 @@ GROUP by ?source
             startTime=time.time()
             self.showProgress(f"getting {self.entityPluralName} for {self.name} ...")
             if getListOfDicts is None:
-                getListOfDicts=self.getListOfDicts
+                if hasattr(self, "getListOfDicts"):
+                    getListOfDicts=self.getListOfDicts
+                else:
+                    raise  Exception("from Cache failed and no secondary cache via getListOfDicts specified")
             listOfDicts=getListOfDicts()
             duration=time.time()-startTime
             self.showProgress(f"got {len(listOfDicts)} {self.entityPluralName} in {duration:5.1f} s")   
-            self.cacheFile=self.storeLoD(listOfDicts,sampleRecordCount=sampleRecordCount)
+            self.cacheFile=self.storeLoD(listOfDicts,withDrop=withDrop,sampleRecordCount=sampleRecordCount)
             self.setListFromLoD(listOfDicts)
         else:
             # fromStore also sets self.cacheFile
@@ -259,13 +270,14 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             lod.append(entity.__dict__)
         return lod
     
-    def store(self,limit=10000000,batchSize=250,fixNone=True,sampleRecordCount=-1)->str:
+    def store(self,limit=10000000,batchSize=250,withDrop=True,fixNone=True,sampleRecordCount=-1)->str:
         '''
         store my list of dicts
         
         Args:
-            limit(int): maximum number of records to store
+            limit(int): maximum number of records to store per batch
             batchSize(int): size of batch for storing
+             withDrop(bool): True if the table should be (re) created
             fixNone(bool): if True make sure the dicts are filled with None references for each record
             sampleRecordCount(int): the number of records to analyze for type information
         
@@ -273,9 +285,9 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             str: The cachefile being used
         '''
         lod=self.getLoD()
-        return self.storeLoD(lod,limit=limit,batchSize=batchSize,fixNone=fixNone,sampleRecordCount=sampleRecordCount)
+        return self.storeLoD(lod,limit=limit,batchSize=batchSize,withDrop=withDrop,fixNone=fixNone,sampleRecordCount=sampleRecordCount)
         
-    def storeLoD(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,fixNone=True,sampleRecordCount=1)->str:
+    def storeLoD(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,withDrop=True,fixNone=True,sampleRecordCount=1)->str:
         ''' 
         store my entities 
         
@@ -284,6 +296,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             limit(int): maximum number of records to store
             batchSize(int): size of batch for storing
             cacheFile(string): the name of the storage e.g path to JSON or sqlite3 file
+            withDrop(bool): True if the table should be (re) created
             fixNone(bool): if True make sure the dicts are filled with None references for each record
             sampleRecordCount(int): the number of records to analyze for type information
             
@@ -318,7 +331,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
                 cacheFile=self.getCacheFile(config=self.config,mode=self.config.mode)
             sqldb=self.getSQLDB(cacheFile)
             self.showProgress ("storing %d %s for %s to %s:%s" % (len(listOfDicts),self.entityPluralName,self.name,config.mode,cacheFile)) 
-            entityInfo=sqldb.createTable(listOfDicts, self.tableName, primaryKey=self.primaryKey,withDrop=True,sampleRecordCount=sampleRecordCount)   
+            entityInfo=sqldb.createTable(listOfDicts, self.tableName, primaryKey=self.primaryKey,withDrop=withDrop,sampleRecordCount=sampleRecordCount)   
             self.sqldb.store(listOfDicts, entityInfo,executeMany=self.executeMany,fixNone=fixNone)
             self.showProgress ("store for %s done after %5.1f secs" % (self.name,time.time()-startTime))
         else:
