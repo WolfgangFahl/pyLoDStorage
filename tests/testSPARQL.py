@@ -4,6 +4,7 @@ Created on 2020-08-14
 @author: wf
 '''
 import unittest
+import copy
 from tests.basetest import Basetest
 from lodstorage.sparql import SPARQL
 from lodstorage.sample import Sample
@@ -322,12 +323,14 @@ LIMIT 200
     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
 }
 ORDER BY ?itemLabel ?sLabel"""
-        lod=wd.queryAsListOfDicts(queryString,fixNone=True)
+        qlod=wd.queryAsListOfDicts(queryString,fixNone=True)
         query=Query(name="EntitySearch",query=queryString,lang='sparql')
-        qdoc=query.documentQueryResult(lod,tablefmt="github")
-        debug=True
-        if debug:
-            print (qdoc)
+        debug=self.debug
+        for tablefmt in ["github","mediawiki","latex"]:
+            lod=copy.deepcopy(qlod)
+            qdoc=query.documentQueryResult(lod,tablefmt=tablefmt)
+            if debug:
+                print (qdoc)
     
 
 if __name__ == "__main__":
