@@ -8,6 +8,7 @@ from tests.basetest import Basetest
 from lodstorage.sparql import SPARQL
 from lodstorage.sample import Sample
 from lodstorage.lod import LOD
+from lodstorage.query import Query
 import time
 import datetime
 import warnings
@@ -290,6 +291,44 @@ LIMIT 200
         for row in lod:
             for field in fields:
                 self.assertTrue(field in row)
+                
+    def testStackoverflow55961615Query(self):
+        '''
+        see 
+        https://stackoverflow.com/questions/55961615/how-to-integrate-wikidata-query-in-python
+        https://stackoverflow.com/a/69771615/1497139
+        '''
+        endpoint="https://query.wikidata.org/sparql"
+        wd=SPARQL(endpoint)
+        queryString="""SELECT ?s ?sLabel ?item ?itemLabel ?sourceCode ?webSite ?stackexchangeTag  {
+    SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:api "EntitySearch".
+        bd:serviceParam wikibase:endpoint "www.wikidata.org".
+        bd:serviceParam mwapi:search "natural language processing".
+        bd:serviceParam mwapi:language "en".
+        ?item wikibase:apiOutputItem mwapi:item.
+        ?num wikibase:apiOrdinal true.
+    }
+    ?s wdt:P279|wdt:P31 ?item .
+    OPTIONAL { 
+      ?s wdt:P1324 ?sourceCode.
+    }
+    OPTIONAL {    
+      ?s wdt:P856 ?webSite.
+    }
+    OPTIONAL {    
+      ?s wdt:P1482 ?stackexchangeTag.
+    }
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}
+ORDER BY ?itemLabel ?sLabel"""
+        lod=wd.queryAsListOfDicts(queryString,fixNone=True)
+        query=Query(name="EntitySearch",query=queryString,lang='sparql')
+        qdoc=query.documentQueryResult(lod,tablefmt="github")
+        debug=True
+        if debug:
+            print (qdoc)
+    
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
