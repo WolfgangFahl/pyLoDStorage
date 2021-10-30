@@ -43,6 +43,15 @@ class SQLDB(object):
         else:
             self.c=connection
         
+    def logError(self,msg):
+        '''
+        log the given error message to stderr
+        
+        Args:
+            msg(str): the error messsage to display
+        '''
+        print(msg,file=sys.stderr,flush=True)
+        
     def close(self):
         ''' close my connection '''
         self.c.close()
@@ -83,7 +92,7 @@ class SQLDB(object):
                 raise Exception(msg)
             else:
                 if self.debug:
-                    print(msg,file=sys.stderr,flush=True)
+                    self.logError(msg)
         sampleRecords=listOfRecords[:sampleRecordCount]
         entityInfo=EntityInfo(sampleRecords,entityName,primaryKey,debug=self.debug)
         if withDrop:
@@ -188,9 +197,15 @@ class SQLDB(object):
             query = cur.execute(sqlQuery)
         colname = [ d[0] for d in query.description ]
         resultList=[]
-        for row in query:
-            record=dict(zip(colname, row))
-            resultList.append(record)
+        try:
+            # loop over all rows
+            for row in query:
+                record=dict(zip(colname, row))
+                resultList.append(record)
+        except Exception as ex:
+            msg=str(ex)
+            self.logError(msg)
+            pass
         cur.close()
         return resultList
         
