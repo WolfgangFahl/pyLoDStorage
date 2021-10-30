@@ -56,7 +56,7 @@ class SQLDB(object):
         '''
         self.c.execute(ddlCmd)
         
-    def createTable(self,listOfRecords,entityName,primaryKey=None,withDrop=False,sampleRecordCount=1,failIfTooFew=True):
+    def createTable(self,listOfRecords,entityName:str,primaryKey:str=None,withCreate:bool=True,withDrop:bool=False,sampleRecordCount=1,failIfTooFew=True):
         '''
         derive  Data Definition Language CREATE TABLE command from list of Records by examining first recorda
         as defining sample record and execute DDL command
@@ -68,6 +68,7 @@ class SQLDB(object):
            entityName(string): the entity / table name to use
            primaryKey(string): the key/column to use as a  primary key
            withDrop(boolean): true if the existing Table should be dropped
+           withCreate(boolean): true if the create Table command should be executed - false if only the entityInfo should be returned
            sampleRecords(int): number of sampleRecords expected and to be inspected
            failIfTooFew(boolean): raise an Exception if to few sampleRecords else warn only
         Returns:
@@ -87,10 +88,11 @@ class SQLDB(object):
         entityInfo=EntityInfo(sampleRecords,entityName,primaryKey,debug=self.debug)
         if withDrop:
             self.c.execute(entityInfo.dropTableCmd) 
-        try:
-            self.c.execute(entityInfo.createTableCmd)
-        except sqlite3.OperationalError as oe:
-            raise Exception(f"createTable failed with error {oe} for {entityInfo.createTableCmd}")
+        if withCreate:
+            try:
+                self.c.execute(entityInfo.createTableCmd)
+            except sqlite3.OperationalError as oe:
+                raise Exception(f"createTable failed with error {oe} for {entityInfo.createTableCmd}")
         return entityInfo
     
     def getDebugInfo(self,record,index,executeMany):
