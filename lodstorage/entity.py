@@ -167,14 +167,14 @@ GROUP by ?source
             raise Exception("unsupported mode %s" % self.mode)            
         return result     
     
-    def fromCache(self,force:bool=False,getListOfDicts=None,withDrop=True,sampleRecordCount=-1):
+    def fromCache(self,force:bool=False,getListOfDicts=None,append=False,sampleRecordCount=-1):
         '''
         get my entries from the cache or from the callback provided
         
         Args:
             force(bool): force ignoring the cache
             getListOfDicts(callable): a function to call for getting the data 
-            withDrop(bool): True if the table should be (re) created
+            append(bool): True if records should be appended
             sampleRecordCount(int): the number of records to analyze for type information
             
         Returns:
@@ -191,7 +191,7 @@ GROUP by ?source
             listOfDicts=getListOfDicts()
             duration=time.time()-startTime
             self.showProgress(f"got {len(listOfDicts)} {self.entityPluralName} in {duration:5.1f} s")   
-            self.cacheFile=self.storeLoD(listOfDicts,withDrop=withDrop,sampleRecordCount=sampleRecordCount)
+            self.cacheFile=self.storeLoD(listOfDicts,append=append,sampleRecordCount=sampleRecordCount)
             self.setListFromLoD(listOfDicts)
         else:
             # fromStore also sets self.cacheFile
@@ -270,14 +270,14 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             lod.append(entity.__dict__)
         return lod
     
-    def store(self,limit=10000000,batchSize=250,withDrop=True,fixNone=True,sampleRecordCount=-1)->str:
+    def store(self,limit=10000000,batchSize=250,append=False,fixNone=True,sampleRecordCount=-1)->str:
         '''
         store my list of dicts
         
         Args:
             limit(int): maximum number of records to store per batch
             batchSize(int): size of batch for storing
-             withDrop(bool): True if the table should be (re) created
+            append(bool): True if records should be appended
             fixNone(bool): if True make sure the dicts are filled with None references for each record
             sampleRecordCount(int): the number of records to analyze for type information
         
@@ -285,9 +285,9 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             str: The cachefile being used
         '''
         lod=self.getLoD()
-        return self.storeLoD(lod,limit=limit,batchSize=batchSize,withDrop=withDrop,fixNone=fixNone,sampleRecordCount=sampleRecordCount)
+        return self.storeLoD(lod,limit=limit,batchSize=batchSize,append=append,fixNone=fixNone,sampleRecordCount=sampleRecordCount)
         
-    def storeLoD(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,withDrop=True,fixNone=True,sampleRecordCount=1)->str:
+    def storeLoD(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,append=False,fixNone=True,sampleRecordCount=1)->str:
         ''' 
         store my entities 
         
@@ -296,7 +296,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             limit(int): maximum number of records to store
             batchSize(int): size of batch for storing
             cacheFile(string): the name of the storage e.g path to JSON or sqlite3 file
-            withDrop(bool): True if the table should be (re) created
+            append(bool): True if records should be appended
             fixNone(bool): if True make sure the dicts are filled with None references for each record
             sampleRecordCount(int): the number of records to analyze for type information
             
@@ -331,7 +331,13 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
                 cacheFile=self.getCacheFile(config=self.config,mode=self.config.mode)
             sqldb=self.getSQLDB(cacheFile)
             self.showProgress ("storing %d %s for %s to %s:%s" % (len(listOfDicts),self.entityPluralName,self.name,config.mode,cacheFile)) 
-            entityInfo=sqldb.createTable(listOfDicts, self.tableName, primaryKey=self.primaryKey,withDrop=withDrop,sampleRecordCount=sampleRecordCount)   
+            if append:
+                withDrop=False
+                withCreate=False
+            else:
+                withDrop=True
+                withCreate=True
+            entityInfo=sqldb.createTable(listOfDicts, self.tableName, primaryKey=self.primaryKey,withCreate=withCreate,withDrop=withDrop,sampleRecordCount=sampleRecordCount)   
             self.sqldb.store(listOfDicts, entityInfo,executeMany=self.executeMany,fixNone=fixNone)
             self.showProgress ("store for %s done after %5.1f secs" % (self.name,time.time()-startTime))
         else:
