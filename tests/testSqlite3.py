@@ -327,7 +327,7 @@ record  #3={'name': 'John Doe'}"""
         primaryKey='pKey'
         sampleRecordCount=sampleSize*10
         sqlDB.debug=debug
-        entityInfo=sqlDB.createTable(listOfRecords, entityName, primaryKey, withDrop, sampleRecordCount,failIfTooFew=failIfTooFew)
+        entityInfo=sqlDB.createTable(listOfRecords, entityName, primaryKey=primaryKey, withDrop=withDrop, sampleRecordCount=sampleRecordCount,failIfTooFew=failIfTooFew)
         executeMany=True
         fixNone=True
         sqlDB.store(listOfRecords,entityInfo,executeMany=executeMany,fixNone=fixNone)
