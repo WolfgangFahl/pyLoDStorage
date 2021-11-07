@@ -299,9 +299,11 @@ LIMIT 200
         https://stackoverflow.com/questions/55961615/how-to-integrate-wikidata-query-in-python
         https://stackoverflow.com/a/69771615/1497139
         '''
-        endpoint="https://query.wikidata.org/sparql"
-        wd=SPARQL(endpoint)
-        queryString="""SELECT ?s ?sLabel ?item ?itemLabel ?sourceCode ?webSite ?stackexchangeTag  {
+        qlod=None
+        try:
+            endpoint="https://query.wikidata.org/sparql"
+            wd=SPARQL(endpoint)
+            queryString="""SELECT ?s ?sLabel ?item ?itemLabel ?sourceCode ?webSite ?stackexchangeTag  {
     SERVICE wikibase:mwapi {
         bd:serviceParam wikibase:api "EntitySearch".
         bd:serviceParam wikibase:endpoint "www.wikidata.org".
@@ -323,14 +325,18 @@ LIMIT 200
     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
 }
 ORDER BY ?itemLabel ?sLabel"""
-        qlod=wd.queryAsListOfDicts(queryString,fixNone=True)
-        query=Query(name="EntitySearch",query=queryString,lang='sparql')
-        debug=self.debug
-        for tablefmt in ["github","mediawiki","latex"]:
-            lod=copy.deepcopy(qlod)
-            qdoc=query.documentQueryResult(lod,tablefmt=tablefmt)
-            if debug:
-                print (qdoc)
+            qlod=wd.queryAsListOfDicts(queryString,fixNone=True)
+        except Exception as ex:
+            print(f"{endpoint} access failed with {ex}- could not run test")
+            
+        if qlod is not None:
+            query=Query(name="EntitySearch",query=queryString,lang='sparql')
+            debug=self.debug
+            for tablefmt in ["github","mediawiki","latex"]:
+                lod=copy.deepcopy(qlod)
+                qdoc=query.documentQueryResult(lod,tablefmt=tablefmt)
+                if debug:
+                    print (qdoc)
     
 
 if __name__ == "__main__":
