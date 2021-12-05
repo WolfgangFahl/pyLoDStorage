@@ -53,13 +53,14 @@ class TestQueries(Basetest):
         else:
             result=self.uniCode2Latex(tab)
         return result
+    
             
     def testQueryDocumentation(self):
         '''
         test QueryDocumentation
         '''
         show=self.debug
-        #show=True
+        show=True
         queries=[
             {
                 "endpoint":"https://query.wikidata.org/sparql",

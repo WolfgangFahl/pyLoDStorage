@@ -156,14 +156,15 @@ class Query(object):
         markup=mwTable.asWikiMarkup()        
         return markup
     
-    def documentQueryResult(self,lod:list,tablefmt:str="mediawiki",tryItUrl:str=None,withSourceCode=True,**kwArgs):
+    def documentQueryResult(self,lod:list,limit=None,tablefmt:str="mediawiki",tryItUrl:str=None,withSourceCode=True,**kwArgs):
         '''
         document the given query results
         
         Args:
             lod: the list of dicts result
-            tryItUrl: the "try it!" url to show
+            limit(int): the maximum number of records to display in result tabulate
             tablefmt(str): the table format to use
+            tryItUrl: the "try it!" url to show
             withSourceCode(bool): if True document the source code
             
         Return:
@@ -171,6 +172,8 @@ class Query(object):
         '''
         sourceCode=self.query
         title=self.title
+        if limit is not None:
+            lod=lod[:limit]
         result=tabulate(lod,headers="keys",tablefmt=tablefmt,**kwArgs)
         if withSourceCode:
             tryItMarkup=self.getLink(tryItUrl, "try it!", tablefmt)
