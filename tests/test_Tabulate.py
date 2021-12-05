@@ -23,7 +23,7 @@ class TestTabulate(Basetest):
         test https://pypi.org/project/tabulate/ support
         '''
         show=self.debug
-        show=True
+        #show=True
         royals=Royals(load=True)
         for fmt in ["latex","grid","mediawiki","github"]:
             table=tabulate(royals.royals,headers="keys",tablefmt=fmt)

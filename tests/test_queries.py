@@ -62,6 +62,22 @@ class TestQueries(Basetest):
         #show=True
         queries=[
             {
+                "endpoint":"https://query.wikidata.org/sparql",
+                "prefixes": [],
+                "lang": "sparql",
+                "name": "Nicknames",
+                "description": "https://stackoverflow.com/questions/70206791/sparql-i-have-individual-with-multiple-values-for-single-object-property-how",
+                "title": "Nick names of US Presidents",
+                "query":"""SELECT ?item ?itemLabel (GROUP_CONCAT(DISTINCT ?nickName; SEPARATOR=",") as ?nickNames)
+WHERE 
+{
+  # president
+  ?item wdt:P39 wd:Q11696.
+  ?item wdt:P1449 ?nickName
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+} GROUP BY ?item ?itemLabel"""
+            },
+            {
             "endpoint":"https://query.wikidata.org/sparql",
             "prefixes": ["http://www.wikidata.org/entity/","http://commons.wikimedia.org/wiki/Special:FilePath/"],
             "lang": "sparql",
