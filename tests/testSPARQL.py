@@ -333,7 +333,7 @@ ORDER BY ?itemLabel ?sLabel"""
             query=Query(name="EntitySearch",query=queryString,lang='sparql')
             debug=self.debug
             for tablefmt in ["github","mediawiki","latex"]:
-                qdoc=query.documentQueryResult(lod,tablefmt=tablefmt)
+                qdoc=query.documentQueryResult(qlod,tablefmt=tablefmt)
                 if debug:
                     print (qdoc)
     
