@@ -7,11 +7,13 @@ import os
 import yaml
 from tabulate import tabulate
 import urllib
+import copy
 #from wikibot.mwTable import MediaWikiTable
 # redundant copy in this library to avoid dependency issues
 # original is at 
 from lodstorage.mwTable import MediaWikiTable
 from pylatexenc.latexencode import unicode_to_latex
+import re
 
 class QueryResultDocumentation():
     '''
@@ -42,6 +44,7 @@ class QueryResultDocumentation():
         self.resultHeader=resultHeader
         self.result=result
         
+        
     @staticmethod
     def uniCode2Latex(text:str)->str:
         '''
@@ -59,7 +62,27 @@ class QueryResultDocumentation():
         '''
         for code in range(8320,8330):
             text=text.replace(chr(code),f"$_{code-8320}$")
-        return unicode_to_latex(text)      
+        return unicode_to_latex(text)
+    
+    @staticmethod
+    def wikiDataLink(record,key,value,tablefmt):
+        '''
+        replace wikiData Link with tablefmt specific link
+        '''
+        if isinstance(value,str):
+            wid=None
+            # "pure" Wikidata Q ID
+            if re.match(r"(Q|Property:P)[0-9]+",value):
+                wid=value
+            else:
+                match=re.match(r"http(s)?://.*/((Q|Property:P)[0-9]+)",value)
+                if match:
+                    wid=match.group(2)
+            if wid is not None:   
+                if tablefmt=="github":
+                    record[key]=f"[{wid}](https://www.wikidata.org/wiki/{wid})"
+                elif tablefmt=="mediawiki":
+                    record[key]=f"[https://www.wikidata.org/wiki/{wid} {wid}]" 
         
     def __str__(self):
         '''
@@ -100,6 +123,26 @@ class Query(object):
         self.description="" if description is None else description
         self.prefixes=prefixes
         self.debug=debug
+        self.formatCallBacks=[]
+        
+    def addFormatCallBack(self,callback):
+        self.formatCallBacks.append(callback)
+    
+    def preFormatWithCallBacks(self,lod,tablefmt:str):
+        '''
+        run the configured call backs to pre-format the given list of dicts for the given tableformat
+        
+        Args:
+            lod(list): the list of dicts to handle
+            tablefmt(str): the table format (according to tabulate) to apply
+        
+        '''
+        for record in lod:
+            for key in record.keys():
+                value=record[key]
+                if value is not None:
+                    for formatCallBack in self.formatCallBacks:
+                        formatCallBack(record,key,value,tablefmt)
         
     def getTryItUrl(self,baseurl:str):
         '''
@@ -140,6 +183,7 @@ class Query(object):
     def prefixToLink(self,lod:list,prefix:str,tablefmt:str):
         '''
         convert url prefixes to link according to the given table format
+        TODO - refactor as preFormat callback
         
         Args:
             lod(list): the list of dicts to convert
@@ -188,12 +232,12 @@ class Query(object):
         markup=mwTable.asWikiMarkup()        
         return markup
     
-    def documentQueryResult(self,lod:list,limit=None,tablefmt:str="mediawiki",tryItUrl:str=None,withSourceCode=True,**kwArgs):
+    def documentQueryResult(self,qlod:list,limit=None,tablefmt:str="mediawiki",tryItUrl:str=None,withSourceCode=True,**kwArgs):
         '''
-        document the given query results
+        document the given query results - note that a copy of the whole list is going to be created for being able to format
         
         Args:
-            lod: the list of dicts result
+            qlod: the list of dicts result
             limit(int): the maximum number of records to display in result tabulate
             tablefmt(str): the table format to use
             tryItUrl: the "try it!" url to show
@@ -205,7 +249,10 @@ class Query(object):
         sourceCode=self.query
         title=self.title
         if limit is not None:
-            lod=lod[:limit]
+            lod=copy.deepcopy(qlod[:limit])
+        else:
+            lod=copy.deepcopy(qlod)    
+        self.preFormatWithCallBacks(lod,tablefmt=tablefmt)
         result=tabulate(lod,headers="keys",tablefmt=tablefmt,**kwArgs)
         if tryItUrl is None and hasattr(self,'tryItUrl'):
             tryItUrl=self.tryItUrl
