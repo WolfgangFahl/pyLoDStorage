@@ -11,20 +11,21 @@ import urllib
 # redundant copy in this library to avoid dependency issues
 # original is at 
 from lodstorage.mwTable import MediaWikiTable
-
+from pylatexenc.latexencode import unicode_to_latex
 
 class QueryResultDocumentation():
     '''
     documentation of a query result
     '''
     
-    def __init__(self,query,title:str,tryItMarkup:str,sourceCodeHeader:str,sourceCode:str,resultHeader:str,result:str):
+    def __init__(self,query,title:str,tablefmt:str,tryItMarkup:str,sourceCodeHeader:str,sourceCode:str,resultHeader:str,result:str):
         '''
         constructor
         
         Args:
             query(Query): the query to be documented
             title(str): the title markup
+            tablefmt(str): the tableformat that has been used
             tryItMarkup: the "try it!" markup to show
             sourceCodeHeader(str): the header title to use for the sourceCode
             sourceCode(str): the sourceCode
@@ -34,24 +35,53 @@ class QueryResultDocumentation():
         '''
         self.query=query
         self.title=title
+        self.tablefmt=tablefmt
         self.tryItMarkup=f"\n{tryItMarkup}"
         self.sourceCodeHeader=sourceCodeHeader
         self.sourceCode=sourceCode
         self.resultHeader=resultHeader
         self.result=result
         
+    @staticmethod
+    def uniCode2Latex(text:str)->str:
+        '''
+        converts unicode text to latex and 
+        fixes UTF-8 chars for latex in a certain range:
+            ₀:$_0$ ... ₉:$_9$
+            
+        see https://github.com/phfaist/pylatexenc/issues/72
+   
+        Args:
+            text(str): the string to fix
+        
+        Return:
+            str: latex presentation of UTF-8 char
+        '''
+        for code in range(8320,8330):
+            text=text.replace(chr(code),f"$_{code-8320}$")
+        return unicode_to_latex(text)      
         
     def __str__(self):
         '''
         simple string representation
         '''
+        return self.asText()
+        
+    def asText(self):
+        '''
+        return my text representation
+        
+        Returns:
+            str: description, sourceCodeHeader, sourceCode, tryIt link and result table
+        '''
         text=f"{self.title}\n{self.query.description}\n{self.sourceCodeHeader}\n{self.sourceCode}{self.tryItMarkup}\n{self.resultHeader}\n{self.result}"
-        return text
+        fixedStr=self.uniCode2Latex(text) if self.tablefmt.lower()=="latex" else text
+        return fixedStr
 
 class Query(object):
     ''' a Query e.g. for SPAQRL '''
     
-    def __init__(self,name:str,query:str,lang='sparql',title:str=None,description:str=None,debug=False):
+    def __init__(self,name:str,query:str,lang='sparql',title:str=None,description:str=None,prefixes=None,debug=False):
         '''
         constructor 
         Args:
@@ -60,6 +90,7 @@ class Query(object):
             lang(string): the language of the query e.g. SPARQL
             title(string): the header/title of the query
             description(string): the description of the query
+            prefixes(list): list of prefixes to be resolved
             debug(boolean): true if debug mode should be switched on
         '''
         self.name=name
@@ -67,6 +98,7 @@ class Query(object):
         self.lang=lang
         self.title=title=name if title is None else title
         self.description="" if description is None else description
+        self.prefixes=prefixes
         self.debug=debug
         
     def getTryItUrl(self,baseurl:str):
@@ -175,6 +207,8 @@ class Query(object):
         if limit is not None:
             lod=lod[:limit]
         result=tabulate(lod,headers="keys",tablefmt=tablefmt,**kwArgs)
+        if tryItUrl is None and hasattr(self,'tryItUrl'):
+            tryItUrl=self.tryItUrl
         if withSourceCode:
             tryItMarkup=self.getLink(tryItUrl, "try it!", tablefmt)
             if tablefmt=="github":
@@ -219,7 +253,7 @@ class Query(object):
                 sourceCode=f"{self.query}"
         if self.lang!="sparql":
             tryItMarkup=""
-        queryResultDocumentation=QueryResultDocumentation(query=self,title=title,tryItMarkup=tryItMarkup,sourceCodeHeader=sourceCodeHeader,sourceCode=sourceCode,resultHeader=resultHeader,result=result)
+        queryResultDocumentation=QueryResultDocumentation(query=self,title=title,tablefmt=tablefmt,tryItMarkup=tryItMarkup,sourceCodeHeader=sourceCodeHeader,sourceCode=sourceCode,resultHeader=resultHeader,result=result)
         return queryResultDocumentation
 
 class QueryManager(object):

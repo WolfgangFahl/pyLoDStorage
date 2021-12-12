@@ -6,7 +6,7 @@ Created on 2021-01-29
 import unittest
 import os
 import copy
-from lodstorage.query import QueryManager, Query
+from lodstorage.query import QueryManager, Query, QueryResultDocumentation
 from lodstorage.sparql import SPARQL
 import tests.testSqlite3
 from tests.basetest import Basetest
@@ -34,25 +34,22 @@ class TestQueries(Basetest):
                 print(resultDoc)
         pass
     
-    def uniCode2Latex(self,s:str):
-        for code in range(8320,8330):
-            s=s.replace(chr(code),f"$_{code-8320}$")
-        return s
-    
-    def testUnicode(self):
+    def testUnicode2LatexWorkaround(self):
         '''
-        
+        test the uniCode2Latex conversion workaround
         '''
+        debug=True
         for code in range(8320,8330):
             uc=chr(code)
-            print(f"{uc}:{self.uniCode2Latex(uc)}")
-            
-    def fixUnicode(self,tab:str,tableFmt):
-        if tableFmt!="latex":
-            result= tab
-        else:
-            result=self.uniCode2Latex(tab)
-        return result
+            latex=QueryResultDocumentation.uniCode2Latex(uc)
+            if debug:
+                print(f"{uc}→{latex}")
+            #self.assertTrue(latex.startswith("$_"))
+        unicode="À votre santé!"
+        latex=QueryResultDocumentation.uniCode2Latex(unicode)
+        if debug:
+            print(f"{unicode}→{latex}")
+        self.assertEqual("\\`A votre sant\\'e!",latex)
     
             
     def testQueryDocumentation(self):
@@ -151,21 +148,18 @@ determines the number of instances available in the OpenStreetMap for the placeT
 """}]
         for queryMap in queries:
             endpointUrl=queryMap.pop("endpoint")
-            prefixes=queryMap.pop("prefixes")
             endpoint=SPARQL(endpointUrl)
             query=Query(**queryMap)
+            query.tryItUrl=endpointUrl
             try:
                 qlod=endpoint.queryAsListOfDicts(query.query)
                 for tablefmt in ["mediawiki","github","latex"]:
                     lod=copy.deepcopy(qlod)
-                    for prefix in prefixes:
-                        query.prefixToLink(lod,prefix,tablefmt)
-                    tryItUrl=query.getTryItUrl(endpointUrl.replace("/sparql",""))
-                    doc=query.documentQueryResult(lod, tablefmt=tablefmt,floatfmt=".0f",tryItUrl=tryItUrl)
+                    doc=query.documentQueryResult(lod, tablefmt=tablefmt,floatfmt=".0f")
+                    docstr=doc.asText()
                     if show:
-                        docstr=str(doc)
-                        fixedStr=self.fixUnicode(docstr,tablefmt)
-                        print(fixedStr)
+                        print (docstr)
+                        
             except Exception as ex:
                 print(f"{query.title} at {endpointUrl} failed: {ex}")
 

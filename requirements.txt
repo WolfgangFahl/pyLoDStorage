@@ -16,3 +16,5 @@ tabulate
 numpy
 # https://pypi.org/project/jsonpickle/
 jsonpickle==1.5.2
+# https://pypi.org/project/pylatexenc/
+pylatexenc~=2.10
