@@ -3,7 +3,7 @@ Created on 2022-02-13
 
 @author: wf
 '''
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __date__ = '2020-09-10'
 __updated__ = '2022-02-13'   
 DEBUG = 0
