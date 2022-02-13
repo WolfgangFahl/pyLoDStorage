@@ -1,0 +1,194 @@
+#!/bin/bash
+# WF 2022-02-12
+# SPARQL query via command line
+
+#ansi colors
+#http://www.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+blue='\033[0;34m'
+red='\033[0;31m'
+green='\033[0;32m' # '\e[1;32m' is too bright for white bg.
+endColor='\033[0m'
+
+#
+# a colored message
+#   params:
+#     1: l_color - the color of the message
+#     2: l_msg - the message to display
+#
+color_msg() {
+  local l_color="$1"
+  local l_msg="$2"
+  echo -e "${l_color}$l_msg${endColor}"
+}
+
+#
+# error
+#
+#   show an error message and exit
+#
+#   params:
+#     1: l_msg - the message to display
+error() {
+  local l_msg="$1"
+  # use ansi red for error
+  color_msg $red "Error: $l_msg" 1>&2
+  exit 1
+}
+
+#
+# show the usage
+#
+usage() {
+  script=$(basename $0)
+  echo "usage: $script [-h|--help][-d|--debug][-e|--endpoint <url>][-f|--format <format>][-o|--output <output>]"
+  echo "  -h|--help: show this usage"
+  echo "  -d|--debug: show debug information"
+  echo "  -e|--endpoint: endpoint to use may be url of endpoint or dbis-wikidata|qlever-wikidata|qlever-wikidata-proxy|qlever-sun"
+  echo "  -f|--format: the format to use - select one of csv,json,tsv,xml"
+  echo "  -o|--output: the ouput file to create stdout if none is given"
+}
+
+#
+# an example SPARQL query showing cities and populations
+#
+cityQuery() {
+  cat << EOF
+  PREFIX wd: <http://www.wikidata.org/entity/>
+  PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  SELECT DISTINCT ?name ?population WHERE {
+    ?city wdt:P31/wdt:P279* wd:Q515 .
+    ?city wdt:P17 wd:Q183 .
+    ?city wdt:P1082 ?population .
+    ?city rdfs:label ?name .
+    FILTER (LANG(?name) = "en")
+  }
+  ORDER BY DESC(?population)
+EOF
+}
+
+#
+# an example SPARQL query showing countries
+#
+countryQuery() {
+  cat << EOF
+  PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+  SELECT DISTINCT ?iso2 ?qid ?osm_relid ?itemLabel
+  WHERE {
+   ?item wdt:P297 _:b0.
+   BIND(strafter(STR(?item),"http://www.wikidata.org/entity/") as ?qid).
+   OPTIONAL { ?item wdt:P1448 ?name .}
+   OPTIONAL { ?item wdt:P297 ?iso2 .}
+   OPTIONAL { ?item wdt:P402 ?osm_relid .}
+   ?item rdfs:label ?itemLabel.
+   FILTER(LANG(?itemLabel) = "en")
+  }
+  ORDER BY ?iso2
+EOF
+}
+
+#
+# query the given sparql endpoint
+#
+doquery() {
+  local l_endpoint="$1"
+  local l_query="$2"
+  local l_outputPrefix="$3"
+  local l_format="$4"
+  if [ "$showdebug" = "true" ]
+  then
+    color_msg  $blue "${l_endpoint}\n${l_query}"
+  fi
+  local l_accept=""
+  case $l_format in
+    json) l_accept="application/sparql-results+json";;
+    csv) l_accept="text/csv";;
+    tsv) l_accept="text/tab-separated-values";;
+    xml) l_accept="application/sparql-results+xml";;
+    *) error "unknown format $l_format"
+  esac
+  local l_outputOption=""
+  if [ "$l_outputPrefix" != "" ]
+  then
+    local l_output="${l_outputPrefix}.${l_format}"
+    l_outputOption="-o $l_output"
+  fi
+  echo $l_outputOption
+  #https://gist.github.com/ColinMaudry/6fd6a5f610f0ac3e6696
+  curl $l_outputOption -G "$l_endpoint" \
+     --header "Accept: $l_accept"  \
+     --data-urlencode query="$l_query"
+}
+
+endpoint="https://query.wikidata.org/sparql"
+query=$(countryQuery)
+outputPrefix=""
+format="csv"
+showDebug="false"
+# commandline option
+while [  "$1" != ""  ]
+do
+  option=$1
+  shift
+  case $option in
+    -h|--help)
+       usage
+       exit 0;;
+    -d|--debug)
+       showDebug="true"
+       ;;
+    -e|--endpoint)
+       if [ $# -lt 1 ]
+       then
+          usage
+       fi
+       endpoint=$1
+       shift
+       case $endpoint in
+          dbis-wikidata)
+            endpoint="https://confident.dbis.rwth-aachen.de/jena/wikidata/sparql"
+            ;;
+          qlever-wikidata-proxy)
+            endpoint="https://qlever.cs.uni-freiburg.de/api/wikidata-proxy"
+            ;;
+          qlever-wikidata)
+            endpoint="https://qlever.cs.uni-freiburg.de/api/wikidata"
+            ;;
+          qlever-sun)
+            endpoint="http://sun.bitplan.com:7001"
+            ;;
+       esac
+       ;;
+    -f|--format)
+      if [ $# -lt 1 ]
+      then
+        usage
+      fi
+      format=$1
+      shift
+      ;;
+    -o|--output)
+      if [ $# -lt 1 ]
+      then
+        usage
+      fi
+      outputPrefix=$1
+      shift
+      ;;
+    -q|--query)
+          if [ $# -lt 1 ]
+          then
+             usage
+          fi
+          query="$1"
+          shift
+          case $query in
+            counties) query=$(countryQuery);;
+            city) query=$(cityQuery);;
+          esac
+  esac
+done
+
+doquery "$endpoint" "$query" "$outputPrefix" "$format"
