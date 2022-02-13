@@ -104,26 +104,35 @@ class QueryResultDocumentation():
 class Query(object):
     ''' a Query e.g. for SPAQRL '''
     
-    def __init__(self,name:str,query:str,lang='sparql',title:str=None,description:str=None,prefixes=None,debug=False):
+    def __init__(self,name:str,query:str,lang='sparql',endpoint:str=None,title:str=None,description:str=None,prefixes=None,tryItUrl:str=None,debug=False):
         '''
         constructor 
         Args:
             name(string): the name/label of the query
             query(string): the native Query text e.g. in SPARQL
             lang(string): the language of the query e.g. SPARQL
+            endpoint(string): the endpoint url to use 
             title(string): the header/title of the query
             description(string): the description of the query
             prefixes(list): list of prefixes to be resolved
+            tryItUrl(str): the url of a "tryit" webpage
             debug(boolean): true if debug mode should be switched on
         '''
         self.name=name
         self.query=query
         self.lang=lang
+        self.endpoint=endpoint
         self.title=title=name if title is None else title
         self.description="" if description is None else description
         self.prefixes=prefixes
         self.debug=debug
+        self.tryItUrl=tryItUrl
         self.formatCallBacks=[]
+        
+    def __str__(self):
+        queryStr="\n".join([f"{key}:{value}" for key, value in self.__dict__.items() if value is not None])
+        return f"{queryStr}"
+        
         
     def addFormatCallBack(self,callback):
         self.formatCallBacks.append(callback)
@@ -203,7 +212,10 @@ class Query(object):
                         link=self.getLink(value,uqitem,tablefmt)
                     record[key]=link
           
-        
+    def asYaml(self):
+        yamlMarkup=yaml.dump(self)
+        return yamlMarkup
+    
     def asWikiSourceMarkup(self):
         '''
         convert me to Mediawiki markup for syntax highlighting using the "source" tag
@@ -308,7 +320,7 @@ class QueryManager(object):
     manages pre packaged Queries
     '''
 
-    def __init__(self,lang='sql',debug=False,path=None):
+    def __init__(self,lang='sql',debug=False,queriesPath=None):
         '''
         Constructor
         Args:
@@ -318,19 +330,24 @@ class QueryManager(object):
         self.queriesByName={}
         self.lang=lang
         self.debug=debug
-        queries=QueryManager.getQueries(path=path)
+        queries=QueryManager.getQueries(queriesPath=queriesPath)
         for name,queryDict in queries.items():
             if self.lang in queryDict:
-                queryText=queryDict[self.lang]
-                query=Query(name,queryText,lang=self.lang,debug=self.debug)
+                queryText=queryDict.pop(self.lang)
+                query=Query(name=name,query=queryText,lang=self.lang,**queryDict,debug=self.debug)
                 self.queriesByName[name]=query
     
     @staticmethod
-    def getQueries(path=None):
-        if path is None:
-            path=os.path.dirname(__file__)+"/.."
-        queriesPath=path+"/queries.yaml"
+    def getQueries(queriesPath=None):
+        '''
+        get the queries for thee given queries Path
+        '''
+        if queriesPath is None:
+            queriesPath=f"{os.path.dirname(__file__)}/../sampledata/queries.yaml"
         with open(queriesPath, 'r') as stream:
             examples = yaml.safe_load(stream)
         return examples
+            
+
+
         

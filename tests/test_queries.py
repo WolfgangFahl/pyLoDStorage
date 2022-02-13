@@ -5,8 +5,11 @@ Created on 2021-01-29
 '''
 import unittest
 import copy
+import io
 import os
+from contextlib import redirect_stdout
 from lodstorage.query import QueryManager, Query, QueryResultDocumentation
+from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
 import tests.testSqlite3
 from tests.basetest import Basetest
@@ -16,12 +19,11 @@ class TestQueries(Basetest):
     Test query handling
     '''
 
-    def testQueries(self):
+    def testSQLQueries(self):
         '''
         see https://github.com/WolfgangFahl/pyLoDStorage/issues/19
         '''
         show=self.debug
-        #show=True
         path="%s/../sampledata" % os.path.dirname(__file__)
         qm=QueryManager(lang='sql',debug=False,path=path)
         self.assertEqual(2,len(qm.queriesByName)) 
@@ -34,6 +36,30 @@ class TestQueries(Basetest):
                 print(resultDoc)
         pass
     
+    def testSparqlQueries(self):
+        '''
+        test SPARQL queries 
+        '''
+        show=self.debug
+        show=True
+        path="%s/../sampledata" % os.path.dirname(__file__)
+        qm=QueryManager(lang='sparql',debug=False,path=path)
+        for name,query in qm.queriesByName.items():
+            if name in ["Nicknames"]:
+                if show:
+                    print(f"{name}:{query}")
+                endpoint=SPARQL(query.endpoint)
+                try:
+                    qlod=endpoint.queryAsListOfDicts(query.query)
+                    for tablefmt in ["mediawiki","github","latex"]:
+                        doc=query.documentQueryResult(qlod, tablefmt=tablefmt,floatfmt=".0f")
+                        docstr=doc.asText()
+                        if show:
+                            print (docstr)
+                            
+                except Exception as ex:
+                    print(f"{query.title} at {query.endpoint} failed: {ex}")
+        
     def testUnicode2LatexWorkaround(self):
         '''
         test the uniCode2Latex conversion workaround
@@ -73,13 +99,46 @@ class TestQueries(Basetest):
         self.assertEqual("[https://www.wikidata.org/wiki/Q1353 Q1353]",lod[0]["wikidata"])
         self.assertEqual("[https://www.wikidata.org/wiki/Q2 Q2]",lod[1]["wikidata"])
         self.assertEqual("[https://www.wikidata.org/wiki/Property:P31 Property:P31]",lod[2]["wikidata"])
+        
+    def testQueryCommandLine(self):
+        '''
+        test the sparql query command line
+        '''
+        debug=self.debug
+        #debug=True
+        args=["-d","-qn","US President Nicknames","-l","sparql","-f","csv"]
+        stdout = io.StringIO()
+        with redirect_stdout(stdout):
+            queryMain(args)
+            result=stdout.getvalue()
+        self.assertTrue('''Theodore Roosevelt","Teddy"''' in result)
+        if debug:
+            print(result)
+        
+    def testCommandLineUsage(self):
+        '''
+        test the command line usage
+        '''
+        args=["-h"]
+        try:
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                queryMain(args)
+            self.fail("system exit expected")
+        except SystemExit:
+            pass
+        debug=self.debug
+        #debug=True
+        if debug:
+            print(stdout.getvalue())
+        self.assertTrue("--queryName" in stdout.getvalue())
             
     def testQueryDocumentation(self):
         '''
         test QueryDocumentation
         '''
         show=self.debug
-        #show=True
+        show=True
         queries=[
             {
                 "endpoint":"https://query.wikidata.org/sparql",
@@ -173,7 +232,10 @@ determines the number of instances available in the OpenStreetMap for the placeT
             endpoint=SPARQL(endpointUrl)
             query=Query(**queryMap)
             query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)  
-            query.tryItUrl=endpointUrl
+            showYaml=True
+            if showYaml:
+                yamlMarkup=query.asYaml()
+                print(yamlMarkup)
             try:
                 qlod=endpoint.queryAsListOfDicts(query.query)
                 for tablefmt in ["mediawiki","github","latex"]:

@@ -11,7 +11,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pylodstorage',
-    version='0.0.85',
+    version='0.1.0',
 
     packages=['lodstorage',],
     author='Wolfgang Fahl',
@@ -42,6 +42,13 @@ setup(
             'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9'
     ],
+    entry_points={
+      'console_scripts': [
+        'sparqlquery = lodstorage.query:mainSPARQL',
+        'sqlquery=lodstorage.query:mainSQL',
+        'lodquery=lodstorage.query:main'
+      ],
+    },
     long_description=long_description,
     long_description_content_type='text/markdown'
 )

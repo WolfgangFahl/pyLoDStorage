@@ -1,6 +1,9 @@
 #!/bin/bash
 # WF 2022-02-12
+#
 # SPARQL query via command line
+# see https://softwarerecs.stackexchange.com/questions/36188/command-line-tool-to-query-wikidata-or-another-sparql-endpoint
+# see https://github.com/WolfgangFahl/pyLoDStorage/issues/58
 
 #ansi colors
 #http://www.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html

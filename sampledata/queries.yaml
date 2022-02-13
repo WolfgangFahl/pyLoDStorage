@@ -20,6 +20,22 @@
         }
         group by ?p ?source
         order by ?source desc(?numberOfPredicates)
+'US President Nicknames':        
+    description: https://stackoverflow.com/questions/70206791/sparql-i-have-individual-with-multiple-values-for-single-object-property-how
+    prefixes: []
+    sparql: |
+        SELECT ?president ?presidentLabel (GROUP_CONCAT(DISTINCT ?nickName; SEPARATOR=",") as ?nickNames)
+        WHERE 
+        {
+          # president
+          ?president wdt:P39 wd:Q11696.
+          # nickname
+          ?president wdt:P1449 ?nickName
+          SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+        } GROUP BY ?president ?presidentLabel
+    title: Nick names of US Presidents
+    tryItUrl: https://query.wikidata.org
+    endpoint: https://query.wikidata.org/sparql
 'Sample Count':
     sql: |
         SELECT count(*) FROM sample
@@ -27,5 +43,3 @@
     sql: |
         SELECT * FROM sample
         LIMIT 5
-
-
