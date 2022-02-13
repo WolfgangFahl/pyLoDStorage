@@ -48,7 +48,7 @@ usage() {
   echo "  -d|--debug: show debug information"
   echo "  -e|--endpoint: endpoint to use may be url of endpoint or dbis-wikidata|qlever-wikidata|qlever-wikidata-proxy|qlever-sun"
   echo "  -f|--format: the format to use - select one of csv,json,tsv,xml"
-  echo "  -o|--output: the ouput file to create stdout if none is given"
+  echo "  -o|--output: the output file to create stdout if none is given"
 }
 
 #

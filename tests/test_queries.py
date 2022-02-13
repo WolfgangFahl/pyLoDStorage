@@ -24,8 +24,7 @@ class TestQueries(Basetest):
         see https://github.com/WolfgangFahl/pyLoDStorage/issues/19
         '''
         show=self.debug
-        path="%s/../sampledata" % os.path.dirname(__file__)
-        qm=QueryManager(lang='sql',debug=False,path=path)
+        qm=QueryManager(lang='sql',debug=False)
         self.assertEqual(2,len(qm.queriesByName)) 
         sqlDB=tests.testSqlite3.TestSQLDB.getSampleTableDB()
         #print(sqlDB.getTableDict())
@@ -42,8 +41,7 @@ class TestQueries(Basetest):
         '''
         show=self.debug
         show=True
-        path="%s/../sampledata" % os.path.dirname(__file__)
-        qm=QueryManager(lang='sparql',debug=False,path=path)
+        qm=QueryManager(lang='sparql',debug=False)
         for name,query in qm.queriesByName.items():
             if name in ["Nicknames"]:
                 if show:
@@ -64,7 +62,7 @@ class TestQueries(Basetest):
         '''
         test the uniCode2Latex conversion workaround
         '''
-        debug=True
+        debug=self.debug
         for code in range(8320,8330):
             uc=chr(code)
             latex=QueryResultDocumentation.uniCode2Latex(uc)
@@ -138,7 +136,7 @@ class TestQueries(Basetest):
         test QueryDocumentation
         '''
         show=self.debug
-        show=True
+        #show=True
         queries=[
             {
                 "endpoint":"https://query.wikidata.org/sparql",
@@ -232,7 +230,7 @@ determines the number of instances available in the OpenStreetMap for the placeT
             endpoint=SPARQL(endpointUrl)
             query=Query(**queryMap)
             query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)  
-            showYaml=True
+            showYaml=False
             if showYaml:
                 yamlMarkup=query.asYaml()
                 print(yamlMarkup)
