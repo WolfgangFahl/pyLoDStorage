@@ -46,7 +46,7 @@ class QueryResultDocumentation():
         
         
     @staticmethod
-    def uniCode2Latex(text:str)->str:
+    def uniCode2Latex(text:str,withConvert:bool=False)->str:
         '''
         converts unicode text to latex and 
         fixes UTF-8 chars for latex in a certain range:
@@ -56,15 +56,18 @@ class QueryResultDocumentation():
    
         Args:
             text(str): the string to fix
+            withConvert(bool): if unicode to latex libary conversion should be used
         
         Return:
             str: latex presentation of UTF-8 char
         '''
         for code in range(8320,8330):
             text=text.replace(chr(code),f"$_{code-8320}$")
-        #latex=unicode_to_latex(text)
-        # workaround {\textbackslash} being returned
-        #latex=latex.replace("{\\textbackslash}",'\\')
+        if withConvert:
+            latex=unicode_to_latex(text)
+            # workaround {\textbackslash} being returned
+            #latex=latex.replace("{\\textbackslash}",'\\')
+            text=latex
         return text
     
     @staticmethod

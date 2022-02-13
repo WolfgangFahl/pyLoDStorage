@@ -70,7 +70,7 @@ class TestQueries(Basetest):
                 print(f"{uc}→{latex}")
             #self.assertTrue(latex.startswith("$_"))
         unicode="À votre santé!"
-        latex=QueryResultDocumentation.uniCode2Latex(unicode)
+        latex=QueryResultDocumentation.uniCode2Latex(unicode,withConvert=True)
         if debug:
             print(f"{unicode}→{latex}")
         self.assertEqual("\\`A votre sant\\'e!",latex)
@@ -103,7 +103,7 @@ class TestQueries(Basetest):
         test the sparql query command line
         '''
         debug=self.debug
-        debug=True
+        #debug=True
         for testArg in [
             {"format":"csv", "expected":'''Theodore Roosevelt","Teddy"'''},
             {"format":"latex","expected":'''Theodore Roosevelt     & Teddy'''},
