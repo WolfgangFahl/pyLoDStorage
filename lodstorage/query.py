@@ -62,7 +62,10 @@ class QueryResultDocumentation():
         '''
         for code in range(8320,8330):
             text=text.replace(chr(code),f"$_{code-8320}$")
-        return unicode_to_latex(text)
+        #latex=unicode_to_latex(text)
+        # workaround {\textbackslash} being returned
+        #latex=latex.replace("{\\textbackslash}",'\\')
+        return text
     
     @staticmethod
     def wikiDataLink(record,key,value,tablefmt):

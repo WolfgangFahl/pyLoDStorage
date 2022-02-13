@@ -103,16 +103,24 @@ class TestQueries(Basetest):
         test the sparql query command line
         '''
         debug=self.debug
-        #debug=True
-        args=["-d","-qn","US President Nicknames","-l","sparql","-f","csv"]
-        stdout = io.StringIO()
-        with redirect_stdout(stdout):
-            queryMain(args)
-            result=stdout.getvalue()
-        self.assertTrue('''Theodore Roosevelt","Teddy"''' in result)
-        if debug:
-            print(result)
-        
+        debug=True
+        for testArg in [
+            {"format":"csv", "expected":'''Theodore Roosevelt","Teddy"'''},
+            {"format":"latex","expected":'''Theodore Roosevelt     & Teddy'''},
+            {"format":"mediawiki", "expected":'''| [https://www.wikidata.org/wiki/Q33866 Q33866] || Theodore Roosevelt     || Teddy'''},
+            {"format":"github","expected":'''| [Q33866](https://www.wikidata.org/wiki/Q33866) | Theodore Roosevelt     | Teddy                           |'''}
+        ]:
+            resultFormat=testArg["format"]
+            expected=testArg["expected"]
+            args=["-d","-qn","US President Nicknames","-l","sparql","-f",resultFormat]
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                queryMain(args)
+                result=stdout.getvalue()
+            if debug:
+                print(f"{resultFormat}:{result}")
+            self.assertTrue(expected in result)
+          
     def testCommandLineUsage(self):
         '''
         test the command line usage

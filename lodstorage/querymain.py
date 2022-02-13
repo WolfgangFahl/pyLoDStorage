@@ -13,7 +13,7 @@ import sys
 import os
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-from lodstorage.query import QueryManager
+from lodstorage.query import QueryManager, QueryResultDocumentation
 from lodstorage.sparql import SPARQL
 from lodstorage.csv import CSV
 
@@ -22,6 +22,9 @@ class Format(Enum):
     json = 'json'
     xml = 'xml'
     tsv = 'tsv'
+    latex = 'latex'
+    mediawiki= 'mediawiki'
+    github = 'github'
  
     def __str__(self):
         return self.value
@@ -45,10 +48,17 @@ class QueryMain:
             query=qm.queriesByName[args.queryName]
             if args.language=="sparql":
                 endpoint=SPARQL(query.endpoint)
+                if "wikidata" in query.endpoint:
+                    query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)  
                 qlod=endpoint.queryAsListOfDicts(query.query)
             if args.format is Format.csv:
                 csv=CSV.toCSV(qlod)
                 print(csv)
+            elif args.format is Format.latex or args.format is Format.github or args.format is Format.mediawiki:
+                doc=query.documentQueryResult(qlod, tablefmt=str(args.format),floatfmt=".0f")
+                docstr=doc.asText()
+                print (docstr)
+                
 
 
 def mainSQL(argv=None):

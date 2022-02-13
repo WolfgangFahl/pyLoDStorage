@@ -44,9 +44,9 @@ setup(
     ],
     entry_points={
       'console_scripts': [
-        'sparqlquery = lodstorage.query:mainSPARQL',
-        'sqlquery=lodstorage.query:mainSQL',
-        'lodquery=lodstorage.query:main'
+        'sparqlquery = lodstorage.querymain:mainSPARQL',
+        'sqlquery=lodstorage.querymain:mainSQL',
+        'lodquery=lodstorage.querymain:main'
       ],
     },
     long_description=long_description,
