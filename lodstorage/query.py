@@ -343,6 +343,9 @@ class QueryManager(object):
         for name,queryDict in queries.items():
             if self.lang in queryDict:
                 queryText=queryDict.pop(self.lang)
+                for qformat in ['sparql', 'sql']:   # drop not needed query variants
+                    if qformat in queryDict:
+                        queryDict.pop(qformat)
                 query=Query(name=name,query=queryText,lang=self.lang,**queryDict,debug=self.debug)
                 self.queriesByName[name]=query
     
