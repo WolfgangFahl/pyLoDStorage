@@ -120,6 +120,25 @@ class TestQueries(Basetest):
             if debug:
                 print(f"{resultFormat}:{result}")
             self.assertTrue(expected in result)
+
+    def testQueryEndpoints(self):
+        """
+        tests the sparql endpoint commandline endpoint selection
+        """
+        testArgs=[
+            {"en":"wikidata",},
+            {"en":"qlever-wikidata"},
+            {"en":"qlever-wikidata-proxy"},
+        ]
+        for testArg in testArgs:
+
+            args = ["-d", "-qn", "cities", "-l", "sparql", "-f", "json", "-en", testArg.get("en"), "-raw"]
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                queryMain(args)
+                result = stdout.getvalue()
+                self.assertTrue("Arnis" in result)
+
           
     def testCommandLineUsage(self):
         '''

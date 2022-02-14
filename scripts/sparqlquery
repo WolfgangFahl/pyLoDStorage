@@ -162,6 +162,9 @@ do
           qlever-sun)
             endpoint="http://sun.bitplan.com:7001"
             ;;
+          wikidata)
+            endpoint="https://query.wikidata.org/sparql"
+            ;;
        esac
        ;;
     -f|--format)
