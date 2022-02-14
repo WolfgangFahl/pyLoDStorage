@@ -10,7 +10,8 @@ import urllib
 import copy
 #from wikibot.mwTable import MediaWikiTable
 # redundant copy in this library to avoid dependency issues
-# original is at 
+# original is at
+from lodstorage.jsonable import JSONAble
 from lodstorage.mwTable import MediaWikiTable
 from pylatexenc.latexencode import unicode_to_latex
 import re
@@ -355,5 +356,48 @@ class QueryManager(object):
         return examples
             
 
+class EndpointManager(object):
+    """
+    manages a set of SPARQL endpoints
+    """
 
-        
+    @staticmethod
+    def getEndpoints(endpointPath=None):
+        '''
+        get the queries for thee given queries Path
+        '''
+        if endpointPath is None:
+            endpointPath = f"{os.path.dirname(__file__)}/../sampledata/endpoints.yaml"
+        endpoints={}
+        with open(endpointPath, 'r') as stream:
+            endpointRecords = yaml.safe_load(stream)
+            for name, record in endpointRecords.items():
+                endpoint=Endpoint()
+                endpoint.fromDict({"name": name, **record})
+                endpoints[name]=endpoint
+        return endpoints
+
+    @staticmethod
+    def getEndpointNames(endpointPath=None) -> list:
+        """
+        Returns a list of all available endpoint names
+        """
+        endpoints = EndpointManager.getEndpoints(endpointPath)
+        return list(endpoints.keys())
+
+
+class Endpoint(JSONAble):
+    """
+    a query endpoint
+    """
+
+    @staticmethod
+    def getSamples():
+        samples=[
+            {
+                "name": "wikidata",
+                "endpoint": "https://query.wikidata.org/sparql",
+                "prefixes": "PREFIX bd: <http://www.bigdata.com/rdf#>\nPREFIX cc: <http://creativecommons.org/ns#>"
+            }
+        ]
+        return samples

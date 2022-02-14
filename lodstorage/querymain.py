@@ -5,7 +5,10 @@ Created on 2022-02-13
 '''
 __version__ = "0.1.8"
 __date__ = '2020-09-10'
-__updated__ = '2022-02-14'   
+__updated__ = '2022-02-14'
+
+import json
+
 DEBUG = 0
 
 from enum import Enum 
@@ -13,7 +16,7 @@ import sys
 import os
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-from lodstorage.query import QueryManager, QueryResultDocumentation
+from lodstorage.query import QueryManager, QueryResultDocumentation, EndpointManager
 from lodstorage.sparql import SPARQL
 from lodstorage.csv import CSV
 
@@ -51,17 +54,25 @@ class QueryMain:
                 raise Exception(f"named query {args.queryName} not available")
             query=qm.queriesByName[args.queryName]
             if args.language=="sparql":
-                endpoint=SPARQL(query.endpoint)
-                if "wikidata" in query.endpoint:
+                endpoints=EndpointManager.getEndpoints(args.endpointPath)
+                if args.endpointName:
+                    endpointConf=endpoints.get(args.endpointName)
+                    endpoint=SPARQL(endpointConf.endpoint)
+                    query.query = f"{endpointConf.prefixes}\n{query.query}"
+                else:
+                    endpoint=SPARQL(query.endpoint)
+                if "wikidata" in args.endpointName:
                     query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)  
                 qlod=endpoint.queryAsListOfDicts(query.query)
             if args.format is Format.csv:
                 csv=CSV.toCSV(qlod)
                 print(csv)
-            elif args.format is Format.latex or args.format is Format.github or args.format is Format.mediawiki:
+            elif args.format in [Format.latex,Format.github, Format.mediawiki]:
                 doc=query.documentQueryResult(qlod, tablefmt=str(args.format),floatfmt=".0f")
                 docstr=doc.asText()
                 print (docstr)
+            elif args.format in [Format.json]:
+                print(json.dumps(qlod))
                 
 
 
@@ -101,13 +112,16 @@ USAGE
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-d", "--debug", dest="debug",   action="store_true", help="set debug [default: %(default)s]")
-        parser.add_argument('-e', '--endpoint', default="https://query.wikidata.org/sparql", help="SPARQL endpoint to use for queries")
+        parser.add_argument('-ep', '--endpointPath', default=None, help="SPARQL endpoint to use for queries")
+        parser.add_argument('-en', '--endpointName', default="wikidata", help=f"Name of the SPARQL endpoint to use for queries. Avaliable by default: {EndpointManager.getEndpointNames()}")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
         parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")
         parser.add_argument('-qp', '--queriesPath',help="path to YAML file with query definitions")
         parser.add_argument("-q", "--query",help="the query to run")
         parser.add_argument("-qn","--queryName",help="run a named query")
         parser.add_argument('-V', '--version', action='version', version=program_version_message)
+        parser.add_argument("-raw",action="store_true", help="return the raw query result from the endpoint. (MIME type defined over -f or -m)")
+        parser.add_argument("-m", "--mimeType",help="MIME-type to use for the raw query")
         if lang is None:
             parser.add_argument('-l','--language',help="the query language to use",required=True)
         args = parser.parse_args(argv)

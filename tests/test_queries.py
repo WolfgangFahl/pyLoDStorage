@@ -8,7 +8,7 @@ import copy
 import io
 import os
 from contextlib import redirect_stdout
-from lodstorage.query import QueryManager, Query, QueryResultDocumentation
+from lodstorage.query import QueryManager, Query, QueryResultDocumentation, EndpointManager
 from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
 import tests.testSqlite3
@@ -127,17 +127,17 @@ class TestQueries(Basetest):
         """
         testArgs=[
             {"en":"wikidata",},
-            {"en":"qlever-wikidata"},
-            {"en":"qlever-wikidata-proxy"},
+            {"en":"qlever-wikidata",},
+            {"en":"qlever-wikidata-proxy",},
         ]
         for testArg in testArgs:
-
-            args = ["-d", "-qn", "cities", "-l", "sparql", "-f", "json", "-en", testArg.get("en"), "-raw"]
+            endpointName = testArg.get("en")
+            args = ["-d", "-qn", "cities", "-l", "sparql", "-f", "json", "-en", endpointName, "-raw"]
             stdout = io.StringIO()
             with redirect_stdout(stdout):
                 queryMain(args)
                 result = stdout.getvalue()
-                self.assertTrue("Arnis" in result)
+                self.assertTrue("Arnis" in result, f"{endpointName}: Arnis not in query result")
 
           
     def testCommandLineUsage(self):
@@ -271,6 +271,19 @@ determines the number of instances available in the OpenStreetMap for the placeT
                         
             except Exception as ex:
                 print(f"{query.title} at {endpointUrl} failed: {ex}")
+
+
+class TestEndpoints(Basetest):
+    """
+    tests Endpoint
+    """
+
+    def testGetEndpoints(self):
+        """
+        tests getEndpoints
+        """
+        e=EndpointManager.getEndpoints()
+        self.assertTrue("wikidata" in e)
 
 
 if __name__ == "__main__":

@@ -54,7 +54,7 @@ class SPARQL(object):
         self.sparql.setQuery(queryString)
         self.sparql.method=method
         queryResult = self.sparql.query()
-        return queryResult 
+        return queryResult
     
     def getResults(self,jsonResult):
         '''
