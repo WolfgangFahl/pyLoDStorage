@@ -11,11 +11,11 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pylodstorage',
-    version='0.1.6',
+    version='0.1.7',
 
-    packages=['lodstorage',],
+    packages=['lodstorage','sampledata'],
     package_data={
-          'lodstorage': ['sampledata/*.yaml'],
+          'sampledata': ['*.yaml'],
     },
     author='Wolfgang Fahl',
     author_email='wf@bitplan.com',
