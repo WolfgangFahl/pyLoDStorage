@@ -8,7 +8,7 @@ __date__ = '2020-09-10'
 __updated__ = '2022-02-14'
 
 import json
-
+import requests
 DEBUG = 0
 
 from enum import Enum 
@@ -61,6 +61,10 @@ class QueryMain:
                     query.query = f"{endpointConf.prefixes}\n{query.query}"
                 else:
                     endpoint=SPARQL(query.endpoint)
+                if args.raw:
+                    qres = cls.rawQuery(endpoint.sparql.endpoint, query=query.query, format=args.format, mimeType=args.mimeType)
+                    print(qres)
+                    return
                 if "wikidata" in args.endpointName:
                     query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)  
                 qlod=endpoint.queryAsListOfDicts(query.query)
@@ -73,6 +77,36 @@ class QueryMain:
                 print (docstr)
             elif args.format in [Format.json]:
                 print(json.dumps(qlod))
+
+    @staticmethod
+    def rawQuery(endpoint, query, format, mimeType):
+        """
+        returns raw result of the endpoint
+
+        Args:
+            endpoint: url of the endpoint
+            query(str): query
+            format(str): format of the result
+            mimeType(str): mimeType
+
+        Returns:
+            raw result of the query
+        """
+        url = endpoint
+        params={
+            "query":query,
+            "format": format
+        }
+        payload = {}
+        if mimeType:
+            headers = {
+                'Accept': mimeType
+            }
+        else:
+            headers={}
+
+        response = requests.request("GET", endpoint, headers=headers, data=payload, params=params)
+        return response.text
                 
 
 
