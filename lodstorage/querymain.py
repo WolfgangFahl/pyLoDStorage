@@ -3,7 +3,7 @@ Created on 2022-02-13
 
 @author: wf
 '''
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 __date__ = '2020-09-10'
 __updated__ = '2022-02-14'   
 DEBUG = 0
@@ -66,10 +66,10 @@ class QueryMain:
 
 
 def mainSQL(argv=None):
-    main(argv,lang='SQL')
+    main(argv,lang='sql')
     
 def mainSPARQL(argv=None):
-    main(argv,lang='SPARQL')
+    main(argv,lang='sparql')
     
 def main(argv=None,lang=None): # IGNORE:C0111
     '''main program.'''
