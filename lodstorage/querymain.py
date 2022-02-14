@@ -3,9 +3,9 @@ Created on 2022-02-13
 
 @author: wf
 '''
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 __date__ = '2020-09-10'
-__updated__ = '2022-02-13'   
+__updated__ = '2022-02-14'   
 DEBUG = 0
 
 from enum import Enum 
@@ -103,7 +103,7 @@ USAGE
         parser.add_argument("-d", "--debug", dest="debug",   action="store_true", help="set debug [default: %(default)s]")
         parser.add_argument('-e', '--endpoint', default="https://query.wikidata.org/sparql", help="SPARQL endpoint to use for queries")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
-        parser.add_argument('-li','--list',help="show the list of available queries")
+        parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")
         parser.add_argument('-qp', '--queriesPath',help="path to YAML file with query definitions")
         parser.add_argument("-q", "--query",help="the query to run")
         parser.add_argument("-qn","--queryName",help="run a named query")

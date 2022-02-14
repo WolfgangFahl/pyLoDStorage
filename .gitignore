@@ -136,3 +136,5 @@ lib
 
 # plots
 plots
+#  Mac OS
+.DS_Store
