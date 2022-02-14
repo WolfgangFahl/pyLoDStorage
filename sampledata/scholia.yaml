@@ -1,0 +1,18 @@
+# scholia sparql queries
+# 2022-02-14 tholzheim
+'WorksAndAuthor':
+  title: 'Works and their authors'
+  sparql: |
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX wikibase: <http://wikiba.se/ontology#>
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        # Authors
+        SELECT ?work ?workLabel ?author ?authorLabel
+        WHERE
+        {
+          ?work wdt:P50 ?author.
+          ?work rdfs:label ?workLabel .
+          ?author rdfs:label ?authorLabel.
+        }
+        LIMIT 10
