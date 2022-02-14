@@ -272,6 +272,19 @@ determines the number of instances available in the OpenStreetMap for the placeT
             except Exception as ex:
                 print(f"{query.title} at {endpointUrl} failed: {ex}")
 
+    def testIssue61(self):
+        """
+        tests different query path
+
+        see https://github.com/WolfgangFahl/pyLoDStorage/issues/61
+        """
+        args=["-qp", "../sampledata/queries.yaml", "--list"]
+        stdout = io.StringIO()
+        with redirect_stdout(stdout):
+            queryMain(args, lang="sparql")
+            result = stdout.getvalue()
+        print(result)
+
 
 class TestEndpoints(Basetest):
     """

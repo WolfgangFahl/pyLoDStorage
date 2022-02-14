@@ -327,13 +327,15 @@ class QueryManager(object):
     manages pre packaged Queries
     '''
 
-    def __init__(self,lang='sql',debug=False,queriesPath=None):
+    def __init__(self,lang:str=None,debug=False,queriesPath=None):
         '''
         Constructor
         Args:
             lang(string): the language to use for the queries sql or sparql
             debug(boolean): True if debug information should be shown
         '''
+        if lang is None:
+            lang='sql'
         self.queriesByName={}
         self.lang=lang
         self.debug=debug
@@ -351,6 +353,8 @@ class QueryManager(object):
         '''
         if queriesPath is None:
             queriesPath=f"{os.path.dirname(__file__)}/../sampledata/queries.yaml"
+        else:
+            queriesPath=os.path.abspath(queriesPath)
         with open(queriesPath, 'r') as stream:
             examples = yaml.safe_load(stream)
         return examples
