@@ -6,7 +6,7 @@ Created on 2021-01-29
 import unittest
 import copy
 import io
-import os
+
 from contextlib import redirect_stdout
 from lodstorage.query import QueryManager, Query, QueryResultDocumentation, EndpointManager
 from lodstorage.querymain import main as queryMain
@@ -278,12 +278,16 @@ determines the number of instances available in the OpenStreetMap for the placeT
 
         see https://github.com/WolfgangFahl/pyLoDStorage/issues/61
         """
-        args=["-qp", "../sampledata/queries.yaml", "--list"]
+        args=["-qp", "../sampledata/scholia.yaml", "--list"]
         stdout = io.StringIO()
         with redirect_stdout(stdout):
             queryMain(args, lang="sparql")
             result = stdout.getvalue()
-        print(result)
+        #debug=self.debug
+        debug=True
+        if debug:
+            print(result)
+        self.assertTrue("WorksAndAuthor" in result)
 
 
 class TestEndpoints(Basetest):
