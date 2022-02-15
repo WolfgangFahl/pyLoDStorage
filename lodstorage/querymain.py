@@ -69,7 +69,7 @@ class QueryMain:
                 else:
                     endpoint=SPARQL(query.endpoint)
                 if args.raw:
-                    qres = cls.rawQuery(endpoint.sparql.endpoint, query=query.query, format=args.format, mimeType=args.mimeType)
+                    qres = cls.rawQuery(endpoint.sparql.endpoint, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
                     print(qres)
                     return
                 if "wikidata" in args.endpointName:

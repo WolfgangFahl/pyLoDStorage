@@ -6,6 +6,7 @@ Created on 2021-01-29
 import unittest
 import copy
 import io
+import os
 
 from contextlib import redirect_stdout
 from lodstorage.query import QueryManager, Query, QueryResultDocumentation, EndpointManager
@@ -131,13 +132,18 @@ class TestQueries(Basetest):
             {"en":"qlever-wikidata",},
             {"en":"qlever-wikidata-proxy",},
         ]
+        debug=self.debug
+        #debug=True
         for testArg in testArgs:
             endpointName = testArg.get("en")
-            args = ["-d", "-qn", "cities", "-l", "sparql", "-f", "json", "-en", endpointName, "-raw"]
+            args = ["-d", "-qn", "cities", "-p","-l", "sparql", "-f", "json", "-en", endpointName, "-raw"]
             stdout = io.StringIO()
             with redirect_stdout(stdout):
                 queryMain(args)
                 result = stdout.getvalue()
+            if debug:
+                print(result)
+            if not "503 Service Unavailable" in result:
                 self.assertTrue("Arnis" in result, f"{endpointName}: Arnis not in query result")
 
           
@@ -279,7 +285,8 @@ determines the number of instances available in the OpenStreetMap for the placeT
 
         see https://github.com/WolfgangFahl/pyLoDStorage/issues/61
         """
-        args=["-qp", "../sampledata/scholia.yaml", "--list"]
+        queriesPath=f"{os.path.dirname(__file__)}/../sampledata/scholia.yaml"
+        args=["-qp", f"{queriesPath}", "--list"]
         stdout = io.StringIO()
         with redirect_stdout(stdout):
             queryMain(args, lang="sparql")
