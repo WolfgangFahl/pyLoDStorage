@@ -10,6 +10,7 @@ import io
 from contextlib import redirect_stdout
 from lodstorage.query import QueryManager, Query, QueryResultDocumentation, EndpointManager
 from lodstorage.querymain import main as queryMain
+from lodstorage.querymain import QueryMain
 from lodstorage.sparql import SPARQL
 import tests.testSqlite3
 from tests.basetest import Basetest
@@ -287,7 +288,7 @@ determines the number of instances available in the OpenStreetMap for the placeT
         debug=True
         if debug:
             print(result)
-        self.assertTrue("WorksAndAuthor" in result)
+        self.assertTrue("WorksAndAuthor" in result)    
 
 
 class TestEndpoints(Basetest):
@@ -295,13 +296,24 @@ class TestEndpoints(Basetest):
     tests Endpoint
     """
 
-    def testGetEndpoints(self):
+    def testEndpoints(self):
         """
-        tests getEndpoints
+        tests getting and rawQuerying Endpoints
         """
-        e=EndpointManager.getEndpoints()
-        self.assertTrue("wikidata" in e)
-
+        debug=self.debug
+        #debug=True
+        endpoints=EndpointManager.getEndpoints()
+        qm=QueryManager(lang='sparql',debug=False)
+        query=qm.queriesByName["FirstTriple"]
+        self.assertTrue("wikidata" in endpoints)
+        for i,item in enumerate(endpoints.items()):
+            name,endpoint=item
+            if debug:
+                print (f"{i}:{name}")
+            resultFormat="json"
+            jsonStr=QueryMain.rawQuery(endpoint.endpoint, query.query, resultFormat, mimeType=None)
+            if debug:
+                print(jsonStr)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

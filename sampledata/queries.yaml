@@ -109,3 +109,14 @@
             FILTER (LANG(?name) = "en")
           }
           ORDER BY DESC(?population)
+          
+'FirstTriple':
+    title: First Triple
+    description: Get the first triple of the triplestore as a generic test query
+    sparql: |
+        # Generic SPARQL test query
+        # First triple
+        # 2022-02-15
+        SELECT ?s ?p ?o WHERE {
+          ?s ?p ?o
+        } LIMIT 1

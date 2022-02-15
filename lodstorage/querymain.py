@@ -3,7 +3,7 @@ Created on 2022-02-13
 
 @author: wf
 '''
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 __date__ = '2020-09-10'
 __updated__ = '2022-02-14'
 
@@ -21,6 +21,9 @@ from lodstorage.sparql import SPARQL
 from lodstorage.csv import CSV
 
 class Format(Enum):
+    '''
+    the supported formats for the results to be delivered
+    '''
     csv = 'csv'
     json = 'json'
     xml = 'xml'
@@ -40,6 +43,9 @@ class QueryMain:
     def main(cls,args):
         '''
         command line activation with parsed args
+        
+        Args:
+            args(list): the command line arguments
         '''
         debug=args.debug
         if args.list:
@@ -58,7 +64,8 @@ class QueryMain:
                 if args.endpointName:
                     endpointConf=endpoints.get(args.endpointName)
                     endpoint=SPARQL(endpointConf.endpoint)
-                    query.query = f"{endpointConf.prefixes}\n{query.query}"
+                    if args.prefixes:
+                        query.query = f"{endpointConf.prefixes}\n{query.query}"
                 else:
                     endpoint=SPARQL(query.endpoint)
                 if args.raw:
@@ -79,23 +86,22 @@ class QueryMain:
                 print(json.dumps(qlod))
 
     @staticmethod
-    def rawQuery(endpoint, query, format, mimeType):
+    def rawQuery(endpoint, query, resultFormat, mimeType):
         """
         returns raw result of the endpoint
 
         Args:
             endpoint: url of the endpoint
             query(str): query
-            format(str): format of the result
+            resultFormat(str): format of the result
             mimeType(str): mimeType
 
         Returns:
             raw result of the query
         """
-        url = endpoint
         params={
             "query":query,
-            "format": format
+            "format": resultFormat
         }
         payload = {}
         if mimeType:
@@ -108,7 +114,6 @@ class QueryMain:
         response = requests.request("GET", endpoint, headers=headers, data=payload, params=params)
         return response.text
                 
-
 
 def mainSQL(argv=None):
     main(argv,lang='sql')
@@ -150,12 +155,13 @@ USAGE
         parser.add_argument('-en', '--endpointName', default="wikidata", help=f"Name of the SPARQL endpoint to use for queries. Avaliable by default: {EndpointManager.getEndpointNames()}")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
         parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")
+        parser.add_argument("-m", "--mimeType",help="MIME-type to use for the raw query")
+        parser.add_argument("-p", "--prefixes",action="store_true",help="add predefined prefixes for endpoint")
         parser.add_argument('-qp', '--queriesPath',help="path to YAML file with query definitions")
         parser.add_argument("-q", "--query",help="the query to run")
         parser.add_argument("-qn","--queryName",help="run a named query")
-        parser.add_argument('-V', '--version', action='version', version=program_version_message)
         parser.add_argument("-raw",action="store_true", help="return the raw query result from the endpoint. (MIME type defined over -f or -m)")
-        parser.add_argument("-m", "--mimeType",help="MIME-type to use for the raw query")
+        parser.add_argument('-V', '--version', action='version', version=program_version_message)
         if lang is None:
             parser.add_argument('-l','--language',help="the query language to use",required=True)
         args = parser.parse_args(argv)
