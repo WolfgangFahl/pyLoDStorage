@@ -1,0 +1,28 @@
+#
+# Sample Queries for Wikidata
+#
+# WF 2022-02-19
+'MountainsHigher8000m':
+    title:  Mountains higher than 8000 m
+    description: https://qlever.cs.uni-freiburg.de/wikidata/F7JXq3
+    sparql: |
+      # Mountains higher than 8000 m
+      # fixes:
+      # https://qlever.cs.uni-freiburg.de/wikidata/F7JXq3
+      # see https://github.com/ad-freiburg/qlever/issues/604
+      PREFIX wd: <http://www.wikidata.org/entity/>
+      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+      PREFIX p: <http://www.wikidata.org/prop/>
+      PREFIX psn: <http://www.wikidata.org/prop/statement/value-normalized/>
+      PREFIX wikibase: <http://wikiba.se/ontology#>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      SELECT ?mountain ?mountain_label (MAX(?elevationValues) AS ?elevation) (SAMPLE(?coordinateValues) AS ?coordinates) WHERE {
+        ?mountain wdt:P31 wd:Q8502 .
+        ?mountain p:P2044/psn:P2044/wikibase:quantityAmount ?elevationValues .
+        ?mountain wdt:P625 ?coordinateValues .
+        ?mountain rdfs:label ?mountain_label .
+        FILTER(?elevationValues >= 8000.0) .
+        FILTER (LANG(?mountain_label) = "en")
+      }
+      GROUP BY ?mountain ?mountain_label
+      ORDER BY DESC(?elevation)
