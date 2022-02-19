@@ -26,3 +26,28 @@
       }
       GROUP BY ?mountain ?mountain_label
       ORDER BY DESC(?elevation)
+'GermanFIFA2014WorldCupTeam':
+     title: German FIFA 2014 World Cup Team
+     description:  German football players participating in the FIFA World GermanFIFA2014WorldCupTeam
+     sparql: |
+        # German FIFA 2014 Worldcup Team
+        #
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX p: <http://www.wikidata.org/prop/>
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+        SELECT  ?player ?playerLabel
+        WHERE
+          {
+            #SERVICE  <https://query.wikidata.org/bigdata/namespace/wdq/sparql>
+            #SERVICE  <http://sun.bitplan.com:7001/>
+            {                           #a working example query for wikidata:
+              ?player wdt:P31 wd:Q5.         #humans
+              ?player wdt:P54 wd:Q43310.     #germans
+              ?player wdt:P1344 wd:Q79859.   #part of world cup 2014
+              ?player rdfs:label ?playerLabel.
+              FILTER(LANG(?playerLabel) = "en")
+            }
+        }
+        ORDER BY(?playerLabel)
