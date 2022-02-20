@@ -16,13 +16,13 @@
           ?author rdfs:label ?authorLabel.
         }
         LIMIT 10
-        
+
 'Papers with Fulltext':
     title: 'Papers with Fulltext'
     description: see also https://qlever.cs.uni-freiburg.de/wikidata/fd5w1u
     sparql: |
-        # 
-        # Example Query for 
+        #
+        # Example Query for
         # https://github.com/WDscholia/scholia/issues/1774
         #
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -30,26 +30,44 @@
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         # Scholarly articles with full text
         SELECT ?paperLabel ?publishedInLabel ?event ?eventLabel ?fullText ?authors
-        WHERE 
+        WHERE
         {
           ?paper wdt:P31 wd:Q13442814.
-          ?paper rdfs:label ?paperLabel. 
+          ?paper rdfs:label ?paperLabel.
           filter(lang(?paperLabel) = "en").
-          ?paper wdt:P953 ?fullText. 
+          ?paper wdt:P953 ?fullText.
           # wikidata query service
-          #?paper wdt:P953 ?fullText filter (strends(str(?fullText), ".pdf" )). 
+          #?paper wdt:P953 ?fullText filter (strends(str(?fullText), ".pdf" )).
           # qlever
-          filter(regex(?fullText, "\\.pdf\\>$" )). 
+          filter(regex(?fullText, "\\.pdf\\>$" )).
           ?paper wdt:P1433 ?publishedIn.
-          ?publishedIn rdfs:label ?publishedInLabel. 
+          ?publishedIn rdfs:label ?publishedInLabel.
           filter(lang(?publishedInLabel) = "en" ).
-          ?publishedIn wdt:P4745 ?event. 
-          ?event rdfs:label ?eventLabel. 
-          filter(lang(?eventLabel) = "en"). 
-          { 
+          ?publishedIn wdt:P4745 ?event.
+          ?event rdfs:label ?eventLabel.
+          filter(lang(?eventLabel) = "en").
+          {
              SELECT (GROUP_CONCAT(?authorLabel) as ?authors) WHERE {
                ?paper wdt:P50 ?author.
                ?author rdfs:label ?authorLabel . filter(lang(?authorLabel) = "en").
              } GROUP BY ?paper
           }
         }
+'ACL-Paper2Event':
+    title:
+    description:
+    sparql: |
+      # ACL Anthology article ID 
+      SELECT ?article ?articleLabel ?aclId ?publishedIn ?publishedInLabel ?event ?eventLabel WHERE {
+        #ACL Anthology article ID
+        ?article wdt:P7505 ?aclId.
+        ?article rdfs:label ?articleLabel .
+        #?aclIdStatement (ps:P7505) ?aclId.
+        ?article wdt:P1433 ?publishedIn.
+        ?publishedIn rdfs:label ?publishedInLabel .
+        #OPTIONAL {
+           # is proceedings from
+           ?publishedIn wdt:P4745 ?event.
+           ?event rdfs:label ?eventLabel.
+        #}
+      } LIMIT 50
