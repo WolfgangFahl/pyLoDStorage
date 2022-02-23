@@ -1,0 +1,18 @@
+'PaperToEventFullText20':
+    title: Papers published at scientific events with Fulltext
+    description: see also https://qlever.cs.uni-freiburg.de/wikidata/fd5w1u
+    sparql: |
+      # Scholarly articles with full text
+      SELECT ?paper ?paperLabel ?publishedIn ?publishedInLabel ?event ?eventLabel ?fullText
+      WHERE
+      {
+        ?paper wdt:P31 wd:Q13442814.
+        ?paper rdfs:label ?paperLabel filter(lang(?paperLabel) = 'en').
+        ?paper wdt:P953 ?fullText filter (strends(str(?fullText), ".pdf" )).
+        ?paper wdt:P1433 ?publishedIn.
+        ?publishedIn rdfs:label ?publishedInLabel  filter(lang(?publishedInLabel) = 'en'
+        ).
+        ?publishedIn wdt:P4745 ?event. # proceedings from
+        ?event rdfs:label ?eventLabel filter(lang(?eventLabel) = 'en').
+      }
+      LIMIT 20

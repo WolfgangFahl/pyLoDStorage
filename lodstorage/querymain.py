@@ -3,9 +3,9 @@ Created on 2022-02-13
 
 @author: wf
 '''
-__version__ = "0.1.10"
+__version__ = "0.1.11"
 __date__ = '2020-09-10'
-__updated__ = '2022-02-14'
+__updated__ = '2022-02-23'
 
 import json
 import requests
