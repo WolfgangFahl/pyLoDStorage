@@ -57,7 +57,7 @@
     title:
     description:
     sparql: |
-      # ACL Anthology article ID 
+      # ACL Anthology article ID
       SELECT ?article ?articleLabel ?aclId ?publishedIn ?publishedInLabel ?event ?eventLabel WHERE {
         #ACL Anthology article ID
         ?article wdt:P7505 ?aclId.
@@ -71,3 +71,19 @@
            ?event rdfs:label ?eventLabel.
         #}
       } LIMIT 50
+'DblpAuthors':
+    title: find all persons with a dblp author id
+    description: see also https://qlever.cs.uni-freiburg.de/wikidata/73DtyS
+    sparql: |
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+      PREFIX wd: <http://www.wikidata.org/entity/>
+      PREFIX wikibase: <http://wikiba.se/ontology#>
+      # Scholars by dblpId
+      SELECT ?scholar ?scholarLabel ?dlpId
+      WHERE
+      {
+        ?scholar wdt:P31 wd:Q5.
+        ?scholar wdt:P2456 ?dblpId.
+        ?scholar rdfs:label ?scholarLabel .
+      }

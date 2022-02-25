@@ -15,6 +15,7 @@ from lodstorage.jsonable import JSONAble
 from lodstorage.mwTable import MediaWikiTable
 from pylatexenc.latexencode import unicode_to_latex
 import re
+from pathlib import Path
 
 class QueryResultDocumentation():
     '''
@@ -376,12 +377,19 @@ class EndpointManager(object):
         if endpointPath is None:
             endpointPath = f"{os.path.dirname(__file__)}/../sampledata/endpoints.yaml"
         endpoints={}
-        with open(endpointPath, 'r') as stream:
-            endpointRecords = yaml.safe_load(stream)
-            for name, record in endpointRecords.items():
-                endpoint=Endpoint()
-                endpoint.fromDict({"name": name, **record})
-                endpoints[name]=endpoint
+        endpointPaths=[endpointPath]
+        home = str(Path.home())
+        # additional endpoints from users endpoint configuration
+        homepath = f"{home}/.pylodstorage/endpoints.yaml"
+        if os.path.isfile(homepath):
+            endpointPaths.append(homepath)
+        for lEndpointPath in endpointPaths:
+            with open(lEndpointPath, 'r') as stream:
+                endpointRecords = yaml.safe_load(stream)
+                for name, record in endpointRecords.items():
+                    endpoint=Endpoint()
+                    endpoint.fromDict({"name": name, **record})
+                    endpoints[name]=endpoint
         return endpoints
 
     @staticmethod

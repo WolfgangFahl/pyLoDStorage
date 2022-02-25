@@ -151,7 +151,7 @@ USAGE
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-d", "--debug", dest="debug",   action="store_true", help="set debug [default: %(default)s]")
-        parser.add_argument('-ep', '--endpointPath', default=None, help="SPARQL endpoint to use for queries")
+        parser.add_argument('-ep', '--endpointPath', default=None, help="path to yaml file to configure SPARQL endpoints to use for queries")
         parser.add_argument('-en', '--endpointName', default="wikidata", help=f"Name of the SPARQL endpoint to use for queries. Avaliable by default: {EndpointManager.getEndpointNames()}")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
         parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")
