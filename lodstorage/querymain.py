@@ -3,7 +3,7 @@ Created on 2022-02-13
 
 @author: wf
 '''
-__version__ = "0.1.12"
+__version__ = "0.1.13"
 __date__ = '2020-09-10'
 __updated__ = '2022-02-26'
 
@@ -65,7 +65,9 @@ class QueryMain:
                 raise Exception(f"named query {args.queryName} not available")
             query=qm.queriesByName[args.queryName]
             if debug or args.showQuery:
-                print(query.query)
+                if hasattr(query, "description") and query.description is not None:
+                    print(query.description)
+                print(f"{args.language}:\n{query.query}")
             if args.language=="sparql":
                 if args.endpointName:
                     endpointConf=endpoints.get(args.endpointName)

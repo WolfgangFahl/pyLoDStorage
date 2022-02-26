@@ -110,6 +110,8 @@
           ?city wdt:P17 ?country .
           ?city rdfs:label ?cityLabel.
           FILTER(LANG(?cityLabel) = "en").
+          ?country rdfs:label ?countryLabel.
+          FILTER(LANG(?countryLabel) = "en").
         }
         ORDER BY DESC(?population)
         LIMIT 10

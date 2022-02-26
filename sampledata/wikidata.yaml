@@ -26,6 +26,34 @@
       }
       GROUP BY ?mountain ?mountain_label
       ORDER BY DESC(?elevation)
+'HumansWithLibrisEntryAndImageAndMap':
+     title: Humans with Entry in Swedish National Library and Image and Map available
+     description: |
+       see https://github.com/ad-freiburg/qlever/issues/615 see
+       https://qlever.cs.uni-freiburg.de/wikidata/5sDHUw
+       String functions URI and CONCAT not yet supported [reported by @dpriskorn on 15.10.2022]
+       variant of query that works: https://qlever.cs.uni-freiburg.de/wikidata/aIbGvo
+
+     sparql: |
+        # humans with images and maps in swedish national library
+        # 53142 results in 20.6 seconds on Wikidata Query Service
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX wikibase: <http://wikiba.se/ontology#>
+        SELECT ?item ?librisuri ?coord (sample(?img) AS ?image) (sample(?map) AS ?map) WHERE {
+          # humans with a Libris-URI (swedish national library) and a known birthplace
+          ?item wdt:P5587 ?librisid;
+                wdt:P31 wd:Q5;
+                wdt:P19 ?birthplace.
+          # birthplace coordinates
+          ?birthplace wdt:P625 ?coord.
+          # image of the subject
+          OPTIONAL {?item wdt:P18 ?img}.
+          # map of the subject
+          OPTIONAL {?item wdt:P242 ?map}.
+          BIND(URI(CONCAT("https://libris.kb.se/katalogisering/",?librisid)) AS ?librisuri)
+        }
+        group by ?item ?librisuri ?coord
 'GermanFIFA2014WorldCupTeam':
      title: German FIFA 2014 World Cup Team
      description:  German football players participating in the FIFA World GermanFIFA2014WorldCupTeam
