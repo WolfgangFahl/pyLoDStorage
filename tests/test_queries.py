@@ -99,7 +99,23 @@ class TestQueries(Basetest):
         self.assertEqual("[https://www.wikidata.org/wiki/Q1353 Q1353]",lod[0]["wikidata"])
         self.assertEqual("[https://www.wikidata.org/wiki/Q2 Q2]",lod[1]["wikidata"])
         self.assertEqual("[https://www.wikidata.org/wiki/Property:P31 Property:P31]",lod[2]["wikidata"])
+       
+    def captureQueryMain(self,args):
+        '''
+        run queryMain and capture stdout
         
+        Args:
+            args(list): command line arguments
+            
+        Returns:
+            str: the stdout content of the command line call
+        '''
+        stdout = io.StringIO()
+        with redirect_stdout(stdout):
+            queryMain(args)
+            result = stdout.getvalue()
+        return result
+             
     def testQueryCommandLine(self):
         '''
         test the sparql query command line
@@ -115,13 +131,11 @@ class TestQueries(Basetest):
             resultFormat=testArg["format"]
             expected=testArg["expected"]
             args=["-d","-qn","US President Nicknames","-l","sparql","-f",resultFormat]
-            stdout = io.StringIO()
-            with redirect_stdout(stdout):
-                queryMain(args)
-                result=stdout.getvalue()
+            result=self.captureQueryMain(args, debug=debug)
             if debug:
                 print(f"{resultFormat}:{result}")
             self.assertTrue(expected in result)
+    
 
     def testQueryEndpoints(self):
         """
@@ -137,16 +151,39 @@ class TestQueries(Basetest):
         for testArg in testArgs:
             endpointName = testArg.get("en")
             args = ["-d", "-qn", "cities", "-p","-l", "sparql", "-f", "json", "-en", endpointName, "-raw"]
-            stdout = io.StringIO()
-            with redirect_stdout(stdout):
-                queryMain(args)
-                result = stdout.getvalue()
-            if debug:
-                print(result)
+            result=self.captureQueryMain(args)
+            
             if not "503 Service Unavailable" in result:
                 self.assertTrue("Arnis" in result, f"{endpointName}: Arnis not in query result")
 
-          
+    
+    def testIssue69showEndpoints(self):
+        '''
+        test the listEndpoints option
+        
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/69
+        '''
+        debug=self.debug
+        debug=True
+        for option in ["-le","--listEndpoints"]:
+            args=[option,"-l","sparql"]
+            result=self.captureQueryMain(args)
+            if debug:
+                print(result)
+        
+    def testIssue70showQuery(self):
+        '''
+        test the showQuery option
+        
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/70
+        '''
+        for option in ["-sq","--showQuery"]:
+            args=["-qn","10 Largest Cities Of The World",option,"-l","sparql"]
+            result=self.captureQueryMain(args)
+            if self.debug:
+                print(result)
+            self.assertTrue("SELECT DISTINCT ?city ?cityLabel" in result)
+        
     def testCommandLineUsage(self):
         '''
         test the command line usage

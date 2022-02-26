@@ -416,3 +416,7 @@ class Endpoint(JSONAble):
             }
         ]
         return samples
+    
+    def __str__(self):
+        text=f"{self.name}:{self.endpoint}"
+        return text
