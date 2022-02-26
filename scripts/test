@@ -9,6 +9,10 @@ do
       # show environment for debugging
       env
       ;;
+    -p|--python)
+      shift
+      python="$1"
+      ;;
   esac
   shift
 done
