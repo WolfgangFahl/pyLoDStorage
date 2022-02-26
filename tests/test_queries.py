@@ -131,7 +131,7 @@ class TestQueries(Basetest):
             resultFormat=testArg["format"]
             expected=testArg["expected"]
             args=["-d","-qn","US President Nicknames","-l","sparql","-f",resultFormat]
-            result=self.captureQueryMain(args, debug=debug)
+            result=self.captureQueryMain(args)
             if debug:
                 print(f"{resultFormat}:{result}")
             self.assertTrue(expected in result)
