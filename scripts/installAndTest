@@ -11,5 +11,4 @@ scripts/jena -f example
 # command to install dependencies
 scripts/install
 # command to run tests
-scripts/test
-
+scripts/test "$@"
