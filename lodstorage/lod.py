@@ -178,7 +178,7 @@ class LOD(object):
                             del lod[i]
                             continue
                         else:
-                            newValue=separator.join(value)   
+                            newValue=separator.join(filter(None, value))
                             record[key]=newValue
         
     @staticmethod

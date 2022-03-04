@@ -20,7 +20,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
     generic entity manager
     '''
 
-    def __init__(self,name,entityName,entityPluralName:str,listName:str=None,clazz=None,tableName:str=None,primaryKey:str=None,config=None,handleInvalidListTypes=False,filterInvalidListTypes=False,debug=False):
+    def __init__(self,name,entityName,entityPluralName:str,listName:str=None,clazz=None,tableName:str=None,primaryKey:str=None,config=None,handleInvalidListTypes=False,filterInvalidListTypes=False,listSeparator='⇹',debug=False):
         '''
         Constructor
         
@@ -31,6 +31,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
             config(StorageConfig): the configuration to be used if None a default configuration will be used
             handleInvalidListTypes(bool): True if invalidListTypes should be converted or filtered
             filterInvalidListTypes(bool): True if invalidListTypes should be deleted
+            listSeparator(str): the symbol to use as a list separator
             debug(boolean): override debug setting when default of config is used via config=None
         '''
         self.name=name
@@ -56,6 +57,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin,JSONAbleList):
             self.sparql=SPARQL(config.endpoint,debug=config.debug,profile=config.profile)
         elif config.mode is StoreMode.SQL:
             self.executeMany=False # may be True when issues are fixed
+        self.listSeparator=listSeparator
             
     def storeMode(self):
         '''
@@ -324,7 +326,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
         config=self.config
         mode=config.mode
         if self.handleInvalidListTypes:
-            LOD.handleListTypes(lod=listOfDicts,doFilter=self.filterInvalidListTypes)
+            LOD.handleListTypes(lod=listOfDicts,doFilter=self.filterInvalidListTypes,separator=self.listSeparator)
         if mode is StoreMode.JSON or mode is StoreMode.JSONPICKLE:    
             if cacheFile is None:
                 cacheFile=self.getCacheFile(config=self.config,mode=mode)
