@@ -114,24 +114,28 @@ class ValueFormatter():
         if key in record:
             value=record[key]
             if value is not None and isinstance(value,str):
+                # if there are no regular expressions specified always format
+                doformat=len(self.regexps)==0
                 for regexp in self.regexps:
                     try:
                         vmatch=re.match(regexp,value)
                         if (vmatch):
+                            # we found a match and will format it if the value is not none
+                            doformat=True
                             value=vmatch.group("value")
                     except Exception as ex:
                         print(f"ValueFormatter: {self.name}\nInvalid regular expression:{regexp}\n{str(ex)}",file=sys.stderr)
-                    if value is not None:
-                        link=self.formatString.format(value=value)
-                        newValue=None
-                        if resultFormat=="github":
-                            newValue=f"[{value}]({link})"
-                        elif resultFormat=="mediawiki":
-                            newValue=f"[{link} {value}]"
-                        elif resultFormat=="latex":
-                            newValue=f"\href{{{link}}}{{{value}}}"
-                        if newValue is not None:
-                            record[key]=newValue
+                if value is not None and doformat:
+                    link=self.formatString.format(value=value)
+                    newValue=None
+                    if resultFormat=="github":
+                        newValue=f"[{value}]({link})"
+                    elif resultFormat=="mediawiki":
+                        newValue=f"[{link} {value}]"
+                    elif resultFormat=="latex":
+                        newValue=f"\href{{{link}}}{{{value}}}"
+                    if newValue is not None:
+                        record[key]=newValue
 
 class QueryResultDocumentation():
     '''
