@@ -36,8 +36,8 @@ class QueryMain:
         '''
         debug=args.debug
         endpoints=EndpointManager.getEndpoints(args.endpointPath)
+        qm=QueryManager(lang=args.language,debug=debug,queriesPath=args.queriesPath)
         if args.list:
-            qm=QueryManager(lang=args.language,debug=debug,queriesPath=args.queriesPath)
             for name,query in qm.queriesByName.items():
                 print(f"{name}:{query.title}")
         elif args.listEndpoints:
@@ -48,7 +48,6 @@ class QueryMain:
         elif args.queryName is not None:
             if debug or args.showQuery:
                 print(f"named query {args.queryName}:")
-            qm=QueryManager(lang=args.language,debug=debug,queriesPath=args.queriesPath)
             if args.queryName not in qm.queriesByName:
                 raise Exception(f"named query {args.queryName} not available")
             query=qm.queriesByName[args.queryName]
@@ -70,8 +69,8 @@ class QueryMain:
                     qres = cls.rawQuery(endPointUrl, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
                     print(qres)
                     return
-                if "wikidata" in args.endpointName:
-                    query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)  
+                if "wikidata" in args.endpointName and query.formats is None:
+                    query.formats=["*:wikidata"]
                 qlod=sparql.queryAsListOfDicts(query.query)
             elif args.language=="sql":
                 sqlDB=SQLDB(endpointConf.endpoint)

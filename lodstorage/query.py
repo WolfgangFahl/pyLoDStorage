@@ -17,6 +17,7 @@ from lodstorage.jsonable import JSONAble
 from lodstorage.mwTable import MediaWikiTable
 from pylatexenc.latexencode import unicode_to_latex
 import re
+import sys
 from pathlib import Path
 
 class Format(Enum):
@@ -56,7 +57,7 @@ class ValueFormatter():
     formatsPath=f"{os.path.dirname(__file__)}/../sampledata/formats.yaml"
     valueFormats=None
     
-    def __init__(self,formatString:str,regexps:list=None,):
+    def __init__(self,name:str,formatString:str,regexps:list=None,):
         '''
         constructor
         
@@ -64,11 +65,12 @@ class ValueFormatter():
             fstring(str): the format String to use
             regexps(list): the regular expressions to apply
         '''
+        self.name=name
         self.regexps=regexps
         self.formatString=formatString
     
     @classmethod    
-    def fromDict(cls,record:dict):
+    def fromDict(cls,name:str,record:dict):
         '''
         create a ValueFormatter from the given dict
         '''
@@ -76,11 +78,19 @@ class ValueFormatter():
             regexps=record["regexps"]
         else:
             regexps=[]
-        vf=ValueFormatter(record["format"],regexps)
+        vf=ValueFormatter(name=name,formatString=record["format"],regexps=regexps)
         return vf
      
     @classmethod    
-    def getFormats(cls,formatsPath:None)->dict:
+    def getFormats(cls,formatsPath:str=None)->dict:
+        '''
+        get the available ValueFormatters
+        
+        Args:
+            formatsPath(str): the path to the yaml file to read the format specs from
+        Returns:
+            dict: a map for ValueFormatters by formatter Name
+        '''
         if cls.valueFormats is None:
             valueFormats={}
             formatPaths=YamlPath.getPaths("formats.yaml",formatsPath)
@@ -88,7 +98,7 @@ class ValueFormatter():
                 with open(formatPath, 'r') as stream:
                     valueFormatRecords = yaml.safe_load(stream)
                     for valueFormatKey,valueFormatRecord in valueFormatRecords.items():
-                        valueFormats[valueFormatKey]=ValueFormatter.fromDict(valueFormatRecord)           
+                        valueFormats[valueFormatKey]=ValueFormatter.fromDict(name=valueFormatKey,record=valueFormatRecord)           
             cls.valueFormats=valueFormats
         return cls.valueFormats
         
@@ -105,20 +115,23 @@ class ValueFormatter():
             value=record[key]
             if value is not None and isinstance(value,str):
                 for regexp in self.regexps:
-                    vmatch=re.match(regexp,value)
-                    if (vmatch):
-                        value=vmatch.group("value")
-                        if value is not None:
-                            link=self.formatString.format(value=value)
-                            newValue=None
-                            if resultFormat=="github":
-                                newValue=f"[{value}]({link})"
-                            elif resultFormat=="mediawiki":
-                                newValue=f"[{link} {value}]"
-                            elif resultFormat=="latex":
-                                newValue=f"\href{{{link}}}{{{value}}}"
-                            if newValue is not None:
-                                record[key]=newValue
+                    try:
+                        vmatch=re.match(regexp,value)
+                        if (vmatch):
+                            value=vmatch.group("value")
+                    except Exception as ex:
+                        print(f"ValueFormatter: {self.name}\nInvalid regular expression:{regexp}\n{str(ex)}",file=sys.stderr)
+                    if value is not None:
+                        link=self.formatString.format(value=value)
+                        newValue=None
+                        if resultFormat=="github":
+                            newValue=f"[{value}]({link})"
+                        elif resultFormat=="mediawiki":
+                            newValue=f"[{link} {value}]"
+                        elif resultFormat=="latex":
+                            newValue=f"\href{{{link}}}{{{value}}}"
+                        if newValue is not None:
+                            record[key]=newValue
 
 class QueryResultDocumentation():
     '''
@@ -175,27 +188,6 @@ class QueryResultDocumentation():
             text=latex
         return text
         
-    
-    @staticmethod
-    def wikiDataLink(record,key,value,tablefmt):
-        '''
-        replace wikiData Link with tablefmt specific link
-        '''
-        if isinstance(value,str):
-            wid=None
-            # "pure" Wikidata Q ID
-            if re.match(r"(Q|Property:P)[0-9]+",value):
-                wid=value
-            else:
-                match=re.match(r"http(s)?://.*/((Q|Property:P)[0-9]+)",value)
-                if match:
-                    wid=match.group(2)
-            if wid is not None:   
-                if tablefmt=="github":
-                    record[key]=f"[{wid}](https://www.wikidata.org/wiki/{wid})"
-                elif tablefmt=="mediawiki":
-                    record[key]=f"[https://www.wikidata.org/wiki/{wid} {wid}]" 
-        
     def __str__(self):
         '''
         simple string representation
@@ -216,7 +208,7 @@ class QueryResultDocumentation():
 class Query(object):
     ''' a Query e.g. for SPAQRL '''
     
-    def __init__(self,name:str,query:str,lang='sparql',endpoint:str=None,title:str=None,description:str=None,prefixes=None,tryItUrl:str=None,debug=False):
+    def __init__(self,name:str,query:str,lang='sparql',endpoint:str=None,title:str=None,description:str=None,prefixes=None,tryItUrl:str=None,formats:list=None,debug=False):
         '''
         constructor 
         Args:
@@ -228,6 +220,7 @@ class Query(object):
             description(string): the description of the query
             prefixes(list): list of prefixes to be resolved
             tryItUrl(str): the url of a "tryit" webpage
+            formats(list): key,value pairs of ValueFormatters to be applied
             debug(boolean): true if debug mode should be switched on
         '''
         self.name=name
@@ -239,6 +232,7 @@ class Query(object):
         self.prefixes=prefixes
         self.debug=debug
         self.tryItUrl=tryItUrl
+        self.formats=formats
         self.formatCallBacks=[]
         
     def __str__(self):
@@ -263,6 +257,31 @@ class Query(object):
                 if value is not None:
                     for formatCallBack in self.formatCallBacks:
                         formatCallBack(record,key,value,tablefmt)
+    
+    def formatWithValueFormatters(self,lod,tablefmt:str):
+        '''
+        format the given list of Dicts with the ValueFormatters
+        '''
+        valueFormatters=ValueFormatter.getFormats()
+        formatsToApply={}
+        for valueFormatSpec in self.formats:
+            parts=valueFormatSpec.split(":")
+            # e.g. president:wikidata
+            keytoformat=parts[0]
+            formatName=parts[1]
+            if formatName in valueFormatters:
+                formatsToApply[keytoformat]=valueFormatters[formatName]
+        for record in lod:
+            for keytoformat in formatsToApply:
+                valueFormatter=formatsToApply[keytoformat]
+                # format all key values
+                if keytoformat=="*":
+                    for key in record:
+                        valueFormatter.applyFormat(record,key,tablefmt)
+                # or just a selected one
+                elif keytoformat in record:
+                    valueFormatter.applyFormat(record,keytoformat,tablefmt)
+            pass
         
     def getTryItUrl(self,baseurl:str):
         '''
@@ -376,6 +395,7 @@ class Query(object):
         else:
             lod=copy.deepcopy(qlod)    
         self.preFormatWithCallBacks(lod,tablefmt=tablefmt)
+        self.formatWithValueFormatters(lod,tablefmt=tablefmt)
         result=tabulate(lod,headers="keys",tablefmt=tablefmt,**kwArgs)
         if tryItUrl is None and hasattr(self,'tryItUrl'):
             tryItUrl=self.tryItUrl

@@ -78,6 +78,8 @@
 'US President Nicknames':
     description: https://stackoverflow.com/questions/70206791/sparql-i-have-individual-with-multiple-values-for-single-object-property-how
     prefixes: []
+    formats:
+        - president:wikidata
     sparql: |
         SELECT ?president ?presidentLabel (GROUP_CONCAT(DISTINCT ?nickName; SEPARATOR=",") as ?nickNames)
         WHERE

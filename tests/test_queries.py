@@ -202,7 +202,7 @@ class TestQueries(Basetest):
             {"wikidata":"Q2","label":"Earth"},
             {"wikidata":"https://www.wikidata.org/wiki/Property:P31","label":"instanceof"}
         ]
-        vf=ValueFormatter(regexps=[
+        vf=ValueFormatter(name="wikidata",regexps=[
             r"(?P<value>(Q|Property:P)[0-9]+)",
             r"http(s)?://.*/(?P<value>(Q|Property:P)[0-9]+)"
         ],formatString="https://www.wikidata.org/wiki/{value}")

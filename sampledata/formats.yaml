@@ -3,7 +3,7 @@
 wikidata:
   regexps:
     - (?P<value>(Q|Property:P)[0-9]+)
-    - (http(s)?://.*/(?P<value>(Q|Property:P)[0-9]+)
+    - http(s)?://.*/(?P<value>(Q|Property:P)[0-9]+)
   format: https://www.wikidata.org/wiki/{value}
 
 tibkat:
