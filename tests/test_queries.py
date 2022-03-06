@@ -9,7 +9,7 @@ import io
 import os
 
 from contextlib import redirect_stdout
-from lodstorage.query import QueryManager, Query, QueryResultDocumentation, EndpointManager
+from lodstorage.query import QueryManager, Query, QueryResultDocumentation, EndpointManager, ValueFormatter, Format
 from lodstorage.querymain import main as queryMain
 from lodstorage.querymain import QueryMain
 from lodstorage.sparql import SPARQL
@@ -190,7 +190,37 @@ class TestQueries(Basetest):
             if self.debug:
                 print(result)
             self.assertTrue("SELECT DISTINCT ?city ?cityLabel" in result)
-        
+            
+    def testIssue73Formatting(self):
+        '''
+        test formatting
+        '''
+        debug=self.debug
+        debug=True
+        qlod=[
+            {"wikidata":"http://www.wikidata.org/entity/Q1353","label":"Delhi"},
+            {"wikidata":"Q2","label":"Earth"},
+            {"wikidata":"https://www.wikidata.org/wiki/Property:P31","label":"instanceof"}
+        ]
+        vf=ValueFormatter([
+            r"(?P<value>(Q|Property:P)[0-9]+)",
+            r"http(s)?://.*/(?P<value>(Q|Property:P)[0-9]+)"
+        ],"https://www.wikidata.org/wiki/{value}")
+        key="wikidata"
+        for tablefmt in [Format.mediawiki,Format.github,Format.latex]:
+            lod=copy.deepcopy(qlod) 
+            for record in lod:
+                vf.applyFormat(record, key,tablefmt.value)
+                if (debug):
+                    print(tablefmt)
+                    print(record)
+                    
+    def testIssue73ReadFormats(self):
+        '''
+        test reading the valueFormatters
+        '''
+        vfs=ValueFormatter.getFormats(ValueFormatter.formatsPath)
+       
     def testCommandLineUsage(self):
         '''
         test the command line usage

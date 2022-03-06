@@ -10,7 +10,6 @@ __updated__ = Version.updated
 
 DEBUG = 0
 
-from enum import Enum 
 import json
 import requests
 import sys
@@ -18,25 +17,10 @@ import traceback
 import os
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-from lodstorage.query import QueryManager, QueryResultDocumentation, EndpointManager
+from lodstorage.query import QueryManager, QueryResultDocumentation, EndpointManager, Format, ValueFormatter
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
 from lodstorage.csv import CSV
-
-class Format(Enum):
-    '''
-    the supported formats for the results to be delivered
-    '''
-    csv = 'csv'
-    json = 'json'
-    xml = 'xml'
-    tsv = 'tsv'
-    latex = 'latex'
-    mediawiki= 'mediawiki'
-    github = 'github'
- 
-    def __str__(self):
-        return self.value
 
 class QueryMain:
     '''
@@ -179,6 +163,7 @@ USAGE
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-d", "--debug", dest="debug",   action="store_true", help="set debug [default: %(default)s]")
         parser.add_argument('-ep', '--endpointPath', default=None, help="path to yaml file to configure endpoints to use for queries")
+        parser.add_argument('-fp', '--formatPath', default=ValueFormatter.formatsPath, help="path to yaml file to configure formats to use for querie result documentation")
         parser.add_argument('-en', '--endpointName', default="wikidata", help=f"Name of the endpoint to use for queries. Available by default: {EndpointManager.getEndpointNames()}")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
         parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")

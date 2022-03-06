@@ -1,0 +1,16 @@
+# format templates
+# WF 2022-06-03
+wikidata:
+  regexps:
+    - (?P<value>(Q|Property:P)[0-9]+)
+    - (http(s)?://.*/(?P<value>(Q|Property:P)[0-9]+)
+  format: https://www.wikidata.org/wiki/{value}
+
+tibkat:
+  format: https://www.tib.eu/en/search/id/TIBKAT:{value}
+
+lobid:
+  format: https://lobid.org/gnd/{value}
+
+doi:
+  format: http://dx.doi.org/{value}

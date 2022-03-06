@@ -3,6 +3,8 @@ Created on 2020-08-22
 
 @author: wf
 '''
+
+from enum import Enum 
 import os
 import yaml
 from tabulate import tabulate
@@ -16,6 +18,103 @@ from lodstorage.mwTable import MediaWikiTable
 from pylatexenc.latexencode import unicode_to_latex
 import re
 from pathlib import Path
+
+class Format(Enum):
+    '''
+    the supported formats for the results to be delivered
+    '''
+    csv = 'csv'
+    json = 'json'
+    xml = 'xml'
+    tsv = 'tsv'
+    latex = 'latex'
+    mediawiki= 'mediawiki'
+    github = 'github'
+ 
+    def __str__(self):
+        return self.value
+    
+class YamlPath:
+    @staticmethod
+    def getPaths(yamlFileName:str,yamlPath:None):
+        if yamlPath is None:
+            yamlPath = f"{os.path.dirname(__file__)}/../sampledata/{yamlFileName}"
+        yamlPaths=[yamlPath]
+        home = str(Path.home())
+        # additional yamls from users yaml configuration
+        homepath = f"{home}/.pylodstorage/{yamlFileName}"
+        if os.path.isfile(homepath):
+            yamlPaths.append(homepath)
+        return yamlPaths
+
+class ValueFormatter():
+    '''
+    a value Formatter
+    '''
+    home = str(Path.home())
+    # additional endpoints from users endpoint configuration
+    formatsPath=f"{os.path.dirname(__file__)}/../sampledata/formats.yaml"
+    valueFormats=None
+    
+    def __init__(self,formatString:str,regexps:list=None,):
+        '''
+        constructor
+        
+        Args:
+            regexps(list): the regular expressions to apply
+            fstring(str): the format String to use
+        '''
+        self.regexps=regexps
+        self.formatString=formatString
+    
+    @classmethod    
+    def fromDict(cls,record:dict):
+        '''
+        create a ValueFormatter from the given dict
+        '''
+        vf=ValueFormatter(record["format"],record["regexps"])
+        return vf
+     
+    @classmethod    
+    def getFormats(cls,formatsPath:None)->dict:
+        if cls.valueFormats is None:
+            valueFormats={}
+            formatPaths=YamlPath.getPaths("formats.yaml",formatsPath)
+            for formatPath in formatPaths:
+                with open(formatPath, 'r') as stream:
+                    valueFormatRecords = yaml.safe_load(stream)
+                    for valueFormatKey,valueFormatRecord in valueFormatRecords.items():
+                        valueFormats[valueFormatKey]=ValueFormatter.fromDict(valueFormatRecord)           
+            cls.valueFormats=valueFormats
+        return cls.valueFormats
+        
+    def applyFormat(self,record,key,resultFormat:Format):
+        '''
+        apply the given format to the given record
+        
+        Args:
+            record(dict): the record to handle
+            key(str): the property key 
+            resultFormat(str): the resultFormat Style to apply
+        '''
+        if key in record:
+            value=record[key]
+            if value is not None and isinstance(value,str):
+                for regexp in self.regexps:
+                    vmatch=re.match(regexp,value)
+                    if (vmatch):
+                        value=vmatch.group("value")
+                        if value is not None:
+                            link=self.formatString.format(value=value)
+                            newValue=None
+                            if resultFormat=="github":
+                                newValue=f"[{value}]({link})"
+                            elif resultFormat=="mediawiki":
+                                newValue=f"[{link} {value}]"
+                            elif resultFormat=="latex":
+                                newValue=f"\href{{{link}}}{{{value}}}"
+                            if newValue is not None:
+                                record[key]=newValue
 
 class QueryResultDocumentation():
     '''
@@ -71,6 +170,7 @@ class QueryResultDocumentation():
             #latex=latex.replace("{\\textbackslash}",'\\')
             text=latex
         return text
+        
     
     @staticmethod
     def wikiDataLink(record,key,value,tablefmt):
@@ -140,7 +240,6 @@ class Query(object):
     def __str__(self):
         queryStr="\n".join([f"{key}:{value}" for key, value in self.__dict__.items() if value is not None])
         return f"{queryStr}"
-        
         
     def addFormatCallBack(self,callback):
         self.formatCallBacks.append(callback)
@@ -355,13 +454,14 @@ class QueryManager(object):
         '''
         get the queries for thee given queries Path
         '''
-        if queriesPath is None:
-            queriesPath=f"{os.path.dirname(__file__)}/../sampledata/queries.yaml"
-        else:
-            queriesPath=os.path.abspath(queriesPath)
-        with open(queriesPath, 'r') as stream:
-            examples = yaml.safe_load(stream)
-        return examples
+        queriesPaths=YamlPath.getPaths("queries.yaml", queriesPath)
+        queries={}
+        for queriesPath in queriesPaths:
+            with open(queriesPath, 'r') as stream:
+                lqueries = yaml.safe_load(stream)
+                for key in lqueries:
+                    queries[key]=lqueries[key]
+        return queries
             
 
 class EndpointManager(object):
@@ -374,15 +474,8 @@ class EndpointManager(object):
         '''
         get the queries for thee given queries Path
         '''
-        if endpointPath is None:
-            endpointPath = f"{os.path.dirname(__file__)}/../sampledata/endpoints.yaml"
+        endpointPaths=YamlPath.getPaths("endpoints.yaml",endpointPath)
         endpoints={}
-        endpointPaths=[endpointPath]
-        home = str(Path.home())
-        # additional endpoints from users endpoint configuration
-        homepath = f"{home}/.pylodstorage/endpoints.yaml"
-        if os.path.isfile(homepath):
-            endpointPaths.append(homepath)
         for lEndpointPath in endpointPaths:
             with open(lEndpointPath, 'r') as stream:
                 endpointRecords = yaml.safe_load(stream)
