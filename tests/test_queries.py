@@ -196,16 +196,16 @@ class TestQueries(Basetest):
         test formatting
         '''
         debug=self.debug
-        debug=True
+        #debug=True
         qlod=[
             {"wikidata":"http://www.wikidata.org/entity/Q1353","label":"Delhi"},
             {"wikidata":"Q2","label":"Earth"},
             {"wikidata":"https://www.wikidata.org/wiki/Property:P31","label":"instanceof"}
         ]
-        vf=ValueFormatter([
+        vf=ValueFormatter(regexps=[
             r"(?P<value>(Q|Property:P)[0-9]+)",
             r"http(s)?://.*/(?P<value>(Q|Property:P)[0-9]+)"
-        ],"https://www.wikidata.org/wiki/{value}")
+        ],formatString="https://www.wikidata.org/wiki/{value}")
         key="wikidata"
         for tablefmt in [Format.mediawiki,Format.github,Format.latex]:
             lod=copy.deepcopy(qlod) 
@@ -214,12 +214,17 @@ class TestQueries(Basetest):
                 if (debug):
                     print(tablefmt)
                     print(record)
-                    
+            if tablefmt is Format.mediawiki:
+                self.assertEqual("[https://www.wikidata.org/wiki/Q1353 Q1353]",lod[0]["wikidata"])
+                self.assertEqual("[https://www.wikidata.org/wiki/Q2 Q2]",lod[1]["wikidata"])
+                self.assertEqual("[https://www.wikidata.org/wiki/Property:P31 Property:P31]",lod[2]["wikidata"])
+                        
     def testIssue73ReadFormats(self):
         '''
         test reading the valueFormatters
         '''
         vfs=ValueFormatter.getFormats(ValueFormatter.formatsPath)
+        self.assertTrue("wikidata" in vfs)
        
     def testCommandLineUsage(self):
         '''

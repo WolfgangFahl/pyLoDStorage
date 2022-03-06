@@ -61,8 +61,8 @@ class ValueFormatter():
         constructor
         
         Args:
-            regexps(list): the regular expressions to apply
             fstring(str): the format String to use
+            regexps(list): the regular expressions to apply
         '''
         self.regexps=regexps
         self.formatString=formatString
@@ -72,7 +72,11 @@ class ValueFormatter():
         '''
         create a ValueFormatter from the given dict
         '''
-        vf=ValueFormatter(record["format"],record["regexps"])
+        if "regexps" in  record:
+            regexps=record["regexps"]
+        else:
+            regexps=[]
+        vf=ValueFormatter(record["format"],regexps)
         return vf
      
     @classmethod    
