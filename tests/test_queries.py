@@ -154,8 +154,11 @@ class TestQueries(Basetest):
             result=self.captureQueryMain(args)
             
             if not "503 Service Unavailable" in result:
+                #if debug:
+                #    print(result)
                 self.assertTrue("Arnis" in result, f"{endpointName}: Arnis not in query result")
-
+            elif debug:
+                print(f"{endpointName} returns 503 Service Unavailable")
     
     def testIssue69showEndpoints(self):
         '''
@@ -164,12 +167,16 @@ class TestQueries(Basetest):
         https://github.com/WolfgangFahl/pyLoDStorage/issues/69
         '''
         debug=self.debug
-        debug=True
+        #debug=True
+        expected={"sparql":"wikidata"}
         for option in ["-le","--listEndpoints"]:
-            args=[option,"-l","sparql"]
-            result=self.captureQueryMain(args)
-            if debug:
-                print(result)
+            for lang in ["sparql","sql"]:  
+                args=[option,"-l",lang]
+                result=self.captureQueryMain(args)
+                if debug:
+                    print(result)
+                if lang in expected:
+                    self.assertTrue(expected[lang] in result)
         
     def testIssue70showQuery(self):
         '''

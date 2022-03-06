@@ -3,21 +3,24 @@ Created on 2022-02-13
 
 @author: wf
 '''
-__version__ = "0.1.13"
-__date__ = '2020-09-10'
-__updated__ = '2022-02-26'
+from lodstorage.version import Version
+__version__ = Version.version
+__date__ = Version.date
+__updated__ = Version.updated
 
-import json
-import requests
 DEBUG = 0
 
 from enum import Enum 
+import json
+import requests
 import sys
+import traceback
 import os
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 from lodstorage.query import QueryManager, QueryResultDocumentation, EndpointManager
 from lodstorage.sparql import SPARQL
+from lodstorage.sql import SQLDB
 from lodstorage.csv import CSV
 
 class Format(Enum):
@@ -55,7 +58,8 @@ class QueryMain:
                 print(f"{name}:{query.title}")
         elif args.listEndpoints:
             for endpoint in endpoints.values():
-                print(endpoint)
+                if hasattr(endpoint, "lang") and endpoint.lang==args.language:
+                    print(endpoint)
 
         elif args.queryName is not None:
             if debug or args.showQuery:
@@ -68,21 +72,28 @@ class QueryMain:
                 if hasattr(query, "description") and query.description is not None:
                     print(query.description)
                 print(f"{args.language}:\n{query.query}")
+            if args.endpointName:
+                endpointConf=endpoints.get(args.endpointName)                
             if args.language=="sparql":
                 if args.endpointName:
-                    endpointConf=endpoints.get(args.endpointName)
-                    endpoint=SPARQL(endpointConf.endpoint)
-                    if args.prefixes:
-                        query.query = f"{endpointConf.prefixes}\n{query.query}"
+                    endPointUrl=endpointConf.endpoint
                 else:
-                    endpoint=SPARQL(query.endpoint)
+                    endPointUrl=query.endpoint
+                sparql=SPARQL(endPointUrl)
+                if args.prefixes:
+                    query.query = f"{endpointConf.prefixes}\n{query.query}"
                 if args.raw:
-                    qres = cls.rawQuery(endpoint.sparql.endpoint, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
+                    qres = cls.rawQuery(endPointUrl, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
                     print(qres)
                     return
                 if "wikidata" in args.endpointName:
                     query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)  
-                qlod=endpoint.queryAsListOfDicts(query.query)
+                qlod=sparql.queryAsListOfDicts(query.query)
+            elif args.language=="sql":
+                sqlDB=SQLDB(endpointConf.endpoint)
+                qlod=sqlDB.query(query.query)
+            else:
+                raise Exception(f"language {args.language} not known/supported")    
             if args.format is Format.csv:
                 csv=CSV.toCSV(qlod)
                 print(csv)
@@ -122,16 +133,24 @@ class QueryMain:
         response = requests.request("GET", endpoint, headers=headers, data=payload, params=params)
         return response.text
                 
-
 def mainSQL(argv=None):
+    '''
+    commandline for SQL queries
+    '''
     main(argv,lang='sql')
     
 def mainSPARQL(argv=None):
+    '''
+    commandline for SPARQL queries
+    '''
     main(argv,lang='sparql')
     
 def main(argv=None,lang=None): # IGNORE:C0111
-    '''main program.'''
-
+    '''
+    main program.
+    
+    commandline access to List of Dicts / Linked Open Data Queries
+    '''
     if argv is None:
         argv=sys.argv[1:]
         
@@ -159,8 +178,8 @@ USAGE
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-d", "--debug", dest="debug",   action="store_true", help="set debug [default: %(default)s]")
-        parser.add_argument('-ep', '--endpointPath', default=None, help="path to yaml file to configure SPARQL endpoints to use for queries")
-        parser.add_argument('-en', '--endpointName', default="wikidata", help=f"Name of the SPARQL endpoint to use for queries. Avaliable by default: {EndpointManager.getEndpointNames()}")
+        parser.add_argument('-ep', '--endpointPath', default=None, help="path to yaml file to configure endpoints to use for queries")
+        parser.add_argument('-en', '--endpointName', default="wikidata", help=f"Name of the endpoint to use for queries. Available by default: {EndpointManager.getEndpointNames()}")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
         parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")
         parser.add_argument('-le','--listEndpoints',action="store_true",help="show the list of available endpoints") 
@@ -178,7 +197,6 @@ USAGE
         if lang is not None:
             args.language=lang
         QueryMain.main(args)
-     
   
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
@@ -189,6 +207,8 @@ USAGE
         indent = len(program_name) * " "
         sys.stderr.write(program_name + ": " + repr(e) + "\n")
         sys.stderr.write(indent + "  for help use --help")
+        if args.debug:
+            print(traceback.format_exc())
         return 2     
 
 if __name__ == "__main__":

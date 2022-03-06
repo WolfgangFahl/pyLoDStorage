@@ -1,6 +1,7 @@
 # Default SPARQL endpoints for sparqlquery tool
 # 2022-02-14 tholzheim
 'wikidata':
+  lang: sparql
   endpoint: https://query.wikidata.org/sparql
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -36,6 +37,7 @@
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 'qlever-wikidata':
+  lang: sparql
   endpoint: https://qlever.cs.uni-freiburg.de/api/wikidata
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -71,6 +73,7 @@
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 'qlever-wikidata-proxy':
+  lang: sparql
   endpoint: https://qlever.cs.uni-freiburg.de/api/wikidata-proxy
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>

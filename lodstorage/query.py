@@ -411,6 +411,7 @@ class Endpoint(JSONAble):
         samples=[
             {
                 "name": "wikidata",
+                "lang": "sparql",
                 "endpoint": "https://query.wikidata.org/sparql",
                 "prefixes": "PREFIX bd: <http://www.bigdata.com/rdf#>\nPREFIX cc: <http://creativecommons.org/ns#>"
             }
@@ -418,5 +419,5 @@ class Endpoint(JSONAble):
         return samples
     
     def __str__(self):
-        text=f"{self.name}:{self.endpoint}"
+        text=f"{self.name}({self.name}):{self.endpoint}"
         return text
