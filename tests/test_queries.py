@@ -319,7 +319,6 @@ determines the number of instances available in the OpenStreetMap for the placeT
             endpointUrl=queryMap.pop("endpoint")
             endpoint=SPARQL(endpointUrl)
             query=Query(**queryMap)
-            query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)  
             showYaml=False
             if showYaml:
                 yamlMarkup=query.asYaml()
