@@ -262,6 +262,11 @@ class Query(object):
         '''
         format the given list of Dicts with the ValueFormatters
         '''
+        # is there anything to do?
+        if self.formats is None:
+            # no 
+            return
+        # get the value Formatters that might apply here
         valueFormatters=ValueFormatter.getFormats()
         formatsToApply={}
         for valueFormatSpec in self.formats:

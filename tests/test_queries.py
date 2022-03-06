@@ -76,30 +76,7 @@ class TestQueries(Basetest):
         if debug:
             print(f"{unicode}→{latex}")
         self.assertEqual("\\`A votre sant\\'e!",latex)
-    
-    def testWikiDataLinker(self):
-        '''
-        https://github.com/WolfgangFahl/pyLoDStorage/issues/56
         
-        addWikiData Linker to QueryResultDocumentation and callback for further such handlers while at it
-        '''
-        qlod=[
-            {"wikidata":"http://www.wikidata.org/entity/Q1353","label":"Delhi"},
-            {"wikidata":"Q2","label":"Earth"},
-            {"wikidata":"https://www.wikidata.org/wiki/Property:P31","label":"instanceof"}
-        ]
-        query=Query(name="testQuery",query="no specific query")
-        query.addFormatCallBack(QueryResultDocumentation.wikiDataLink)
-        debug=self.debug
-        #debug=True
-        lod=copy.deepcopy(qlod)
-        query.preFormatWithCallBacks(lod,"mediawiki")
-        if debug:
-            print(lod)
-        self.assertEqual("[https://www.wikidata.org/wiki/Q1353 Q1353]",lod[0]["wikidata"])
-        self.assertEqual("[https://www.wikidata.org/wiki/Q2 Q2]",lod[1]["wikidata"])
-        self.assertEqual("[https://www.wikidata.org/wiki/Property:P31 Property:P31]",lod[2]["wikidata"])
-       
     def captureQueryMain(self,args):
         '''
         run queryMain and capture stdout
