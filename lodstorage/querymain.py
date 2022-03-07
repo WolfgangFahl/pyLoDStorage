@@ -37,6 +37,8 @@ class QueryMain:
         debug=args.debug
         endpoints=EndpointManager.getEndpoints(args.endpointPath)
         qm=QueryManager(lang=args.language,debug=debug,queriesPath=args.queriesPath)
+        # preload ValueFormatter
+        ValueFormatter.getFormats(args.formatsPath)
         if args.list:
             for name,query in qm.queriesByName.items():
                 print(f"{name}:{query.title}")
@@ -162,7 +164,7 @@ USAGE
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-d", "--debug", dest="debug",   action="store_true", help="set debug [default: %(default)s]")
         parser.add_argument('-ep', '--endpointPath', default=None, help="path to yaml file to configure endpoints to use for queries")
-        parser.add_argument('-fp', '--formatPath', default=ValueFormatter.formatsPath, help="path to yaml file to configure formats to use for querie result documentation")
+        parser.add_argument('-fp', '--formatsPath', default=ValueFormatter.formatsPath, help="path to yaml file to configure formats to use for querie result documentation")
         parser.add_argument('-en', '--endpointName', default="wikidata", help=f"Name of the endpoint to use for queries. Available by default: {EndpointManager.getEndpointNames()}")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
         parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")
