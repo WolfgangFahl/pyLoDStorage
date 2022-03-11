@@ -60,11 +60,15 @@ class QueryMain:
             if args.endpointName:
                 endpointConf=endpoints.get(args.endpointName)                
             if args.language=="sparql":
+                method='POST'
                 if args.endpointName:
                     endPointUrl=endpointConf.endpoint
+                    method=endpointConf.method
                 else:
                     endPointUrl=query.endpoint
-                sparql=SPARQL(endPointUrl)
+                if args.method:
+                    method=method
+                sparql=SPARQL(endPointUrl,method=method)
                 if args.prefixes:
                     query.query = f"{endpointConf.prefixes}\n{query.query}"
                 if args.raw:
@@ -166,6 +170,7 @@ USAGE
         parser.add_argument('-ep', '--endpointPath', default=None, help="path to yaml file to configure endpoints to use for queries")
         parser.add_argument('-fp', '--formatsPath', default=ValueFormatter.formatsPath, help="path to yaml file to configure formats to use for querie result documentation")
         parser.add_argument('-en', '--endpointName', default="wikidata", help=f"Name of the endpoint to use for queries. Available by default: {EndpointManager.getEndpointNames()}")
+        parser.add_argument('--method',help="method to be used for SPARQL queries")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
         parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")
         parser.add_argument('-le','--listEndpoints',action="store_true",help="show the list of available endpoints") 
