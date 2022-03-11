@@ -41,7 +41,7 @@ class SPARQL(object):
         self.typedLiterals=typedLiterals
         self.profile=profile
         self.sparql=SPARQLWrapper2(url)
-        self.sparql.method=method
+        self.method=method
         self.sparql.agent=agent
         
     def rawQuery(self,queryString,method='POST'):
@@ -285,7 +285,7 @@ class SPARQL(object):
         Returns:
             list: a list ofDicts
         '''
-        records=self.query(queryString)
+        records=self.query(queryString,method=self.method)
         listOfDicts=self.asListOfDicts(records,fixNone=fixNone,sampleCount=sampleCount)
         return listOfDicts
     
