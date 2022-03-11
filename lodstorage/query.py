@@ -544,6 +544,14 @@ class Endpoint(JSONAble):
         ]
         return samples
     
+    def __init__(self):
+        '''
+        constructor for setting defaults
+        '''
+        self.method="POST"
+        self.lang="SPARQL"
+        
+    
     def __str__(self):
-        text=f"{self.name}({self.name}):{self.endpoint}"
+        text=f"{self.name}({self.name}):{self.endpoint}({self.method})"
         return text
