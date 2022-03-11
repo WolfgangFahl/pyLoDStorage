@@ -3,6 +3,7 @@
 'wikidata':
   lang: sparql
   endpoint: https://query.wikidata.org/sparql
+  method: POST
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>
     PREFIX cc: <http://creativecommons.org/ns#>
@@ -38,6 +39,7 @@
 
 'qlever-wikidata':
   lang: sparql
+  method: GET
   endpoint: https://qlever.cs.uni-freiburg.de/api/wikidata
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -74,6 +76,7 @@
 
 'qlever-wikidata-proxy':
   lang: sparql
+  method: GET
   endpoint: https://qlever.cs.uni-freiburg.de/api/wikidata-proxy
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>

@@ -20,8 +20,9 @@ class SPARQL(object):
     :ivar typedLiterals: True if INSERT should be done with typedLiterals
     :ivar profile(boolean): True if profiling / timing information should be displayed
     :ivar sparql: the SPARQLWrapper2 instance to be used
+    :ivar method(str): the HTTP method to be used 'POST' or 'GET'
     '''
-    def __init__(self,url,mode='query', debug=False, typedLiterals=False,  profile=False, agent='PyLodStorage'):
+    def __init__(self,url,mode='query', debug=False, typedLiterals=False,  profile=False, agent='PyLodStorage',method='POST'):
         '''
         Constructor a SPARQL wrapper
         
@@ -32,6 +33,7 @@ class SPARQL(object):
             typedLiterals(bool): True if INSERT should be done with typedLiterals
             profile(boolean): True if profiling / timing information should be displayed
             agent(string): the User agent to use
+            method(string): the HTTP method to be used 'POST' or 'GET'
         '''
         self.url="url%s" % (mode)
         self.mode=mode
@@ -39,6 +41,7 @@ class SPARQL(object):
         self.typedLiterals=typedLiterals
         self.profile=profile
         self.sparql=SPARQLWrapper2(url)
+        self.sparql.method=method
         self.sparql.agent=agent
         
     def rawQuery(self,queryString,method='POST'):

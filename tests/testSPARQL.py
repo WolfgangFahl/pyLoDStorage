@@ -259,14 +259,18 @@ WHERE
         results=wd.query(queryString)
         self.assertTrue(238<=len(results))
         
-    def testIssue20(self):
+    def testIssue20And76(self):
         '''
         see https://github.com/WolfgangFahl/pyLoDStorage/issues/20
         add fixNone option to SPARQL results (same functionality as in SQL)
+        
+         https://github.com/WolfgangFahl/pyLoDStorage/issues/76
+        SPARQL GET method support
         '''
         endpoint="https://query.wikidata.org/sparql"
-        wd=SPARQL(endpoint)
-        queryString="""
+        for method in [ "POST","GET" ]:
+            wd=SPARQL(endpoint,method=method)
+            queryString="""
         # Conference Series wikidata query
 # see https://confident.dbis.rwth-aachen.de/dblpconf/wikidata
 # WF 2021-01-30
@@ -285,13 +289,13 @@ WHERE
 }
 LIMIT 200
 """
-        lod=wd.queryAsListOfDicts(queryString,fixNone=True)
-        fields=LOD.getFields(lod)
-        if self.debug:
-            print(fields)
-        for row in lod:
-            for field in fields:
-                self.assertTrue(field in row)
+            lod=wd.queryAsListOfDicts(queryString,fixNone=True)
+            fields=LOD.getFields(lod)
+            if self.debug:
+                print(fields)
+            for row in lod:
+                for field in fields:
+                    self.assertTrue(field in row)
                 
     def testStackoverflow55961615Query(self):
         '''
