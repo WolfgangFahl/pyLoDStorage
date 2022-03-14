@@ -414,7 +414,7 @@ class Query(object):
                 title=f"## {self.title}"
                 sourceCodeHeader="### query"
                 resultHeader="## result"
-                sourceCode=f"""```sql
+                sourceCode=f"""```{self.lang}
 {self.query}
 ```"""
                 
