@@ -3,7 +3,7 @@
 # 321 stars, 95 forks
 # https://github.com/RDFLib/sparqlwrapper
 # https://stackoverflow.com/questions/tagged/sparqlwrapper
-SPARQLWrapper~=1.8.5
+SPARQLWrapper~=2.0.0
 # https://pypi.org/project/PyYAML/
 PyYAML
 # https://pypi.org/project/pandas/
