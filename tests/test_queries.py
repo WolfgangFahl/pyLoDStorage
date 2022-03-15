@@ -45,7 +45,7 @@ class TestQueries(Basetest):
         show=True
         qm=QueryManager(lang='sparql',debug=False)
         for name,query in qm.queriesByName.items():
-            if name in ["Nicknames"]:
+            if name in ["US President Nicknames"]:
                 if show:
                     print(f"{name}:{query}")
                 endpoint=SPARQL(query.endpoint)

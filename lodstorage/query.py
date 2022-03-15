@@ -302,6 +302,7 @@ class Query(object):
         Returns:
             str: the "try it!" url for the given query
         '''
+        # https://stackoverflow.com/a/9345102/1497139
         quoted=urllib.parse.quote(self.query)
         quoted=f"#{quoted}"
         url=f"{baseurl}/{quoted}"
@@ -409,7 +410,8 @@ class Query(object):
         if tryItUrl is None and hasattr(self,'tryItUrl'):
             tryItUrl=self.tryItUrl
         if withSourceCode:
-            tryItMarkup=self.getLink(tryItUrl, "try it!", tablefmt)
+            tryItUrlEncoded=self.getTryItUrl(tryItUrl)
+            tryItMarkup=self.getLink(tryItUrlEncoded, "try it!", tablefmt)
             if tablefmt=="github":
                 title=f"## {self.title}"
                 sourceCodeHeader="### query"
