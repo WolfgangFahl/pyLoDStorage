@@ -399,6 +399,9 @@ class Query(object):
             str: the documentation tabular text for the given parameters
         '''
         sourceCode=self.query
+        tryItMarkup=""
+        sourceCodeHeader=""
+        resultHeader=""
         title=self.title
         if limit is not None:
             lod=copy.deepcopy(qlod[:limit])
@@ -409,28 +412,39 @@ class Query(object):
         result=tabulate(lod,headers="keys",tablefmt=tablefmt,**kwArgs)
         if tryItUrl is None and hasattr(self,'tryItUrl'):
             tryItUrl=self.tryItUrl
+        if tablefmt=="github":
+            title=f"## {self.title}"
+            resultHeader="## result"
+        elif tablefmt=="mediawiki":
+            title=f"== {self.title} =="
+            resultHeader="=== result ==="
+        elif tablefmt=="latex":
+            resultHeader=""
+            result=r"""\begin{table}
+            \caption{%s}
+            \label{tab:%s}
+            %s
+            \end{table}
+            """ % (self.title,self.name,result)
+        else: 
+            title=f"{self.title}"
+            resultHeader="result:"
         if withSourceCode:
             tryItUrlEncoded=self.getTryItUrl(tryItUrl)
             tryItMarkup=self.getLink(tryItUrlEncoded, "try it!", tablefmt)
             if tablefmt=="github":
-                title=f"## {self.title}"
                 sourceCodeHeader="### query"
-                resultHeader="## result"
                 sourceCode=f"""```{self.lang}
 {self.query}
-```"""
-                
+```"""    
             elif tablefmt=="mediawiki":
-                title=f"== {self.title} =="
                 sourceCodeHeader="=== query ==="
-                resultHeader="=== result ==="
                 sourceCode=f"""<source lang='{self.lang}'>
 {self.query}
 </source>
 """
             elif tablefmt=="latex":
                 sourceCodeHeader=r"see query listing \ref{listing:%s} and result table \ref{tab:%s}" % (self.name,self.name)
-                resultHeader=""
                 sourceCode=r"""\begin{listing}[ht]
 \caption{%s}
 \label{listing:%s}
@@ -440,17 +454,8 @@ class Query(object):
 %s
 \end{listing}
 """ % (self.title,self.name,self.lang.lower(),self.query,tryItMarkup)
-                tryItMarkup=""
-                result=r"""\begin{table}
-\caption{%s}
-\label{tab:%s}
-%s
-\end{table}
-""" % (self.title,self.name,result)
             else:
-                title=f"{self.title}"
                 sourceCodeHeader="query:"
-                resultHeader="result:"
                 sourceCode=f"{self.query}"
         if self.lang!="sparql":
             tryItMarkup=""
