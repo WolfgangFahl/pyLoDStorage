@@ -9,6 +9,6 @@ class Version(object):
     Version handling for ConferenceCorpus
     '''
     name="pyLodStorage"
-    version='0.1.22'
+    version='0.1.23'
     date = '2020-09-10'
-    updated = '2022-03-16'
+    updated = '2022-03-18'

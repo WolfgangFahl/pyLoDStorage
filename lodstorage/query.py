@@ -37,7 +37,7 @@ class Format(Enum):
     
 class YamlPath:
     @staticmethod
-    def getPaths(yamlFileName:str,yamlPath:None):
+    def getPaths(yamlFileName:str,yamlPath:str=None):
         if yamlPath is None:
             yamlPath = f"{os.path.dirname(__file__)}/../sampledata/{yamlFileName}"
         yamlPaths=[yamlPath]
