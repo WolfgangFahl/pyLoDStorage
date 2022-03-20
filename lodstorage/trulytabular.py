@@ -75,24 +75,79 @@ SELECT ?property ?propertyLabel WHERE {
         return wdProperties
     
 class WikidataItem:
-    def __init__(self,qid:str):
+    '''
+    a wikidata Item
+    '''
+    def __init__(self,qid:str,lang:str="en",sparql:SPARQL=None):
         '''
-        construct me with the given item id
+        construct me with the given item id, language and optional SPARQL access
         
         Args:
             qid(str): the item Id
+            lang(str): the language to use
+            sparql(SPARQL): the sparql access to use
         '''
         self.qid=qid
-        
-        
+        self.lang=lang
+        self.sparql=sparql
+        if sparql is not None:
+            self.qlabel,self.description=WikidataItem.getLabelAndDescription(sparql, self.qid, self.lang)
+    
     def __str__(self):
+                
+        return self.asText(long=False)
+    
+    def asText(self,long:bool=True):
+        '''
+        returns my content as a text representation
+        
+        Args:
+            long(bool): True if a long format including url is wished
+            
+        Returns:
+            str: a text representation of my content
+        '''
         text=self.qid
         if hasattr(self, "qlabel"):
-            text=f"{self.qlabel} ({self.qid})"
+            text=f"{self.qlabel} ({self.qid})"  
+        if hasattr(self,"description"):
+            text+=f":{self.description}"
+        if long:
+            text+=f"-> https://www.wikidata.org/wiki/{self.qid}"
         return text
+    
+    @classmethod
+    def getLabelAndDescription(self,sparql:SPARQL, itemId:str,lang:str="en"):
+        '''
+        get  the label for the given item and language
+        
+        Args:
+            itemId(str): the wikidata Q/P id
+            lang(str): the language of the label 
+            
+        Returns:
+            (str,str): the label and description as a tuple
+        '''
+        query="""
+# get the label for the given item
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?itemLabel ?itemDescription
+WHERE
+{
+  VALUES ?item {
+    wd:%s
+  }
+  ?item rdfs:label ?itemLabel.
+  filter (lang(?itemLabel) = "%s").
+  ?item schema:description ?itemDescription.
+  FILTER((LANG(?itemDescription)) = "%s")
+}""" % (itemId,lang,lang)
+        return sparql.getValues(query, ["itemLabel","itemDescription"])
         
     @classmethod
-    def getItemsByLabel(cls,sparql,itemLabel:str,lang:str="en")->list:
+    def getItemsByLabel(cls,sparql:SPARQL,itemLabel:str,lang:str="en")->list:
         '''
         get a Wikidata items by the given label
         
@@ -161,7 +216,7 @@ class TrulyTabular(object):
         self.sparql=SPARQL(endpoint,method=method)
         self.where=f"\n  {where}" if where is not None else ""
         self.lang=lang
-        self.label=self.getLabel(itemQid,lang=self.lang)
+        self.item=WikidataItem(itemQid,sparql=self.sparql)
         self.queryManager=TrulyTabular.getQueryManager(debug=self.debug)
         self.properties=WikidataProperty.getPropertiesByLabels(self.sparql, propertyLabels, lang)
         
@@ -171,6 +226,20 @@ class TrulyTabular(object):
             str: my text representation
         '''
         return self.asText(long=False)
+    
+    def count(self):
+        '''
+        get my count
+        '''
+        query=f"""# Count all items with the given 
+# type {self.item.asText(long=True)}
+SELECT (COUNT (DISTINCT ?item) AS ?count)
+WHERE
+{{
+  # instance of {self.item.qlabel}
+  ?item wdt:P31 wd:{self.item.qid}.{self.where}
+}}"""
+        return self.sparql.getValue(query, "count")
     
     def asText(self,long:bool=True):
         '''
@@ -182,10 +251,8 @@ class TrulyTabular(object):
         Returns:
             str: a text representation of my content
         '''
-        if long:
-            return f"{self.label}({self.itemQid}) https://www.wikidata.org/wiki/{self.itemQid}"
-        else:
-            return f"{self.label}({self.itemQid})"
+        text=self.item.asText(long)
+        return text
     
     @classmethod
     def getQueryManager(cls,lang='sparql',name="trulytabular",debug=False):
@@ -203,77 +270,6 @@ class TrulyTabular(object):
                 qm=QueryManager(lang=lang,debug=debug,queriesPath=qYamlFile)
                 return qm
         return None
-    
-        
-    def getValue(self,sparqlQuery:str,attr:str):
-        '''
-        get the value for the given SPARQL query using the given attr
-        
-        Args:
-            sparqlQuery(str): the SPARQL query to run
-            attr(str): the attribute to get
-        '''
-        if self.debug:
-            print(sparqlQuery)
-        qLod=self.sparql.queryAsListOfDicts(sparqlQuery)
-        return self.getFirst(qLod, attr)
-        
-    def getFirst(self,qLod:list,attr:str):
-        '''
-        get the column attr of the first row of the given qLod list
-        
-        Args:
-            qLod(list): the list of dicts (returned by a query)
-            attr(str): the attribute to retrieve
-            
-        Returns:
-            object: the value
-        '''
-        if len(qLod)==1 and attr in qLod[0]:
-            value=qLod[0][attr]
-            return value
-        raise Exception(f"getFirst for attribute {attr} failed for {qLod}")
-        
-    def getLabel(self,itemId:str,lang:str="en"):
-        '''
-        get  the label for the given item
-        
-        Args:
-            itemId(str): the wikidata Q/P id
-            lang(str): the language of the label 
-            
-        Returns:
-            str: the label
-        '''
-        query="""
-# get the label for the given item
-PREFIX wd: <http://www.wikidata.org/entity/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-SELECT ?itemLabel
-WHERE
-{
-  VALUES ?item {
-    wd:%s
-  }
-  ?item rdfs:label ?itemLabel.
-  filter (lang(?itemLabel) = "%s").
-}""" % (itemId,lang)
-        return self.getValue(query, "itemLabel")
-        
-    def count(self):
-        '''
-        get my count
-        '''
-        query=f"""# Count all items with the given 
-# type {self.asText(long=True)}
-SELECT (COUNT (DISTINCT ?item) AS ?count)
-WHERE
-{{
-  # instance of {self.label}
-  ?item wdt:P31 wd:{self.itemQid}.{self.where}
-}}"""
-        return self.getValue(query, "count")
     
     def mostFrequentPropertiesQuery(self):
         '''
@@ -303,7 +299,7 @@ WHERE
 SELECT ?item ?itemLabel (COUNT (?value) AS ?count)
 WHERE
 {{
-  # instance of {self.label}
+  # instance of {self.item.qlabel}
   ?item wdt:P31 wd:{self.itemQid}.{self.where}
   ?item rdfs:label ?itemLabel.
   filter (lang(?itemLabel) = "en").
@@ -323,7 +319,7 @@ ORDER BY DESC (?frequency)"""
             sparql=f"""{sparql}
 HAVING (COUNT (?value) > 1)
 ORDER BY DESC(?count)"""
-        query=Query(query=sparql,name=f"NonTabular {self.label}/{propertyLabel}:{freqDesc}",title=f"non tabular entries for {self.label}/{propertyLabel}:{freqDesc}")
+        query=Query(query=sparql,name=f"NonTabular {self.item.qlabel}/{propertyLabel}:{freqDesc}",title=f"non tabular entries for {self.item.qlabel}/{propertyLabel}:{freqDesc}")
         return query
 
     def noneTabular(self,wdProperty:WikidataProperty):

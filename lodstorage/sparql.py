@@ -59,6 +59,56 @@ class SPARQL(object):
         queryResult = self.sparql.query()
         return queryResult
     
+    def getValue(self,sparqlQuery:str,attr:str):
+        '''
+        get the value for the given SPARQL query using the given attr
+        
+        Args:
+            sparql(SPARQL): the SPARQL endpoint to ge the value for
+            sparqlQuery(str): the SPARQL query to run
+            attr(str): the attribute to get
+        '''
+        if self.debug:
+            print(sparqlQuery)
+        qLod=self.queryAsListOfDicts(sparqlQuery)
+        return self.getFirst(qLod, attr)
+    
+    def getValues(self,sparqlQuery:str,attrList:list):
+        '''
+        get Values for the given sparlQuery and attribute list
+        '''
+        if self.debug:
+            print(sparqlQuery)
+        qLod=self.queryAsListOfDicts(sparqlQuery)
+        if not (len(qLod)==1):
+            msg=f"getValues for {attrList} failed for {qLod}"
+            raise Exception(msg)
+        record=qLod[0]
+        values=()
+        for attr in attrList:
+            if not attr in record:
+                msg=f"getValues failed for attribute {attr} which is missing in result record {record}"
+                raise Exception(msg)
+            recordTuple=(record[attr],)
+            values+=recordTuple
+        return values
+    
+    def getFirst(self,qLod:list,attr:str):
+        '''
+        get the column attr of the first row of the given qLod list
+        
+        Args:
+            qLod(list): the list of dicts (returned by a query)
+            attr(str): the attribute to retrieve
+            
+        Returns:
+            object: the value
+        '''
+        if len(qLod)==1 and attr in qLod[0]:
+            value=qLod[0][attr]
+            return value
+        raise Exception(f"getFirst for attribute {attr} failed for {qLod}")
+    
     def getResults(self,jsonResult):
         '''
         get the result from the given jsonResult

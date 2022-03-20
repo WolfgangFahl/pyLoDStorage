@@ -44,7 +44,7 @@ class TestTrulyTabular(unittest.TestCase):
             qLod=testcase["qlod"]
             expected=testcase["expected"]
             try:
-                value=tt.getFirst(qLod,"name")
+                value=tt.sparql.getFirst(qLod,"name")
                 self.assertEqual(expected,value)
             except Exception as ex:
                 if self.debug:
