@@ -146,12 +146,13 @@ class QuerySyntaxHighlight:
     '''
     Syntax highlighting for queries with pygments
     '''
-    def __init__(self,query,highlightFormat):
+    def __init__(self,query,highlightFormat:str="html"):
         '''
         construct me for the given query and highlightFormat
         
         Args:
             query(Query): the query to do the syntax highlighting for
+            highlightFormat(str): the highlight format to be used
         '''
         self.query=query
         self.highlightFormat=highlightFormat
