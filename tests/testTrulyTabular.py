@@ -80,11 +80,17 @@ class TestTrulyTabular(unittest.TestCase):
         '''
         try getting items by label
         '''
+        #debug=self.debug
+        debug=True
         qLabels=["academic conference","scientific conference series","whisky distillery","human"]
         sparql=SPARQL(TrulyTabular.endpoint)
-        items=WikidataItem.getItemsByLabel(sparql, qLabels)
-        for item in items.values():
-            print(item)
+        items={}
+        for qLabel in qLabels:
+            items4Label=WikidataItem.getItemsByLabel(sparql, qLabel)
+            for item in items4Label:
+                if debug:
+                    print(item)
+            items[qLabel]=items4Label[0]
         for qLabel in qLabels:
             self.assertTrue(qLabel in items)
 

@@ -92,37 +92,47 @@ class WikidataItem:
         return text
         
     @classmethod
-    def getItemsByLabel(cls,sparql,itemLabels:list,lang:str="en"):
+    def getItemsByLabel(cls,sparql,itemLabel:str,lang:str="en")->list:
         '''
-        get a list of Wikidata items by the given label list
+        get a Wikidata items by the given label
         
         Args:
             sparql(SPARQL): the SPARQL endpoint to use
-            itemLabels(list): a list of labels of items
+            itemLabel(str): the label of the items
             lang(str): the language of the label
+            
+        Returns:
+            a list of potential items
         '''
-        items={}
-        valuesClause=""
-        for itemLabel in itemLabels:
-            valuesClause+=f'   "{itemLabel}"@{lang}\n'
-        query="""# get the lowest item that has the given label 
-# e.g. we'll find human=Q5 instead of the newer human entries in wikidata
-SELECT (MIN(?itemValue) as ?item) ?itemLabel
+        valuesClause=f'   "{itemLabel}"@{lang}\n'
+        query="""# get the items that have the given label in the given language
+# e.g. we'll find human=Q5 as the oldest type for the label "human" first
+# and then the newer ones such as "race in Warcraft"
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <http://schema.org/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+SELECT ?itemId ?item ?itemLabel ?itemDescription
 WHERE { 
   VALUES ?itemLabel {
 %s
   }
-  ?itemValue rdfs:label ?itemLabel. 
-} GROUP BY ?itemLabel""" % valuesClause
+  BIND (xsd:integer(SUBSTR(STR(?item),33)) AS ?itemId)
+  ?item rdfs:label ?itemLabel. 
+  ?item schema:description ?itemDescription
+  FILTER(LANG(?itemDescription)="%s")
+} ORDER BY ?itemId""" % (valuesClause,lang)
 
         qLod=sparql.queryAsListOfDicts(query)
+        items=[]
         for record in qLod:
             url=record["item"] 
             qid=re.sub(r"http://www.wikidata.org/entity/(.*)",r"\1",url)
             item=WikidataItem(qid)
             item.url=url
             item.qlabel=record["itemLabel"]
-            items[item.qlabel]=item
+            item.description=record["itemDescription"]
+            items.append(item)
         return items
         
 class TrulyTabular(object):
