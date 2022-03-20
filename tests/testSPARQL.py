@@ -341,6 +341,26 @@ ORDER BY ?itemLabel ?sLabel"""
                 qdoc=query.documentQueryResult(qlod,tablefmt=tablefmt)
                 if debug:
                     print (qdoc)
+ 
+    def testStackoverflow71444069(self):
+        '''
+        https://stackoverflow.com/questions/71444069/create-csv-from-result-of-a-for-google-colab/71548650#71548650
+        '''
+        from lodstorage.sparql import SPARQL
+        from lodstorage.csv import CSV
+        sparqlQuery="""SELECT ?org ?orgLabel
+WHERE
+{
+  ?org wdt:P31 wd:Q4830453. #instance of organizations
+  ?org wdt:P17 wd:Q96. #Mexico country
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en"}
+}"""
+        sparql=SPARQL("https://query.wikidata.org/sparql")
+        qlod=sparql.queryAsListOfDicts(sparqlQuery)
+        csv=CSV.toCSV(qlod)
+        print(csv)
+        
     
 
 if __name__ == "__main__":

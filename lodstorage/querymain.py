@@ -38,6 +38,7 @@ class QueryMain:
         endpoints=EndpointManager.getEndpoints(args.endpointPath)
         qm=QueryManager(lang=args.language,debug=debug,queriesPath=args.queriesPath)
         queryCode=args.query
+        endpointConf=None
         formats=None
         # preload ValueFormatter
         ValueFormatter.getFormats(args.formatsPath)
@@ -75,7 +76,7 @@ class QueryMain:
                 if args.method:
                     method=method
                 sparql=SPARQL(endPointUrl,method=method)
-                if args.prefixes:
+                if args.prefixes and endpointConf is not None:
                     queryCode = f"{endpointConf.prefixes}\n{queryCode}"
                 if args.raw:
                     qres = cls.rawQuery(endPointUrl, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
