@@ -37,6 +37,8 @@ class QueryMain:
         debug=args.debug
         endpoints=EndpointManager.getEndpoints(args.endpointPath)
         qm=QueryManager(lang=args.language,debug=debug,queriesPath=args.queriesPath)
+        queryCode=args.query
+        formats=None
         # preload ValueFormatter
         ValueFormatter.getFormats(args.formatsPath)
         if args.list:
@@ -53,10 +55,14 @@ class QueryMain:
             if args.queryName not in qm.queriesByName:
                 raise Exception(f"named query {args.queryName} not available")
             query=qm.queriesByName[args.queryName]
+            formats=query.formats
+            queryCode=query.query
             if debug or args.showQuery:
                 if hasattr(query, "description") and query.description is not None:
                     print(query.description)
-                print(f"{args.language}:\n{query.query}")
+        if queryCode:
+            if debug or args.showQuery:
+                print(f"{args.language}:\n{queryCode}")
             if args.endpointName:
                 endpointConf=endpoints.get(args.endpointName)                
             if args.language=="sparql":
@@ -70,17 +76,17 @@ class QueryMain:
                     method=method
                 sparql=SPARQL(endPointUrl,method=method)
                 if args.prefixes:
-                    query.query = f"{endpointConf.prefixes}\n{query.query}"
+                    queryCode = f"{endpointConf.prefixes}\n{queryCode}"
                 if args.raw:
                     qres = cls.rawQuery(endPointUrl, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
                     print(qres)
                     return
-                if "wikidata" in args.endpointName and query.formats is None:
-                    query.formats=["*:wikidata"]
-                qlod=sparql.queryAsListOfDicts(query.query)
+                if "wikidata" in args.endpointName and formats is None:
+                    formats=["*:wikidata"]
+                qlod=sparql.queryAsListOfDicts(queryCode)
             elif args.language=="sql":
                 sqlDB=SQLDB(endpointConf.endpoint)
-                qlod=sqlDB.query(query.query)
+                qlod=sqlDB.query(queryCode)
             else:
                 raise Exception(f"language {args.language} not known/supported")    
             if args.format is Format.csv:
