@@ -237,6 +237,8 @@ class TrulyTabular(object):
         '''
         query="""
 # get the label for the given item
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 SELECT ?itemLabel
 WHERE
 {
@@ -262,12 +264,12 @@ WHERE
 }}"""
         return self.getValue(query, "count")
     
-    def mostFrequentIdentifiersQuery(self):
+    def mostFrequentPropertiesQuery(self):
         '''
-        get the most frequently used identifiers
+        get the most frequently used properties
         '''
-        query=self.queryManager.queriesByName["mostFrequentIdentifiers"]
-        query.title=f"most frequently used identifiers for {self.asText(long=True)}"
+        query=self.queryManager.queriesByName["mostFrequentProperties"]
+        query.title=f"most frequently used properties for {self.asText(long=True)}"
         query.query=query.query % self.itemQid
         return query
     

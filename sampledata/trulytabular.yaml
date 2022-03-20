@@ -8,7 +8,7 @@
           {
             SELECT ?prop (COUNT(DISTINCT ?item) AS ?count) WHERE {
               hint:Query hint:optimizer "None".
-              ?item wdt:P31 wd:Q1143604;
+              ?item wdt:P31 wd:%s;
                 ?p ?id.
               ?prop wikibase:directClaim ?p.
             }

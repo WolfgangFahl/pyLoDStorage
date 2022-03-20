@@ -5,7 +5,7 @@ Created on 2022-03-4
 '''
 import unittest
 from lodstorage.trulytabular import TrulyTabular, WikidataItem
-from lodstorage.query import Query
+from lodstorage.query import Query, QuerySyntaxHighlight
 from lodstorage.sparql import SPARQL
 
 class TestTrulyTabular(unittest.TestCase):
@@ -166,18 +166,34 @@ class TestTrulyTabular(unittest.TestCase):
                 self.assertEqual(0,errors)
             
                 
-    def testMostFrequentIdentifiers(self):
+    def testMostFrequentProperties(self):
         '''
-        test getting the most frequent identifiers for some Wikidata Items
+        test getting the most frequent properties for some Wikidata Item types
         '''
-        show=True
+        #show=True
+        show=False
         debug=self.debug
         #debug=True
-        for qid in ["Q2020153","Q47258130","Q1143604"]:
+        for qid in ["Q6256"]:
             tt=TrulyTabular(qid,debug=debug)
-            query=tt.mostFrequentIdentifiersQuery()
+            query=tt.mostFrequentPropertiesQuery()
             self.documentQuery(tt, query,formats=["github"],show=show)
 
+    def testSyntaxHighlighting(self):
+        '''
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/81
+        '''
+        #debug=self.debug
+        debug=True
+        qid="Q6256" # country
+        tt=TrulyTabular(qid,debug=debug)
+        query=tt.mostFrequentPropertiesQuery()
+        sh=QuerySyntaxHighlight(query,"html")
+        html=sh.highlight()
+        if debug:
+            print(html)
+        self.assertTrue('<span class="k">SELECT</span>' in html)
+        pass
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

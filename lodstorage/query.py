@@ -19,6 +19,11 @@ from pylatexenc.latexencode import unicode_to_latex
 import re
 import sys
 from pathlib import Path
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters.html import HtmlFormatter
+from pygments.formatters.latex import LatexFormatter
+
 
 class Format(Enum):
     '''
@@ -136,6 +141,33 @@ class ValueFormatter():
                         newValue=f"\href{{{link}}}{{{value}}}"
                     if newValue is not None:
                         record[key]=newValue
+                    
+class QuerySyntaxHighlight:
+    '''
+    Syntax highlighting for queries with pygments
+    '''
+    def __init__(self,query,highlightFormat):
+        '''
+        construct me for the given query and highlightFormat
+        
+        Args:
+            query(Query): the query to do the syntax highlighting for
+        '''
+        self.query=query
+        self.highlightFormat=highlightFormat
+        self.lexer=get_lexer_by_name(self.query.lang)
+        if self.highlightFormat=="html":
+            self.formatter=HtmlFormatter()
+        elif self.highlightFormat=="latex":
+            self.formatter=LatexFormatter()
+        
+    def highlight(self):
+        '''
+        Returns:
+            str: the result of the syntax highlighting with pygments
+        '''
+        syntaxResult=highlight(self.query.query,self.lexer, self.formatter)    
+        return syntaxResult
 
 class QueryResultDocumentation():
     '''
@@ -546,6 +578,7 @@ class Endpoint(JSONAble):
                 "name": "wikidata",
                 "lang": "sparql",
                 "endpoint": "https://query.wikidata.org/sparql",
+                "method": "POST",
                 "prefixes": "PREFIX bd: <http://www.bigdata.com/rdf#>\nPREFIX cc: <http://creativecommons.org/ns#>"
             }
         ]
@@ -560,5 +593,9 @@ class Endpoint(JSONAble):
         
     
     def __str__(self):
+        '''
+        Returns:    
+            str: a string representation of this Endpoint
+        '''
         text=f"{self.name}({self.name}):{self.endpoint}({self.method})"
         return text
