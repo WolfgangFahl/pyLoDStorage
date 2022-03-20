@@ -120,9 +120,9 @@ class TestQueries(Basetest):
         """
         testArgs=[
             {"en":"wikidata",},
-            {"en":"qlever-wikidata",},
+            #{"en":"qlever-wikidata",},
             # workaround https://github.com/ad-freiburg/qlever/issues/631
-            {"en":"qlever-wikidata-proxy",},
+            #{"en":"qlever-wikidata-proxy",},
         ]
         debug=self.debug
         showServerDown=True
