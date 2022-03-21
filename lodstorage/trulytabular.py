@@ -57,6 +57,7 @@ class WikidataProperty():
 # get the property for the given labels
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?property ?propertyLabel WHERE {
   VALUES ?propertyLabel {
 %s
@@ -282,7 +283,7 @@ WHERE
         '''
         query=self.queryManager.queriesByName["mostFrequentProperties"]
         query.title=f"most frequently used properties for {self.asText(long=True)}"
-        query.query=query.query % self.itemQid
+        query.query=query.query % (self.item.asText(long=True),self.itemQid,self.lang)
         return query
     
     def noneTabularQuery(self,wdProperty:WikidataProperty,asFrequency:bool=True):

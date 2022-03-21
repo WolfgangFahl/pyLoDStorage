@@ -4,6 +4,8 @@
     title: most frequently used  properties
     description: most frequently used  properties
     sparql: |
+        # get the most frequently used properties for
+        # %s
         SELECT ?prop ?propLabel ?count WHERE {
           {
             SELECT ?prop (COUNT(DISTINCT ?item) AS ?count) WHERE {
@@ -15,7 +17,7 @@
             GROUP BY ?prop ?propLabel
           }
           ?prop rdfs:label ?propLabel
-          filter(lang(?propLabel) = "en")      
+          filter(lang(?propLabel) = "%s")      
         }
         ORDER BY DESC (?count)
 "mostFrequentIdentifiers":
