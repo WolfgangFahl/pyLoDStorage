@@ -6,7 +6,7 @@ Created on 2022-03-06
 
 class Version(object):
     '''
-    Version handling for ConferenceCorpus
+    Version handling for pyLoDStorage
     '''
     name="pyLodStorage"
     version='0.1.27'
