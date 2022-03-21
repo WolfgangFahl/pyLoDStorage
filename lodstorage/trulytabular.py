@@ -55,6 +55,8 @@ class WikidataProperty():
             valuesClause+=f'   "{propertyLabel}"@{lang}\n'
         query="""
 # get the property for the given labels
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 SELECT ?property ?propertyLabel WHERE {
   VALUES ?propertyLabel {
 %s
@@ -133,6 +135,7 @@ class WikidataItem:
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX schema: <http://schema.org/>
 SELECT ?itemLabel ?itemDescription
 WHERE
 {
@@ -233,6 +236,8 @@ class TrulyTabular(object):
         '''
         query=f"""# Count all items with the given 
 # type {self.item.asText(long=True)}
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT (COUNT (DISTINCT ?item) AS ?count)
 WHERE
 {{
