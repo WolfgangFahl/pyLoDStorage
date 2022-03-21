@@ -220,7 +220,7 @@ class TrulyTabular(object):
         self.sparql=SPARQL(endpoint,method=method)
         self.where=f"\n  {where}" if where is not None else ""
         self.lang=lang
-        self.item=WikidataItem(itemQid,sparql=self.sparql)
+        self.item=WikidataItem(itemQid,sparql=self.sparql,lang=lang)
         self.queryManager=TrulyTabular.getQueryManager(debug=self.debug)
         self.properties=WikidataProperty.getPropertiesByLabels(self.sparql, propertyLabels, lang)
         
