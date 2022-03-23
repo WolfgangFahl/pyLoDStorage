@@ -393,16 +393,16 @@ ORDER BY DESC(?count)"""
         add a statistics Column
         '''
         m[col]=value
-        m[f"{col}%"]=float(f"{value/total*100:.1f}")
+        m[f"{col}%"]=float(f"{value/total*100:.1f}") 
         
-        
-    def genWdPropertyStatistic(self,wdProperty:WikidataProperty,itemCount:int)->dict:
+    def genWdPropertyStatistic(self,wdProperty:WikidataProperty,itemCount:int,withQuery=True)->dict:
         '''
         generate a property Statistics Row for the given wikidata Property
         
         Args:
             wdProperty(WikidataProperty): the property to get the statistics for
             itemCount(int): the total number of items to check
+            withQuery(bool): if true include the sparql query
             
         Returns:
             dict: a statistics row
@@ -424,6 +424,9 @@ ORDER BY DESC(?count)"""
                 maxCount=count     
             total+=f
         statsRow["max"]=maxCount
+        if withQuery:
+            statsRow["queryf"]=self.noneTabularQuery(wdProperty)
+            statsRow["queryex"]=self.noneTabularQuery(wdProperty,asFrequency=False)
         self.addStatsColWithPercent(statsRow,"total",total,itemCount)
         self.addStatsColWithPercent(statsRow,"non tabular",nttotal,total)
         return statsRow
