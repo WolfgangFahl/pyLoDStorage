@@ -64,8 +64,52 @@ SELECT ?property ?propertyLabel WHERE {
   }
   ?property rdf:type wikibase:Property;
   rdfs:label ?propertyLabel.
-  FILTER((LANG(?propertyLabel)) = "en")
-}""" % valuesClause
+  FILTER((LANG(?propertyLabel)) = "%s")
+}""" % (valuesClause,lang)
+        cls.addPropertiesForQuery(wdProperties,sparql,query)
+        return wdProperties
+    
+    @classmethod
+    def getPropertiesByIds(cls,sparql,propertyIds:list,lang:str="en"):
+        '''
+        get a list of Wikidata properties by the given id list
+        
+        Args:
+            sparql(SPARQL): the SPARQL endpoint to use
+            propertyIds(list): a list of ids of the properties 
+            lang(str): the language of the label
+        '''
+        # the result dict
+        wdProperties={}
+        valuesClause=""
+        for propertyId in propertyIds:
+            valuesClause+=f'   wd:{propertyId}\n'
+        query="""
+# get the property for the given property Ids
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+SELECT ?property ?propertyLabel WHERE {
+  VALUES ?property {
+%s
+  }
+  ?property rdf:type wikibase:Property;
+  rdfs:label ?propertyLabel.
+  FILTER((LANG(?propertyLabel)) = "%s")
+}""" % (valuesClause,lang)
+        cls.addPropertiesForQuery(wdProperties,sparql,query)
+        return wdProperties
+        
+    @classmethod    
+    def addPropertiesForQuery(cls,wdProperties:list,sparql,query):  
+        '''
+          add properties from the given query's result to the given
+          wdProperties list using the given sparql endpoint
+        Args:
+          wdProperties(list): the list of wikidata properties
+          sparql(SPARQL): the SPARQL endpoint to use
+          query(str): the SPARQL query to perform
+        '''
         qLod=sparql.queryAsListOfDicts(query)
         for record in qLod:
             url=record["property"]
@@ -202,13 +246,14 @@ class TrulyTabular(object):
     '''
     endpoint="https://query.wikidata.org/sparql"
 
-    def __init__(self, itemQid, propertyLabels:list=[],where:str=None,endpoint=None,method="POST",lang="en",debug=False):
+    def __init__(self, itemQid, propertyLabels:list=[],propertyIds:list=[],where:str=None,endpoint=None,method="POST",lang="en",debug=False):
         '''
         Constructor
         
         Args:
             itemQid(str): wikidata id of the type to analyze 
-            popertyLabels(list) the list of labels of properties to be considered
+            propertyLabels(list): a list of labels of properties to be considered
+            propertyIds(list): a list of ids of properties to be considered
             where(str): extra where clause for instance selection (if any)
             endpoint(str): the url of the SPARQL endpoint to be used
         '''
@@ -222,7 +267,9 @@ class TrulyTabular(object):
         self.lang=lang
         self.item=WikidataItem(itemQid,sparql=self.sparql,lang=lang)
         self.queryManager=TrulyTabular.getQueryManager(debug=self.debug)
-        self.properties=WikidataProperty.getPropertiesByLabels(self.sparql, propertyLabels, lang)
+        self.properties=WikidataProperty.getPropertiesByIds(self.sparql,propertyIds,lang)
+        self.properties.update(WikidataProperty.getPropertiesByLabels(self.sparql, propertyLabels, lang))
+    
         
     def __str__(self):
         '''

@@ -4,7 +4,7 @@ Created on 2022-03-4
 @author: wf
 '''
 import unittest
-from lodstorage.trulytabular import TrulyTabular, WikidataItem
+from lodstorage.trulytabular import TrulyTabular, WikidataItem, WikidataProperty
 from lodstorage.query import Query, QuerySyntaxHighlight
 from lodstorage.sparql import SPARQL
 
@@ -69,12 +69,27 @@ class TestTrulyTabular(unittest.TestCase):
         '''
         debug=self.debug
         #debug=True
-        propList=["title","country","location"]
-        tt=TrulyTabular("Q2020153",propList)
+        propertyLabels=["title","country","location"]
+        tt=TrulyTabular("Q2020153",propertyLabels=propertyLabels)
         if debug:
             print (tt.properties)
-        for prop in propList:
+        for prop in propertyLabels:
             self.assertTrue(prop in tt.properties)
+            
+    def testGetPropertiesById(self):
+        '''
+        try getting properties by label
+        '''
+        debug=self.debug
+        #debug=True
+        propertyIds=["P1800"]
+        expected=["Wikimedia database name"]
+        sparql=SPARQL(TrulyTabular.endpoint)
+        propList=WikidataProperty.getPropertiesByIds(sparql, propertyIds, lang="en")
+        for i,prop in enumerate(propList):
+            if debug:
+                print(f"{i}:{prop}")
+            self.assertEquals(prop,expected[i])
             
     def testGetItemsByLabel(self):
         '''
