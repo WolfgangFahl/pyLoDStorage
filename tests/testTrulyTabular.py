@@ -168,7 +168,7 @@ class TestTrulyTabular(unittest.TestCase):
             if (debug):
                 print(count)
             self.assertTrue(count>table["expected"])
-            stats=tt.getPropertyStatics()
+            stats=tt.getPropertyStatistics()
             # sort descending by total percentage
             stats = sorted(stats, key=lambda row: row['total%'],reverse=True) 
             for tablefmt in showStats:
