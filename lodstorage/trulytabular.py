@@ -8,7 +8,6 @@ from lodstorage.query import Query,QueryManager,YamlPath
 import os
 import re
 
-
 class WikidataProperty():
     '''
     a WikidataProperty
@@ -425,8 +424,8 @@ ORDER BY DESC(?count)"""
             total+=f
         statsRow["max"]=maxCount
         if withQuery:
-            statsRow["queryf"]=self.noneTabularQuery(wdProperty)
-            statsRow["queryex"]=self.noneTabularQuery(wdProperty,asFrequency=False)
+            statsRow["queryf"]=self.noneTabularQuery(wdProperty).query
+            statsRow["queryex"]=self.noneTabularQuery(wdProperty,asFrequency=False).query
         self.addStatsColWithPercent(statsRow,"total",total,itemCount)
         self.addStatsColWithPercent(statsRow,"non tabular",nttotal,total)
         return statsRow
