@@ -394,8 +394,53 @@ ORDER BY DESC(?count)"""
         '''
         m[col]=value
         m[f"{col}%"]=float(f"{value/total*100:.1f}")
+        
+        
+    def genWdPropertyStatistic(self,wdProperty:WikidataProperty,itemCount:int)->dict:
+        '''
+        generate a property Statistics Row for the given wikidata Property
+        
+        Args:
+            wdProperty(WikidataProperty): the property to get the statistics for
+            itemCount(int): the total number of items to check
+            
+        Returns:
+            dict: a statistics row
+        '''
+        ntlod=self.noneTabular(wdProperty)
+        statsRow={"property":wdProperty.pLabel}
+        total=0
+        nttotal=0
+        maxCount=0
+        for record in ntlod:
+            f=record["frequency"]
+            count=record["count"]
+            #statsRow[f"f{count}"]=f
+            if count>1:
+                nttotal+=f
+            else:
+                statsRow["1"]=f
+            if count>maxCount:
+                maxCount=count     
+            total+=f
+        statsRow["max"]=maxCount
+        self.addStatsColWithPercent(statsRow,"total",total,itemCount)
+        self.addStatsColWithPercent(statsRow,"non tabular",nttotal,total)
+        return statsRow
+        
+    def genPropertyStatistics(self):
+        '''
+        generate the property Statistics
+        
+        Returns:
+            generator: a generator of statistic dict rows
+        '''
+        itemCount=self.count()
+        for wdProperty in self.properties.values():
+            statsRow=self.genWdPropertyStatistic(wdProperty, itemCount)
+            yield statsRow
     
-    def getPropertyStatics(self):
+    def getPropertyStatistics(self):
         '''
         get the property Statistics
         '''
@@ -406,25 +451,7 @@ ORDER BY DESC(?count)"""
             "total%": 100.0
         }]
         for wdProperty in self.properties.values():
-            ntlod=self.noneTabular(wdProperty)
-            statsRow={"property":wdProperty.pLabel}
-            total=0
-            nttotal=0
-            maxCount=0
-            for record in ntlod:
-                f=record["frequency"]
-                count=record["count"]
-                #statsRow[f"f{count}"]=f
-                if count>1:
-                    nttotal+=f
-                else:
-                    statsRow["1"]=f
-                if count>maxCount:
-                    maxCount=count     
-                total+=f
-            statsRow["max"]=maxCount
-            self.addStatsColWithPercent(statsRow,"total",total,itemCount)
-            self.addStatsColWithPercent(statsRow,"non tabular",nttotal,total)
+            statsRow=self.genWdPropertyStatistic(wdProperty, itemCount)
             lod.append(statsRow)
         return lod
     
