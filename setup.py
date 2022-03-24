@@ -37,6 +37,7 @@ setup(
           'pandas',
           'jsonpickle',
           'tabulate',
+          'pygments',
           'pylatexenc~=2.10'
     ],
     classifiers=[
