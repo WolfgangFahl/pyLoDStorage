@@ -87,8 +87,9 @@
           # president
           ?president wdt:P39 wd:Q11696.
           # nickname
-          ?president wdt:P1449 ?nickName
-          SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+          ?president wdt:P1449 ?nickName.
+          ?president rdfs:label ?presidentLabel.
+          FILTER (LANG(?presidentLabel)="en")
         } GROUP BY ?president ?presidentLabel
     title: Nick names of US Presidents
     tryItUrl: https://query.wikidata.org

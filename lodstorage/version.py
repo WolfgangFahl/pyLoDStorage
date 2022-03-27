@@ -9,6 +9,6 @@ class Version(object):
     Version handling for pyLoDStorage
     '''
     name="pylodstorage"
-    version='0.2.0'
+    version='0.2.1'
     date = '2020-09-10'
-    updated = '2022-03-24'
+    updated = '2022-03-27'
