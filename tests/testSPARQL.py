@@ -359,8 +359,8 @@ WHERE
         sparql=SPARQL("https://query.wikidata.org/sparql")
         qlod=sparql.queryAsListOfDicts(sparqlQuery)
         csv=CSV.toCSV(qlod)
-        print(csv)
-        
+        if self.debug:
+            print(csv)
     
 
 if __name__ == "__main__":
