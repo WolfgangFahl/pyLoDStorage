@@ -273,7 +273,20 @@ record  #3={'name': 'John Doe'}"""
         '''
         limit=100000
         listOfRecords=Sample.getSample(limit)
-        self.checkListOfRecords(listOfRecords, 'Sample', 'pKey')     
+        self.checkListOfRecords(listOfRecords, 'Sample', 'pKey')  
+        
+    def testIssue87AllowUsingQueryWithGenerator(self):
+        '''
+        test the query gen approach
+        '''   
+        debug=self.debug
+        #debug=True
+        sqlDB=self.getSampleTableDB(sampleSize=5)
+        sqlQuery="select * FROM sample"
+        for cindex,record in enumerate(sqlDB.queryGen(sqlQuery)):
+            if debug:
+                print(record)
+            self.assertEqual(cindex,record["cindex"])
 
     def testBackup(self):
         '''

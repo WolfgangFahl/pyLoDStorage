@@ -173,9 +173,9 @@ class SQLDB(object):
             msg="%s\nfailed:%s%s" % (insertCmd,str(ex),debugInfo)
             raise Exception(msg)
         
-    def query(self,sqlQuery,params=None):
+    def queryGen(self,sqlQuery,params=None):
         '''
-        run the given sqlQuery and return a list of Dicts
+        run the given sqlQuery a a generator for dicts
         
         Args:
             
@@ -183,7 +183,7 @@ class SQLDB(object):
             params(tuple): the query params, if any
                 
         Returns:
-            list: a list of Dicts
+            a generator of dicts
         '''
         if self.debug:
             print(sqlQuery)
@@ -196,17 +196,32 @@ class SQLDB(object):
         else:
             query = cur.execute(sqlQuery)
         colname = [ d[0] for d in query.description ]
-        resultList=[]
         try:
             # loop over all rows
             for row in query:
                 record=dict(zip(colname, row))
-                resultList.append(record)
+                yield record
         except Exception as ex:
             msg=str(ex)
             self.logError(msg)
             pass
         cur.close()
+        
+    def query(self,sqlQuery,params=None):
+        '''
+        run the given sqlQuery and return a list of Dicts
+        
+        Args:
+            
+            sqlQuery(string): the SQL query to be executed
+            params(tuple): the query params, if any
+                
+        Returns:
+            list: a list of Dicts
+        '''
+        resultList=[]
+        for record in self.queryGen(sqlQuery, params):
+            resultList.append(record)
         return resultList
         
     def queryAll(self,entityInfo,fixDates=True):

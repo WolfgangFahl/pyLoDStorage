@@ -323,13 +323,20 @@ WHERE
                 return qm
         return None
     
-    def mostFrequentPropertiesQuery(self):
+    def mostFrequentPropertiesQuery(self,whereClause:str=None):
         '''
         get the most frequently used properties
+        
+        Args:
+            whereClause(str): an extra WhereClause to use
         '''
         query=self.queryManager.queriesByName["mostFrequentProperties"]
+        if whereClause is None:
+            whereClause=f"?item wdt:P31 wd:{self.itemQid};";
+        else:
+            whereClause+=";"
         query.title=f"most frequently used properties for {self.asText(long=True)}"
-        query.query=query.query % (self.item.asText(long=True),self.itemQid,self.lang)
+        query.query=query.query % (self.item.asText(long=True),whereClause,self.lang)
         return query
     
     def noneTabularQuery(self,wdProperty:WikidataProperty,asFrequency:bool=True):
