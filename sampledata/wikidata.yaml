@@ -79,3 +79,35 @@
             }
         }
         ORDER BY(?playerLabel)
+'Top200HumanSettlementClasses':
+    title: top 2000 human settlement classes https://www.wikidata.org/wiki/Q486972
+    description: based on wdtaxonomy Q486972 -c -d -m = using https://www.npmjs.com/package/wikidata-taxonomy
+    formats:
+        - item:wikidata
+    sparql: |
+      # relevant human settlement classes in wikidata
+      # based on wdtaxonomy Q486972 -c -d -m = -s
+      # WF 2021-08-25
+      SELECT ?item ?itemLabel ?itemDescription ?instances ?sites  WITH {
+          SELECT DISTINCT ?item { ?item wdt:P279* wd:Q486972 }
+        } AS %items WHERE {
+          INCLUDE %items .
+          {
+            SELECT ?item (count(distinct ?element) as ?instances) {
+              INCLUDE %items.
+              OPTIONAL { ?element wdt:P31 ?item }
+            } GROUP BY ?item
+          }
+          {
+            SELECT ?item (count(distinct ?site) as ?sites) {
+              INCLUDE %items.
+              OPTIONAL { ?site schema:about ?item }
+            } GROUP BY ?item
+          }
+          SERVICE wikibase:label {
+            bd:serviceParam wikibase:language "en"
+          }
+
+          FILTER(?instances>700)
+        } ORDER BY DESC (?instances)
+      LIMIT 200
