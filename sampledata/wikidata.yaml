@@ -80,7 +80,7 @@
         }
         ORDER BY(?playerLabel)
 'Top200HumanSettlementClasses':
-    title: top 2000 human settlement classes https://www.wikidata.org/wiki/Q486972
+    title: top 200 human settlement classes https://www.wikidata.org/wiki/Q486972
     description: based on wdtaxonomy Q486972 -c -d -m = using https://www.npmjs.com/package/wikidata-taxonomy
     formats:
         - item:wikidata
