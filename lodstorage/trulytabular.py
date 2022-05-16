@@ -262,6 +262,7 @@ class TrulyTabular(object):
             endpoint=TrulyTabular.endpoint
         self.endpoint=endpoint
         self.sparql=SPARQL(endpoint,method=method)
+        self.sparql.debug=self.debug
         self.where=f"\n  {where}" if where is not None else ""
         self.lang=lang
         self.item=WikidataItem(itemQid,sparql=self.sparql,lang=lang)
