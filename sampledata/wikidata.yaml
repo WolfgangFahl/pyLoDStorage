@@ -111,3 +111,15 @@
           FILTER(?instances>700)
         } ORDER BY DESC (?instances)
       LIMIT 200
+'AcademicConferenceItemLabel':
+  sparql: |
+      # get the label for the given item
+      SELECT ?itemLabel
+      WHERE
+      {
+        VALUES (?item) {
+          (wd:Q2020153)
+        }
+        ?item rdfs:label ?itemLabel.
+        filter (lang(?itemLabel) = "en").
+      }
