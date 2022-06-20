@@ -34,6 +34,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
 </ul>
@@ -178,13 +179,17 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.query.Query.addFormatCallBack">addFormatCallBack() (lodstorage.query.Query method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.mwTable.MediaWikiTable.addHeader">addHeader() (lodstorage.mwTable.MediaWikiTable method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.lod.LOD.addLookup">addLookup() (lodstorage.lod.LOD static method)</a>
@@ -197,6 +202,8 @@
         <li><a href="lodstorage.html#lodstorage.sql.EntityInfo.addType">(lodstorage.sql.EntityInfo method)</a>
 </li>
       </ul></li>
+      <li><a href="lodstorage.html#lodstorage.query.ValueFormatter.applyFormat">applyFormat() (lodstorage.query.ValueFormatter method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.asJSON">asJSON() (lodstorage.jsonable.JSONAble method)</a>
 
       <ul>
@@ -209,6 +216,8 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.asListOfDicts">asListOfDicts() (lodstorage.sparql.SPARQL method)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.query.QueryResultDocumentation.asText">asText() (lodstorage.query.QueryResultDocumentation method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.mwTable.MediaWikiTable.asWikiMarkup">asWikiMarkup() (lodstorage.mwTable.MediaWikiTable method)</a>
 
       <ul>
@@ -216,6 +225,8 @@
 </li>
       </ul></li>
       <li><a href="lodstorage.html#lodstorage.query.Query.asWikiSourceMarkup">asWikiSourceMarkup() (lodstorage.query.Query method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.Query.asYaml">asYaml() (lodstorage.query.Query method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -225,11 +236,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.backup">backup() (lodstorage.sql.SQLDB method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.backupProgress">backupProgress() (lodstorage.sql.SQLDB method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.plot.Plot.barchart">barchart() (lodstorage.plot.Plot method)</a>
+</li>
+      <li><a href="tests.html#tests.basetest.Basetest">Basetest (class in tests.basetest)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -237,6 +250,8 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tests.html#tests.test_queries.TestQueries.captureQueryMain">captureQueryMain() (tests.test_queries.TestQueries method)</a>
+</li>
       <li><a href="tests.html#tests.testJson.TestJsonAble.check">check() (tests.testJson.TestJsonAble method)</a>
 </li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.checkErrors">checkErrors() (tests.testSPARQL.TestSPARQL method)</a>
@@ -273,6 +288,8 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.csv.CSV">CSV (class in lodstorage.csv)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.query.Format.csv">csv (lodstorage.query.Format attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -285,9 +302,13 @@
         <li><a href="lodstorage.html#lodstorage.yamlablemixin.YamlAbleMixin.debug">(lodstorage.yamlablemixin.YamlAbleMixin attribute)</a>
 </li>
       </ul></li>
+      <li><a href="lodstorage.html#lodstorage.sample.Sample.dob">dob() (lodstorage.sample.Sample static method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="lodstorage.html#lodstorage.sample.Sample.dob">dob() (lodstorage.sample.Sample static method)</a>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.documentQuery">documentQuery() (tests.testTrulyTabular.TestTrulyTabular method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.Query.documentQueryResult">documentQueryResult() (lodstorage.query.Query method)</a>
 </li>
       <li><a href="tests.html#tests.testJson.TestJsonAble.dumpListOfDicts">dumpListOfDicts() (tests.testJson.TestJsonAble method)</a>
 </li>
@@ -297,12 +318,16 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="lodstorage.html#lodstorage.sql.EntityInfo">EntityInfo (class in lodstorage.sql)</a>
+      <li><a href="lodstorage.html#lodstorage.query.Endpoint">Endpoint (class in lodstorage.query)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.entity.EntityManager">EntityManager (class in lodstorage.entity)</a>
+      <li><a href="lodstorage.html#lodstorage.query.EndpointManager">EndpointManager (class in lodstorage.query)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.sql.EntityInfo">EntityInfo (class in lodstorage.sql)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.entity.EntityManager">EntityManager (class in lodstorage.entity)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.execute">execute() (lodstorage.sql.SQLDB method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.executeDump">executeDump() (lodstorage.sql.SQLDB method)</a>
@@ -313,6 +338,8 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.lod.LOD.filterFields">filterFields() (lodstorage.lod.LOD static method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.sql.EntityInfo.fixDates">fixDates() (lodstorage.sql.EntityInfo method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.Types.fixListOfDicts">fixListOfDicts() (lodstorage.jsonable.Types method)</a>
@@ -323,16 +350,26 @@
         <li><a href="lodstorage.html#lodstorage.jsonable.Types.fixTypes">(lodstorage.jsonable.Types method)</a>
 </li>
       </ul></li>
-      <li><a href="lodstorage.html#lodstorage.jsonable.Types.forTable">forTable() (lodstorage.jsonable.Types static method)</a>
+      <li><a href="lodstorage.html#lodstorage.query.Format">Format (class in lodstorage.query)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.entity.EntityManager.fromCache">fromCache() (lodstorage.entity.EntityManager method)</a>
+      <li><a href="lodstorage.html#lodstorage.query.ValueFormatter.formatsPath">formatsPath (lodstorage.query.ValueFormatter attribute)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.Query.formatWithValueFormatters">formatWithValueFormatters() (lodstorage.query.Query method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.Types.forTable">forTable() (lodstorage.jsonable.Types static method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.entity.EntityManager.fromCache">fromCache() (lodstorage.entity.EntityManager method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.csv.CSV.fromCSV">fromCSV() (lodstorage.csv.CSV static method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.fromDict">fromDict() (lodstorage.jsonable.JSONAble method)</a>
+
+      <ul>
+        <li><a href="lodstorage.html#lodstorage.query.ValueFormatter.fromDict">(lodstorage.query.ValueFormatter class method)</a>
 </li>
+      </ul></li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.fromJson">fromJson() (lodstorage.jsonable.JSONAble method)</a>
 
       <ul>
@@ -367,7 +404,15 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getDefault">getDefault() (lodstorage.storageconfig.StorageConfig static method)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.query.EndpointManager.getEndpointNames">getEndpointNames() (lodstorage.query.EndpointManager static method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.EndpointManager.getEndpoints">getEndpoints() (lodstorage.query.EndpointManager static method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.lod.LOD.getFields">getFields() (lodstorage.lod.LOD static method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.getFirst">getFirst() (lodstorage.sparql.SPARQL method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.ValueFormatter.getFormats">getFormats() (lodstorage.query.ValueFormatter class method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.schema.Schema.getGeneral">getGeneral() (lodstorage.schema.Schema static method)</a>
 </li>
@@ -385,7 +430,11 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.getJsonTypeSamples">getJsonTypeSamples() (lodstorage.jsonable.JSONAble method)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.getJsonTypeSamplesForClass">getJsonTypeSamplesForClass() (lodstorage.jsonable.JSONAble static method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.getJSONValue">getJSONValue() (lodstorage.jsonable.JSONAble method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.Query.getLink">getLink() (lodstorage.query.Query method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAbleList.getList">getList() (lodstorage.jsonable.JSONAbleList method)</a>
 </li>
@@ -403,6 +452,8 @@
         <li><a href="lodstorage.html#lodstorage.lod.LOD.getLookup">(lodstorage.lod.LOD static method)</a>
 </li>
       </ul></li>
+      <li><a href="lodstorage.html#lodstorage.query.YamlPath.getPaths">getPaths() (lodstorage.query.YamlPath static method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.getPluralname">getPluralname() (lodstorage.jsonable.JSONAble class method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.query.QueryManager.getQueries">getQueries() (lodstorage.query.QueryManager static method)</a>
@@ -415,8 +466,12 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.sample.Sample.getSample">getSample() (lodstorage.sample.Sample static method)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.sample.Royal.getSamples">getSamples() (lodstorage.sample.Royal class method)</a>
+      <li><a href="lodstorage.html#lodstorage.query.Endpoint.getSamples">getSamples() (lodstorage.query.Endpoint static method)</a>
+
+      <ul>
+        <li><a href="lodstorage.html#lodstorage.sample.Royal.getSamples">(lodstorage.sample.Royal class method)</a>
 </li>
+      </ul></li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.getSampleTableDB">getSampleTableDB() (tests.testSqlite3.TestSQLDB static method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getSPARQL">getSPARQL() (lodstorage.storageconfig.StorageConfig static method)</a>
@@ -429,13 +484,21 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.getTableList">getTableList() (lodstorage.sql.SQLDB method)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.query.Query.getTryItUrl">getTryItUrl() (lodstorage.query.Query method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.jsonable.Types.getType">getType() (lodstorage.jsonable.Types method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.Types.getTypes">getTypes() (lodstorage.jsonable.Types method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.Types.getTypesForItems">getTypesForItems() (lodstorage.jsonable.Types method)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.getValue">getValue() (lodstorage.sparql.SPARQL method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.getValues">getValues() (lodstorage.sparql.SPARQL method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getYaml">getYaml() (lodstorage.storageconfig.StorageConfig static method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.Format.github">github (lodstorage.query.Format attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -445,9 +508,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.lod.LOD.handleListTypes">handleListTypes() (lodstorage.lod.LOD class method)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.query.QuerySyntaxHighlight.highlight">highlight() (lodstorage.query.QuerySyntaxHighlight method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.plot.Plot.hist">hist() (lodstorage.plot.Plot method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.ValueFormatter.home">home (lodstorage.query.ValueFormatter attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -457,12 +524,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAbleSettings.indent">indent (lodstorage.jsonable.JSONAbleSettings attribute)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.insert">insert() (lodstorage.sparql.SPARQL method)</a>
+      <li><a href="lodstorage.html#lodstorage.entity.EntityManager.initSQLDB">initSQLDB() (lodstorage.entity.EntityManager method)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.insertListOfDicts">insertListOfDicts() (lodstorage.sparql.SPARQL method)</a>
+      <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.insert">insert() (lodstorage.sparql.SPARQL method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.insertListOfDicts">insertListOfDicts() (lodstorage.sparql.SPARQL method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.insertListOfDictsBatch">insertListOfDictsBatch() (lodstorage.sparql.SPARQL method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.lod.LOD.intersect">intersect() (lodstorage.lod.LOD static method)</a>
@@ -475,14 +544,16 @@
 <h2 id="J">J</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.query.Format.json">json (lodstorage.query.Format attribute)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.storageconfig.StoreMode.JSON">JSON (lodstorage.storageconfig.StoreMode attribute)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble">JSONAble (class in lodstorage.jsonable)</a>
 </li>
-      <li><a href="lodstorage.html#lodstorage.jsonable.JSONAbleList">JSONAbleList (class in lodstorage.jsonable)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.jsonable.JSONAbleList">JSONAbleList (class in lodstorage.jsonable)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAbleSettings">JSONAbleSettings (class in lodstorage.jsonable)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.storageconfig.StoreMode.JSONPICKLE">JSONPICKLE (lodstorage.storageconfig.StoreMode attribute)</a>
@@ -495,6 +566,8 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.query.Format.latex">latex (lodstorage.query.Format attribute)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.lod.LOD">LOD (class in lodstorage.lod)</a>
 </li>
       <li>
@@ -618,12 +691,16 @@
         <li><a href="lodstorage.html#module-lodstorage.yamlablemixin">module</a>
 </li>
       </ul></li>
+      <li><a href="lodstorage.html#lodstorage.sql.SQLDB.logError">logError() (lodstorage.sql.SQLDB method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.query.Format.mediawiki">mediawiki (lodstorage.query.Format attribute)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.mwTable.MediaWikiTable">MediaWikiTable (class in lodstorage.mwTable)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.uml.UML.mergeSchema">mergeSchema() (lodstorage.uml.UML method)</a>
@@ -666,7 +743,11 @@
 </li>
         <li><a href="lodstorage.html#module-lodstorage.yamlablemixin">lodstorage.yamlablemixin</a>
 </li>
+        <li><a href="sampledata.html#module-sampledata">sampledata</a>
+</li>
         <li><a href="tests.html#module-tests">tests</a>
+</li>
+        <li><a href="tests.html#module-tests.basetest">tests.basetest</a>
 </li>
         <li><a href="tests.html#module-tests.test_csv">tests.test_csv</a>
 </li>
@@ -687,6 +768,8 @@
         <li><a href="tests.html#module-tests.testSPARQL">tests.testSPARQL</a>
 </li>
         <li><a href="tests.html#module-tests.testSqlite3">tests.testSqlite3</a>
+</li>
+        <li><a href="tests.html#module-tests.testTrulyTabular">tests.testTrulyTabular</a>
 </li>
       </ul></li>
   </ul></td>
@@ -709,9 +792,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.plot.Plot">Plot (class in lodstorage.plot)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.query.Query.prefixToLink">prefixToLink() (lodstorage.query.Query method)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.Query.preFormatWithCallBacks">preFormatWithCallBacks() (lodstorage.query.Query method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.printErrors">printErrors() (lodstorage.sparql.SPARQL method)</a>
+</li>
+      <li><a href="tests.html#tests.basetest.Profiler">Profiler (class in tests.basetest)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.progress">progress() (lodstorage.sql.SQLDB method)</a>
 </li>
@@ -729,13 +818,19 @@
         <li><a href="lodstorage.html#lodstorage.sql.SQLDB.query">(lodstorage.sql.SQLDB method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.sql.SQLDB.queryAll">queryAll() (lodstorage.sql.SQLDB method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.sparql.SPARQL.queryAsListOfDicts">queryAsListOfDicts() (lodstorage.sparql.SPARQL method)</a>
 </li>
+      <li><a href="lodstorage.html#lodstorage.sql.SQLDB.queryGen">queryGen() (lodstorage.sql.SQLDB method)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.query.QueryManager">QueryManager (class in lodstorage.query)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.QueryResultDocumentation">QueryResultDocumentation (class in lodstorage.query)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.QuerySyntaxHighlight">QuerySyntaxHighlight (class in lodstorage.query)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -793,6 +888,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.sample.Sample">Sample (class in lodstorage.sample)</a>
 </li>
+      <li>
+    sampledata
+
+      <ul>
+        <li><a href="sampledata.html#module-sampledata">module</a>
+</li>
+      </ul></li>
       <li><a href="lodstorage.html#lodstorage.schema.Schema">Schema (class in lodstorage.schema)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.schema.SchemaManager">SchemaManager (class in lodstorage.schema)</a>
@@ -809,26 +911,14 @@
       </ul></li>
       <li><a href="lodstorage.html#lodstorage.lod.LOD.setNone4List">setNone4List() (lodstorage.lod.LOD static method)</a>
 </li>
-      <li><a href="tests.html#tests.test_csv.TestCSV.setUp">setUp() (tests.test_csv.TestCSV method)</a>
+      <li><a href="tests.html#tests.basetest.Basetest.setUp">setUp() (tests.basetest.Basetest method)</a>
 
       <ul>
-        <li><a href="tests.html#tests.test_lod.TestLOD.setUp">(tests.test_lod.TestLOD method)</a>
-</li>
-        <li><a href="tests.html#tests.test_Plot.TestPlot.setUp">(tests.test_Plot.TestPlot method)</a>
-</li>
-        <li><a href="tests.html#tests.test_queries.TestQueries.setUp">(tests.test_queries.TestQueries method)</a>
-</li>
-        <li><a href="tests.html#tests.test_Tabulate.TestTabulate.setUp">(tests.test_Tabulate.TestTabulate method)</a>
-</li>
-        <li><a href="tests.html#tests.testEntityManager.TestEntityManager.setUp">(tests.testEntityManager.TestEntityManager method)</a>
+        <li><a href="tests.html#tests.test_csv.TestCSV.setUp">(tests.test_csv.TestCSV method)</a>
 </li>
         <li><a href="tests.html#tests.testJson.TestJsonAble.setUp">(tests.testJson.TestJsonAble method)</a>
 </li>
-        <li><a href="tests.html#tests.testPandas.TestPandas.setUp">(tests.testPandas.TestPandas method)</a>
-</li>
-        <li><a href="tests.html#tests.testSPARQL.TestSPARQL.setUp">(tests.testSPARQL.TestSPARQL method)</a>
-</li>
-        <li><a href="tests.html#tests.testSqlite3.TestSQLDB.setUp">(tests.testSqlite3.TestSQLDB method)</a>
+        <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.setUp">(tests.testTrulyTabular.TestTrulyTabular method)</a>
 </li>
       </ul></li>
       <li><a href="lodstorage.html#lodstorage.plot.Plot.showDebug">showDebug() (lodstorage.plot.Plot method)</a>
@@ -837,12 +927,12 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.plot.Plot.showMe">showMe() (lodstorage.plot.Plot method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.entity.EntityManager.showProgress">showProgress() (lodstorage.entity.EntityManager method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAbleSettings.singleQuoteRegex">singleQuoteRegex (lodstorage.jsonable.JSONAbleSettings attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuote">singleQuoteToDoubleQuote() (lodstorage.jsonable.JSONAble static method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuoteUsingBracketLoop">singleQuoteToDoubleQuoteUsingBracketLoop() (lodstorage.jsonable.JSONAble static method)</a>
@@ -895,26 +985,12 @@
 </li>
       <li><a href="lodstorage.html#lodstorage.tabulateCounter.TabulateCounter">TabulateCounter (class in lodstorage.tabulateCounter)</a>
 </li>
-      <li><a href="tests.html#tests.test_csv.TestCSV.tearDown">tearDown() (tests.test_csv.TestCSV method)</a>
+      <li><a href="tests.html#tests.basetest.Basetest.tearDown">tearDown() (tests.basetest.Basetest method)</a>
 
       <ul>
-        <li><a href="tests.html#tests.test_lod.TestLOD.tearDown">(tests.test_lod.TestLOD method)</a>
+        <li><a href="tests.html#tests.test_csv.TestCSV.tearDown">(tests.test_csv.TestCSV method)</a>
 </li>
-        <li><a href="tests.html#tests.test_Plot.TestPlot.tearDown">(tests.test_Plot.TestPlot method)</a>
-</li>
-        <li><a href="tests.html#tests.test_queries.TestQueries.tearDown">(tests.test_queries.TestQueries method)</a>
-</li>
-        <li><a href="tests.html#tests.test_Tabulate.TestTabulate.tearDown">(tests.test_Tabulate.TestTabulate method)</a>
-</li>
-        <li><a href="tests.html#tests.testEntityManager.TestEntityManager.tearDown">(tests.testEntityManager.TestEntityManager method)</a>
-</li>
-        <li><a href="tests.html#tests.testJson.TestJsonAble.tearDown">(tests.testJson.TestJsonAble method)</a>
-</li>
-        <li><a href="tests.html#tests.testPandas.TestPandas.tearDown">(tests.testPandas.TestPandas method)</a>
-</li>
-        <li><a href="tests.html#tests.testSPARQL.TestSPARQL.tearDown">(tests.testSPARQL.TestSPARQL method)</a>
-</li>
-        <li><a href="tests.html#tests.testSqlite3.TestSQLDB.tearDown">(tests.testSqlite3.TestSQLDB method)</a>
+        <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.tearDown">(tests.testTrulyTabular.TestTrulyTabular method)</a>
 </li>
       </ul></li>
       <li><a href="tests.html#tests.test_csv.TestCSV.test_from_csv">test_from_csv() (tests.test_csv.TestCSV method)</a>
@@ -937,13 +1013,25 @@
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testBindingError">testBindingError() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testCommandLineUsage">testCommandLineUsage() (tests.test_queries.TestQueries method)</a>
+</li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testControlEscape">testControlEscape() (tests.testSPARQL.TestSPARQL method)</a>
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testCopy">testCopy() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
       <li><a href="tests.html#tests.test_csv.TestCSV">TestCSV (class in tests.test_csv)</a>
 </li>
+      <li><a href="tests.html#tests.test_csv.TestCSV.testCsvFromJSONAble">testCsvFromJSONAble() (tests.test_csv.TestCSV method)</a>
+</li>
+      <li><a href="tests.html#tests.test_csv.TestCSV.testCsvFromJSONAbleExcludeFields">testCsvFromJSONAbleExcludeFields() (tests.test_csv.TestCSV method)</a>
+</li>
+      <li><a href="tests.html#tests.test_csv.TestCSV.testCsvFromJSONAbleIncludeFields">testCsvFromJSONAbleIncludeFields() (tests.test_csv.TestCSV method)</a>
+</li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testDob">testDob() (tests.testSPARQL.TestSPARQL method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestEndpoints">TestEndpoints (class in tests.test_queries)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestEndpoints.testEndpoints">testEndpoints() (tests.test_queries.TestEndpoints method)</a>
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testEntityInfo">testEntityInfo() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
@@ -953,7 +1041,17 @@
 </li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testEscapeStringContent">testEscapeStringContent() (tests.testSPARQL.TestSPARQL method)</a>
 </li>
+      <li><a href="tests.html#tests.test_lod.TestLOD.testGetFields">testGetFields() (tests.test_lod.TestLOD method)</a>
+</li>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.testGetFirst">testGetFirst() (tests.testTrulyTabular.TestTrulyTabular method)</a>
+</li>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.testGetItemsByLabel">testGetItemsByLabel() (tests.testTrulyTabular.TestTrulyTabular method)</a>
+</li>
       <li><a href="tests.html#tests.test_lod.TestLOD.testGetLookupIssue31And32">testGetLookupIssue31And32() (tests.test_lod.TestLOD method)</a>
+</li>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.testGetPropertiesById">testGetPropertiesById() (tests.testTrulyTabular.TestTrulyTabular method)</a>
+</li>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.testGetPropertiesByLabel">testGetPropertiesByLabel() (tests.testTrulyTabular.TestTrulyTabular method)</a>
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testIssue13_setNoneValue">testIssue13_setNoneValue() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
@@ -965,7 +1063,7 @@
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testIssue18">testIssue18() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
-      <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testIssue20">testIssue20() (tests.testSPARQL.TestSPARQL method)</a>
+      <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testIssue20And76">testIssue20And76() (tests.testSPARQL.TestSPARQL method)</a>
 </li>
       <li><a href="tests.html#tests.testJson.TestJsonAble.testIssue22">testIssue22() (tests.testJson.TestJsonAble method)</a>
 </li>
@@ -977,7 +1075,21 @@
 </li>
       <li><a href="tests.html#tests.testJson.TestJsonAble.testIssue30_SampleLimited">testIssue30_SampleLimited() (tests.testJson.TestJsonAble method)</a>
 </li>
+      <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testIssue41">testIssue41() (tests.testSqlite3.TestSQLDB method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testIssue61">testIssue61() (tests.test_queries.TestQueries method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testIssue69showEndpoints">testIssue69showEndpoints() (tests.test_queries.TestQueries method)</a>
+</li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testIssue7">testIssue7() (tests.testSPARQL.TestSPARQL method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testIssue70showQuery">testIssue70showQuery() (tests.test_queries.TestQueries method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testIssue73Formatting">testIssue73Formatting() (tests.test_queries.TestQueries method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testIssue73ReadFormats">testIssue73ReadFormats() (tests.test_queries.TestQueries method)</a>
+</li>
+      <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testIssue87AllowUsingQueryWithGenerator">testIssue87AllowUsingQueryWithGenerator() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testJenaInsert">testJenaInsert() (tests.testSPARQL.TestSPARQL method)</a>
 </li>
@@ -995,14 +1107,16 @@
 </li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testListOfDictInsert">testListOfDictInsert() (tests.testSPARQL.TestSPARQL method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testListOfDictSpeed">testListOfDictSpeed() (tests.testSPARQL.TestSPARQL method)</a>
 </li>
       <li><a href="tests.html#tests.test_lod.TestLOD">TestLOD (class in tests.test_lod)</a>
 </li>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.testMostFrequentProperties">testMostFrequentProperties() (tests.testTrulyTabular.TestTrulyTabular method)</a>
+</li>
       <li><a href="tests.html#tests.testPandas.TestPandas">TestPandas (class in tests.testPandas)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tests.html#tests.test_Plot.TestPlot">TestPlot (class in tests.test_Plot)</a>
 </li>
       <li><a href="tests.html#tests.test_Plot.TestPlot.testPlot">testPlot() (tests.test_Plot.TestPlot method)</a>
@@ -1011,19 +1125,34 @@
 </li>
       <li><a href="tests.html#tests.test_queries.TestQueries">TestQueries (class in tests.test_queries)</a>
 </li>
-      <li><a href="tests.html#tests.test_queries.TestQueries.testQueries">testQueries() (tests.test_queries.TestQueries method)</a>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testQueryCommandLine">testQueryCommandLine() (tests.test_queries.TestQueries method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testQueryDocumentation">testQueryDocumentation() (tests.test_queries.TestQueries method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testQueryEndpoints">testQueryEndpoints() (tests.test_queries.TestQueries method)</a>
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testQueryParams">testQueryParams() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
       <li><a href="tests.html#tests.testJson.TestJsonAble.testRestoreFromJsonStr">testRestoreFromJsonStr() (tests.testJson.TestJsonAble method)</a>
 </li>
-      <li><a href="tests.html#tests.testJson.TestJsonAble.testRoyals">testRoyals() (tests.testJson.TestJsonAble method)</a>
+      <li><a href="tests.html#tests.test_csv.TestCSV.testRoyals">testRoyals() (tests.test_csv.TestCSV method)</a>
+
+      <ul>
+        <li><a href="tests.html#tests.testJson.TestJsonAble.testRoyals">(tests.testJson.TestJsonAble method)</a>
 </li>
+      </ul></li>
       <li>
     tests
 
       <ul>
         <li><a href="tests.html#module-tests">module</a>
+</li>
+      </ul></li>
+      <li>
+    tests.basetest
+
+      <ul>
+        <li><a href="tests.html#module-tests.basetest">module</a>
 </li>
       </ul></li>
       <li>
@@ -1096,6 +1225,13 @@
         <li><a href="tests.html#module-tests.testSqlite3">module</a>
 </li>
       </ul></li>
+      <li>
+    tests.testTrulyTabular
+
+      <ul>
+        <li><a href="tests.html#module-tests.testTrulyTabular">module</a>
+</li>
+      </ul></li>
       <li><a href="tests.html#tests.testJson.TestJsonAble.testSingleQuoteToDoubleQuoteStackoverflow">testSingleQuoteToDoubleQuoteStackoverflow() (tests.testJson.TestJsonAble method)</a>
 </li>
       <li><a href="tests.html#tests.testJson.TestJsonAble.testSingleToDoubleQuote">testSingleToDoubleQuote() (tests.testJson.TestJsonAble method)</a>
@@ -1104,21 +1240,39 @@
 </li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testSPARQLErrorMessage">testSPARQLErrorMessage() (tests.testSPARQL.TestSPARQL method)</a>
 </li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testSparqlQueries">testSparqlQueries() (tests.test_queries.TestQueries method)</a>
+</li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB">TestSQLDB (class in tests.testSqlite3)</a>
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testSqlite3">testSqlite3() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testSqllite3Speed">testSqllite3Speed() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testSQLQueries">testSQLQueries() (tests.test_queries.TestQueries method)</a>
+</li>
+      <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testStackoverflow55961615Query">testStackoverflow55961615Query() (tests.testSPARQL.TestSPARQL method)</a>
+</li>
+      <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testStackoverflow71444069">testStackoverflow71444069() (tests.testSPARQL.TestSPARQL method)</a>
+</li>
       <li><a href="tests.html#tests.testJson.TestJsonAble.testStoreAndRestore">testStoreAndRestore() (tests.testJson.TestJsonAble method)</a>
 </li>
       <li><a href="tests.html#tests.testEntityManager.TestEntityManager.testStoreMode">testStoreMode() (tests.testEntityManager.TestEntityManager method)</a>
 </li>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.testSyntaxHighlighting">testSyntaxHighlighting() (tests.testTrulyTabular.TestTrulyTabular method)</a>
+</li>
       <li><a href="tests.html#tests.test_Tabulate.TestTabulate">TestTabulate (class in tests.test_Tabulate)</a>
+</li>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular">TestTrulyTabular (class in tests.testTrulyTabular)</a>
+</li>
+      <li><a href="tests.html#tests.testTrulyTabular.TestTrulyTabular.testTrulyTabularTables">testTrulyTabularTables() (tests.testTrulyTabular.TestTrulyTabular method)</a>
+</li>
+      <li><a href="tests.html#tests.test_queries.TestQueries.testUnicode2LatexWorkaround">testUnicode2LatexWorkaround() (tests.test_queries.TestQueries method)</a>
 </li>
       <li><a href="tests.html#tests.testSqlite3.TestSQLDB.testUniqueConstraint">testUniqueConstraint() (tests.testSqlite3.TestSQLDB method)</a>
 </li>
       <li><a href="tests.html#tests.testSPARQL.TestSPARQL.testWikdata">testWikdata() (tests.testSPARQL.TestSPARQL method)</a>
+</li>
+      <li><a href="tests.html#tests.basetest.Profiler.time">time() (tests.basetest.Profiler method)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.plot.Plot.titleMe">titleMe() (lodstorage.plot.Plot method)</a>
 </li>
@@ -1132,6 +1286,8 @@
         <li><a href="lodstorage.html#lodstorage.jsonable.JSONAbleList.toJsonAbleValue">(lodstorage.jsonable.JSONAbleList method)</a>
 </li>
       </ul></li>
+      <li><a href="lodstorage.html#lodstorage.query.Format.tsv">tsv (lodstorage.query.Format attribute)</a>
+</li>
       <li><a href="lodstorage.html#lodstorage.jsonable.Types.typeName2Type">typeName2Type (lodstorage.jsonable.Types attribute)</a>
 </li>
       <li><a href="lodstorage.html#lodstorage.jsonable.Types">Types (class in lodstorage.jsonable)</a>
@@ -1143,6 +1299,22 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.uml.UML">UML (class in lodstorage.uml)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.query.QueryResultDocumentation.uniCode2Latex">uniCode2Latex() (lodstorage.query.QueryResultDocumentation static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.query.ValueFormatter.valueFormats">valueFormats (lodstorage.query.ValueFormatter attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.query.ValueFormatter">ValueFormatter (class in lodstorage.query)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1161,6 +1333,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lodstorage.html#lodstorage.query.Format.xml">xml (lodstorage.query.Format attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="Y">Y</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1169,6 +1349,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lodstorage.html#lodstorage.yamlablemixin.YamlAbleMixin">YamlAbleMixin (class in lodstorage.yamlablemixin)</a>
+</li>
+      <li><a href="lodstorage.html#lodstorage.query.YamlPath">YamlPath (class in lodstorage.query)</a>
 </li>
   </ul></td>
 </tr></table>

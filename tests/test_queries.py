@@ -101,6 +101,7 @@ class TestQueries(Basetest):
         #debug=True
         for testArg in [
             {"format":"csv", "expected":'''Theodore Roosevelt","Teddy"'''},
+            {"format":"xml", "expected":'''<?xml version="1.0" ?>'''},
             {"format":"latex","expected":'''Theodore Roosevelt     & Teddy'''},
             {"format":"mediawiki", "expected":'''| [https://www.wikidata.org/wiki/Q33866 Q33866] || Theodore Roosevelt     || Teddy'''},
             {"format":"github","expected":'''| [Q33866](https://www.wikidata.org/wiki/Q33866) | Theodore Roosevelt     | Teddy                           |'''}

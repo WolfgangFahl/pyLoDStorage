@@ -15,17 +15,22 @@ import requests
 import sys
 import traceback
 import os
+
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-from lodstorage.query import QueryManager, QueryResultDocumentation, EndpointManager, Format, ValueFormatter
+
+from lodstorage.csv import CSV
+from lodstorage.query import QueryManager, EndpointManager, Format, ValueFormatter
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
-from lodstorage.csv import CSV
+from lodstorage.xml import Lod2Xml
+
 
 class QueryMain:
     '''
     Commandline handler
     '''
+    
     @classmethod
     def main(cls,args):
         '''
@@ -99,6 +104,13 @@ class QueryMain:
                 print (docstr)
             elif args.format in [Format.json]:
                 print(json.dumps(qlod))
+            elif args.format in [Format.xml]:
+                lod2xml=Lod2Xml(qlod)
+                xml=lod2xml.asXml()
+                print(xml)
+                
+            else:
+                raise Exception(f"format {args.format} not supported yet") 
 
     @staticmethod
     def rawQuery(endpoint, query, resultFormat, mimeType):

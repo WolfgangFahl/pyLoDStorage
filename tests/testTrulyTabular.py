@@ -89,7 +89,7 @@ class TestTrulyTabular(unittest.TestCase):
         for i,prop in enumerate(propList):
             if debug:
                 print(f"{i}:{prop}")
-            self.assertEquals(prop,expected[i])
+            self.assertEqual(prop,expected[i])
             
     def testGetItemsByLabel(self):
         '''

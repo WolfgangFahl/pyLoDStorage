@@ -4,6 +4,14 @@ tests package
 Submodules
 ----------
 
+tests.basetest module
+---------------------
+
+.. automodule:: tests.basetest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tests.testEntityManager module
 ------------------------------
 
@@ -40,6 +48,14 @@ tests.testSqlite3 module
 ------------------------
 
 .. automodule:: tests.testSqlite3
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.testTrulyTabular module
+-----------------------------
+
+.. automodule:: tests.testTrulyTabular
    :members:
    :undoc-members:
    :show-inheritance:

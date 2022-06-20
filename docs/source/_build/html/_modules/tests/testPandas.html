@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -164,18 +165,10 @@
 
 <span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Sample</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">tests.basetest</span> <span class="kn">import</span> <span class="n">Basetest</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<div class="viewcode-block" id="TestPandas"><a class="viewcode-back" href="../../tests.html#tests.testPandas.TestPandas">[docs]</a><span class="k">class</span> <span class="nc">TestPandas</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
-
-
-<div class="viewcode-block" id="TestPandas.setUp"><a class="viewcode-back" href="../../tests.html#tests.testPandas.TestPandas.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
-        <span class="k">pass</span></div>
-
-
-<div class="viewcode-block" id="TestPandas.tearDown"><a class="viewcode-back" href="../../tests.html#tests.testPandas.TestPandas.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="TestPandas"><a class="viewcode-back" href="../../tests.html#tests.testPandas.TestPandas">[docs]</a><span class="k">class</span> <span class="nc">TestPandas</span><span class="p">(</span><span class="n">Basetest</span><span class="p">):</span>
 
 
 <div class="viewcode-block" id="TestPandas.testIssue25"><a class="viewcode-back" href="../../tests.html#tests.testPandas.TestPandas.testIssue25">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue25</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

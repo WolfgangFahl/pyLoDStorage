@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -157,28 +158,47 @@
             
   <h1>Source code for tests.test_csv</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
 
 <span class="kn">from</span> <span class="nn">lodstorage.csv</span> <span class="kn">import</span> <span class="n">CSV</span>
+<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAbleList</span><span class="p">,</span> <span class="n">JSONAble</span>
 <span class="kn">from</span> <span class="nn">lodstorage.lod</span> <span class="kn">import</span> <span class="n">LOD</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Sample</span>
+<span class="kn">from</span> <span class="nn">tests.basetest</span> <span class="kn">import</span> <span class="n">Basetest</span>  
 
-
-<div class="viewcode-block" id="TestCSV"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV">[docs]</a><span class="k">class</span> <span class="nc">TestCSV</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestCSV"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV">[docs]</a><span class="k">class</span> <span class="nc">TestCSV</span><span class="p">(</span><span class="n">Basetest</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Tests functionalities for the conversion between csv and list od dicts (LoD)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="TestCSV.setUp"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="TestCSV.setUp"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setUp</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test_pyLoDStorage_&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">testFolder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="o">.</span><span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">csvStr</span><span class="o">=</span><span class="s2">&quot;pageTitle,name,label</span><span class="se">\r\n</span><span class="s2">page_1,Test Page 1,1</span><span class="se">\r\n</span><span class="s2">page_2,Test Page 2,2</span><span class="se">\r\n</span><span class="s2">&quot;</span>   <span class="c1"># \r\n because the csv is in excel dialect</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">csvStr</span><span class="o">=</span><span class="s1">&#39;&quot;pageTitle&quot;,&quot;name&quot;,&quot;label&quot;</span><span class="se">\r\n</span><span class="s1">&quot;page_1&quot;,&quot;Test Page 1&quot;,&quot;1&quot;</span><span class="se">\r\n</span><span class="s1">&quot;page_2&quot;,&quot;Test Page 2&quot;,&quot;2&quot;</span><span class="se">\r\n</span><span class="s1">&#39;</span>   <span class="c1"># \r\n because the csv is in excel dialect</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">csvLOD</span><span class="o">=</span><span class="p">[</span>
             <span class="p">{</span><span class="s2">&quot;pageTitle&quot;</span><span class="p">:</span> <span class="s2">&quot;page_1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test Page 1&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">},</span>
             <span class="p">{</span><span class="s2">&quot;pageTitle&quot;</span><span class="p">:</span> <span class="s2">&quot;page_2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test Page 2&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">}</span>
         <span class="p">]</span></div>
 
 <div class="viewcode-block" id="TestCSV.tearDown"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">tearDown</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="TestCSV.testRoyals"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.testRoyals">[docs]</a>    <span class="k">def</span> <span class="nf">testRoyals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test conversion of royals</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> 
+        <span class="c1"># TODO - fix me</span>
+        <span class="n">inlod</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyals</span><span class="p">()</span>
+        <span class="n">csv</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="n">inlod</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span>
+        <span class="c1"># https://stackoverflow.com/questions/3717785/what-is-a-convenient-way-to-store-and-retrieve-boolean-values-in-a-csv-file</span>
+        <span class="n">outlod</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">fromCSV</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span>    
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">outlod</span><span class="p">)</span></div>
+        
 
 <div class="viewcode-block" id="TestCSV.test_to_csv"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.test_to_csv">[docs]</a>    <span class="k">def</span> <span class="nf">test_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;tests if LoD is correctly converted to csv str&#39;&#39;&#39;</span>
@@ -195,7 +215,7 @@
             <span class="p">{</span><span class="s2">&quot;pageTitle&quot;</span><span class="p">:</span> <span class="s2">&quot;page_1&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">},</span>
             <span class="p">{</span><span class="s2">&quot;pageTitle&quot;</span><span class="p">:</span> <span class="s2">&quot;page_2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test Page 2&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">}</span>
         <span class="p">]</span>
-        <span class="n">expectedStr</span> <span class="o">=</span> <span class="s2">&quot;pageTitle,label,name</span><span class="se">\r\n</span><span class="s2">page_1,1,</span><span class="se">\r\n</span><span class="s2">page_2,2,Test Page 2</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+        <span class="n">expectedStr</span> <span class="o">=</span> <span class="s1">&#39;&quot;pageTitle&quot;,&quot;label&quot;,&quot;name&quot;</span><span class="se">\r\n</span><span class="s1">&quot;page_1&quot;,&quot;1&quot;,&quot;&quot;</span><span class="se">\r\n</span><span class="s1">&quot;page_2&quot;,&quot;2&quot;,&quot;Test Page 2&quot;</span><span class="se">\r\n</span><span class="s1">&#39;</span>
         <span class="n">actualStr</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="n">csvLOD</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expectedStr</span><span class="p">,</span> <span class="n">actualStr</span><span class="p">)</span></div>
 
@@ -246,7 +266,7 @@
 
 <div class="viewcode-block" id="TestCSV.test_from_csv_without_header"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.test_from_csv_without_header">[docs]</a>    <span class="k">def</span> <span class="nf">test_from_csv_without_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;tests if csv string without embedded headers is parsed correctly&#39;&#39;&#39;</span>
-        <span class="n">csvStr</span> <span class="o">=</span> <span class="s2">&quot;page_1,Test Page 1,1</span><span class="se">\r\n</span><span class="s2">page_2,Test Page 2,2</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+        <span class="n">csvStr</span> <span class="o">=</span> <span class="s1">&#39;&quot;page_1&quot;,&quot;Test Page 1&quot;,&quot;1&quot;</span><span class="se">\r\n</span><span class="s1">&quot;page_2&quot;,&quot;Test Page 2&quot;,&quot;2&quot;</span><span class="se">\r\n</span><span class="s1">&#39;</span>
         <span class="n">headerNames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pageTitle&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">]</span>
         <span class="n">actualLOD</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">fromCSV</span><span class="p">(</span><span class="n">csvStr</span><span class="p">,</span> <span class="n">headerNames</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csvLOD</span><span class="p">,</span> <span class="n">actualLOD</span><span class="p">)</span></div>
@@ -258,7 +278,79 @@
         <span class="p">]</span>
         <span class="n">actualCSVStr</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="n">csvLOD</span><span class="p">)</span>
         <span class="n">actualLOD</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">fromCSV</span><span class="p">(</span><span class="n">actualCSVStr</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">csvLOD</span><span class="p">,</span> <span class="n">actualLOD</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">csvLOD</span><span class="p">,</span> <span class="n">actualLOD</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestCSV.testCsvFromJSONAble"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.testCsvFromJSONAble">[docs]</a>    <span class="k">def</span> <span class="nf">testCsvFromJSONAble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        tests generation of csv from list of JSONAble object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">lod</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test 2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Different&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;Munich&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+        <span class="n">jsonAbleList</span> <span class="o">=</span> <span class="n">JSONAbleList</span><span class="p">(</span><span class="n">clazz</span><span class="o">=</span><span class="n">JSONAble</span><span class="p">)</span>
+        <span class="n">jsonAbleList</span><span class="o">.</span><span class="n">fromLoD</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
+        <span class="n">actualCsvString</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="n">jsonAbleList</span><span class="o">.</span><span class="n">getList</span><span class="p">())</span>
+        <span class="n">expectedCsvString</span><span class="o">=</span><span class="s1">&#39;&quot;name&quot;,&quot;label&quot;,&quot;location&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Test&quot;,1,&quot;&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Test 2&quot;,2,&quot;&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Different&quot;,&quot;&quot;,&quot;Munich&quot;</span><span class="se">\r\n</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">actualCsvString</span><span class="p">,</span><span class="n">expectedCsvString</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestCSV.testCsvFromJSONAbleExcludeFields"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.testCsvFromJSONAbleExcludeFields">[docs]</a>    <span class="k">def</span> <span class="nf">testCsvFromJSONAbleExcludeFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        tests generation of csv from list of JSONAble object with excluding specific fields (negative list)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">lod</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test 2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Different&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;Munich&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+        <span class="n">jsonAbleList</span> <span class="o">=</span> <span class="n">JSONAbleList</span><span class="p">(</span><span class="n">clazz</span><span class="o">=</span><span class="n">JSONAble</span><span class="p">)</span>
+        <span class="n">jsonAbleList</span><span class="o">.</span><span class="n">fromLoD</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
+        <span class="n">actualCsvString</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="n">jsonAbleList</span><span class="o">.</span><span class="n">getList</span><span class="p">(),</span> <span class="n">excludeFields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">])</span>
+        <span class="n">expectedCsvString</span><span class="o">=</span><span class="s1">&#39;&quot;name&quot;,&quot;location&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Test&quot;,&quot;&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Test 2&quot;,&quot;&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Different&quot;,&quot;Munich&quot;</span><span class="se">\r\n</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">actualCsvString</span><span class="p">,</span><span class="n">expectedCsvString</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestCSV.testCsvFromJSONAbleIncludeFields"><a class="viewcode-back" href="../../tests.html#tests.test_csv.TestCSV.testCsvFromJSONAbleIncludeFields">[docs]</a>    <span class="k">def</span> <span class="nf">testCsvFromJSONAbleIncludeFields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        tests generation of csv from list of JSONAble object with including only specified fields (positive list)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">lod</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test 2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Different&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;Munich&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+        <span class="n">jsonAbleList</span> <span class="o">=</span> <span class="n">JSONAbleList</span><span class="p">(</span><span class="n">clazz</span><span class="o">=</span><span class="n">JSONAble</span><span class="p">)</span>
+        <span class="n">jsonAbleList</span><span class="o">.</span><span class="n">fromLoD</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
+        <span class="n">actualCsvString</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="n">jsonAbleList</span><span class="o">.</span><span class="n">getList</span><span class="p">(),</span> <span class="n">includeFields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;location&#39;</span><span class="p">])</span>
+        <span class="n">expectedCsvString</span><span class="o">=</span><span class="s1">&#39;&quot;name&quot;,&quot;location&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Test&quot;,&quot;&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Test 2&quot;,&quot;&quot;</span><span class="se">\r\n</span><span class="s1">&quot;Different&quot;,&quot;Munich&quot;</span><span class="se">\r\n</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">actualCsvString</span><span class="p">,</span><span class="n">expectedCsvString</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

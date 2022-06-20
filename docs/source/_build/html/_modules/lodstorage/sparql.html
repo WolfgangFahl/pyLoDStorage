@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -178,8 +179,9 @@
 <span class="sd">    :ivar typedLiterals: True if INSERT should be done with typedLiterals</span>
 <span class="sd">    :ivar profile(boolean): True if profiling / timing information should be displayed</span>
 <span class="sd">    :ivar sparql: the SPARQLWrapper2 instance to be used</span>
+<span class="sd">    :ivar method(str): the HTTP method to be used &#39;POST&#39; or &#39;GET&#39;</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">url</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">typedLiterals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">profile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="s1">&#39;PyLodStorage&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">url</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">typedLiterals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">profile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="s1">&#39;PyLodStorage&#39;</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Constructor a SPARQL wrapper</span>
 <span class="sd">        </span>
@@ -190,6 +192,7 @@
 <span class="sd">            typedLiterals(bool): True if INSERT should be done with typedLiterals</span>
 <span class="sd">            profile(boolean): True if profiling / timing information should be displayed</span>
 <span class="sd">            agent(string): the User agent to use</span>
+<span class="sd">            method(string): the HTTP method to be used &#39;POST&#39; or &#39;GET&#39;</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;url</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mode</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span>
@@ -197,6 +200,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">typedLiterals</span><span class="o">=</span><span class="n">typedLiterals</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">=</span><span class="n">profile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">=</span><span class="n">SPARQLWrapper2</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">=</span><span class="n">method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">agent</span><span class="o">=</span><span class="n">agent</span>
         
 <div class="viewcode-block" id="SPARQL.rawQuery"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.rawQuery">[docs]</a>    <span class="k">def</span> <span class="nf">rawQuery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">queryString</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">):</span>
@@ -212,7 +216,57 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">setQuery</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">method</span><span class="o">=</span><span class="n">method</span>
         <span class="n">queryResult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">queryResult</span> </div>
+        <span class="k">return</span> <span class="n">queryResult</span></div>
+    
+<div class="viewcode-block" id="SPARQL.getValue"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sparqlQuery</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">attr</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get the value for the given SPARQL query using the given attr</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            sparql(SPARQL): the SPARQL endpoint to ge the value for</span>
+<span class="sd">            sparqlQuery(str): the SPARQL query to run</span>
+<span class="sd">            attr(str): the attribute to get</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">sparqlQuery</span><span class="p">)</span>
+        <span class="n">qLod</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">sparqlQuery</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFirst</span><span class="p">(</span><span class="n">qLod</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="SPARQL.getValues"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.getValues">[docs]</a>    <span class="k">def</span> <span class="nf">getValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sparqlQuery</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">attrList</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get Values for the given sparlQuery and attribute list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">sparqlQuery</span><span class="p">)</span>
+        <span class="n">qLod</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">sparqlQuery</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qLod</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;getValues for </span><span class="si">{</span><span class="n">attrList</span><span class="si">}</span><span class="s2"> failed for </span><span class="si">{</span><span class="n">qLod</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">record</span><span class="o">=</span><span class="n">qLod</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">values</span><span class="o">=</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrList</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">record</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;getValues failed for attribute </span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2"> which is missing in result record </span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">recordTuple</span><span class="o">=</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">attr</span><span class="p">],)</span>
+            <span class="n">values</span><span class="o">+=</span><span class="n">recordTuple</span>
+        <span class="k">return</span> <span class="n">values</span></div>
+    
+<div class="viewcode-block" id="SPARQL.getFirst"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.getFirst">[docs]</a>    <span class="k">def</span> <span class="nf">getFirst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">qLod</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span><span class="n">attr</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get the column attr of the first row of the given qLod list</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            qLod(list): the list of dicts (returned by a query)</span>
+<span class="sd">            attr(str): the attribute to retrieve</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            object: the value</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">qLod</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">qLod</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">qLod</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;getFirst for attribute </span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2"> failed for </span><span class="si">{</span><span class="n">qLod</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="SPARQL.getResults"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.sparql.SPARQL.getResults">[docs]</a>    <span class="k">def</span> <span class="nf">getResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">jsonResult</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -333,18 +387,18 @@
         <span class="k">if</span> <span class="n">startTime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">startTime</span><span class="o">=</span><span class="n">batchStartTime</span>
         <span class="n">rdfprefix</span><span class="o">=</span><span class="s2">&quot;PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">insertCommand</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="se">\n</span><span class="s1">INSERT DATA {</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rdfprefix</span><span class="p">,</span><span class="n">prefixes</span><span class="p">)</span>
+        <span class="n">insertCommand</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">rdfprefix</span><span class="si">}{</span><span class="n">prefixes</span><span class="si">}</span><span class="se">\n</span><span class="s1">INSERT DATA </span><span class="se">{{\n</span><span class="s1">&#39;</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">record</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">primaryKey</span> <span class="ow">in</span> <span class="n">record</span><span class="p">:</span>
-                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;missing primary key </span><span class="si">%s</span><span class="s2"> in record </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">primaryKey</span><span class="p">,</span><span class="n">index</span><span class="p">))</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;missing primary key </span><span class="si">{</span><span class="n">primaryKey</span><span class="si">}</span><span class="s2"> in record </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>    
                 <span class="n">primaryValue</span><span class="o">=</span><span class="n">record</span><span class="p">[</span><span class="n">primaryKey</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">primaryValue</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;primary key </span><span class="si">%s</span><span class="s2"> value is None in record </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">primaryKey</span><span class="p">,</span><span class="n">index</span><span class="p">))</span>    
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;primary key </span><span class="si">{</span><span class="n">primaryKey</span><span class="si">}</span><span class="s2"> value is None in record </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>    
                 <span class="k">else</span><span class="p">:</span>    
                     <span class="n">encodedPrimaryValue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getLocalName</span><span class="p">(</span><span class="n">primaryValue</span><span class="p">)</span>
-                    <span class="n">tSubject</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">entityType</span><span class="p">,</span><span class="n">encodedPrimaryValue</span><span class="p">)</span>
-                    <span class="n">insertCommand</span><span class="o">+=</span><span class="s1">&#39;  </span><span class="si">%s</span><span class="s1"> rdf:type &quot;</span><span class="si">%s</span><span class="s1">&quot;.</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">tSubject</span><span class="p">,</span><span class="n">entityType</span><span class="p">)</span>
+                    <span class="n">tSubject</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entityType</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">encodedPrimaryValue</span><span class="si">}</span><span class="s2">&quot;</span> 
+                    <span class="n">insertCommand</span><span class="o">+=</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="n">tSubject</span><span class="si">}</span><span class="s1"> rdf:type &quot;</span><span class="si">{</span><span class="n">entityType</span><span class="si">}</span><span class="s1">&quot;.</span><span class="se">\n</span><span class="s1">&#39;</span> 
                     <span class="k">for</span> <span class="n">keyValue</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                         <span class="n">key</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">keyValue</span>
                         <span class="c1"># convert key if necessary</span>
@@ -352,7 +406,7 @@
                         <span class="n">valueType</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
                             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">valueType</span><span class="p">,</span><span class="n">value</span><span class="p">))</span>
-                        <span class="n">tPredicate</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">entityType</span><span class="p">,</span><span class="n">key</span><span class="p">)</span>
+                        <span class="n">tPredicate</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entityType</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span> 
                         <span class="n">tObject</span><span class="o">=</span><span class="n">value</span>    
                         <span class="k">if</span> <span class="n">valueType</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
                             <span class="n">escapedString</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">controlEscape</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -440,7 +494,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            list: a list ofDicts</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">records</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span>
+        <span class="n">records</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">queryString</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
         <span class="n">listOfDicts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">asListOfDicts</span><span class="p">(</span><span class="n">records</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="n">fixNone</span><span class="p">,</span><span class="n">sampleCount</span><span class="o">=</span><span class="n">sampleCount</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">listOfDicts</span></div>
     

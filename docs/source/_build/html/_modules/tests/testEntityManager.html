@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -162,27 +163,20 @@
 <span class="sd">@author: wf</span>
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">tests.basetest</span> <span class="kn">import</span> <span class="n">Basetest</span>
 <span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">Royal</span>
 <span class="kn">from</span> <span class="nn">lodstorage.entity</span> <span class="kn">import</span> <span class="n">EntityManager</span>
 <span class="kn">from</span> <span class="nn">lodstorage.storageconfig</span> <span class="kn">import</span> <span class="n">StoreMode</span><span class="p">,</span> <span class="n">StorageConfig</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<div class="viewcode-block" id="TestEntityManager"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager">[docs]</a><span class="k">class</span> <span class="nc">TestEntityManager</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestEntityManager"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager">[docs]</a><span class="k">class</span> <span class="nc">TestEntityManager</span><span class="p">(</span><span class="n">Basetest</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    test the entity manager wrapper</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-
-<div class="viewcode-block" id="TestEntityManager.setUp"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
-        <span class="k">pass</span></div>
-    
+ 
 <div class="viewcode-block" id="TestEntityManager.configure"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.configure">[docs]</a>    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">:</span><span class="n">StorageConfig</span><span class="p">):</span>
         <span class="n">config</span><span class="o">.</span><span class="n">cacheDirName</span><span class="o">=</span><span class="s2">&quot;lodstorage-test&quot;</span></div>
-
-
-<div class="viewcode-block" id="TestEntityManager.tearDown"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+   
 
 <div class="viewcode-block" id="TestEntityManager.testStoreMode"><a class="viewcode-back" href="../../tests.html#tests.testEntityManager.TestEntityManager.testStoreMode">[docs]</a>    <span class="k">def</span> <span class="nf">testStoreMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -222,6 +216,8 @@
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">royals</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyals</span><span class="p">(),</span><span class="n">Sample</span><span class="o">.</span><span class="n">getRoyalsInstances</span><span class="p">()]):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">royals</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">sparqlConfig</span><span class="o">=</span><span class="n">StorageConfig</span><span class="o">.</span><span class="n">getSPARQL</span><span class="p">(</span><span class="s2">&quot;http://example.bitplan.com&quot;</span><span class="p">,</span> <span class="s2">&quot;http://localhost:3030/example&quot;</span><span class="p">,</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">)</span>
+            <span class="c1"># TODO use sparql Config</span>
             <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="p">[</span><span class="n">StorageConfig</span><span class="o">.</span><span class="n">getDefault</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">),</span><span class="n">StorageConfig</span><span class="o">.</span><span class="n">getJSON</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">),</span><span class="n">StorageConfig</span><span class="o">.</span><span class="n">getJsonPickle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)]:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
                 <span class="n">name</span><span class="o">=</span><span class="s2">&quot;royal&quot;</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;royalorm&quot;</span>
@@ -232,7 +228,8 @@
                     <span class="n">cacheFile</span><span class="o">=</span><span class="n">em</span><span class="o">.</span><span class="n">storeLoD</span><span class="p">(</span><span class="n">royals</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">cacheFile</span><span class="o">=</span><span class="n">em</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">cacheFile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">))</span>
                 <span class="n">royalsLod</span><span class="o">=</span><span class="n">em</span><span class="o">.</span><span class="n">fromStore</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">royalsLod</span><span class="p">,</span><span class="nb">list</span><span class="p">))</span>
                 <span class="n">hint</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">):</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>

@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -162,42 +163,380 @@
 <span class="sd">@author: wf</span>
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">lodstorage.query</span> <span class="kn">import</span> <span class="n">QueryManager</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">redirect_stdout</span>
+<span class="kn">from</span> <span class="nn">lodstorage.query</span> <span class="kn">import</span> <span class="n">QueryManager</span><span class="p">,</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResultDocumentation</span><span class="p">,</span> <span class="n">EndpointManager</span><span class="p">,</span> <span class="n">ValueFormatter</span><span class="p">,</span> <span class="n">Format</span>
+<span class="kn">from</span> <span class="nn">lodstorage.querymain</span> <span class="kn">import</span> <span class="n">main</span> <span class="k">as</span> <span class="n">queryMain</span>
+<span class="kn">from</span> <span class="nn">lodstorage.querymain</span> <span class="kn">import</span> <span class="n">QueryMain</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sparql</span> <span class="kn">import</span> <span class="n">SPARQL</span>
 <span class="kn">import</span> <span class="nn">tests.testSqlite3</span>
+<span class="kn">from</span> <span class="nn">tests.basetest</span> <span class="kn">import</span> <span class="n">Basetest</span>
 
-<div class="viewcode-block" id="TestQueries"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries">[docs]</a><span class="k">class</span> <span class="nc">TestQueries</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestQueries"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries">[docs]</a><span class="k">class</span> <span class="nc">TestQueries</span><span class="p">(</span><span class="n">Basetest</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Test query handling</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
-
-<div class="viewcode-block" id="TestQueries.setUp"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
-        <span class="k">pass</span></div>
-
-
-<div class="viewcode-block" id="TestQueries.tearDown"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
-
-<div class="viewcode-block" id="TestQueries.testQueries"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testQueries">[docs]</a>    <span class="k">def</span> <span class="nf">testQueries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestQueries.testSQLQueries"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testSQLQueries">[docs]</a>    <span class="k">def</span> <span class="nf">testSQLQueries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        see https://github.com/WolfgangFahl/pyLoDStorage/issues/19</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">path</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/../sampledata&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
-        <span class="n">qm</span><span class="o">=</span><span class="n">QueryManager</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;sql&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">show</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="n">qm</span><span class="o">=</span><span class="n">QueryManager</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;sql&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qm</span><span class="o">.</span><span class="n">queriesByName</span><span class="p">))</span> 
         <span class="n">sqlDB</span><span class="o">=</span><span class="n">tests</span><span class="o">.</span><span class="n">testSqlite3</span><span class="o">.</span><span class="n">TestSQLDB</span><span class="o">.</span><span class="n">getSampleTableDB</span><span class="p">()</span>
         <span class="c1">#print(sqlDB.getTableDict())</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">query</span> <span class="ow">in</span> <span class="n">qm</span><span class="o">.</span><span class="n">queriesByName</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_name</span><span class="p">,</span><span class="n">query</span> <span class="ow">in</span> <span class="n">qm</span><span class="o">.</span><span class="n">queriesByName</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">listOfDicts</span><span class="o">=</span><span class="n">sqlDB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
-            <span class="n">markup</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">asWikiMarkup</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;== </span><span class="si">%s</span><span class="s2"> ==&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">))</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== query ===&quot;</span><span class="p">)</span>
-                <span class="nb">print</span> <span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">asWikiSourceMarkup</span><span class="p">())</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== result ===&quot;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">markup</span><span class="p">)</span>
-        <span class="k">pass</span></div></div>
+            <span class="n">resultDoc</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">documentQueryResult</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>         
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">resultDoc</span><span class="p">)</span>
+        <span class="k">pass</span></div>
+    
+<div class="viewcode-block" id="TestQueries.testSparqlQueries"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testSparqlQueries">[docs]</a>    <span class="k">def</span> <span class="nf">testSparqlQueries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test SPARQL queries </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">show</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="n">show</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">qm</span><span class="o">=</span><span class="n">QueryManager</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;sparql&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">query</span> <span class="ow">in</span> <span class="n">qm</span><span class="o">.</span><span class="n">queriesByName</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;US President Nicknames&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">endpoint</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">qlod</span><span class="o">=</span><span class="n">endpoint</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">tablefmt</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mediawiki&quot;</span><span class="p">,</span><span class="s2">&quot;github&quot;</span><span class="p">,</span><span class="s2">&quot;latex&quot;</span><span class="p">]:</span>
+                        <span class="n">doc</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">documentQueryResult</span><span class="p">(</span><span class="n">qlod</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">,</span><span class="n">floatfmt</span><span class="o">=</span><span class="s2">&quot;.0f&quot;</span><span class="p">)</span>
+                        <span class="n">docstr</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">asText</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                            <span class="nb">print</span> <span class="p">(</span><span class="n">docstr</span><span class="p">)</span>
+                            
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestQueries.testUnicode2LatexWorkaround"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testUnicode2LatexWorkaround">[docs]</a>    <span class="k">def</span> <span class="nf">testUnicode2LatexWorkaround</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test the uniCode2Latex conversion workaround</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8320</span><span class="p">,</span><span class="mi">8330</span><span class="p">):</span>
+            <span class="n">uc</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+            <span class="n">latex</span><span class="o">=</span><span class="n">QueryResultDocumentation</span><span class="o">.</span><span class="n">uniCode2Latex</span><span class="p">(</span><span class="n">uc</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uc</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">latex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1">#self.assertTrue(latex.startswith(&quot;$_&quot;))</span>
+        <span class="n">unicode</span><span class="o">=</span><span class="s2">&quot;À votre santé!&quot;</span>
+        <span class="n">latex</span><span class="o">=</span><span class="n">QueryResultDocumentation</span><span class="o">.</span><span class="n">uniCode2Latex</span><span class="p">(</span><span class="n">unicode</span><span class="p">,</span><span class="n">withConvert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unicode</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">latex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">`A votre sant</span><span class="se">\\</span><span class="s2">&#39;e!&quot;</span><span class="p">,</span><span class="n">latex</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestQueries.captureQueryMain"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.captureQueryMain">[docs]</a>    <span class="k">def</span> <span class="nf">captureQueryMain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        run queryMain and capture stdout</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            args(list): command line arguments</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the stdout content of the command line call</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">stdout</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">stdout</span><span class="p">):</span>
+            <span class="n">queryMain</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+             
+<div class="viewcode-block" id="TestQueries.testQueryCommandLine"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testQueryCommandLine">[docs]</a>    <span class="k">def</span> <span class="nf">testQueryCommandLine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test the sparql query command line</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="k">for</span> <span class="n">testArg</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;expected&quot;</span><span class="p">:</span><span class="s1">&#39;&#39;&#39;Theodore Roosevelt&quot;,&quot;Teddy&quot;&#39;&#39;&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span><span class="s2">&quot;xml&quot;</span><span class="p">,</span> <span class="s2">&quot;expected&quot;</span><span class="p">:</span><span class="s1">&#39;&#39;&#39;&lt;?xml version=&quot;1.0&quot; ?&gt;&#39;&#39;&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span><span class="s2">&quot;latex&quot;</span><span class="p">,</span><span class="s2">&quot;expected&quot;</span><span class="p">:</span><span class="s1">&#39;&#39;&#39;Theodore Roosevelt     &amp; Teddy&#39;&#39;&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span><span class="s2">&quot;mediawiki&quot;</span><span class="p">,</span> <span class="s2">&quot;expected&quot;</span><span class="p">:</span><span class="s1">&#39;&#39;&#39;| [https://www.wikidata.org/wiki/Q33866 Q33866] || Theodore Roosevelt     || Teddy&#39;&#39;&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span><span class="s2">&quot;github&quot;</span><span class="p">,</span><span class="s2">&quot;expected&quot;</span><span class="p">:</span><span class="s1">&#39;&#39;&#39;| [Q33866](https://www.wikidata.org/wiki/Q33866) | Theodore Roosevelt     | Teddy                           |&#39;&#39;&#39;</span><span class="p">}</span>
+        <span class="p">]:</span>
+            <span class="n">resultFormat</span><span class="o">=</span><span class="n">testArg</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">]</span>
+            <span class="n">expected</span><span class="o">=</span><span class="n">testArg</span><span class="p">[</span><span class="s2">&quot;expected&quot;</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-d&quot;</span><span class="p">,</span><span class="s2">&quot;-qn&quot;</span><span class="p">,</span><span class="s2">&quot;US President Nicknames&quot;</span><span class="p">,</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span><span class="s2">&quot;sparql&quot;</span><span class="p">,</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span><span class="n">resultFormat</span><span class="p">]</span>
+            <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">captureQueryMain</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resultFormat</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">expected</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span></div>
+    
 
+<div class="viewcode-block" id="TestQueries.testQueryEndpoints"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testQueryEndpoints">[docs]</a>    <span class="k">def</span> <span class="nf">testQueryEndpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        tests the sparql endpoint commandline endpoint selection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">testArgs</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;en&quot;</span><span class="p">:</span><span class="s2">&quot;wikidata&quot;</span><span class="p">,},</span>
+            <span class="c1">#{&quot;en&quot;:&quot;qlever-wikidata&quot;,},</span>
+            <span class="c1"># workaround https://github.com/ad-freiburg/qlever/issues/631</span>
+            <span class="c1">#{&quot;en&quot;:&quot;qlever-wikidata-proxy&quot;,},</span>
+        <span class="p">]</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="n">showServerDown</span><span class="o">=</span><span class="kc">True</span>
+        <span class="k">for</span> <span class="n">testArg</span> <span class="ow">in</span> <span class="n">testArgs</span><span class="p">:</span>
+            <span class="n">endpointName</span> <span class="o">=</span> <span class="n">testArg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;en&quot;</span><span class="p">)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="s2">&quot;-qn&quot;</span><span class="p">,</span> <span class="s2">&quot;cities&quot;</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">,</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="s2">&quot;sparql&quot;</span><span class="p">,</span> <span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;-en&quot;</span><span class="p">,</span> <span class="n">endpointName</span><span class="p">,</span> <span class="s2">&quot;-raw&quot;</span><span class="p">]</span>
+            <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">captureQueryMain</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;503 Service Unavailable&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                <span class="c1">#if debug:</span>
+                <span class="c1">#    print(result)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;Arnis&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpointName</span><span class="si">}</span><span class="s2">: Arnis not in query result&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">showServerDown</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpointName</span><span class="si">}</span><span class="s2"> returns 503 Service Unavailable&quot;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TestQueries.testIssue69showEndpoints"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testIssue69showEndpoints">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue69showEndpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test the listEndpoints option</span>
+<span class="sd">        </span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/69</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="n">expected</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sparql&quot;</span><span class="p">:</span><span class="s2">&quot;wikidata&quot;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;-le&quot;</span><span class="p">,</span><span class="s2">&quot;--listEndpoints&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sparql&quot;</span><span class="p">,</span><span class="s2">&quot;sql&quot;</span><span class="p">]:</span>  
+                <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">option</span><span class="p">,</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span><span class="n">lang</span><span class="p">]</span>
+                <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">captureQueryMain</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">expected</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">expected</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestQueries.testIssue70showQuery"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testIssue70showQuery">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue70showQuery</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test the showQuery option</span>
+<span class="sd">        </span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/70</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;-sq&quot;</span><span class="p">,</span><span class="s2">&quot;--showQuery&quot;</span><span class="p">]:</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-qn&quot;</span><span class="p">,</span><span class="s2">&quot;10 Largest Cities Of The World&quot;</span><span class="p">,</span><span class="n">option</span><span class="p">,</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span><span class="s2">&quot;sparql&quot;</span><span class="p">]</span>
+            <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">captureQueryMain</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;SELECT DISTINCT ?city ?cityLabel&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="TestQueries.testIssue73Formatting"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testIssue73Formatting">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue73Formatting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test formatting</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="n">qlod</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;wikidata&quot;</span><span class="p">:</span><span class="s2">&quot;http://www.wikidata.org/entity/Q1353&quot;</span><span class="p">,</span><span class="s2">&quot;label&quot;</span><span class="p">:</span><span class="s2">&quot;Delhi&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;wikidata&quot;</span><span class="p">:</span><span class="s2">&quot;Q2&quot;</span><span class="p">,</span><span class="s2">&quot;label&quot;</span><span class="p">:</span><span class="s2">&quot;Earth&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;wikidata&quot;</span><span class="p">:</span><span class="s2">&quot;https://www.wikidata.org/wiki/Property:P31&quot;</span><span class="p">,</span><span class="s2">&quot;label&quot;</span><span class="p">:</span><span class="s2">&quot;instanceof&quot;</span><span class="p">}</span>
+        <span class="p">]</span>
+        <span class="n">vf</span><span class="o">=</span><span class="n">ValueFormatter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;wikidata&quot;</span><span class="p">,</span><span class="n">regexps</span><span class="o">=</span><span class="p">[</span>
+            <span class="sa">r</span><span class="s2">&quot;(?P&lt;value&gt;(Q|Property:P)[0-9]+)&quot;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s2">&quot;http(s)?://.*/(?P&lt;value&gt;(Q|Property:P)[0-9]+)&quot;</span>
+        <span class="p">],</span><span class="n">formatString</span><span class="o">=</span><span class="s2">&quot;https://www.wikidata.org/wiki/</span><span class="si">{value}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">key</span><span class="o">=</span><span class="s2">&quot;wikidata&quot;</span>
+        <span class="k">for</span> <span class="n">tablefmt</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Format</span><span class="o">.</span><span class="n">mediawiki</span><span class="p">,</span><span class="n">Format</span><span class="o">.</span><span class="n">github</span><span class="p">,</span><span class="n">Format</span><span class="o">.</span><span class="n">latex</span><span class="p">]:</span>
+            <span class="n">lod</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">qlod</span><span class="p">)</span> 
+            <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+                <span class="n">vf</span><span class="o">.</span><span class="n">applyFormat</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span><span class="n">tablefmt</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">tablefmt</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tablefmt</span> <span class="ow">is</span> <span class="n">Format</span><span class="o">.</span><span class="n">mediawiki</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;[https://www.wikidata.org/wiki/Q1353 Q1353]&quot;</span><span class="p">,</span><span class="n">lod</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;wikidata&quot;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;[https://www.wikidata.org/wiki/Q2 Q2]&quot;</span><span class="p">,</span><span class="n">lod</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;wikidata&quot;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;[https://www.wikidata.org/wiki/Property:P31 Property:P31]&quot;</span><span class="p">,</span><span class="n">lod</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;wikidata&quot;</span><span class="p">])</span></div>
+                        
+<div class="viewcode-block" id="TestQueries.testIssue73ReadFormats"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testIssue73ReadFormats">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue73ReadFormats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test reading the valueFormatters</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">vfs</span><span class="o">=</span><span class="n">ValueFormatter</span><span class="o">.</span><span class="n">getFormats</span><span class="p">(</span><span class="n">ValueFormatter</span><span class="o">.</span><span class="n">formatsPath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;wikidata&quot;</span> <span class="ow">in</span> <span class="n">vfs</span><span class="p">)</span></div>
+       
+<div class="viewcode-block" id="TestQueries.testCommandLineUsage"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testCommandLineUsage">[docs]</a>    <span class="k">def</span> <span class="nf">testCommandLineUsage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test the command line usage</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-h&quot;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stdout</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">stdout</span><span class="p">):</span>
+                <span class="n">queryMain</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="s2">&quot;system exit expected&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">SystemExit</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">stdout</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;--queryName&quot;</span> <span class="ow">in</span> <span class="n">stdout</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span></div>
+            
+<div class="viewcode-block" id="TestQueries.testQueryDocumentation"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testQueryDocumentation">[docs]</a>    <span class="k">def</span> <span class="nf">testQueryDocumentation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test QueryDocumentation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">show</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#show=True</span>
+        <span class="n">queries</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span><span class="s2">&quot;https://query.wikidata.org/sparql&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefixes&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;sparql&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nicknames&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;https://stackoverflow.com/questions/70206791/sparql-i-have-individual-with-multiple-values-for-single-object-property-how&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Nick names of US Presidents&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;query&quot;</span><span class="p">:</span><span class="s2">&quot;&quot;&quot;SELECT ?item ?itemLabel (GROUP_CONCAT(DISTINCT ?nickName; SEPARATOR=&quot;,&quot;) as ?nickNames)</span>
+<span class="s2">WHERE </span>
+<span class="s2">{</span>
+<span class="s2">  # president</span>
+<span class="s2">  ?item wdt:P39 wd:Q11696.</span>
+<span class="s2">  ?item wdt:P1449 ?nickName</span>
+<span class="s2">  SERVICE wikibase:label { bd:serviceParam wikibase:language &quot;en&quot;. }</span>
+<span class="s2">} GROUP BY ?item ?itemLabel&quot;&quot;&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+            <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span><span class="s2">&quot;https://query.wikidata.org/sparql&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;prefixes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;http://www.wikidata.org/entity/&quot;</span><span class="p">,</span><span class="s2">&quot;http://commons.wikimedia.org/wiki/Special:FilePath/&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;sparql&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CAS15&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;15 Random substances with CAS number&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Wikidata SPARQL query showing the 15 random chemical substances with their CAS Number&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;# List of 15 random chemical components with CAS-Number, formula and structure</span>
+<span class="s2"># see also https://github.com/WolfgangFahl/pyLoDStorage/issues/46</span>
+<span class="s2"># WF 2021-08-23</span>
+<span class="s2">SELECT ?substance ?substanceLabel ?formula ?structure ?CAS</span>
+<span class="s2">WHERE { </span>
+<span class="s2">  ?substance wdt:P31 wd:Q11173.</span>
+<span class="s2">  ?substance wdt:P231 ?CAS.</span>
+<span class="s2">  ?substance wdt:P274 ?formula.</span>
+<span class="s2">  ?substance wdt:P117  ?structure.</span>
+<span class="s2">  SERVICE wikibase:label { bd:serviceParam wikibase:language &quot;[AUTO_LANGUAGE],en&quot;. }</span>
+<span class="s2">}</span>
+<span class="s2">LIMIT 15</span>
+<span class="s2">&quot;&quot;&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+            <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span><span class="s2">&quot;https://query.wikidata.org/sparql&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;prefixes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;http://www.wikidata.org/entity/&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;sparql&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CityTop10&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Ten largest cities of the world&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Wikidata SPARQL query showing the 10 most populated cities of the world using the million city class Q1637706 for selection&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;# Ten Largest cities of the world </span>
+<span class="s2"># WF 2021-08-23</span>
+<span class="s2"># see also http://wiki.bitplan.com/index.php/PyLoDStorage#Examples</span>
+<span class="s2"># see also https://github.com/WolfgangFahl/pyLoDStorage/issues/46</span>
+<span class="s2">SELECT DISTINCT ?city ?cityLabel ?population ?country ?countryLabel </span>
+<span class="s2">WHERE {</span>
+<span class="s2">  VALUES ?cityClass { wd:Q1637706}.</span>
+<span class="s2">  ?city wdt:P31 ?cityClass .</span>
+<span class="s2">  ?city wdt:P1082 ?population .</span>
+<span class="s2">  ?city wdt:P17 ?country .</span>
+<span class="s2">  SERVICE wikibase:label {</span>
+<span class="s2">    bd:serviceParam wikibase:language &quot;en&quot; .</span>
+<span class="s2">  }</span>
+<span class="s2">}</span>
+<span class="s2">ORDER BY DESC(?population)</span>
+<span class="s2">LIMIT 10&quot;&quot;&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+            <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span><span class="s2">&quot;https://sophox.org/sparql&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;sparql&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;prefixes&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;query&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;# count osm place type instances</span>
+<span class="sd"># WF 2021-08-23</span>
+<span class="sd"># see also http://wiki.bitplan.com/index.php/PyLoDStorage#Examples</span>
+<span class="sd"># see also https://github.com/WolfgangFahl/pyLoDStorage/issues/46</span>
+<span class="sd">SELECT (count(?instance) as ?count) ?placeType ?placeTypeLabel</span>
+<span class="sd">WHERE { </span>
+<span class="sd">  VALUES ?placeType {</span>
+<span class="sd">    &quot;city&quot;</span>
+<span class="sd">    &quot;town&quot;</span>
+<span class="sd">    &quot;village&quot;</span>
+<span class="sd">  }</span>
+<span class="sd">  ?instance osmt:place ?placeType</span>
+<span class="sd">  SERVICE wikibase:label { bd:serviceParam wikibase:language &quot;[AUTO_LANGUAGE],en&quot;. }</span>
+<span class="sd">}</span>
+<span class="sd">GROUP BY ?placeType ?placeTypeLabel</span>
+<span class="sd">ORDER BY ?count&quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;OSM place types&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;count OpenStreetMap place type instances&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span><span class="s2">&quot;&quot;&quot;This SPARQL query </span>
+<span class="s2">determines the number of instances available in the OpenStreetMap for the placeTypes city,town and village</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">}]</span>
+        <span class="k">for</span> <span class="n">queryMap</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+            <span class="n">endpointUrl</span><span class="o">=</span><span class="n">queryMap</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">)</span>
+            <span class="n">endpoint</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="n">endpointUrl</span><span class="p">)</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">Query</span><span class="p">(</span><span class="o">**</span><span class="n">queryMap</span><span class="p">)</span>
+            <span class="n">showYaml</span><span class="o">=</span><span class="kc">False</span>
+            <span class="k">if</span> <span class="n">showYaml</span><span class="p">:</span>
+                <span class="n">yamlMarkup</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">asYaml</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">yamlMarkup</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">qlod</span><span class="o">=</span><span class="n">endpoint</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">tablefmt</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mediawiki&quot;</span><span class="p">,</span><span class="s2">&quot;github&quot;</span><span class="p">,</span><span class="s2">&quot;latex&quot;</span><span class="p">]:</span>
+                    <span class="n">doc</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">documentQueryResult</span><span class="p">(</span><span class="n">qlod</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">,</span><span class="n">floatfmt</span><span class="o">=</span><span class="s2">&quot;.0f&quot;</span><span class="p">)</span>
+                    <span class="n">docstr</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">asText</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                        <span class="nb">print</span> <span class="p">(</span><span class="n">docstr</span><span class="p">)</span>
+                        
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">endpointUrl</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestQueries.testIssue61"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestQueries.testIssue61">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue61</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        tests different query path</span>
+
+<span class="sd">        see https://github.com/WolfgangFahl/pyLoDStorage/issues/61</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">queriesPath</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="si">}</span><span class="s2">/../sampledata/scholia.yaml&quot;</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-qp&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">queriesPath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;--list&quot;</span><span class="p">]</span>
+        <span class="n">stdout</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">stdout</span><span class="p">):</span>
+            <span class="n">queryMain</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;sparql&quot;</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="c1">#debug=self.debug</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;WorksAndAuthor&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>    </div></div>
+
+
+<div class="viewcode-block" id="TestEndpoints"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestEndpoints">[docs]</a><span class="k">class</span> <span class="nc">TestEndpoints</span><span class="p">(</span><span class="n">Basetest</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    tests Endpoint</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestEndpoints.testEndpoints"><a class="viewcode-back" href="../../tests.html#tests.test_queries.TestEndpoints.testEndpoints">[docs]</a>    <span class="k">def</span> <span class="nf">testEndpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        tests getting and rawQuerying Endpoints</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="n">endpoints</span><span class="o">=</span><span class="n">EndpointManager</span><span class="o">.</span><span class="n">getEndpoints</span><span class="p">()</span>
+        <span class="n">qm</span><span class="o">=</span><span class="n">QueryManager</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;sparql&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">query</span><span class="o">=</span><span class="n">qm</span><span class="o">.</span><span class="n">queriesByName</span><span class="p">[</span><span class="s2">&quot;FirstTriple&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;wikidata&quot;</span> <span class="ow">in</span> <span class="n">endpoints</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">endpoints</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">name</span><span class="p">,</span><span class="n">endpoint</span><span class="o">=</span><span class="n">item</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">resultFormat</span><span class="o">=</span><span class="s2">&quot;json&quot;</span>
+            <span class="n">jsonStr</span><span class="o">=</span><span class="n">QueryMain</span><span class="o">.</span><span class="n">rawQuery</span><span class="p">(</span><span class="n">endpoint</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">resultFormat</span><span class="p">,</span> <span class="n">mimeType</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">jsonStr</span><span class="p">)</span></div></div>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="c1">#import sys;sys.argv = [&#39;&#39;, &#39;Test.testName&#39;]</span>

@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -166,19 +167,12 @@
 <span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">lodstorage.tabulateCounter</span> <span class="kn">import</span> <span class="n">TabulateCounter</span>
+<span class="kn">from</span> <span class="nn">tests.basetest</span> <span class="kn">import</span> <span class="n">Basetest</span>
 
-<div class="viewcode-block" id="TestTabulate"><a class="viewcode-back" href="../../tests.html#tests.test_Tabulate.TestTabulate">[docs]</a><span class="k">class</span> <span class="nc">TestTabulate</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestTabulate"><a class="viewcode-back" href="../../tests.html#tests.test_Tabulate.TestTabulate">[docs]</a><span class="k">class</span> <span class="nc">TestTabulate</span><span class="p">(</span><span class="n">Basetest</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    test tabulate support/compatibility</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-
-<div class="viewcode-block" id="TestTabulate.setUp"><a class="viewcode-back" href="../../tests.html#tests.test_Tabulate.TestTabulate.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
-        <span class="k">pass</span></div>
-
-
-<div class="viewcode-block" id="TestTabulate.tearDown"><a class="viewcode-back" href="../../tests.html#tests.test_Tabulate.TestTabulate.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="TestTabulate.testIssue24_IntegrateTabulate"><a class="viewcode-back" href="../../tests.html#tests.test_Tabulate.TestTabulate.testIssue24_IntegrateTabulate">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue24_IntegrateTabulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -187,10 +181,13 @@
 <span class="sd">        </span>
 <span class="sd">        test https://pypi.org/project/tabulate/ support</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">show</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#show=True</span>
         <span class="n">royals</span><span class="o">=</span><span class="n">Royals</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;latex&quot;</span><span class="p">,</span><span class="s2">&quot;grid&quot;</span><span class="p">,</span><span class="s2">&quot;mediawiki&quot;</span><span class="p">,</span><span class="s2">&quot;github&quot;</span><span class="p">]:</span>
             <span class="n">table</span><span class="o">=</span><span class="n">tabulate</span><span class="p">(</span><span class="n">royals</span><span class="o">.</span><span class="n">royals</span><span class="p">,</span><span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span><span class="n">tablefmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="n">table</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span><span class="n">table</span><span class="p">)</span>
     
         <span class="n">cities</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">getCities</span><span class="p">()</span>    
         <span class="n">counter</span><span class="o">=</span><span class="n">Counter</span><span class="p">()</span>
@@ -199,11 +196,10 @@
         <span class="n">tabulateCounter</span><span class="o">=</span><span class="n">TabulateCounter</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;latex&quot;</span><span class="p">,</span><span class="s2">&quot;grid&quot;</span><span class="p">,</span><span class="s2">&quot;mediawiki&quot;</span><span class="p">,</span><span class="s2">&quot;github&quot;</span><span class="p">]:</span>
             <span class="n">table</span><span class="o">=</span><span class="n">tabulateCounter</span><span class="o">.</span><span class="n">mostCommonTable</span><span class="p">(</span><span class="n">tablefmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
         <span class="k">pass</span></div></div>
     
-
-
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="c1">#import sys;sys.argv = [&#39;&#39;, &#39;Test.testName&#39;]</span>
     <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>

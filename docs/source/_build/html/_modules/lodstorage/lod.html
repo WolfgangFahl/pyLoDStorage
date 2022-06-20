@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -181,7 +182,10 @@
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="n">sampleCount</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>
         <span class="n">fields</span><span class="o">=</span><span class="p">[]</span>
+        <span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">listOfDicts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">JSONAble</span><span class="p">):</span>
+                <span class="n">row</span><span class="o">=</span><span class="nb">vars</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
                     <span class="n">fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -333,9 +337,31 @@
                             <span class="k">del</span> <span class="n">lod</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                             <span class="k">continue</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">newValue</span><span class="o">=</span><span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>   
-                            <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">newValue</span></div></div>
+                            <span class="n">newValue</span><span class="o">=</span><span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+                            <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">newValue</span></div>
         
+<div class="viewcode-block" id="LOD.filterFields"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.lod.LOD.filterFields">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filterFields</span><span class="p">(</span><span class="n">lod</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span> <span class="n">reverse</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        filter the given LoD with the given list of fields by either limiting the LoD to the fields or removing the</span>
+<span class="sd">        fields contained in the list depending on the state of the reverse parameter</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lod(list): list of dicts from which the fields should be excluded</span>
+<span class="sd">            fields(list): list of fields that should be excluded from the lod</span>
+<span class="sd">            reverse(bool): If True limit dict to the list of given fields. Otherwise exclude the fields from the dict.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            LoD</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">res</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">reverse</span><span class="p">:</span>
+                <span class="n">recordReduced</span><span class="o">=</span><span class="p">{</span><span class="n">d</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">record</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">recordReduced</span> <span class="o">=</span> <span class="p">{</span><span class="n">d</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">record</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">}</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">recordReduced</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div></div>
 </pre></div>
 
            </div>

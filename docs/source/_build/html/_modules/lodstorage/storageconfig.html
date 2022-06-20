@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -186,26 +187,32 @@
 <span class="sd">        Args:</span>
 <span class="sd">            name(str): the name of the cache to use</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">home</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">())</span>
-        <span class="n">cachedir</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">home</span><span class="si">}</span><span class="s2">/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cacheDirName</span><span class="si">}</span><span class="s2">&quot;</span>
+        
+        <span class="n">cachedir</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cacheRootDir</span><span class="si">}</span><span class="s2">/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cacheDirName</span><span class="si">}</span><span class="s2">&quot;</span>
         
         <span class="k">if</span> <span class="n">ensureExists</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cachedir</span><span class="p">):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">cachedir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cachedir</span></div>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">,</span><span class="n">cacheDirName</span><span class="o">=</span><span class="s2">&quot;lodstorage&quot;</span><span class="p">,</span><span class="n">cacheFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">withShowProgress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">errorDebug</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">,</span><span class="n">cacheRootDir</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cacheDirName</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;lodstorage&quot;</span><span class="p">,</span><span class="n">cacheFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">withShowProgress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">errorDebug</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Constructor</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            mode(StoreMode): the storage mode e.g. sql</span>
+<span class="sd">            cacheRootDir(str): the cache root directory to use - if None the home directory will be used</span>
 <span class="sd">            cacheFile(string): the common cacheFile to use (if any)</span>
 <span class="sd">            withShowProgress(boolean): True if progress should be shown</span>
 <span class="sd">            profile(boolean): True if timing / profiling information should be shown</span>
 <span class="sd">            debug(boolean): True if debugging information should be shown</span>
 <span class="sd">            errorDebug(boolean): True if debug info should be provided on errors (should not be used for production since it might reveal data)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">cacheRootDir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">home</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cacheRootDir</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">home</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cacheRootDir</span><span class="o">=</span><span class="n">cacheRootDir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cacheDirName</span><span class="o">=</span><span class="n">cacheDirName</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cacheFile</span><span class="o">=</span><span class="n">cacheFile</span>

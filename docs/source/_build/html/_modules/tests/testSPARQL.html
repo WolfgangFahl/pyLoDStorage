@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -162,24 +163,18 @@
 <span class="sd">@author: wf</span>
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">tests.basetest</span> <span class="kn">import</span> <span class="n">Basetest</span>
 <span class="kn">from</span> <span class="nn">lodstorage.sparql</span> <span class="kn">import</span> <span class="n">SPARQL</span>
 <span class="kn">from</span> <span class="nn">lodstorage.sample</span> <span class="kn">import</span> <span class="n">Sample</span>
 <span class="kn">from</span> <span class="nn">lodstorage.lod</span> <span class="kn">import</span> <span class="n">LOD</span>
+<span class="kn">from</span> <span class="nn">lodstorage.query</span> <span class="kn">import</span> <span class="n">Query</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
-<div class="viewcode-block" id="TestSPARQL"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL">[docs]</a><span class="k">class</span> <span class="nc">TestSPARQL</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSPARQL"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL">[docs]</a><span class="k">class</span> <span class="nc">TestSPARQL</span><span class="p">(</span><span class="n">Basetest</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Test SPARQL access e.g. Apache Jena via Wrapper&#39;&#39;&#39;</span>
-
-<div class="viewcode-block" id="TestSPARQL.setUp"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">=</span><span class="kc">False</span>
-        <span class="k">pass</span></div>
-
-
-<div class="viewcode-block" id="TestSPARQL.tearDown"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="TestSPARQL.getJena"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.getJena">[docs]</a>    <span class="k">def</span> <span class="nf">getJena</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;query&#39;</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">typedLiterals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">profile</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -217,8 +212,13 @@
 <span class="s2">        }</span>
 <span class="s2">        &quot;&quot;&quot;</span><span class="p">,</span><span class="s1">&#39;INVALID COMMAND&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">insertCommand</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">insertCommands</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">index</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
             <span class="n">result</span><span class="p">,</span><span class="n">ex</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">insertCommand</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception: </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -329,6 +329,7 @@
         <span class="n">errors</span><span class="o">=</span><span class="n">jena</span><span class="o">.</span><span class="n">insertListOfDicts</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">,</span><span class="n">entityType</span><span class="p">,</span><span class="n">primaryKey</span><span class="p">,</span><span class="n">prefixes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checkErrors</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">error</span><span class="o">=</span><span class="n">errors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;error is </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;probably the sparql query is bad formed&quot;</span> <span class="ow">in</span> <span class="n">error</span><span class="p">)</span></div>
          
         
@@ -418,14 +419,18 @@
         <span class="n">results</span><span class="o">=</span><span class="n">wd</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="mi">238</span><span class="o">&lt;=</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">))</span></div>
         
-<div class="viewcode-block" id="TestSPARQL.testIssue20"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.testIssue20">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue20</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSPARQL.testIssue20And76"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.testIssue20And76">[docs]</a>    <span class="k">def</span> <span class="nf">testIssue20And76</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        see https://github.com/WolfgangFahl/pyLoDStorage/issues/20</span>
 <span class="sd">        add fixNone option to SPARQL results (same functionality as in SQL)</span>
+<span class="sd">        </span>
+<span class="sd">         https://github.com/WolfgangFahl/pyLoDStorage/issues/76</span>
+<span class="sd">        SPARQL GET method support</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;https://query.wikidata.org/sparql&quot;</span>
-        <span class="n">wd</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="n">endpoint</span><span class="p">)</span>
-        <span class="n">queryString</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span><span class="s2">&quot;GET&quot;</span> <span class="p">]:</span>
+            <span class="n">wd</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+            <span class="n">queryString</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        # Conference Series wikidata query</span>
 <span class="s2"># see https://confident.dbis.rwth-aachen.de/dblpconf/wikidata</span>
 <span class="s2"># WF 2021-01-30</span>
@@ -444,13 +449,78 @@
 <span class="s2">}</span>
 <span class="s2">LIMIT 200</span>
 <span class="s2">&quot;&quot;&quot;</span>
-        <span class="n">lod</span><span class="o">=</span><span class="n">wd</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">queryString</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">fields</span><span class="o">=</span><span class="n">LOD</span><span class="o">.</span><span class="n">getFields</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
+            <span class="n">lod</span><span class="o">=</span><span class="n">wd</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">queryString</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">fields</span><span class="o">=</span><span class="n">LOD</span><span class="o">.</span><span class="n">getFields</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span></div>
+                
+<div class="viewcode-block" id="TestSPARQL.testStackoverflow55961615Query"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.testStackoverflow55961615Query">[docs]</a>    <span class="k">def</span> <span class="nf">testStackoverflow55961615Query</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        see </span>
+<span class="sd">        https://stackoverflow.com/questions/55961615/how-to-integrate-wikidata-query-in-python</span>
+<span class="sd">        https://stackoverflow.com/a/69771615/1497139</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">qlod</span><span class="o">=</span><span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;https://query.wikidata.org/sparql&quot;</span>
+            <span class="n">wd</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="n">endpoint</span><span class="p">)</span>
+            <span class="n">queryString</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;SELECT ?s ?sLabel ?item ?itemLabel ?sourceCode ?webSite ?stackexchangeTag  {</span>
+<span class="s2">    SERVICE wikibase:mwapi {</span>
+<span class="s2">        bd:serviceParam wikibase:api &quot;EntitySearch&quot;.</span>
+<span class="s2">        bd:serviceParam wikibase:endpoint &quot;www.wikidata.org&quot;.</span>
+<span class="s2">        bd:serviceParam mwapi:search &quot;natural language processing&quot;.</span>
+<span class="s2">        bd:serviceParam mwapi:language &quot;en&quot;.</span>
+<span class="s2">        ?item wikibase:apiOutputItem mwapi:item.</span>
+<span class="s2">        ?num wikibase:apiOrdinal true.</span>
+<span class="s2">    }</span>
+<span class="s2">    ?s wdt:P279|wdt:P31 ?item .</span>
+<span class="s2">    OPTIONAL { </span>
+<span class="s2">      ?s wdt:P1324 ?sourceCode.</span>
+<span class="s2">    }</span>
+<span class="s2">    OPTIONAL {    </span>
+<span class="s2">      ?s wdt:P856 ?webSite.</span>
+<span class="s2">    }</span>
+<span class="s2">    OPTIONAL {    </span>
+<span class="s2">      ?s wdt:P1482 ?stackexchangeTag.</span>
+<span class="s2">    }</span>
+<span class="s2">    SERVICE wikibase:label { bd:serviceParam wikibase:language &quot;[AUTO_LANGUAGE],en&quot; }</span>
+<span class="s2">}</span>
+<span class="s2">ORDER BY ?itemLabel ?sLabel&quot;&quot;&quot;</span>
+            <span class="n">qlod</span><span class="o">=</span><span class="n">wd</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">queryString</span><span class="p">,</span><span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2"> access failed with </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="s2">- could not run test&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">qlod</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">Query</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;EntitySearch&quot;</span><span class="p">,</span><span class="n">query</span><span class="o">=</span><span class="n">queryString</span><span class="p">,</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;sparql&#39;</span><span class="p">)</span>
+            <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+            <span class="k">for</span> <span class="n">tablefmt</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;github&quot;</span><span class="p">,</span><span class="s2">&quot;mediawiki&quot;</span><span class="p">,</span><span class="s2">&quot;latex&quot;</span><span class="p">]:</span>
+                <span class="n">qdoc</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">documentQueryResult</span><span class="p">(</span><span class="n">qlod</span><span class="p">,</span><span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span> <span class="p">(</span><span class="n">qdoc</span><span class="p">)</span></div>
+ 
+<div class="viewcode-block" id="TestSPARQL.testStackoverflow71444069"><a class="viewcode-back" href="../../tests.html#tests.testSPARQL.TestSPARQL.testStackoverflow71444069">[docs]</a>    <span class="k">def</span> <span class="nf">testStackoverflow71444069</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        https://stackoverflow.com/questions/71444069/create-csv-from-result-of-a-for-google-colab/71548650#71548650</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">from</span> <span class="nn">lodstorage.sparql</span> <span class="kn">import</span> <span class="n">SPARQL</span>
+        <span class="kn">from</span> <span class="nn">lodstorage.csv</span> <span class="kn">import</span> <span class="n">CSV</span>
+        <span class="n">sparqlQuery</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;SELECT ?org ?orgLabel</span>
+<span class="s2">WHERE</span>
+<span class="s2">{</span>
+<span class="s2">  ?org wdt:P31 wd:Q4830453. #instance of organizations</span>
+<span class="s2">  ?org wdt:P17 wd:Q96. #Mexico country</span>
+
+<span class="s2">  SERVICE wikibase:label { bd:serviceParam wikibase:language &quot;en&quot;}</span>
+<span class="s2">}&quot;&quot;&quot;</span>
+        <span class="n">sparql</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="s2">&quot;https://query.wikidata.org/sparql&quot;</span><span class="p">)</span>
+        <span class="n">qlod</span><span class="o">=</span><span class="n">sparql</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">sparqlQuery</span><span class="p">)</span>
+        <span class="n">csv</span><span class="o">=</span><span class="n">CSV</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="n">qlod</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span></div></div>
+            <span class="nb">print</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span></div></div>
+    
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="c1">#import sys;sys.argv = [&#39;&#39;, &#39;Test.testName&#39;]</span>

@@ -34,6 +34,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -87,7 +88,7 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
 </ul>
@@ -159,6 +160,7 @@
 <span></span><span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">import</span> <span class="nn">io</span>
 
+<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span>
 <span class="kn">from</span> <span class="nn">lodstorage.lod</span> <span class="kn">import</span> <span class="n">LOD</span>
 
 
@@ -187,7 +189,7 @@
         <span class="k">return</span> <span class="n">lod</span></div>
 
 <div class="viewcode-block" id="CSV.fromCSV"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.csv.CSV.fromCSV">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">fromCSV</span><span class="p">(</span><span class="n">csvString</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">headerNames</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fromCSV</span><span class="p">(</span><span class="n">csvString</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONNUMERIC</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        convert given csv string to list of dicts (LOD)</span>
 
@@ -198,7 +200,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            list of dicts (LoD) containing the content of the given csv string</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">csvString</span><span class="p">),</span> <span class="n">headerNames</span><span class="p">)</span>
+        <span class="n">csvStream</span><span class="o">=</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">csvString</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">csvStream</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">fields</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">quoting</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">lod</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
         <span class="n">CSV</span><span class="o">.</span><span class="n">fixTypes</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">lod</span></div>
@@ -221,25 +224,35 @@
         <span class="n">CSV</span><span class="o">.</span><span class="n">writeFile</span><span class="p">(</span><span class="n">csvStr</span><span class="p">,</span> <span class="n">filePath</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CSV.toCSV"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.csv.CSV.toCSV">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">toCSV</span><span class="p">(</span><span class="n">lod</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">toCSV</span><span class="p">(</span><span class="n">lod</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span> <span class="n">includeFields</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">excludeFields</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONNUMERIC</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        converts the given lod to CSV string.</span>
+<span class="sd">        For details about the csv dialect parameters see https://docs.python.org/3/library/csv.html#csv-fmt-params</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lod(list): lod that should be converted to csv string</span>
-
+<span class="sd">            includeFields(list): list of fields that should be included in the csv (positive list)</span>
+<span class="sd">            excludeFields(list): list of fields that should be excluded from the csv (negative list)</span>
+<span class="sd">            kwargs: csv dialect parameters</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            csv string of the given lod</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="n">LOD</span><span class="o">.</span><span class="n">getFields</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
-        <span class="n">keys</span><span class="o">=</span><span class="n">fields</span>
-        <span class="n">csvString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">csvStream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">csvString</span><span class="p">)</span>
-        <span class="n">dict_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">csvStream</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lod</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">JSONAble</span><span class="p">):</span>
+            <span class="n">lod</span><span class="o">=</span><span class="p">[</span><span class="nb">vars</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">excludeFields</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lod</span><span class="o">=</span><span class="n">LOD</span><span class="o">.</span><span class="n">filterFields</span><span class="p">(</span><span class="n">lod</span><span class="p">,</span> <span class="n">excludeFields</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">includeFields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="n">LOD</span><span class="o">.</span><span class="n">getFields</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fields</span><span class="o">=</span><span class="n">includeFields</span>
+            <span class="n">lod</span><span class="o">=</span><span class="n">LOD</span><span class="o">.</span><span class="n">filterFields</span><span class="p">(</span><span class="n">lod</span><span class="p">,</span> <span class="n">includeFields</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">csvStream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="n">dict_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">csvStream</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">fields</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">quoting</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">dict_writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
         <span class="n">dict_writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">lod</span><span class="p">)</span>
-        <span class="n">csvStream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">csvString</span> <span class="o">=</span> <span class="n">csvStream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">csvString</span> <span class="o">=</span> <span class="n">csvStream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">csvString</span></div>
 
 <div class="viewcode-block" id="CSV.readFile"><a class="viewcode-back" href="../../lodstorage.html#lodstorage.csv.CSV.readFile">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -252,7 +265,6 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Content of the file as string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">content</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">content</span></div>
