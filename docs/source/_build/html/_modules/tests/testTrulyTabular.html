@@ -1,0 +1,426 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>tests.testTrulyTabular &mdash; pyLoDStorage  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyLoDStorage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">setup module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyLoDStorage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>tests.testTrulyTabular</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for tests.testTrulyTabular</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Created on 2022-03-4</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">lodstorage.trulytabular</span> <span class="kn">import</span> <span class="n">TrulyTabular</span><span class="p">,</span> <span class="n">WikidataItem</span><span class="p">,</span> <span class="n">WikidataProperty</span>
+<span class="kn">from</span> <span class="nn">lodstorage.query</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QuerySyntaxHighlight</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sparql</span> <span class="kn">import</span> <span class="n">SPARQL</span>
+
+<div class="viewcode-block" id="TestTrulyTabular"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular">[docs]</a><span class="k">class</span> <span class="nc">TestTrulyTabular</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    test Truly tabular analysis</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="TestTrulyTabular.setUp"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="TestTrulyTabular.tearDown"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestTrulyTabular.testGetFirst"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.testGetFirst">[docs]</a>    <span class="k">def</span> <span class="nf">testGetFirst</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test the get First helper function</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">tt</span><span class="o">=</span><span class="n">TrulyTabular</span><span class="p">(</span><span class="s2">&quot;Q2020153&quot;</span><span class="p">)</span>
+        <span class="n">testcases</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span> 
+                <span class="s2">&quot;qlod&quot;</span><span class="p">:[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;firstname&quot;</span><span class="p">}],</span>
+                <span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="s2">&quot;firstname&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;qlod&quot;</span><span class="p">:[],</span>
+                <span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="kc">None</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;qlod&quot;</span><span class="p">:[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;firstname&quot;</span><span class="p">},{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;second name&quot;</span><span class="p">}],</span>
+                <span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="kc">None</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">testcase</span> <span class="ow">in</span> <span class="n">testcases</span><span class="p">:</span>
+            <span class="n">qLod</span><span class="o">=</span><span class="n">testcase</span><span class="p">[</span><span class="s2">&quot;qlod&quot;</span><span class="p">]</span>
+            <span class="n">expected</span><span class="o">=</span><span class="n">testcase</span><span class="p">[</span><span class="s2">&quot;expected&quot;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">getFirst</span><span class="p">(</span><span class="n">qLod</span><span class="p">,</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span></div>
+                
+<div class="viewcode-block" id="TestTrulyTabular.documentQuery"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.documentQuery">[docs]</a>    <span class="k">def</span> <span class="nf">documentQuery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">tt</span><span class="p">,</span><span class="n">query</span><span class="p">,</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">formats</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mediawiki&quot;</span><span class="p">]):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        document the given query for the given TrueTabular instance</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">qlod</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tablefmt</span> <span class="ow">in</span> <span class="n">formats</span><span class="p">:</span>
+            <span class="n">tryItUrl</span><span class="o">=</span><span class="s2">&quot;https://query.wikidata.org/&quot;</span>
+            <span class="n">doc</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">documentQueryResult</span><span class="p">(</span><span class="n">qlod</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">,</span><span class="n">tryItUrl</span><span class="o">=</span><span class="n">tryItUrl</span><span class="p">,</span><span class="n">floatfmt</span><span class="o">=</span><span class="s2">&quot;.0f&quot;</span><span class="p">)</span>
+            <span class="n">docstr</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">asText</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span><span class="n">docstr</span><span class="p">)</span></div>
+                
+<div class="viewcode-block" id="TestTrulyTabular.testGetPropertiesByLabel"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.testGetPropertiesByLabel">[docs]</a>    <span class="k">def</span> <span class="nf">testGetPropertiesByLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        try getting properties by label</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="n">propertyLabels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">,</span><span class="s2">&quot;country&quot;</span><span class="p">,</span><span class="s2">&quot;location&quot;</span><span class="p">]</span>
+        <span class="n">tt</span><span class="o">=</span><span class="n">TrulyTabular</span><span class="p">(</span><span class="s2">&quot;Q2020153&quot;</span><span class="p">,</span><span class="n">propertyLabels</span><span class="o">=</span><span class="n">propertyLabels</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">propertyLabels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">prop</span> <span class="ow">in</span> <span class="n">tt</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="TestTrulyTabular.testGetPropertiesById"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.testGetPropertiesById">[docs]</a>    <span class="k">def</span> <span class="nf">testGetPropertiesById</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        try getting properties by label</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="n">propertyIds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;P1800&quot;</span><span class="p">]</span>
+        <span class="n">expected</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Wikimedia database name&quot;</span><span class="p">]</span>
+        <span class="n">sparql</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="n">TrulyTabular</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+        <span class="n">propList</span><span class="o">=</span><span class="n">WikidataProperty</span><span class="o">.</span><span class="n">getPropertiesByIds</span><span class="p">(</span><span class="n">sparql</span><span class="p">,</span> <span class="n">propertyIds</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">prop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">propList</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">prop</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span><span class="n">expected</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+            
+<div class="viewcode-block" id="TestTrulyTabular.testGetItemsByLabel"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.testGetItemsByLabel">[docs]</a>    <span class="k">def</span> <span class="nf">testGetItemsByLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        try getting items by label</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1">#debug=self.debug</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">qLabels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;academic conference&quot;</span><span class="p">,</span><span class="s2">&quot;scientific conference series&quot;</span><span class="p">,</span><span class="s2">&quot;whisky distillery&quot;</span><span class="p">,</span><span class="s2">&quot;human&quot;</span><span class="p">]</span>
+        <span class="n">sparql</span><span class="o">=</span><span class="n">SPARQL</span><span class="p">(</span><span class="n">TrulyTabular</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+        <span class="n">items</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">qLabel</span> <span class="ow">in</span> <span class="n">qLabels</span><span class="p">:</span>
+            <span class="n">items4Label</span><span class="o">=</span><span class="n">WikidataItem</span><span class="o">.</span><span class="n">getItemsByLabel</span><span class="p">(</span><span class="n">sparql</span><span class="p">,</span> <span class="n">qLabel</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items4Label</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">items</span><span class="p">[</span><span class="n">qLabel</span><span class="p">]</span><span class="o">=</span><span class="n">items4Label</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">qLabel</span> <span class="ow">in</span> <span class="n">qLabels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">qLabel</span> <span class="ow">in</span> <span class="n">items</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTrulyTabular.testTrulyTabularTables"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.testTrulyTabularTables">[docs]</a>    <span class="k">def</span> <span class="nf">testTrulyTabularTables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test Truly Tabular for different tabular queries</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="n">show</span><span class="o">=</span><span class="kc">False</span>
+        <span class="n">showStats</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mediawiki&quot;</span><span class="p">,</span><span class="s2">&quot;github&quot;</span><span class="p">,</span><span class="s2">&quot;latex&quot;</span><span class="p">]</span>
+        <span class="n">tables</span><span class="o">=</span><span class="p">[</span> 
+            <span class="p">{</span>
+               <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;computer scientist&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;humans with the occupation computer scientist&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;qid&quot;</span><span class="p">:</span><span class="s2">&quot;Q5&quot;</span><span class="p">,</span> <span class="c1"># human</span>
+               <span class="s2">&quot;where&quot;</span><span class="p">:</span> <span class="s2">&quot;?item wdt:P106 wd:Q82594.&quot;</span><span class="p">,</span> <span class="c1"># computer scientist only</span>
+               <span class="s2">&quot;propertyLabels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sex or gender&quot;</span><span class="p">,</span><span class="s2">&quot;date of birth&quot;</span><span class="p">,</span><span class="s2">&quot;place of birth&quot;</span><span class="p">,</span><span class="s2">&quot;field of work&quot;</span><span class="p">,</span><span class="s2">&quot;occupation&quot;</span><span class="p">,</span><span class="s2">&quot;ORCID iD&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;GND ID&quot;</span><span class="p">,</span><span class="s2">&quot;DBLP author ID&quot;</span><span class="p">,</span><span class="s2">&quot;Google Scholar author ID&quot;</span><span class="p">,</span><span class="s2">&quot;VIAF ID&quot;</span><span class="p">],</span>
+               <span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="mi">10</span>  
+            <span class="p">},</span>
+            <span class="p">{</span>
+               <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;academic conferences&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;academic conferences&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;qid&quot;</span><span class="p">:</span> <span class="s2">&quot;Q2020153&quot;</span><span class="p">,</span><span class="c1"># academic conference</span>
+               <span class="s2">&quot;propertyLabels&quot;</span><span class="p">:[</span><span class="s2">&quot;title&quot;</span><span class="p">,</span><span class="s2">&quot;country&quot;</span><span class="p">,</span><span class="s2">&quot;location&quot;</span><span class="p">,</span><span class="s2">&quot;short name&quot;</span><span class="p">,</span><span class="s2">&quot;start time&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;end time&quot;</span><span class="p">,</span><span class="s2">&quot;part of the series&quot;</span><span class="p">,</span><span class="s2">&quot;official website&quot;</span><span class="p">,</span><span class="s2">&quot;described at URL&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;WikiCFP event ID&quot;</span><span class="p">,</span><span class="s2">&quot;GND ID&quot;</span><span class="p">,</span><span class="s2">&quot;VIAF ID&quot;</span><span class="p">,</span><span class="s2">&quot;main subject&quot;</span><span class="p">,</span><span class="s2">&quot;language used&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;is proceedings from&quot;</span>
+               <span class="p">],</span>
+               <span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="mi">7500</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;scientific conferences series&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;scientific conference series&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;qid&quot;</span><span class="p">:</span> <span class="s2">&quot;Q47258130&quot;</span><span class="p">,</span> <span class="c1"># scientific conference series</span>
+                <span class="s2">&quot;propertyLabels&quot;</span><span class="p">:[</span><span class="s2">&quot;title&quot;</span><span class="p">,</span><span class="s2">&quot;short name&quot;</span><span class="p">,</span><span class="s2">&quot;inception&quot;</span><span class="p">,</span><span class="s2">&quot;official website&quot;</span><span class="p">,</span><span class="s2">&quot;DBLP venue ID&quot;</span><span class="p">,</span><span class="s2">&quot;GND ID&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Microsoft Academic ID&quot;</span><span class="p">,</span><span class="s2">&quot;Freebase ID&quot;</span><span class="p">,</span><span class="s2">&quot;WikiCFP conference series ID&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Publons journals/conferences ID&quot;</span><span class="p">,</span><span class="s2">&quot;ACM conference ID&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="mi">4200</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;whisky distilleries&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;whisky distilleries&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;qid&quot;</span><span class="p">:</span> <span class="s2">&quot;Q10373548&quot;</span><span class="p">,</span> <span class="c1"># whisky distillery</span>
+                <span class="s2">&quot;propertyLabels&quot;</span><span class="p">:[</span><span class="s2">&quot;inception&quot;</span><span class="p">,</span><span class="s2">&quot;official website&quot;</span><span class="p">,</span><span class="s2">&quot;owned by&quot;</span><span class="p">,</span><span class="s2">&quot;country&quot;</span><span class="p">,</span><span class="s2">&quot;headquarters location&quot;</span><span class="p">,</span><span class="s2">&quot;Whiskybase distillery ID&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="mi">200</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+        <span class="n">errors</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">[</span><span class="mi">3</span><span class="p">:]:</span>
+            <span class="c1"># academic conference</span>
+            <span class="n">where</span><span class="o">=</span><span class="kc">None</span>
+            <span class="k">if</span> <span class="s2">&quot;where&quot;</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+                <span class="n">where</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;where&quot;</span><span class="p">]</span>
+            <span class="n">tt</span><span class="o">=</span><span class="n">TrulyTabular</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;qid&quot;</span><span class="p">],</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;propertyLabels&quot;</span><span class="p">],</span><span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;is proceedings from&quot;</span> <span class="ow">in</span> <span class="n">tt</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+                <span class="n">tt</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;is proceedings from&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">count</span><span class="o">&gt;</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;expected&quot;</span><span class="p">])</span>
+            <span class="n">stats</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">getPropertyStatistics</span><span class="p">()</span>
+            <span class="c1"># sort descending by total percentage</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;total%&#39;</span><span class="p">],</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+            <span class="k">for</span> <span class="n">tablefmt</span> <span class="ow">in</span> <span class="n">showStats</span><span class="p">:</span>
+                <span class="n">query</span><span class="o">=</span><span class="n">Query</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">doc</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">documentQueryResult</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">,</span> <span class="n">withSourceCode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">wdProperty</span> <span class="ow">in</span> <span class="n">tt</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">asFrequency</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span><span class="kc">False</span><span class="p">]:</span>
+                        <span class="n">query</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">noneTabularQuery</span><span class="p">(</span><span class="n">wdProperty</span><span class="p">,</span><span class="n">asFrequency</span><span class="o">=</span><span class="n">asFrequency</span><span class="p">)</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">documentQuery</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;query for </span><span class="si">{</span><span class="n">wdProperty</span><span class="si">}</span><span class="s2"> failed</span><span class="se">\n</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="n">errors</span><span class="o">+=</span><span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">errors</span><span class="p">)</span></div>
+            
+                
+<div class="viewcode-block" id="TestTrulyTabular.testMostFrequentProperties"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.testMostFrequentProperties">[docs]</a>    <span class="k">def</span> <span class="nf">testMostFrequentProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        test getting the most frequent properties for some Wikidata Item types</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1">#show=True</span>
+        <span class="n">show</span><span class="o">=</span><span class="kc">False</span>
+        <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="c1">#debug=True</span>
+        <span class="k">for</span> <span class="n">qid</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Q6256&quot;</span><span class="p">]:</span>
+            <span class="n">tt</span><span class="o">=</span><span class="n">TrulyTabular</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">mostFrequentPropertiesQuery</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">documentQuery</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span><span class="n">formats</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;github&quot;</span><span class="p">],</span><span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTrulyTabular.testSyntaxHighlighting"><a class="viewcode-back" href="../../tests.html#tests.testTrulyTabular.TestTrulyTabular.testSyntaxHighlighting">[docs]</a>    <span class="k">def</span> <span class="nf">testSyntaxHighlighting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        https://github.com/WolfgangFahl/pyLoDStorage/issues/81</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1">#debug=self.debug</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">qid</span><span class="o">=</span><span class="s2">&quot;Q6256&quot;</span> <span class="c1"># country</span>
+        <span class="n">tt</span><span class="o">=</span><span class="n">TrulyTabular</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">query</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">mostFrequentPropertiesQuery</span><span class="p">()</span>
+        <span class="n">sh</span><span class="o">=</span><span class="n">QuerySyntaxHighlight</span><span class="p">(</span><span class="n">query</span><span class="p">,</span><span class="s2">&quot;html&quot;</span><span class="p">)</span>
+        <span class="n">html</span><span class="o">=</span><span class="n">sh</span><span class="o">.</span><span class="n">highlight</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s1">&#39;&lt;span class=&quot;k&quot;&gt;SELECT&lt;/span&gt;&#39;</span> <span class="ow">in</span> <span class="n">html</span><span class="p">)</span>
+        <span class="k">pass</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1">#import sys;sys.argv = [&#39;&#39;, &#39;Test.testName&#39;]</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020-2021, Wolfgang Fahl.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
