@@ -38,7 +38,7 @@ setup(
           'jsonpickle',
           'tabulate',
           'pygments',
-          'pylatexenc~=2.10'
+          'pylatexenc~=2.10',
           'dictoxml~=1.7.4'
     ],
     classifiers=[
