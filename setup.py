@@ -39,7 +39,7 @@ setup(
           'tabulate',
           'pygments',
           'pylatexenc~=2.10',
-          'dictoxml~=1.7.4'
+          'dicttoxml~=1.7.4'
     ],
     classifiers=[
             'Programming Language :: Python',
