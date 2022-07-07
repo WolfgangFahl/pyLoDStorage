@@ -114,6 +114,9 @@
 'AcademicConferenceItemLabel':
   sparql: |
       # get the label for the given item
+      PREFIX p: <http://www.wikidata.org/prop/>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX wd: <http://www.wikidata.org/entity/>
       SELECT ?itemLabel
       WHERE
       {
