@@ -356,8 +356,11 @@ determines the number of instances available in the OpenStreetMap for the placeT
         see https://github.com/WolfgangFahl/pyLoDStorage/issues/61
         """
         queriesPath=f"{os.path.dirname(__file__)}/../sampledata/scholia.yaml"
-        args=["-qp", f"{queriesPath}", "--list"]
+        args=["-qp", f"{queriesPath}","-l", "sparql", "--list"]
         result=self.captureQueryMain(args)
+        debug=self.debug
+        if debug:
+            print(result)
         self.assertTrue("WorksAndAuthor" in result)    
 
 
