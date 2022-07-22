@@ -335,6 +335,19 @@ determines the number of instances available in the OpenStreetMap for the placeT
                         
             except Exception as ex:
                 print(f"{query.title} at {endpointUrl} failed: {ex}")
+                
+    def testIssue89(self):
+        '''
+        test fix TypeError('Object of type datetime is not JSON serializable') #89 
+        '''
+        queriesPath=f"{os.path.dirname(__file__)}/../sampledata/wikidata.yaml"
+        args=["-qp", f"{queriesPath}", "-l" "sparql", "-qn", "MachadoDeAssis", "-f","json"]
+        result=self.captureQueryMain(args)
+        debug=self.debug
+        if debug:
+            print(result)
+        self.assertTrue("1839-06-21" in result)
+        
 
     def testIssue61(self):
         """
@@ -344,14 +357,7 @@ determines the number of instances available in the OpenStreetMap for the placeT
         """
         queriesPath=f"{os.path.dirname(__file__)}/../sampledata/scholia.yaml"
         args=["-qp", f"{queriesPath}", "--list"]
-        stdout = io.StringIO()
-        with redirect_stdout(stdout):
-            queryMain(args, lang="sparql")
-            result = stdout.getvalue()
-        #debug=self.debug
-        debug=True
-        if debug:
-            print(result)
+        result=self.captureQueryMain(args)
         self.assertTrue("WorksAndAuthor" in result)    
 
 

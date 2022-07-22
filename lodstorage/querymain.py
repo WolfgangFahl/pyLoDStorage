@@ -102,8 +102,9 @@ class QueryMain:
                 doc=query.documentQueryResult(qlod, tablefmt=str(args.format),floatfmt=".0f")
                 docstr=doc.asText()
                 print (docstr)
-            elif args.format in [Format.json]:
-                print(json.dumps(qlod))
+            elif args.format in [Format.json] or args.format is None: # set as default
+                # https://stackoverflow.com/a/36142844/1497139
+                print(json.dumps(qlod,indent=2, sort_keys=True, default=str))
             elif args.format in [Format.xml]:
                 lod2xml=Lod2Xml(qlod)
                 xml=lod2xml.asXml()

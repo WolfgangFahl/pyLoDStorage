@@ -126,3 +126,24 @@
         ?item rdfs:label ?itemLabel.
         filter (lang(?itemLabel) = "en").
       }
+'MachadoDeAssis':
+# https://stackoverflow.com/questions/71809883/sparql-query-dates-json-results-in-the-same-format-that-in-web-portal
+  sparql: |
+    # modified by WF 2022-07-22
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    SELECT ?author ?authorLabel ?birthDate
+    WHERE 
+    {
+      VALUES ?authorLabel {
+        "Machado de Assis"@pt
+      }
+      # Instance of Human
+      ?author wdt:P31 wd:Q5 .
+      # Joaquim Maria Machado de Assis
+      ?author rdfs:label ?authorLabel.
+      FILTER (LANG(?authorLabel) = "pt").
+      # birthDate
+      ?author wdt:P569 ?birthDate .
+    }

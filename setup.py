@@ -3,17 +3,19 @@
 from setuptools import setup
 from collections import OrderedDict
 from lodstorage.version import Version
+import pathlib
 
-# read the contents of your README file
-from os import path
-this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+# where is this setup file?
+here = pathlib.Path(__file__).parent.resolve()
+# get thre requirements
+requirements = (here / 'requirements.txt').read_text(encoding='utf-8').split("\n")
+# and the README content
+long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name=Version.name,
     version=Version.version,
-
+    description=Version.description,
     packages=['lodstorage','sampledata'],
     package_data={
           'sampledata': ['*.yaml'],
@@ -30,23 +32,15 @@ setup(
         )
     ),
     license='Apache License',
-    description='python List of Dict (Table) Storage library',
-    install_requires=[
-          'SPARQLWrapper',
-          'PyYAML',
-          'pandas',
-          'jsonpickle',
-          'tabulate',
-          'pygments',
-          'pylatexenc~=2.10',
-          'dicttoxml~=1.7.4'
-    ],
+   
+    install_requires=requirements,
     classifiers=[
             'Programming Language :: Python',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9'
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10'
     ],
     entry_points={
       'console_scripts': [
