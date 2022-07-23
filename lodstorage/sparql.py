@@ -22,7 +22,7 @@ class SPARQL(object):
     :ivar sparql: the SPARQLWrapper2 instance to be used
     :ivar method(str): the HTTP method to be used 'POST' or 'GET'
     '''
-    def __init__(self,url,mode='query', debug=False, typedLiterals=False,  profile=False, agent='PyLodStorage',method='POST'):
+    def __init__(self,url,mode='query', debug=False, isFuseki=False,typedLiterals=False,  profile=False, agent='PyLodStorage',method='POST'):
         '''
         Constructor a SPARQL wrapper
         
@@ -35,7 +35,10 @@ class SPARQL(object):
             agent(string): the User agent to use
             method(string): the HTTP method to be used 'POST' or 'GET'
         '''
-        self.url=f"{url}/{mode}"
+        if isFuseki:
+            self.url=f"{url}/{mode}"
+        else:
+            self.url=url
         self.mode=mode
         self.debug=debug
         self.typedLiterals=typedLiterals
