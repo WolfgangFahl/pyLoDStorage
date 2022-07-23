@@ -35,7 +35,7 @@ class SPARQL(object):
             agent(string): the User agent to use
             method(string): the HTTP method to be used 'POST' or 'GET'
         '''
-        self.url="url%s" % (mode)
+        self.url=f"{url}/{mode}"
         self.mode=mode
         self.debug=debug
         self.typedLiterals=typedLiterals

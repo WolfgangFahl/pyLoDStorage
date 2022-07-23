@@ -269,7 +269,7 @@ class TrulyTabular(object):
         self.queryManager=TrulyTabular.getQueryManager(debug=self.debug)
         self.properties=WikidataProperty.getPropertiesByIds(self.sparql,propertyIds,lang)
         self.properties.update(WikidataProperty.getPropertiesByLabels(self.sparql, propertyLabels, lang))
-    
+        self.error=None
         
     def __str__(self):
         '''
@@ -295,6 +295,7 @@ WHERE
         try:
             count=self.sparql.getValue(query, "count")
         except Exception as ex:
+            self.error=ex
             count=None
             
         return count
