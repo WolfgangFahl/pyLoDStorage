@@ -157,9 +157,9 @@ class WikidataItem:
         if hasattr(self, "qlabel"):
             text=f"{self.qlabel} ({self.qid})"  
         if hasattr(self,"description"):
-            text+=f":{self.description}"
+            text+=f"☞{self.description}"
         if long:
-            text+=f"-> https://www.wikidata.org/wiki/{self.qid}"
+            text+=f"→ https://www.wikidata.org/wiki/{self.qid}"
         return text
     
     @classmethod
@@ -282,8 +282,10 @@ class TrulyTabular(object):
         '''
         get my count
         '''
-        query=f"""# Count all items with the given 
-# type {self.item.asText(long=True)}
+        #itemText=self.item.asText(long=True)
+        itemText=self.itemQid
+        query=f"""# Count all items with the given type
+# {itemText}
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT (COUNT (DISTINCT ?item) AS ?count)

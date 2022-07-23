@@ -7,6 +7,7 @@ import unittest
 from lodstorage.trulytabular import TrulyTabular, WikidataItem, WikidataProperty
 from lodstorage.query import Query, QuerySyntaxHighlight
 from lodstorage.sparql import SPARQL
+from pickle import TRUE
 
 class TestTrulyTabular(unittest.TestCase):
     '''
@@ -215,7 +216,20 @@ class TestTrulyTabular(unittest.TestCase):
             print(html)
         self.assertTrue('<span class="k">SELECT</span>' in html)
         pass
-
+    
+    def testCount(self):
+        '''
+        test the count function of truly tabular
+        '''
+        debug=True  
+        qid="Q55488" # railway stations
+        tt=TrulyTabular(qid,debug=debug)
+        count=tt.count()
+        if debug:
+            print(f"count of railway stations is {count}")
+        self.assertEqual(106195,count)
+            
+        self.assertTrue(tt.error is None)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
