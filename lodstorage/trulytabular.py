@@ -292,7 +292,12 @@ WHERE
   # instance of {self.item.qlabel}
   ?item wdt:P31 wd:{self.item.qid}.{self.where}
 }}"""
-        return self.sparql.getValue(query, "count")
+        try:
+            count=self.sparql.getValue(query, "count")
+        except Exception as ex:
+            count=None
+            
+        return count
     
     def asText(self,long:bool=True):
         '''
