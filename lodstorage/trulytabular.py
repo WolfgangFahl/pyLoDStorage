@@ -6,6 +6,7 @@ Created on 2022-04-14
 from lodstorage.sparql import SPARQL
 from lodstorage.query import Query,QueryManager,YamlPath
 import os
+import textwrap
 import re
 
 class WikidataProperty():
@@ -140,15 +141,15 @@ class WikidataItem:
             self.qlabel,self.description=WikidataItem.getLabelAndDescription(sparql, self.qid, self.lang)
     
     def __str__(self):
-                
         return self.asText(long=False)
     
-    def asText(self,long:bool=True):
+    def asText(self,long:bool=True,wrapAt:int=0):
         '''
         returns my content as a text representation
         
         Args:
             long(bool): True if a long format including url is wished
+            wrapAt(int): wrap long lines at the given width (if >0)
             
         Returns:
             str: a text representation of my content
@@ -157,7 +158,10 @@ class WikidataItem:
         if hasattr(self, "qlabel"):
             text=f"{self.qlabel} ({self.qid})"  
         if hasattr(self,"description"):
-            text+=f"☞{self.description}"
+            desc=self.description
+            if wrapAt>0:
+                desc=textwrap.fill(desc,width=wrapAt)
+            text+=f"☞{desc}"
         if long:
             text+=f"→ https://www.wikidata.org/wiki/{self.qid}"
         return text
@@ -282,8 +286,7 @@ class TrulyTabular(object):
         '''
         get my count
         '''
-        #itemText=self.item.asText(long=True)
-        itemText=self.itemQid
+        itemText=self.getItemText()
         query=f"""# Count all items with the given type
 # {itemText}
 PREFIX wd: <http://www.wikidata.org/entity/>
@@ -315,6 +318,12 @@ WHERE
         text=self.item.asText(long)
         return text
     
+    def getItemText(self):
+        # leads to 405 Method not allowed in SPARQLWrapper under certain circumstances
+        # itemText=self.asText(long=True)
+        itemText=self.itemQid
+        return itemText
+    
     @classmethod
     def getQueryManager(cls,lang='sparql',name="trulytabular",debug=False):
         '''
@@ -343,9 +352,10 @@ WHERE
         if whereClause is None:
             whereClause=f"?item wdt:P31 wd:{self.itemQid};";
         else:
-            whereClause+=";"
-        query.title=f"most frequently used properties for {self.asText(long=True)}"
-        query.query=query.query % (self.item.asText(long=True),whereClause,self.lang)
+            whereClause+=";"     
+        itemText=self.getItemText()
+        query.title=f"most frequently used properties for {self.item.asText(long=True)}"
+        query.query=query.query % (itemText,whereClause,self.lang)
         return query
     
     def noneTabularQuery(self,wdProperty:WikidataProperty,asFrequency:bool=True):
@@ -387,7 +397,9 @@ ORDER BY DESC (?frequency)"""
             sparql=f"""{sparql}
 HAVING (COUNT (?value) > 1)
 ORDER BY DESC(?count)"""
-        query=Query(query=sparql,name=f"NonTabular {self.item.qlabel}/{propertyLabel}:{freqDesc}",title=f"non tabular entries for {self.item.qlabel}/{propertyLabel}:{freqDesc}")
+        title=f"non tabular entries for {self.item.qlabel}/{propertyLabel}:{freqDesc}"
+        name=f"NonTabular {self.item.qlabel}/{propertyLabel}:{freqDesc}"
+        query=Query(query=sparql,name=name,title=title)
         return query
 
     def noneTabular(self,wdProperty:WikidataProperty):
