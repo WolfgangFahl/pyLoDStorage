@@ -135,6 +135,7 @@ class WikidataItem:
             sparql(SPARQL): the sparql access to use
         '''
         self.qid=qid
+        self.url=f"https://www.wikidata.org/wiki/{self.qid}"
         self.lang=lang
         self.sparql=sparql
         if sparql is not None:
@@ -163,7 +164,7 @@ class WikidataItem:
                 desc=textwrap.fill(desc,width=wrapAt)
             text+=f"☞{desc}"
         if long:
-            text+=f"→ https://www.wikidata.org/wiki/{self.qid}"
+            text+=f"→ {self.url}"
         return text
     
     @classmethod
