@@ -450,7 +450,7 @@ ORDER BY DESC(?count)"""
             if count>maxCount:
                 maxCount=count     
             total+=f
-        statsRow["max"]=maxCount
+        statsRow["maxf"]=maxCount
         if withQuery:
             statsRow["queryf"]=self.noneTabularQuery(wdProperty).query
             statsRow["queryex"]=self.noneTabularQuery(wdProperty,asFrequency=False).query
