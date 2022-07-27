@@ -4,6 +4,7 @@ Created on 2022-02-13
 @author: wf
 '''
 from lodstorage.version import Version
+from pathlib import Path
 __version__ = Version.version
 __date__ = Version.date
 __updated__ = Version.updated
@@ -20,7 +21,7 @@ from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
 from lodstorage.csv import CSV
-from lodstorage.query import QueryManager, EndpointManager, Format, ValueFormatter
+from lodstorage.query import Query,QueryManager, EndpointManager, Format, ValueFormatter
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
 from lodstorage.xml import Lod2Xml
@@ -42,6 +43,7 @@ class QueryMain:
         debug=args.debug
         endpoints=EndpointManager.getEndpoints(args.endpointPath)
         qm=QueryManager(lang=args.language,debug=debug,queriesPath=args.queriesPath)
+        query=None
         queryCode=args.query
         endpointConf=None
         formats=None
@@ -66,6 +68,13 @@ class QueryMain:
             if debug or args.showQuery:
                 if hasattr(query, "description") and query.description is not None:
                     print(query.description)
+        if query is None:
+            name="?"
+            if queryCode is None and args.queryFile is not None:
+                queryFilePath=Path(args.queryFile)
+                queryCode = queryFilePath.read_text()
+                name=queryFilePath.stem
+            query=Query(name="?",query=queryCode,lang=args.language)
         if queryCode:
             if debug or args.showQuery:
                 print(f"{args.language}:\n{queryCode}")
@@ -199,6 +208,7 @@ USAGE
         parser.add_argument('-sq','--showQuery',action="store_true",help="show the query") 
         parser.add_argument('-qp', '--queriesPath',help="path to YAML file with query definitions")
         parser.add_argument("-q", "--query",help="the query to run")
+        parser.add_argument("-qf", "--queryFile",help="the query file to run")
         parser.add_argument("-qn","--queryName",help="run a named query")
         parser.add_argument("-raw",action="store_true", help="return the raw query result from the endpoint. (MIME type defined over -f or -m)")
         parser.add_argument('-V', '--version', action='version', version=program_version_message)
