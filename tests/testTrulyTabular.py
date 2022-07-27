@@ -7,7 +7,6 @@ import unittest
 from lodstorage.trulytabular import TrulyTabular, WikidataItem, WikidataProperty
 from lodstorage.query import Query, QuerySyntaxHighlight
 from lodstorage.sparql import SPARQL
-from pickle import TRUE
 
 class TestTrulyTabular(unittest.TestCase):
     '''
@@ -227,7 +226,7 @@ class TestTrulyTabular(unittest.TestCase):
         count=tt.count()
         if debug:
             print(f"count of railway stations is {count}")
-        self.assertEqual(106195,count)
+        self.assertTrue(count>=106195)
             
         self.assertTrue(tt.error is None)
 if __name__ == "__main__":
