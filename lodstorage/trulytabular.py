@@ -21,6 +21,8 @@ class Variable:
         convert the given potential variable name string to a valid  
         variable name
         
+        see https://stackoverflow.com/a/3305731/1497139
+        
         Args:
             varStr(str): the string to convert
             
