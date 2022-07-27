@@ -229,6 +229,20 @@ class TestTrulyTabular(unittest.TestCase):
         self.assertTrue(count>=106195)
             
         self.assertTrue(tt.error is None)
+        
+    def testGenerateSparqlQuery(self):
+        '''
+        test Generating a SPARQL query
+        '''
+        qid="Q2020153" # academic conference
+        tt=TrulyTabular(qid, propertyIds=["P1813","P17","P1476"])
+        sparqlQuery=tt.generateSparqlQuery()
+        debug=True
+        if debug:
+            print(sparqlQuery)
+        self.assertTrue("?academic_conference wdt:P31 wd:Q2020153." in sparqlQuery)
+        self.assertTrue("OPTIONAL { ?academic_conference wdt:P17 ?country. }" in sparqlQuery)
+    
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
