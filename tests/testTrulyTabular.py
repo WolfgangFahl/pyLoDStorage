@@ -235,13 +235,18 @@ class TestTrulyTabular(unittest.TestCase):
         test Generating a SPARQL query
         '''
         qid="Q2020153" # academic conference
-        tt=TrulyTabular(qid, propertyIds=["P1813","P17","P1476"])
-        sparqlQuery=tt.generateSparqlQuery()
         debug=True
-        if debug:
-            print(sparqlQuery)
-        self.assertTrue("?academic_conference wdt:P31 wd:Q2020153." in sparqlQuery)
-        self.assertTrue("OPTIONAL { ?academic_conference wdt:P17 ?country. }" in sparqlQuery)
+        tt=TrulyTabular(qid, propertyIds=["P1813","P17","P1476"])
+        for naive in [True,False]:
+            sparqlQuery=tt.generateSparqlQuery(naive=naive)
+            
+            if debug:
+                print(sparqlQuery)
+            self.assertTrue("?academic_conference wdt:P31 wd:Q2020153." in sparqlQuery)
+            self.assertTrue("OPTIONAL { ?academic_conference wdt:P17 ?country. }" in sparqlQuery)
+            if not naive:
+                self.assertTrue("SAMPLE" in sparqlQuery)
+                self.assertTrue("GROUP BY" in sparqlQuery)
     
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

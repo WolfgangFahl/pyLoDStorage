@@ -336,7 +336,7 @@ class Query(object):
             str: the "try it!" url for the given query
         '''
         # https://stackoverflow.com/a/9345102/1497139
-        quoted=urllib.parse.quote(self.query)
+        quoted=urllib.parse.quote(str(self.query))
         quoted=f"#{quoted}"
         url=f"{baseurl}/{quoted}"
         return url
