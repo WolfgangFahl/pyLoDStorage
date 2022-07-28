@@ -6,10 +6,15 @@
     sparql: |
         # get the most frequently used properties for
         # %s
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX schema: <http://schema.org/>
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
         SELECT ?prop ?propLabel ?count WHERE {
           {
             SELECT ?prop (COUNT(DISTINCT ?item) AS ?count) WHERE {
-              hint:Query hint:optimizer "None".
+              #hint:Query hint:optimizer "None".
               %s
                 ?p ?id.
               ?prop wikibase:directClaim ?p.
