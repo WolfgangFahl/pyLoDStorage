@@ -7,6 +7,7 @@ import unittest
 from lodstorage.trulytabular import TrulyTabular, WikidataItem, WikidataProperty
 from lodstorage.query import Query, QuerySyntaxHighlight
 from lodstorage.sparql import SPARQL
+from pprint import pprint
 
 class TestTrulyTabular(unittest.TestCase):
     '''
@@ -236,17 +237,56 @@ class TestTrulyTabular(unittest.TestCase):
         '''
         qid="Q2020153" # academic conference
         debug=True
-        tt=TrulyTabular(qid, propertyIds=["P1813","P17","P1476"])
-        for naive in [True,False]:
-            sparqlQuery=tt.generateSparqlQuery(naive=naive)
+        configs=[
+            {
+                "naive":True,
+                "propertyIdMap": {
+                    "P1813": ["label"],
+                    "P17": ["label"],
+                    "P1476": ["label"]
+                },
+                "expected": []
+            },
+            {
+                "naive":False,
+                "propertyIdMap": {
+                    "P1813": ["sample"],
+                    "P17": ["sample"],
+                    "P1476": ["sample"]
+                },
+                "expected": ["GROUP BY","SAMPLE"]
+            },
+            {
+                "naive":False,
+                "propertyIdMap": {
+                    "P1813": ["count","list"],
+                    "P17": ["sample","ignore"],
+                    "P1476": ["count","list"]
+                },
+                "expected": ["GROUP BY","GROUP_CONCAT","HAVING"]
+            }
+        ]
+        # loop over different test configurations
+        for i,config in enumerate(configs):
+            # get the test configuration
+            naive=config["naive"]
+            propertyIdMap=config["propertyIdMap"]
+            expectedList=config["expected"]
             
+            # create a truly tabular analysis
+            tt=TrulyTabular(qid, propertyIds=list(propertyIdMap.keys()))
+            # generate a SPARQL Query
+            sparqlQuery=tt.generateSparqlQuery(genMap=propertyIdMap,naive=naive)
             if debug:
-                print(sparqlQuery)
+                print(f"config {i}:")
+                pprint(config)
+                print(f"{sparqlQuery}")
+            # all queries should have basic graph patterns for the instance of and country
+            # properties
             self.assertTrue("?academic_conference wdt:P31 wd:Q2020153." in sparqlQuery)
-            self.assertTrue("OPTIONAL { ?academic_conference wdt:P17 ?country. }" in sparqlQuery)
-            if not naive:
-                self.assertTrue("SAMPLE" in sparqlQuery)
-                self.assertTrue("GROUP BY" in sparqlQuery)
+            self.assertTrue("?academic_conference wdt:P17 ?country." in sparqlQuery)
+            for expected in expectedList:
+                self.assertTrue(expected in sparqlQuery,f"config {i}:{expected} missing")
     
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
