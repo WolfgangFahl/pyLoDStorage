@@ -263,7 +263,7 @@ class TestTrulyTabular(unittest.TestCase):
                     "P17": ["sample","ignore"],
                     "P1476": ["count","list"]
                 },
-                "expected": ["GROUP BY","GROUP_CONCAT","HAVING"]
+                "expected": ["COUNT (DISTINCT","GROUP BY","GROUP_CONCAT (DISTINCT","HAVING"]
             }
         ]
         # loop over different test configurations

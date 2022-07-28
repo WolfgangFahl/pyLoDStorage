@@ -351,7 +351,7 @@ WHERE
     def getItemText(self):
         # leads to 405 Method not allowed in SPARQLWrapper under certain circumstances
         # itemText=self.asText(long=True)
-        itemText=self.itemQid
+        itemText=f"{self.itemQid}:{self.item.qlabel}"
         return itemText
     
     @classmethod
@@ -407,13 +407,17 @@ SELECT ?{item.varname} ?{item.varname}Label"""
                     genList=genMap[wdProp.pid]
                     for aggregate in genList:
                         if not aggregate in ["ignore","label"]:
+                            distinct=""
                             if aggregate=="list": 
                                 aggregateFunc="GROUP_CONCAT"
                                 aggregateParam=f';SEPARATOR="{listSeparator}"'
+                                distinct="DISTINCT "
                             else:
+                                if aggregate=="count":
+                                    distinct="DISTINCT "
                                 aggregateFunc=aggregate.upper()
                                 aggregateParam=""
-                            sparqlQuery+=f"\n  ({aggregateFunc} (?{wdProp.varname}{aggregateParam}) AS ?{wdProp.varname}_{aggregate})"
+                            sparqlQuery+=f"\n  ({aggregateFunc} ({distinct}?{wdProp.varname}{aggregateParam}) AS ?{wdProp.varname}_{aggregate})"
                         elif aggregate=="label":
                             sparqlQuery+=f"\n  ?{wdProp.varname}Label"
         sparqlQuery+=f"""
@@ -453,14 +457,39 @@ WHERE {{
         Args:
             whereClause(str): an extra WhereClause to use
         '''
-        query=self.queryManager.queriesByName["mostFrequentProperties"]
         if whereClause is None:
             whereClause=f"?item wdt:P31 wd:{self.itemQid};";
         else:
             whereClause+=";"     
         itemText=self.getItemText()
-        query.title=f"most frequently used properties for {self.item.asText(long=True)}"
-        query.query=query.query % (itemText,whereClause,self.lang)
+        if self.endpoint=="https://query.wikidata.org/sparql":
+            optimizerHint='      hint:Query hint:optimizer "None".\n'
+        else:
+            optimizerHint=''
+        sparqlQuery=f"""# get the most frequently used properties for
+# {itemText}
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <http://schema.org/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+SELECT ?prop ?propLabel ?count WHERE {{
+  {{
+    SELECT ?prop (COUNT(DISTINCT ?item) AS ?count) WHERE {{
+{optimizerHint}        
+      {whereClause}
+      ?p ?id.
+      ?prop wikibase:directClaim ?p.
+    }}
+    GROUP BY ?prop ?propLabel
+  }}
+  ?prop rdfs:label ?propLabel
+  FILTER(LANG(?propLabel) = "{self.lang}")      
+}}
+ORDER BY DESC (?count)
+"""
+        title=f"most frequently used properties for {self.item.asText(long=True)}"
+        query=Query(name=f"mostFrequentProperties for {itemText}",query=sparqlQuery,title=title)
         return query
     
     def noneTabularQuery(self,wdProperty:WikidataProperty,asFrequency:bool=True):
