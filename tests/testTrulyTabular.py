@@ -237,16 +237,7 @@ class TestTrulyTabular(unittest.TestCase):
         '''
         debug=True
         configs=[
-            {
-                "naive":False,
-                "qid": "Q1667921", # novel series
-                "propertyIdMap": {
-                    "P50": ["sample","ignore"], # author
-                    "P136": ["sample","ignore"],# genre
-                    "P1476": ["sample","ignore"] #title
-                },
-                "expected": ["GROUP BY","HAVING","COUNT"]
-            },
+
             {
                 "naive":True,
                 "qid": "Q2020153", # academic conference
@@ -276,6 +267,26 @@ class TestTrulyTabular(unittest.TestCase):
                     "P1476": ["count","list"]
                 },
                 "expected": ["COUNT (DISTINCT","GROUP BY","GROUP_CONCAT (DISTINCT","HAVING"]
+            },
+            {
+                "naive":False,
+                "qid": "Q1667921", # novel series
+                "propertyIdMap": {
+                    "P50": ["sample","ignore"], # author
+                    "P136": ["sample","ignore"],# genre
+                    "P1476": ["sample","ignore"] #title
+                },
+                "expected": ["GROUP BY","HAVING","COUNT","<=1"]
+            },
+            {
+                "naive":False,
+                "qid": "Q1667921", # novel series
+                "propertyIdMap": {
+                    "P50": ["sample","ignore","label"], # author
+                    "P136": ["sample","ignore","label"],# genre
+                    "P1476": ["sample","ignore"] #title
+                },
+                "expected": ["GROUP BY","HAVING","COUNT","<=1"]
             },
             
         ]

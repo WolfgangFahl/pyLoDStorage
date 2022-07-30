@@ -442,7 +442,15 @@ WHERE {{
         sparqlQuery+="""}\n"""
         # optionally add Aggregate
         if not naive:
-            sparqlQuery+=f"GROUP BY ?{item.varname} ?{item.varname}Label"
+            sparqlQuery+=f"""GROUP BY
+  ?{item.varname} 
+  ?{item.varname}Label
+"""
+            for wdProp in self.properties.values():
+                if wdProp.pid in genMap:
+                    genList=genMap[wdProp.pid]
+                    if "label" in genList:
+                        sparqlQuery+=f"\n  ?{wdProp.varname}Label"
             havingCount=0
             havingDelim="   "
             for wdProp in self.properties.values():
