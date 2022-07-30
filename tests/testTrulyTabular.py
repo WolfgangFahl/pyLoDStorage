@@ -235,11 +235,21 @@ class TestTrulyTabular(unittest.TestCase):
         '''
         test Generating a SPARQL query
         '''
-        qid="Q2020153" # academic conference
         debug=True
         configs=[
             {
+                "naive":False,
+                "qid": "Q1667921", # novel series
+                "propertyIdMap": {
+                    "P50": ["sample","ignore"], # author
+                    "P136": ["sample","ignore"],# genre
+                    "P1476": ["sample","ignore"] #title
+                },
+                "expected": ["GROUP BY","HAVING","COUNT"]
+            },
+            {
                 "naive":True,
+                "qid": "Q2020153", # academic conference
                 "propertyIdMap": {
                     "P1813": ["label"],
                     "P17": ["label"],
@@ -249,6 +259,7 @@ class TestTrulyTabular(unittest.TestCase):
             },
             {
                 "naive":False,
+                "qid": "Q2020153", # academic conference
                 "propertyIdMap": {
                     "P1813": ["sample"],
                     "P17": ["sample"],
@@ -258,33 +269,38 @@ class TestTrulyTabular(unittest.TestCase):
             },
             {
                 "naive":False,
+                "qid": "Q2020153", # academic conference
                 "propertyIdMap": {
                     "P1813": ["count","list"],
                     "P17": ["sample","ignore"],
                     "P1476": ["count","list"]
                 },
                 "expected": ["COUNT (DISTINCT","GROUP BY","GROUP_CONCAT (DISTINCT","HAVING"]
-            }
+            },
+            
         ]
         # loop over different test configurations
         for i,config in enumerate(configs):
             # get the test configuration
+            qid=config["qid"]
             naive=config["naive"]
             propertyIdMap=config["propertyIdMap"]
             expectedList=config["expected"]
             
             # create a truly tabular analysis
             tt=TrulyTabular(qid, propertyIds=list(propertyIdMap.keys()))
+            varname=tt.item.varname
             # generate a SPARQL Query
             sparqlQuery=tt.generateSparqlQuery(genMap=propertyIdMap,naive=naive)
             if debug:
                 print(f"config {i}:")
                 pprint(config)
                 print(f"{sparqlQuery}")
-            # all queries should have basic graph patterns for the instance of and country
-            # properties
-            self.assertTrue("?academic_conference wdt:P31 wd:Q2020153." in sparqlQuery)
-            self.assertTrue("?academic_conference wdt:P17 ?country." in sparqlQuery)
+            # all queries should have basic graph patterns for the instance of 
+            self.assertTrue(f"?{varname} wdt:P31 wd:{qid}." in sparqlQuery)
+            # and for the properties
+            for pid in propertyIdMap.keys():
+                self.assertTrue(f"?{varname} wdt:{pid}" in sparqlQuery)
             for expected in expectedList:
                 self.assertTrue(expected in sparqlQuery,f"config {i}:{expected} missing")
     

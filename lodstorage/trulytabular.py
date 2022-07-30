@@ -443,11 +443,20 @@ WHERE {{
         # optionally add Aggregate
         if not naive:
             sparqlQuery+=f"GROUP BY ?{item.varname} ?{item.varname}Label"
+            havingCount=0
+            havingDelim="   "
             for wdProp in self.properties.values():
                 if wdProp.pid in genMap:
                     genList=genMap[wdProp.pid]
                     if "ignore" in genList:
-                        sparqlQuery+=f"\nHAVING (COUNT(?{wdProp.varname})=1)"
+                        havingCount+=1
+                        if havingCount==1:
+                            sparqlQuery+=f"\nHAVING ("
+                            
+                        sparqlQuery+=f"\n  {havingDelim}COUNT(?{wdProp.varname})=1"
+                        havingDelim="&& "
+            if havingCount>0:
+                sparqlQuery+=f"\n)"
         return sparqlQuery
     
     def mostFrequentPropertiesQuery(self,whereClause:str=None):
