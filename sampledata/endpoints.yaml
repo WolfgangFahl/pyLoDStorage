@@ -3,6 +3,7 @@
 'wikidata':
   lang: sparql
   endpoint: https://query.wikidata.org/sparql
+  website: https://query.wikidata.org/
   method: POST
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -41,6 +42,7 @@
   lang: sparql
   method: GET
   endpoint: https://qlever.cs.uni-freiburg.de/api/wikidata
+  website: https://qlever.cs.uni-freiburg.de/wikidata
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>
     PREFIX cc: <http://creativecommons.org/ns#>
@@ -78,6 +80,7 @@
   lang: sparql
   method: GET
   endpoint: https://qlever.cs.uni-freiburg.de/api/wikidata-proxy
+  website: https://qlever.cs.uni-freiburg.de/wikidata
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>
     PREFIX cc: <http://creativecommons.org/ns#>
@@ -113,6 +116,7 @@
 'wikidata-openlinksw':
     lang: sparql
     endpoint: https://wikidata.demo.openlinksw.com/sparql
+    website: https://wikidata.demo.openlinksw.com/sparql
     prefixes: |
       PREFIX bd: <http://www.bigdata.com/rdf#>
       PREFIX cc: <http://creativecommons.org/ns#>

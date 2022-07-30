@@ -579,6 +579,7 @@ class Endpoint(JSONAble):
                 "name": "wikidata",
                 "lang": "sparql",
                 "endpoint": "https://query.wikidata.org/sparql",
+                "website": "https://query.wikidata.org/",
                 "method": "POST",
                 "prefixes": "PREFIX bd: <http://www.bigdata.com/rdf#>\nPREFIX cc: <http://creativecommons.org/ns#>"
             }
