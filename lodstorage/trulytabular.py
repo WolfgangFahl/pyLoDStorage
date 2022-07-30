@@ -453,7 +453,7 @@ WHERE {{
                         if havingCount==1:
                             sparqlQuery+=f"\nHAVING ("
                             
-                        sparqlQuery+=f"\n  {havingDelim}COUNT(?{wdProp.varname})=1"
+                        sparqlQuery+=f"\n  {havingDelim}COUNT(?{wdProp.varname})<=1"
                         havingDelim="&& "
             if havingCount>0:
                 sparqlQuery+=f"\n)"
