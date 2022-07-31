@@ -234,15 +234,15 @@ class TestTrulyTabular(unittest.TestCase):
         '''
         test the count function of truly tabular
         '''
-        debug=True  
+        debug=False  
         qid="Q55488" # railway stations
-        tt=TrulyTabular(qid,debug=debug)
-        count=tt.count()
-        if debug:
-            print(f"count of railway stations is {count}")
-        self.assertTrue(count>=106195)
-            
-        self.assertTrue(tt.error is None)
+        for endpointConf in self.endpointConfs:
+            tt=TrulyTabular(qid,endpointConf=endpointConf,debug=debug)
+            count=tt.count()
+            if debug:
+                print(f"count of railway stations is {count}")
+            self.assertTrue(count>=106195)
+            self.assertTrue(tt.error is None)
         
     def testGenerateSparqlQuery(self):
         '''

@@ -333,6 +333,8 @@ WHERE
 }}"""
         try:
             count=self.sparql.getValue(query, "count")
+            # workaround https://github.com/ad-freiburg/qlever/issues/717
+            count=int(count)
         except Exception as ex:
             self.error=ex
             count=None
