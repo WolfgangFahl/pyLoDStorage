@@ -607,7 +607,7 @@ ORDER BY DESC(?count)"""
         nttotal=0
         maxCount=0
         for record in ntlod:
-            f=float(record["frequency"])
+            f=int(record["frequency"])
             count=int(record["count"])
             #statsRow[f"f{count}"]=f
             if count>1:
