@@ -16,6 +16,12 @@ class TestTrulyTabular(unittest.TestCase):
 
     def setUp(self):
         self.debug=False
+        qleverEndpoint=Endpoint()
+        qleverEndpoint.name="qlever-wikidata-proxy"
+        qleverEndpoint.method="GET"
+        qleverEndpoint.database="qlever"
+        qleverEndpoint.endpoint="https://qlever.cs.uni-freiburg.de/api/wikidata-proxy"
+        self.endpointConfs={qleverEndpoint,Endpoint.getDefault()}
         pass
 
 
@@ -71,28 +77,29 @@ class TestTrulyTabular(unittest.TestCase):
         debug=self.debug
         #debug=True
         propertyLabels=["title","country","location"]
-        tt=TrulyTabular("Q2020153",propertyLabels=propertyLabels)
-        if debug:
-            print (tt.properties)
-        for prop in propertyLabels:
-            self.assertTrue(prop in tt.properties)
+        for endpointConf in self.endpointConfs:
+            tt=TrulyTabular("Q2020153",propertyLabels=propertyLabels,endpointConf=endpointConf)
+            if debug:
+                print (tt.properties)
+            for prop in propertyLabels:
+                self.assertTrue(prop in tt.properties)
             
     def testGetPropertiesById(self):
         '''
         try getting properties by label
         '''
         debug=self.debug
-        #debug=True
+        debug=True
         propertyIds=["P1800"]
         expected=["Wikimedia database name"]
-        endpointConf=Endpoint.getDefault()
-        sparql=SPARQL(endpointConf.endpoint)
-        propList=WikidataProperty.getPropertiesByIds(sparql, propertyIds, lang="en")
-        for i,prop in enumerate(propList):
-            if debug:
-                print(f"{i}:{prop}")
-            self.assertEqual(prop,expected[i])
-            
+        for endpointConf in self.endpointConfs:
+            sparql=SPARQL(endpointConf.endpoint,method=endpointConf.method)
+            propList=WikidataProperty.getPropertiesByIds(sparql, propertyIds, lang="en")
+            for i,prop in enumerate(propList):
+                if debug:
+                    print(f"{endpointConf.name} {i}:{prop}")
+                self.assertEqual(prop,expected[i])
+                
     def testGetItemsByLabel(self):
         '''
         try getting items by label
@@ -100,17 +107,17 @@ class TestTrulyTabular(unittest.TestCase):
         #debug=self.debug
         debug=True
         qLabels=["academic conference","scientific conference series","whisky distillery","human"]
-        endpointConf=Endpoint.getDefault()
-        sparql=SPARQL(endpointConf.endpoint)
-        items={}
-        for qLabel in qLabels:
-            items4Label=WikidataItem.getItemsByLabel(sparql, qLabel)
-            for item in items4Label:
-                if debug:
-                    print(item)
-            items[qLabel]=items4Label[0]
-        for qLabel in qLabels:
-            self.assertTrue(qLabel in items)
+        for endpointConf in self.endpointConfs:
+            sparql=SPARQL(endpointConf.endpoint,method=endpointConf.method)
+            items={}
+            for qLabel in qLabels:
+                items4Label=WikidataItem.getItemsByLabel(sparql, qLabel)
+                for i,item in enumerate(items4Label):
+                    if debug:
+                        print(f"{endpointConf.name} {i+1}:{item}")
+                items[qLabel]=items4Label[0]
+            for qLabel in qLabels:
+                self.assertTrue(qLabel in items)
 
     def testTrulyTabularTables(self):
         '''
@@ -198,13 +205,8 @@ class TestTrulyTabular(unittest.TestCase):
         show=False
         debug=self.debug
         debug=True
-        qleverEndpoint=Endpoint()
-        qleverEndpoint.name="qlever-wikidata-proxy"
-        qleverEndpoint.method="GET"
-        qleverEndpoint.database="qlever"
-        qleverEndpoint.endpoint="https://qlever.cs.uni-freiburg.de/api/wikidata-proxy"
-        endpointConfs={qleverEndpoint,Endpoint.getDefault()}
-        for endpointConf in endpointConfs:
+        
+        for endpointConf in self.endpointConfs:
             for qid in ["Q6256"]:
                 tt=TrulyTabular(qid,debug=debug,endpointConf=endpointConf)
                 query=tt.mostFrequentPropertiesQuery()

@@ -84,8 +84,7 @@ SELECT ?property ?propertyLabel WHERE {{
   VALUES ?propertyLabel {{
 {valuesClause}
   }}
-  ?property rdf:type wikibase:Property.
-  rdfs:label ?propertyLabel.
+  ?property rdf:type wikibase:Property;rdfs:label ?propertyLabel.
   FILTER(LANG(?propertyLabel) = "{lang}")
 }}"""
             cls.addPropertiesForQuery(wdProperties,sparql,query)
@@ -110,14 +109,13 @@ SELECT ?property ?propertyLabel WHERE {{
             query=f"""
 # get the property for the given property Ids
 {WikidataItem.getPrefixes()}
-    SELECT ?property ?propertyLabel WHERE {{
-      VALUES ?property {{
-    {valuesClause}
-      }}
-      ?property rdf:type wikibase:Property.
-      rdfs:label ?propertyLabel.
-      FILTER(LANG(?propertyLabel) = "{lang}")
-    }}""" 
+SELECT ?property ?propertyLabel WHERE {{
+  VALUES ?property {{
+{valuesClause}
+  }}
+  ?property rdf:type wikibase:Property;rdfs:label ?propertyLabel.
+  FILTER(LANG(?propertyLabel) = "{lang}")
+}}""" 
             cls.addPropertiesForQuery(wdProperties,sparql,query)
         return wdProperties
         
@@ -157,6 +155,8 @@ class WikidataItem:
             sparql(SPARQL): the sparql access to use
         '''
         self.qid=qid
+        # numeric qid
+        self.qnumber=int(qid[1:])
         self.url=f"https://www.wikidata.org/wiki/{self.qid}"
         self.lang=lang
         self.sparql=sparql
@@ -192,7 +192,9 @@ class WikidataItem:
     
     @classmethod
     def getPrefixes(cls):
-        prefixes="""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        # see also https://www.wikidata.org/wiki/EntitySchema:E49
+        prefixes="""PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX schema: <http://schema.org/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -245,17 +247,21 @@ WHERE
 # e.g. we'll find human=Q5 as the oldest type for the label "human" first
 # and then the newer ones such as "race in Warcraft"
 {cls.getPrefixes()}
-SELECT ?itemId ?item ?itemLabel ?itemDescription
+SELECT 
+  #?itemId 
+  ?item 
+  ?itemLabel 
+  ?itemDescription
 WHERE {{ 
   VALUES ?itemLabel {{
     {valuesClause}
   }}
-  BIND (xsd:integer(SUBSTR(STR(?item),33)) AS ?itemId)
+  #BIND (xsd:integer(SUBSTR(STR(?item),33)) AS ?itemId)
   ?item rdfs:label ?itemLabel. 
   ?item schema:description ?itemDescription.
   FILTER(LANG(?itemDescription)="{lang}")
-}} ORDER BY ?itemId""" 
-
+}} 
+#ORDER BY ?itemId""" 
         qLod=sparql.queryAsListOfDicts(query)
         items=[]
         for record in qLod:
@@ -267,7 +273,8 @@ WHERE {{
             item.varname=Variable.validVarName(item.qlabel)
             item.description=record["itemDescription"]
             items.append(item)
-        return items
+        sortedItems=sorted(items,key=lambda item: item.qnumber)
+        return sortedItems
         
 class TrulyTabular(object):
     '''
