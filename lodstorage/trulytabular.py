@@ -537,11 +537,7 @@ ORDER BY DESC (?count)
         # work around https://github.com/RDFLib/sparqlwrapper/issues/211
         if "described at" in propertyLabel:
             propertyLabel=propertyLabel.replace("described at","describ'd at")
-        sparql=f"""
-# Count all {self.asText(long=True)} items
-# with the given {propertyLabel}({propertyId}) https://www.wikidata.org/wiki/Property:{propertyId} 
-{WikidataItem.getPrefixes()}
-SELECT ?item ?itemLabel (COUNT (?value) AS ?count)
+        sparql=f"""SELECT ?item ?itemLabel (COUNT (?value) AS ?count)
 WHERE
 {{
   # instance of {self.item.qlabel}
@@ -564,6 +560,10 @@ ORDER BY DESC (?frequency)"""
             sparql=f"""{sparql}
 HAVING (COUNT (?value) > 1)
 ORDER BY DESC(?count)"""
+        sparql=f"""# Count all {self.asText(long=True)} items
+# with the given {propertyLabel}({propertyId}) https://www.wikidata.org/wiki/Property:{propertyId} 
+{WikidataItem.getPrefixes()}
+"""+sparql
         title=f"non tabular entries for {self.item.qlabel}/{propertyLabel}:{freqDesc}"
         name=f"NonTabular {self.item.qlabel}/{propertyLabel}:{freqDesc}"
         query=Query(query=sparql,name=name,title=title)

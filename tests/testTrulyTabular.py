@@ -184,7 +184,8 @@ class TestTrulyTabular(unittest.TestCase):
             for tablefmt in showStats:
                 query=Query(name=table["name"],title=table["title"],query="")
                 doc=query.documentQueryResult(stats, tablefmt=tablefmt, withSourceCode=False)
-                print(doc)
+                if debug:
+                    print(doc)
             if show:
                 for wdProperty in tt.properties.values():
                     for asFrequency in [True,False]:
