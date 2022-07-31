@@ -540,16 +540,17 @@ ORDER BY DESC (?count)
         sparql=f"""
 # Count all {self.asText(long=True)} items
 # with the given {propertyLabel}({propertyId}) https://www.wikidata.org/wiki/Property:{propertyId} 
+{WikidataItem.getPrefixes()}
 SELECT ?item ?itemLabel (COUNT (?value) AS ?count)
 WHERE
 {{
   # instance of {self.item.qlabel}
   ?item wdt:P31 wd:{self.itemQid}.{self.where}
   ?item rdfs:label ?itemLabel.
-  filter (lang(?itemLabel) = "en").
+  FILTER (LANG(?itemLabel) = "{self.lang}").
   # {propertyLabel}
   ?item {wdProperty.getPredicate()} ?value.
-}} GROUP by ?item ?itemLabel
+}} GROUP BY ?item ?itemLabel
 """
         if asFrequency:
             freqDesc="frequencies"
