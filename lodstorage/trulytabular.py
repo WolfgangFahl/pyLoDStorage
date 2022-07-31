@@ -5,7 +5,7 @@ Created on 2022-04-14
 '''
 import datetime
 from lodstorage.sparql import SPARQL
-from lodstorage.query import Query,QueryManager,YamlPath
+from lodstorage.query import Query,QueryManager,YamlPath,Endpoint
 from lodstorage.version import Version
 from pathlib import Path
 import os
@@ -74,23 +74,21 @@ class WikidataProperty():
         '''
         # the result dict
         wdProperties={}
-        valuesClause=""
-        for propertyLabel in propertyLabels:
-            valuesClause+=f'   "{propertyLabel}"@{lang}\n'
-        query="""
-# get the property for the given labels
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?property ?propertyLabel WHERE {
-  VALUES ?propertyLabel {
-%s
-  }
-  ?property rdf:type wikibase:Property;
+        if len(propertyLabels)>0:
+            valuesClause=""
+            for propertyLabel in propertyLabels:
+                valuesClause+=f'   "{propertyLabel}"@{lang}\n'
+            query=f"""# get the properties for the given labels
+{WikidataItem.getPrefixes()}
+SELECT ?property ?propertyLabel WHERE {{
+  VALUES ?propertyLabel {{
+{valuesClause}
+  }}
+  ?property rdf:type wikibase:Property.
   rdfs:label ?propertyLabel.
-  FILTER((LANG(?propertyLabel)) = "%s")
-}""" % (valuesClause,lang)
-        cls.addPropertiesForQuery(wdProperties,sparql,query)
+  FILTER(LANG(?propertyLabel) = "{lang}")
+}}"""
+            cls.addPropertiesForQuery(wdProperties,sparql,query)
         return wdProperties
     
     @classmethod
@@ -105,23 +103,22 @@ SELECT ?property ?propertyLabel WHERE {
         '''
         # the result dict
         wdProperties={}
-        valuesClause=""
-        for propertyId in propertyIds:
-            valuesClause+=f'   wd:{propertyId}\n'
-        query="""
+        if len(propertyIds)>0:
+            valuesClause=""
+            for propertyId in propertyIds:
+                valuesClause+=f'   wd:{propertyId}\n'
+            query=f"""
 # get the property for the given property Ids
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-SELECT ?property ?propertyLabel WHERE {
-  VALUES ?property {
-%s
-  }
-  ?property rdf:type wikibase:Property;
-  rdfs:label ?propertyLabel.
-  FILTER((LANG(?propertyLabel)) = "%s")
-}""" % (valuesClause,lang)
-        cls.addPropertiesForQuery(wdProperties,sparql,query)
+{WikidataItem.getPrefixes()}
+    SELECT ?property ?propertyLabel WHERE {{
+      VALUES ?property {{
+    {valuesClause}
+      }}
+      ?property rdf:type wikibase:Property.
+      rdfs:label ?propertyLabel.
+      FILTER(LANG(?propertyLabel) = "{lang}")
+    }}""" 
+            cls.addPropertiesForQuery(wdProperties,sparql,query)
         return wdProperties
         
     @classmethod    
@@ -199,9 +196,10 @@ class WikidataItem:
 PREFIX schema: <http://schema.org/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>"""
         return prefixes
-    
+
     @classmethod
     def getLabelAndDescription(cls,sparql:SPARQL, itemId:str,lang:str="en"):
         '''
@@ -223,9 +221,9 @@ WHERE
     wd:{itemId}
   }}
   ?item rdfs:label ?itemLabel.
-  FILTER (lang(?itemLabel) = "{lang}").
+  FILTER (LANG(?itemLabel) = "{lang}").
   ?item schema:description ?itemDescription.
-  FILTER((LANG(?itemDescription)) = "{lang}")
+  FILTER(LANG(?itemDescription) = "{lang}")
 }}""" 
         return sparql.getValues(query, ["itemLabel","itemDescription"])
         
@@ -254,7 +252,7 @@ WHERE {{
   }}
   BIND (xsd:integer(SUBSTR(STR(?item),33)) AS ?itemId)
   ?item rdfs:label ?itemLabel. 
-  ?item schema:description ?itemDescription
+  ?item schema:description ?itemDescription.
   FILTER(LANG(?itemDescription)="{lang}")
 }} ORDER BY ?itemId""" 
 
@@ -277,9 +275,8 @@ class TrulyTabular(object):
     
     checks "how tabular" a query based on a list of properties of an itemclass is
     '''
-    endpoint="https://query.wikidata.org/sparql"
 
-    def __init__(self, itemQid, propertyLabels:list=[],propertyIds:list=[],where:str=None,endpoint=None,method="POST",lang="en",debug=False):
+    def __init__(self, itemQid, propertyLabels:list=[],propertyIds:list=[],where:str=None,endpointConf=None,lang="en",debug=False):
         '''
         Constructor
         
@@ -292,10 +289,10 @@ class TrulyTabular(object):
         '''
         self.itemQid=itemQid
         self.debug=debug
-        if endpoint is None:
-            endpoint=TrulyTabular.endpoint
-        self.endpoint=endpoint
-        self.sparql=SPARQL(endpoint,method=method)
+        if endpointConf is None:
+            endpointConf=Endpoint.getDefault()
+        self.endpointConf=endpointConf
+        self.sparql=SPARQL(endpointConf.endpoint,method=self.endpointConf.method)
         self.sparql.debug=self.debug
         self.where=f"\n  {where}" if where is not None else ""
         self.lang=lang
@@ -475,32 +472,41 @@ WHERE {{
             whereClause(str): an extra WhereClause to use
         '''
         if whereClause is None:
-            whereClause=f"?item wdt:P31 wd:{self.itemQid};";
-        else:
-            whereClause+=";"     
+            whereClause=f"?item wdt:P31 wd:{self.itemQid}";
+            if self.endpointConf.database!="qlever":
+                whereClause+=";?p ?id"
+        whereClause+="."  
         itemText=self.getItemText()
-        if self.endpoint=="https://query.wikidata.org/sparql":
-            optimizerHint='      hint:Query hint:optimizer "None".\n'
-        else:
-            optimizerHint=''
         sparqlQuery=f"""# get the most frequently used properties for
 # {itemText}
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX schema: <http://schema.org/>
-PREFIX wd: <http://www.wikidata.org/entity/>
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+{WikidataItem.getPrefixes()}
 SELECT ?prop ?propLabel ?count WHERE {{
-  {{
-    SELECT ?prop (COUNT(DISTINCT ?item) AS ?count) WHERE {{
-{optimizerHint}        
-      {whereClause}
-      ?p ?id.
+  {{"""
+        if self.endpointConf.database=="qlever":
+            sparqlQuery+=f"""
+    SELECT ?p (COUNT(DISTINCT ?item) AS ?count) WHERE {{"""
+        else:
+            sparqlQuery+=f"""
+    SELECT ?prop (COUNT(DISTINCT ?item) AS ?count) WHERE {{"""
+        if self.endpointConf.database=="blazegraph":
+            sparqlQuery+=f"""
+      hint:Query hint:optimizer "None"."""
+        sparqlQuery+=f"""
+      {whereClause}"""
+        if self.endpointConf.database=="qlever":
+            sparqlQuery+=f"""  
+      ?item ql:has-predicate ?p 
+    }} GROUP BY ?p
+  }}
+  ?prop wikibase:directClaim ?p."""
+        else:
+            sparqlQuery+=f"""
       ?prop wikibase:directClaim ?p.
     }}
     GROUP BY ?prop ?propLabel
-  }}
-  ?prop rdfs:label ?propLabel
+  }}"""
+        sparqlQuery+=f"""
+  ?prop rdfs:label ?propLabel.
   FILTER(LANG(?propLabel) = "{self.lang}")      
 }}
 ORDER BY DESC (?count)

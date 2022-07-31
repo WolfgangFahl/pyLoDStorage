@@ -580,11 +580,18 @@ class Endpoint(JSONAble):
                 "lang": "sparql",
                 "endpoint": "https://query.wikidata.org/sparql",
                 "website": "https://query.wikidata.org/",
+                "database": "blazegraph",
                 "method": "POST",
                 "prefixes": "PREFIX bd: <http://www.bigdata.com/rdf#>\nPREFIX cc: <http://creativecommons.org/ns#>"
             }
         ]
         return samples
+    
+    @classmethod
+    def getDefault(cls):
+        endpointConf=Endpoint()
+        endpointConf.fromDict(Endpoint.getSamples()[0])
+        return endpointConf
     
     def __init__(self):
         '''

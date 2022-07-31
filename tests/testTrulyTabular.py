@@ -5,7 +5,7 @@ Created on 2022-03-4
 '''
 import unittest
 from lodstorage.trulytabular import TrulyTabular, WikidataItem, WikidataProperty
-from lodstorage.query import Query, QuerySyntaxHighlight
+from lodstorage.query import Query, QuerySyntaxHighlight, Endpoint
 from lodstorage.sparql import SPARQL
 from pprint import pprint
 
@@ -85,7 +85,8 @@ class TestTrulyTabular(unittest.TestCase):
         #debug=True
         propertyIds=["P1800"]
         expected=["Wikimedia database name"]
-        sparql=SPARQL(TrulyTabular.endpoint)
+        endpointConf=Endpoint.getDefault()
+        sparql=SPARQL(endpointConf.endpoint)
         propList=WikidataProperty.getPropertiesByIds(sparql, propertyIds, lang="en")
         for i,prop in enumerate(propList):
             if debug:
@@ -99,7 +100,8 @@ class TestTrulyTabular(unittest.TestCase):
         #debug=self.debug
         debug=True
         qLabels=["academic conference","scientific conference series","whisky distillery","human"]
-        sparql=SPARQL(TrulyTabular.endpoint)
+        endpointConf=Endpoint.getDefault()
+        sparql=SPARQL(endpointConf.endpoint)
         items={}
         for qLabel in qLabels:
             items4Label=WikidataItem.getItemsByLabel(sparql, qLabel)
@@ -195,11 +197,20 @@ class TestTrulyTabular(unittest.TestCase):
         #show=True
         show=False
         debug=self.debug
-        #debug=True
-        for qid in ["Q6256"]:
-            tt=TrulyTabular(qid,debug=debug)
-            query=tt.mostFrequentPropertiesQuery()
-            self.documentQuery(tt, query,formats=["github"],show=show)
+        debug=True
+        qleverEndpoint=Endpoint()
+        qleverEndpoint.name="qlever-wikidata-proxy"
+        qleverEndpoint.method="GET"
+        qleverEndpoint.database="qlever"
+        qleverEndpoint.endpoint="https://qlever.cs.uni-freiburg.de/api/wikidata-proxy"
+        endpointConfs={qleverEndpoint,Endpoint.getDefault()}
+        for endpointConf in endpointConfs:
+            for qid in ["Q6256"]:
+                tt=TrulyTabular(qid,debug=debug,endpointConf=endpointConf)
+                query=tt.mostFrequentPropertiesQuery()
+                if debug:
+                    print(query.query)
+                self.documentQuery(tt, query,formats=["github"],show=show)
 
     def testSyntaxHighlighting(self):
         '''
