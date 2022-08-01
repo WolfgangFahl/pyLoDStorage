@@ -199,7 +199,6 @@ class QueryResultDocumentation():
         self.resultHeader=resultHeader
         self.result=result
         
-        
     @staticmethod
     def uniCode2Latex(text:str,withConvert:bool=False)->str:
         '''
@@ -245,7 +244,7 @@ class QueryResultDocumentation():
 class Query(object):
     ''' a Query e.g. for SPAQRL '''
     
-    def __init__(self,name:str,query:str,lang='sparql',endpoint:str=None,title:str=None,description:str=None,prefixes=None,tryItUrl:str=None,formats:list=None,debug=False):
+    def __init__(self,name:str,query:str,lang='sparql',endpoint:str=None,database:str="blazegraph",title:str=None,description:str=None,prefixes=None,tryItUrl:str=None,formats:list=None,debug=False):
         '''
         constructor 
         Args:
@@ -253,6 +252,7 @@ class Query(object):
             query(string): the native Query text e.g. in SPARQL
             lang(string): the language of the query e.g. SPARQL
             endpoint(string): the endpoint url to use 
+            database(string): the type of database e.g. "blazegraph"
             title(string): the header/title of the query
             description(string): the description of the query
             prefixes(list): list of prefixes to be resolved
@@ -264,11 +264,13 @@ class Query(object):
         self.query=query
         self.lang=lang
         self.endpoint=endpoint
+        self.database=database
+        self.tryItUrl=tryItUrl
+        
         self.title=title=name if title is None else title
         self.description="" if description is None else description
         self.prefixes=prefixes
         self.debug=debug
-        self.tryItUrl=tryItUrl
         self.formats=formats
         self.formatCallBacks=[]
         
@@ -325,7 +327,7 @@ class Query(object):
                     valueFormatter.applyFormat(record,keytoformat,tablefmt)
             pass
         
-    def getTryItUrl(self,baseurl:str):
+    def getTryItUrl(self,baseurl:str,database:str="blazegraph"):
         '''
         return the "try it!" url for the given baseurl
         
@@ -337,8 +339,11 @@ class Query(object):
         '''
         # https://stackoverflow.com/a/9345102/1497139
         quoted=urllib.parse.quote(str(self.query))
-        quoted=f"#{quoted}"
-        url=f"{baseurl}/{quoted}"
+        if database=="blazegraph":
+            delim="/#"
+        else:
+            delim="?query="
+        url=f"{baseurl}{delim}{quoted}"
         return url
     
     def getLink(self,url,title,tablefmt):
@@ -463,7 +468,7 @@ class Query(object):
             title=f"{self.title}"
             resultHeader="result:"
         if withSourceCode:
-            tryItUrlEncoded=self.getTryItUrl(tryItUrl)
+            tryItUrlEncoded=self.getTryItUrl(tryItUrl,self.database)
             tryItMarkup=self.getLink(tryItUrlEncoded, "try it!", tablefmt)
             if tablefmt=="github":
                 sourceCodeHeader="### query"
@@ -606,5 +611,5 @@ class Endpoint(JSONAble):
         Returns:    
             str: a string representation of this Endpoint
         '''
-        text=f"{self.name}({self.name}):{self.endpoint}({self.method})"
+        text=f"{self.name}:{self.website}:{self.endpoint}({self.method})"
         return text

@@ -53,6 +53,7 @@ class QueryMain:
             for name,query in qm.queriesByName.items():
                 print(f"{name}:{query.title}")
         elif args.listEndpoints:
+            # list endpoints
             for endpoint in endpoints.values():
                 if hasattr(endpoint, "lang") and endpoint.lang==args.language:
                     print(endpoint)
@@ -85,6 +86,8 @@ class QueryMain:
                 if args.endpointName:
                     endPointUrl=endpointConf.endpoint
                     method=endpointConf.method
+                    query.tryItUrl=endpointConf.website
+                    query.database=endpointConf.database
                 else:
                     endPointUrl=query.endpoint
                 if args.method:

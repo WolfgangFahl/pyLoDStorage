@@ -3,7 +3,7 @@
 'wikidata':
   lang: sparql
   endpoint: https://query.wikidata.org/sparql
-  website: https://query.wikidata.org/
+  website: https://query.wikidata.org
   database: blazegraph
   method: POST
   prefixes: |

@@ -1,0 +1,62 @@
+# Game of Thrones example
+# WF 2022-07-31
+'gotNaive1':
+  sparql: |
+    # Game of Thrones Characters
+    SELECT
+      ?item ?itemLabel
+      ?genderLabel
+      ?countryLabel
+      ?placeOfBirthLabel
+      ?placeOfDeathLabel
+    WHERE
+    {
+      ?item wdt:P31 wd:Q20086263. # must be a game of thrones character
+      ?item wdt:P21 ?gender.
+      ?item wdt:P27 ?country.
+      ?item wdt:P19 ?placeOfBirth.
+      ?item wdt:P20 ?placeOfDeath.
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    }
+'gotNaive2':
+  sparql: |
+    # Game of Thrones Characters
+    SELECT
+      ?item ?itemLabel
+      ?genderLabel
+      ?countryLabel
+      ?placeOfBirthLabel
+      ?placeOfDeathLabel
+    WHERE
+    {
+      ?item wdt:P31 wd:Q20086263. # must be a game of thrones character
+      OPTIONAL { ?item wdt:P21 ?gender}.
+      OPTIONAL { ?item wdt:P27 ?country}.
+      OPTIONAL { ?item wdt:P19 ?placeOfBirth}.
+      OPTIONAL { ?item wdt:P20 ?placeOfDeath}.
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    }
+'gotNaive3':
+  sparql: |
+    # Game of Thrones Characters
+    SELECT
+      ?item ?itemLabel
+      ?genderLabel
+      ?countryLabel
+      ?placeOfBirthLabel
+      ?placeOfDeathLabel
+      ?killedByLabel
+      ?familyLabel
+      ?occupationLabel
+    WHERE
+    {
+      ?item wdt:P31 wd:Q20086263. # must be a game of thrones character
+      OPTIONAL { ?item wdt:P21 ?gender}.
+      OPTIONAL { ?item wdt:P27 ?country}.
+      OPTIONAL { ?item wdt:P19 ?placeOfBirth}.
+      OPTIONAL { ?item wdt:P20 ?placeOfDeath}.
+      OPTIONAL { ?item wdt:P157 ?killedBy}.
+      OPTIONAL { ?item wdt:P53 ?family}.
+      OPTIONAL { ?item wdt:P106 ?occupation}.
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    }
