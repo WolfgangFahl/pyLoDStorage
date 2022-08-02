@@ -79,7 +79,7 @@ class WikidataProperty():
             for propertyLabel in propertyLabels:
                 valuesClause+=f'   "{propertyLabel}"@{lang}\n'
             query=f"""# get the properties for the given labels
-{WikidataItem.getPrefixes()}
+{WikidataItem.getPrefixes(["rdf","rdfs","wikibase"])}
 SELECT ?property ?propertyLabel WHERE {{
   VALUES ?propertyLabel {{
 {valuesClause}
@@ -108,7 +108,7 @@ SELECT ?property ?propertyLabel WHERE {{
                 valuesClause+=f'   wd:{propertyId}\n'
             query=f"""
 # get the property for the given property Ids
-{WikidataItem.getPrefixes()}
+{WikidataItem.getPrefixes(["rdf","rdfs","wd","wikibase"])}
 SELECT ?property ?propertyLabel WHERE {{
   VALUES ?property {{
 {valuesClause}
@@ -191,16 +191,46 @@ class WikidataItem:
         return text
     
     @classmethod
-    def getPrefixes(cls):
+    def getPrefixes(cls,prefixes=["rdf","rdfs","schema","wd","wdt","wikibase","xsd"]):
+        prefixMap={
+          "bd":"<http://www.bigdata.com/rdf#>",
+          "cc":"<http://creativecommons.org/ns#>",
+          "dct":"<http://purl.org/dc/terms/>",
+          "geo":"<http://www.opengis.net/ont/geosparql#>",
+          "ontolex":"<http://www.w3.org/ns/lemon/ontolex#>",
+          "owl":"<http://www.w3.org/2002/07/owl#>",
+          "p":"<http://www.wikidata.org/prop/>",
+          "pq":"<http://www.wikidata.org/prop/qualifier/>",
+          "pqn":"<http://www.wikidata.org/prop/qualifier/value-normalized/>",
+          "pqv":"<http://www.wikidata.org/prop/qualifier/value/>",
+          "pr":"<http://www.wikidata.org/prop/reference/>",
+          "prn":"<http://www.wikidata.org/prop/reference/value-normalized/>",
+          "prov":"<http://www.w3.org/ns/prov#>",
+          "prv":"<http://www.wikidata.org/prop/reference/value/>",
+          "ps":"<http://www.wikidata.org/prop/statement/>",
+          "psn":"<http://www.wikidata.org/prop/statement/value-normalized/>",
+          "psv":"<http://www.wikidata.org/prop/statement/value/>",
+          "rdf":"<http://www.w3.org/1999/02/22-rdf-syntax-ns#>",
+          "rdfs":"<http://www.w3.org/2000/01/rdf-schema#>",
+          "schema":"<http://schema.org/>",
+          "skos":"<http://www.w3.org/2004/02/skos/core#>",
+          "wd":"<http://www.wikidata.org/entity/>",
+          "wdata":"<http://www.wikidata.org/wiki/Special:EntityData/>",
+          "wdno":"<http://www.wikidata.org/prop/novalue/>",
+          "wdref":"<http://www.wikidata.org/reference/>",
+          "wds":"<http://www.wikidata.org/entity/statement/>",
+          "wdt":"<http://www.wikidata.org/prop/direct/>",
+          "wdtn":"<http://www.wikidata.org/prop/direct-normalized/>",
+          "wdv":"<http://www.wikidata.org/value/>",
+          "wikibase":"<http://wikiba.se/ontology#>",
+          "xsd":"<http://www.w3.org/2001/XMLSchema#>"
+        }
         # see also https://www.wikidata.org/wiki/EntitySchema:E49
-        prefixes="""PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX schema: <http://schema.org/>
-PREFIX wd: <http://www.wikidata.org/entity/>
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wikibase: <http://wikiba.se/ontology#>
-PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>"""
-        return prefixes
+        sparql=""
+        for prefix in prefixes:
+            if prefix in prefixMap:
+                sparql+=f"PREFIX {prefix}: {prefixMap[prefix]}\n"
+        return sparql
 
     @classmethod
     def getLabelAndDescription(cls,sparql:SPARQL, itemId:str,lang:str="en"):
@@ -215,7 +245,7 @@ PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>"""
             (str,str): the label and description as a tuple
         '''
         query=f"""# get the label for the given item
-{cls.getPrefixes()}        
+{cls.getPrefixes(["rdfs","wd","schema"])}        
 SELECT ?itemLabel ?itemDescription
 WHERE
 {{
@@ -246,7 +276,7 @@ WHERE
         query=f"""# get the items that have the given label in the given language
 # e.g. we'll find human=Q5 as the oldest type for the label "human" first
 # and then the newer ones such as "race in Warcraft"
-{cls.getPrefixes()}
+{cls.getPrefixes("rdfs","schema","xsd")}
 SELECT 
   #?itemId 
   ?item 
@@ -324,7 +354,7 @@ class TrulyTabular(object):
         itemText=self.getItemText()
         query=f"""# Count all items with the given type
 # {itemText}
-{WikidataItem.getPrefixes()}
+{WikidataItem.getPrefixes(["wdt"])}
 SELECT (COUNT (DISTINCT ?item) AS ?count)
 WHERE
 {{
@@ -339,7 +369,7 @@ WHERE
             self.error=ex
             count=None
             
-        return count
+        return count,query
     
     def asText(self,long:bool=True):
         '''
