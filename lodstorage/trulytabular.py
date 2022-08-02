@@ -276,7 +276,7 @@ WHERE
         query=f"""# get the items that have the given label in the given language
 # e.g. we'll find human=Q5 as the oldest type for the label "human" first
 # and then the newer ones such as "race in Warcraft"
-{cls.getPrefixes("rdfs","schema","xsd")}
+{cls.getPrefixes(["rdfs","schema","xsd"])}
 SELECT 
   #?itemId 
   ?item 
@@ -354,7 +354,7 @@ class TrulyTabular(object):
         itemText=self.getItemText()
         query=f"""# Count all items with the given type
 # {itemText}
-{WikidataItem.getPrefixes(["wdt"])}
+{WikidataItem.getPrefixes()}
 SELECT (COUNT (DISTINCT ?item) AS ?count)
 WHERE
 {{

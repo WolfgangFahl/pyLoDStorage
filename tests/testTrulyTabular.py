@@ -174,7 +174,7 @@ class TestTrulyTabular(unittest.TestCase):
             tt=TrulyTabular(table["qid"],table["propertyLabels"],where=where,debug=debug)
             if "is proceedings from" in tt.properties:
                 tt.properties["is proceedings from"].reverse=True
-            count=tt.count()
+            count,query=tt.count()
             if (debug):
                 print(count)
             self.assertTrue(count>table["expected"])
@@ -235,13 +235,16 @@ class TestTrulyTabular(unittest.TestCase):
         '''
         test the count function of truly tabular
         '''
-        debug=False  
+        debug=self.debug  
+        #debug=True
         qid="Q55488" # railway stations
         for endpointConf in self.endpointConfs:
             tt=TrulyTabular(qid,endpointConf=endpointConf,debug=debug)
-            count=tt.count()
+            count,query=tt.count()
             if debug:
+                print(query)
                 print(f"count of railway stations is {count}")
+            self.assertTrue(qid in query)
             self.assertTrue(count>=106195)
             self.assertTrue(tt.error is None)
         
