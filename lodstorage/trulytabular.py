@@ -503,7 +503,7 @@ WHERE {{
                 sparqlQuery+=f"\n)"
         return sparqlQuery
     
-    def mostFrequentPropertiesQuery(self,whereClause:str=None):
+    def mostFrequentPropertiesQuery(self,whereClause:str=None,minCount:int=0):
         '''
         get the most frequently used properties
         
@@ -515,6 +515,9 @@ WHERE {{
             if self.endpointConf.database!="qlever":
                 whereClause+=";?p ?id"
         whereClause+="."  
+        minCountFilter=""
+        if minCount>0:
+            minCountFilter=f"\n  FILTER(?count >{minCount})."
         itemText=self.getItemText()
         sparqlQuery=f"""# get the most frequently used properties for
 # {itemText}
@@ -546,7 +549,7 @@ SELECT ?prop ?propLabel ?count WHERE {{
   }}"""
         sparqlQuery+=f"""
   ?prop rdfs:label ?propLabel.
-  FILTER(LANG(?propLabel) = "{self.lang}")      
+  FILTER(LANG(?propLabel) = "{self.lang}").{minCountFilter}  
 }}
 ORDER BY DESC (?count)
 """
@@ -590,7 +593,8 @@ ORDER BY DESC (?frequency)"""
             sparql=f"""{sparql}
 HAVING (COUNT (?value) > 1)
 ORDER BY DESC(?count)"""
-        sparql=f"""# Count all {self.asText(long=True)} items
+        itemText=self.getItemText()
+        sparql=f"""# Count all {itemText} items
 # with the given {propertyLabel}({propertyId}) https://www.wikidata.org/wiki/Property:{propertyId} 
 {WikidataItem.getPrefixes()}
 """+sparql

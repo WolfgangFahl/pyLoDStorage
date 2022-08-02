@@ -205,15 +205,16 @@ class TestTrulyTabular(unittest.TestCase):
         #show=True
         show=False
         debug=self.debug
-        debug=True
+        #debug=True
         
         for endpointConf in self.endpointConfs:
             for qid in ["Q6256"]:
                 tt=TrulyTabular(qid,debug=debug,endpointConf=endpointConf)
-                query=tt.mostFrequentPropertiesQuery()
-                if debug:
-                    print(query.query)
-                self.documentQuery(tt, query,formats=["github"],show=show)
+                for minCount in [0,100]:
+                    query=tt.mostFrequentPropertiesQuery(minCount=minCount)
+                    if debug:
+                        print(query.query)
+                    self.documentQuery(tt, query,formats=["github"],show=show)
 
     def testSyntaxHighlighting(self):
         '''
