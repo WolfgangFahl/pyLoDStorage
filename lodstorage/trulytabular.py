@@ -662,7 +662,7 @@ ORDER BY DESC(?count)"""
         Returns:
             generator: a generator of statistic dict rows
         '''
-        itemCount=self.count()
+        itemCount,_itemCountQuery=self.count()
         for wdProperty in self.properties.values():
             statsRow=self.genWdPropertyStatistic(wdProperty, itemCount)
             yield statsRow
@@ -671,7 +671,7 @@ ORDER BY DESC(?count)"""
         '''
         get the property Statistics
         '''
-        itemCount=self.count()
+        itemCount,_itemCountQuery=self.count()
         lod=[{
             "property": "∑",
             "total": itemCount,
