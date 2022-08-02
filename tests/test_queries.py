@@ -375,7 +375,7 @@ class TestEndpoints(Basetest):
         """
         debug=self.debug
         #debug=True
-        endpoints=EndpointManager.getEndpoints()
+        endpoints=EndpointManager.getEndpoints(lang="sparql")
         qm=QueryManager(lang='sparql',debug=False)
         query=qm.queriesByName["FirstTriple"]
         self.assertTrue("wikidata" in endpoints)

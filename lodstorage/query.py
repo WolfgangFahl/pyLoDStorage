@@ -548,9 +548,13 @@ class EndpointManager(object):
     """
 
     @staticmethod
-    def getEndpoints(endpointPath=None):
+    def getEndpoints(endpointPath:str=None,lang:str=None):
         '''
-        get the queries for thee given queries Path
+        get the endpoints for the given endpointPath
+        
+        Args: 
+            endpointPath(str): the path to the yaml file with the endpoint configurations
+            lang(str): if lang is given filter by the given language
         '''
         endpointPaths=YamlPath.getPaths("endpoints.yaml",endpointPath)
         endpoints={}
@@ -558,9 +562,13 @@ class EndpointManager(object):
             with open(lEndpointPath, 'r') as stream:
                 endpointRecords = yaml.safe_load(stream)
                 for name, record in endpointRecords.items():
-                    endpoint=Endpoint()
-                    endpoint.fromDict({"name": name, **record})
-                    endpoints[name]=endpoint
+                    select=True
+                    if lang is not None:
+                        select=record["lang"]==lang
+                    if select:
+                        endpoint=Endpoint()
+                        endpoint.fromDict({"name": name, **record})
+                        endpoints[name]=endpoint
         return endpoints
 
     @staticmethod
