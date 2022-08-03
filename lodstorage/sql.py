@@ -154,6 +154,7 @@ class SQLDB(object):
         except sqlite3.ProgrammingError as pe:
             msg=pe.args[0]
             if "You did not supply a value for binding" in msg:
+                # sqlite now returns the parameter name not the number
                 if sys.version >= '3.10':
                     columnName=re.findall(r':([a-zA-Z][a-zA-Z0-9_]*)',msg)[0]
                     columnName=columnName.replace(":","")

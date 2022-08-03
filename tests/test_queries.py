@@ -42,7 +42,7 @@ class TestQueries(Basetest):
         test SPARQL queries 
         '''
         show=self.debug
-        show=True
+        #show=True
         qm=QueryManager(lang='sparql',debug=False)
         for name,query in qm.queriesByName.items():
             if name in ["US President Nicknames"]:
