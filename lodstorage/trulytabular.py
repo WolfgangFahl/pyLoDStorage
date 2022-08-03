@@ -80,11 +80,12 @@ class WikidataProperty():
                 valuesClause+=f'   "{propertyLabel}"@{lang}\n'
             query=f"""# get the properties for the given labels
 {WikidataItem.getPrefixes(["rdf","rdfs","wikibase"])}
-SELECT ?property ?propertyLabel WHERE {{
+SELECT ?property ?propertyLabel ?wbType WHERE {{
   VALUES ?propertyLabel {{
 {valuesClause}
   }}
   ?property rdf:type wikibase:Property;rdfs:label ?propertyLabel.
+  ?property wikibase:propertyType  ?wbType.
   FILTER(LANG(?propertyLabel) = "{lang}")
 }}"""
             cls.addPropertiesForQuery(wdProperties,sparql,query)
@@ -109,11 +110,12 @@ SELECT ?property ?propertyLabel WHERE {{
             query=f"""
 # get the property for the given property Ids
 {WikidataItem.getPrefixes(["rdf","rdfs","wd","wikibase"])}
-SELECT ?property ?propertyLabel WHERE {{
+SELECT ?property ?propertyLabel ?wbType WHERE {{
   VALUES ?property {{
 {valuesClause}
   }}
   ?property rdf:type wikibase:Property;rdfs:label ?propertyLabel.
+  ?property wikibase:propertyType  ?wbType.
   FILTER(LANG(?propertyLabel) = "{lang}")
 }}""" 
             cls.addPropertiesForQuery(wdProperties,sparql,query)
@@ -135,6 +137,7 @@ SELECT ?property ?propertyLabel WHERE {{
             pid=re.sub(r"http://www.wikidata.org/entity/(.*)",r"\1",url)
             prop=WikidataProperty(pid)
             prop.plabel=record["propertyLabel"]
+            prop.wbtype=record["wbType"]
             prop.url=url
             wdProperties[prop.plabel]=prop
             prop.varname=Variable.validVarName(prop.plabel)
