@@ -123,8 +123,7 @@ class SQLDB(object):
                 # show only index
                 debugInfo="\nrecord #%d" % index
         return debugInfo
-        
-       
+               
     def store(self,listOfRecords,entityInfo,executeMany=False,fixNone=False):
         '''
         store the given list of records based on the given entityInfo
@@ -154,12 +153,14 @@ class SQLDB(object):
         except sqlite3.ProgrammingError as pe:
             msg=pe.args[0]
             if "You did not supply a value for binding" in msg:
-                # sqlite now returns the parameter name not the number
-                if sys.version >= '3.10':
+                if ":" in msg:
+                    # sqlite now returns the parameter name not the number
+                    # You did not supply a value for binding parameter :type.
                     columnName=re.findall(r':([a-zA-Z][a-zA-Z0-9_]*)',msg)[0]
                     columnName=columnName.replace(":","")
                 else:
                     # pre python 3.10
+                    # You did not supply a value for binding 2.
                     columnIndex=int(re.findall(r'\d+',msg)[0])
                     columnName=list(entityInfo.typeMap.keys())[columnIndex-1]
                 debugInfo=self.getDebugInfo(record, index, executeMany)
