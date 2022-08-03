@@ -530,7 +530,7 @@ class QueryManager(object):
     @staticmethod
     def getQueries(queriesPath=None):
         '''
-        get the queries for thee given queries Path
+        get the queries for the given queries Path
         '''
         queriesPaths=YamlPath.getPaths("queries.yaml", queriesPath)
         queries={}

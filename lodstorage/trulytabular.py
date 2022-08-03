@@ -4,6 +4,8 @@ Created on 2022-04-14
 @author: wf
 '''
 import datetime
+from typing import Union
+
 from lodstorage.sparql import SPARQL
 from lodstorage.query import Query,QueryManager,YamlPath,Endpoint
 from lodstorage.version import Version
@@ -622,12 +624,20 @@ ORDER BY DESC(?count)"""
         qlod=self.sparql.queryAsListOfDicts(query.query)
         return qlod
     
-    def addStatsColWithPercent(self,m,col,value,total): 
+    def addStatsColWithPercent(self, m:dict, col:str, value:Union[int, float], total:Union[int, float]):
         '''
         add a statistics Column
+        Args:
+            m(dict):
+            col(str): name of the column
+            value: value
+            total: total value
         '''
         m[col]=value
-        m[f"{col}%"]=float(f"{value/total*100:.1f}") 
+        if total > 0:
+            m[f"{col}%"]=float(f"{value/total*100:.1f}")
+        else:
+            m[f"{col}%"] = None
         
     def genWdPropertyStatistic(self,wdProperty:WikidataProperty,itemCount:int,withQuery=True)->dict:
         '''
