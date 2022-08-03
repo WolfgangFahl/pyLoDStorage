@@ -8,6 +8,7 @@ from lodstorage.trulytabular import TrulyTabular, WikidataItem, WikidataProperty
 from lodstorage.query import Query, QuerySyntaxHighlight, Endpoint
 from lodstorage.sparql import SPARQL
 from pprint import pprint
+from urllib.error import HTTPError
 
 class TestTrulyTabular(unittest.TestCase):
     '''
@@ -17,12 +18,18 @@ class TestTrulyTabular(unittest.TestCase):
     def setUp(self):
         self.debug=False
         qleverEndpoint=Endpoint()
-        qleverEndpoint.name="qlever-wikidata-proxy"
-        qleverEndpoint.method="GET"
+        qleverEndpoint.name="qlever-wikidata"
+        qleverEndpoint.method="POST"
         qleverEndpoint.database="qlever"
-        qleverEndpoint.endpoint="https://qlever.cs.uni-freiburg.de/api/wikidata-proxy"
+        qleverEndpoint.endpoint="https://qlever.cs.uni-freiburg.de/api/wikidata"
         self.endpointConfs={qleverEndpoint,Endpoint.getDefault()}
         pass
+    
+    def handleServiceUnavailable(self,ex,endpointConf):
+        if "503" in str(ex):
+            print(f"{endpointConf.name} at {endpointConf.endpoint} returns 503 Service Unavailable")
+        else:
+            raise(ex)
 
 
     def tearDown(self):
@@ -78,46 +85,58 @@ class TestTrulyTabular(unittest.TestCase):
         #debug=True
         propertyLabels=["title","country","location"]
         for endpointConf in self.endpointConfs:
-            tt=TrulyTabular("Q2020153",propertyLabels=propertyLabels,endpointConf=endpointConf)
-            if debug:
-                print (tt.properties)
-            for prop in propertyLabels:
-                self.assertTrue(prop in tt.properties)
+            try:
+                tt=TrulyTabular("Q2020153",propertyLabels=propertyLabels,endpointConf=endpointConf)
+                if debug:
+                    print (tt.properties)
+                for prop in propertyLabels:
+                    self.assertTrue(prop in tt.properties)
+            except (Exception,HTTPError) as ex: 
+                    self.handleServiceUnavailable(ex,endpointConf)
+                    pass
             
     def testGetPropertiesById(self):
         '''
         try getting properties by label
         '''
         debug=self.debug
-        debug=True
+        #debug=True
         propertyIds=["P1800"]
         expected=["Wikimedia database name"]
         for endpointConf in self.endpointConfs:
-            sparql=SPARQL(endpointConf.endpoint,method=endpointConf.method)
-            propList=WikidataProperty.getPropertiesByIds(sparql, propertyIds, lang="en")
-            for i,prop in enumerate(propList):
-                if debug:
-                    print(f"{endpointConf.name} {i}:{prop}")
-                self.assertEqual(prop,expected[i])
+            try:
+                sparql=SPARQL(endpointConf.endpoint,method=endpointConf.method)
+                propList=WikidataProperty.getPropertiesByIds(sparql, propertyIds, lang="en")
+                for i,prop in enumerate(propList):
+                    if debug:
+                        print(f"{endpointConf.name} {i}:{prop}")
+                    self.assertEqual(prop,expected[i])
+            except (Exception,HTTPError) as ex: 
+                    self.handleServiceUnavailable(ex,endpointConf)
+                    pass
                 
     def testGetItemsByLabel(self):
         '''
         try getting items by label
         '''
-        #debug=self.debug
-        debug=True
+        debug=self.debug
+        #debug=True
         qLabels=["academic conference","scientific conference series","whisky distillery","human"]
         for endpointConf in self.endpointConfs:
-            sparql=SPARQL(endpointConf.endpoint,method=endpointConf.method)
-            items={}
-            for qLabel in qLabels:
-                items4Label=WikidataItem.getItemsByLabel(sparql, qLabel)
-                for i,item in enumerate(items4Label):
-                    if debug:
-                        print(f"{endpointConf.name} {i+1}:{item}")
-                items[qLabel]=items4Label[0]
-            for qLabel in qLabels:
-                self.assertTrue(qLabel in items)
+            try:
+                sparql=SPARQL(endpointConf.endpoint,method=endpointConf.method)
+                items={}
+                for qLabel in qLabels:
+                    items4Label=WikidataItem.getItemsByLabel(sparql, qLabel)
+                    for i,item in enumerate(items4Label):
+                        if debug:
+                            print(f"{endpointConf.name} {i+1}:{item}")
+                    items[qLabel]=items4Label[0]
+                for qLabel in qLabels:
+                    self.assertTrue(qLabel in items)
+            except (Exception,HTTPError) as ex: 
+                    self.handleServiceUnavailable(ex,endpointConf)
+                    pass
 
     def testTrulyTabularTables(self):
         '''
@@ -206,22 +225,25 @@ class TestTrulyTabular(unittest.TestCase):
         show=False
         debug=self.debug
         #debug=True
-        
         for endpointConf in self.endpointConfs:
             for qid in ["Q6256"]:
-                tt=TrulyTabular(qid,debug=debug,endpointConf=endpointConf)
-                for minCount in [0,100]:
-                    query=tt.mostFrequentPropertiesQuery(minCount=minCount)
-                    if debug:
-                        print(query.query)
-                    self.documentQuery(tt, query,formats=["github"],show=show)
+                try:
+                    tt=TrulyTabular(qid,debug=debug,endpointConf=endpointConf)
+                    for minCount in [0,100]:
+                        query=tt.mostFrequentPropertiesQuery(minCount=minCount)
+                        if debug:
+                            print(query.query)
+                        self.documentQuery(tt, query,formats=["github"],show=show)
+                except (Exception,HTTPError) as ex: 
+                    self.handleServiceUnavailable(ex,endpointConf)
+                    pass
 
     def testSyntaxHighlighting(self):
         '''
         https://github.com/WolfgangFahl/pyLoDStorage/issues/81
         '''
-        #debug=self.debug
-        debug=True
+        debug=self.debug
+        #debug=True
         qid="Q6256" # country
         tt=TrulyTabular(qid,debug=debug)
         query=tt.mostFrequentPropertiesQuery()
@@ -240,20 +262,24 @@ class TestTrulyTabular(unittest.TestCase):
         #debug=True
         qid="Q55488" # railway stations
         for endpointConf in self.endpointConfs:
-            tt=TrulyTabular(qid,endpointConf=endpointConf,debug=debug)
-            count,query=tt.count()
-            if debug:
-                print(query)
-                print(f"count of railway stations is {count}")
-            self.assertTrue(qid in query)
-            self.assertTrue(count>=106195)
-            self.assertTrue(tt.error is None)
-        
+            try:
+                tt=TrulyTabular(qid,endpointConf=endpointConf,debug=debug)
+                count,query=tt.count()
+                if debug:
+                    print(query)
+                    print(f"count of railway stations is {count}")
+                self.assertTrue(qid in query)
+                self.assertTrue(count>=106195)
+                self.assertTrue(tt.error is None)
+            except (Exception,HTTPError) as ex: 
+                self.handleServiceUnavailable(ex,endpointConf)
+              
     def testGenerateSparqlQuery(self):
         '''
         test Generating a SPARQL query
         '''
-        debug=True
+        debug=self.debug
+        #debug=True
         configs=[
 
             {
