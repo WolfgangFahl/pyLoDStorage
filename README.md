@@ -24,7 +24,7 @@ Installation
 pip install pylodstorage
 ```
 
-Get Sources 
+Get Sources
 ===========
 ```bash
 git clone https://github.com/WolfgangFahl/pyLoDStorage
@@ -47,3 +47,4 @@ see [test cases](https://github.com/WolfgangFahl/pyLoDStorage/tree/master/tests)
 
 ### Authors
 * [Wolfgang Fahl](http://www.bitplan.com/Wolfgang_Fahl)
+* [Tim Holzheim](https://www.semantic-mediawiki.org/wiki/Tim_Holzheim)
