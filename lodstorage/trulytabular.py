@@ -461,7 +461,7 @@ SELECT ?{item.varname} ?{item.varname}Label"""
                             sparqlQuery+=f"\n  ({aggregateFunc} ({distinct}?{wdProp.varname}{aggregateParam}) AS ?{wdProp.varname}_{aggregate})"
                         elif aggregate=="label":
                             sparqlQuery+=f"\n  ?{wdProp.varname}Label"
-                        elif aggregate=="ignore":
+                        elif aggregate=="ignore" and not "label" in genList:
                             sparqlQuery+=f"\n  ?{wdProp.varname}"    
         sparqlQuery+=f"""
 WHERE {{
