@@ -21,4 +21,6 @@ pylatexenc~=2.10
 # https://pygments.org/
 pygments
 #https://pypi.org/project/dicttoxml/
-dicttoxml>=1.7.4
+# dicttoxml>=1.7.4
+# https://pypi.org/project/dicttoxml2/
+dicttoxml2
