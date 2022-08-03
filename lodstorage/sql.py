@@ -154,8 +154,13 @@ class SQLDB(object):
         except sqlite3.ProgrammingError as pe:
             msg=pe.args[0]
             if "You did not supply a value for binding" in msg:
-                columnIndex=int(re.findall(r'\d+',msg)[0])
-                columnName=list(entityInfo.typeMap.keys())[columnIndex-1]
+                if sys.version >= '3.10':
+                    columnName=re.findall(r':([a-zA-Z][a-zA-Z0-9_]*)',msg)[0]
+                    columnName=columnName.replace(":","")
+                else:
+                    # pre python 3.10
+                    columnIndex=int(re.findall(r'\d+',msg)[0])
+                    columnName=list(entityInfo.typeMap.keys())[columnIndex-1]
                 debugInfo=self.getDebugInfo(record, index, executeMany)
                 raise Exception("%s\nfailed: no value supplied for column '%s'%s" % (insertCmd,columnName,debugInfo))
             else:
