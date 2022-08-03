@@ -8,7 +8,7 @@ see
 @author: tyleradams
 @author: wf
 '''
-from dicttoxml import dicttoxml
+from dicttoxml2 import dicttoxml
 from xml.dom.minidom import parseString
 
 

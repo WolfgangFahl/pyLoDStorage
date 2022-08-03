@@ -98,7 +98,7 @@ class TestQueries(Basetest):
         test the sparql query command line
         '''
         debug=self.debug
-        debug=True
+        #debug=True
         for testArg in [
             {"format":"csv", "expected":'''Theodore Roosevelt","Teddy"'''},
             {"format":"xml", "expected":'''<?xml version="1.0" ?>'''},
