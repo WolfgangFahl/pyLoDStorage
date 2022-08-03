@@ -459,6 +459,8 @@ SELECT ?{item.varname} ?{item.varname}Label"""
                             sparqlQuery+=f"\n  ({aggregateFunc} ({distinct}?{wdProp.varname}{aggregateParam}) AS ?{wdProp.varname}_{aggregate})"
                         elif aggregate=="label":
                             sparqlQuery+=f"\n  ?{wdProp.varname}Label"
+                        elif aggregate=="ignore":
+                            sparqlQuery+=f"\n  ?{wdProp.varname}"    
         sparqlQuery+=f"""
 WHERE {{
   # instanceof {item.qid}:{item.qlabel}
@@ -525,7 +527,7 @@ WHERE {{
         sparqlQuery=f"""# get the most frequently used properties for
 # {itemText}
 {WikidataItem.getPrefixes()}
-SELECT ?prop ?propLabel ?count WHERE {{
+SELECT ?prop ?propLabel ?wbType ?count WHERE {{
   {{"""
         if self.endpointConf.database=="qlever":
             sparqlQuery+=f"""
@@ -552,6 +554,7 @@ SELECT ?prop ?propLabel ?count WHERE {{
   }}"""
         sparqlQuery+=f"""
   ?prop rdfs:label ?propLabel.
+  ?prop wikibase:propertyType ?wbType.
   FILTER(LANG(?propLabel) = "{self.lang}").{minCountFilter}  
 }}
 ORDER BY DESC (?count)
