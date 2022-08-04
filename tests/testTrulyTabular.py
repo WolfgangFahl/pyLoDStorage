@@ -279,7 +279,7 @@ class TestTrulyTabular(unittest.TestCase):
         test Generating a SPARQL query
         '''
         debug=self.debug
-        debug=True
+        #debug=True
         configs=[
 
             {

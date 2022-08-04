@@ -34,6 +34,21 @@ case $os in
    install="sudo apt-get install"
    ;;
 esac
+while [  "$1" != ""  ]
+do
+  option="$1"
+  case $option in
+    -d|--debug)
+      # show environment for debugging
+      env
+      ;;
+    -p|--python)
+      shift
+      pip="$1 -m pip"
+      ;;
+  esac
+  shift
+done
 #$install python3-pip
 #autoinstall jq jq
 $pip --version

@@ -27,7 +27,7 @@ class TestQueries(Basetest):
         '''
         show=self.debug
         qm=QueryManager(lang='sql',debug=False)
-        self.assertEqual(2,len(qm.queriesByName)) 
+        self.assertTru(len(qm.queriesByName)>=2) 
         sqlDB=tests.testSqlite3.TestSQLDB.getSampleTableDB()
         #print(sqlDB.getTableDict())
         for _name,query in qm.queriesByName.items():

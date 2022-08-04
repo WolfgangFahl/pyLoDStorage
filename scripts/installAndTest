@@ -9,6 +9,6 @@ scripts/jena -k
 # run apache jena fuseki server
 scripts/jena -f example
 # command to install dependencies
-scripts/install
+scripts/install "$@"
 # command to run tests
 scripts/test "$@"
