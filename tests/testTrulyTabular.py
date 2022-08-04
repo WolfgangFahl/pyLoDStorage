@@ -279,7 +279,7 @@ class TestTrulyTabular(unittest.TestCase):
         test Generating a SPARQL query
         '''
         debug=self.debug
-        #debug=True
+        debug=True
         configs=[
 
             {
@@ -344,7 +344,7 @@ class TestTrulyTabular(unittest.TestCase):
             
             # create a truly tabular analysis
             tt=TrulyTabular(qid, propertyIds=list(propertyIdMap.keys()))
-            varname=tt.item.varname
+            varname=tt.item.itemVarname
             # generate a SPARQL Query
             sparqlQuery=tt.generateSparqlQuery(genMap=propertyIdMap,naive=naive)
             if debug:
