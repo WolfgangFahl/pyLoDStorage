@@ -643,7 +643,7 @@ ORDER BY DESC(?count)"""
             total: total value
         '''
         m[col]=value
-        if total > 0:
+        if total is not None and total > 0:
             m[f"{col}%"]=float(f"{value/total*100:.1f}")
         else:
             m[f"{col}%"] = None
