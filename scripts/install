@@ -52,5 +52,5 @@ done
 #$install python3-pip
 #autoinstall jq jq
 $pip --version
-echo "installing required python modules with useroption $useroption"
+echo "installing required python modules with $pip install $useroption"
 if [ -f requirements.txt ]; then $pip install $useroption -r requirements.txt; fi
