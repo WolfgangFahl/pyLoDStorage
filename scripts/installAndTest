@@ -9,6 +9,8 @@ scripts/jena -k
 # run apache jena fuseki server
 scripts/jena -f example
 # command to install dependencies
+python3.10 -m venv .venv
+source .venv/bin/activate
 scripts/install "$@"
 # command to run tests
 scripts/test "$@"

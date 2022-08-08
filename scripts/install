@@ -1,7 +1,8 @@
 #!/bin/bash
 # WF 2020-03-25
 os=$(uname -a)
-useroption="--user"
+useroption=""
+#useroption="--user"
 
 #
 # autoinstall the package for the given command
