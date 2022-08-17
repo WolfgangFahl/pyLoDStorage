@@ -4,7 +4,8 @@ Created on 2020-08-14
 @author: wf
 '''
 import unittest
-import copy
+from SPARQLWrapper import  SPARQLExceptions
+
 from tests.basetest import Basetest
 from lodstorage.sparql import SPARQL
 from lodstorage.sample import Sample
@@ -13,6 +14,7 @@ from lodstorage.query import Query
 import time
 import datetime
 import warnings
+
 
 class TestSPARQL(Basetest):
     ''' Test SPARQL access e.g. Apache Jena via Wrapper'''
@@ -361,6 +363,16 @@ WHERE
         csv=CSV.toCSV(qlod)
         if self.debug:
             print(csv)
+
+    @unittest.skipIf(not Basetest.isUser("holzheim"), "Tests against local stardog instance → once confident sparql endpoint is online change to this endpoint")
+    def test_query_with_authentication(self):
+        """tests querying an endpoint that requires authentication"""
+        query = """SELECT * WHERE { ?proceeding dblp:publishedInSeriesVolume "2816" .}"""
+        sparql = SPARQL("http://localhost:5820/dblp/query", method="POST")
+        self.assertRaises(SPARQLExceptions.Unauthorized, sparql.queryAsListOfDicts, queryString=query)
+        sparql.addAuthentication("admin", "admin")
+        qres = sparql.queryAsListOfDicts(query)
+        self.assertEqual(2, len(qres))
     
 
 if __name__ == "__main__":

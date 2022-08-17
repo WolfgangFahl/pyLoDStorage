@@ -3,8 +3,9 @@ Created on 2020-08-14
 
 @author: wf
 '''
+from typing import Union
 from SPARQLWrapper import SPARQLWrapper2
-from SPARQLWrapper.Wrapper import POSTDIRECTLY, POST
+from SPARQLWrapper.Wrapper import POSTDIRECTLY, POST, BASIC, DIGEST
 from lodstorage.lod import LOD
 import datetime
 import time
@@ -46,8 +47,19 @@ class SPARQL(object):
         self.sparql=SPARQLWrapper2(url)
         self.method=method
         self.sparql.agent=agent
+
+    def addAuthentication(self, username:str, password:str, method: Union[BASIC, DIGEST] = BASIC):
+        """
+        Add Http Authentication credentials to the sparql wrapper
+        Args:
+            username: name of the user
+            password: password of the user
+            method: HTTP Authentication method
+        """
+        self.sparql.setHTTPAuth(method)
+        self.sparql.setCredentials(username, password)
         
-    def rawQuery(self,queryString,method='POST'):
+    def rawQuery(self,queryString,method=POST):
         '''
         query with the given query string
         

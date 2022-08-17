@@ -3,6 +3,8 @@ Created on 2021-08-19
 
 @author: wf
 '''
+import os
+import getpass
 from unittest import TestCase
 import time
 
@@ -23,7 +25,21 @@ class Basetest(TestCase):
         
     def tearDown(self):
         TestCase.tearDown(self)
-        self.profiler.time()    
+        self.profiler.time()
+
+    @staticmethod
+    def inPublicCI():
+        '''
+        are we running in a public Continuous Integration Environment?
+        '''
+        publicCI = getpass.getuser() in ["travis", "runner"]
+        jenkins = "JENKINS_HOME" in os.environ
+        return publicCI or jenkins
+
+    @staticmethod
+    def isUser(name:str):
+        """Checks if the system has the given name"""
+        return getpass.getuser() == name
 
 class Profiler:
     '''
