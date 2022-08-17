@@ -9,7 +9,7 @@ class Version(object):
     Version handling for pyLoDStorage
     '''
     name="pylodstorage"
-    version='0.4.6'
+    version='0.4.7'
     date = '2020-09-10'
-    updated = '2022-08-07'
+    updated = '2022-08-17'
     description='python List of Dict (Table) Storage library'
