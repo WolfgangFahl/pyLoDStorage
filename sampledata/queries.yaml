@@ -2,6 +2,22 @@
 # Sample Queries for pyLodStorage library
 #
 # WF 2020-08-22
+'classHistogramm':
+  sparql: |
+    SELECT ?c (COUNT(?c) AS ?count)
+    WHERE {
+      ?subject a ?c
+    }
+    GROUP BY ?c
+    HAVING (?count >100)
+    ORDER BY DESC(?count)
+'propertyHistogramm':
+  sparql: |
+    SELECT ?property (COUNT(?property) AS ?propTotal)
+    WHERE { ?s ?property ?o . }
+    GROUP BY ?property
+    HAVING (?propTotal >1000)
+    ORDER BY DESC(?propTotal)
 'Predicate usage':
     sparql: |
         SELECT ?p (count(?p) as ?numberOfPredicates)
