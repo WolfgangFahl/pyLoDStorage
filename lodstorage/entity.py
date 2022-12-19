@@ -290,7 +290,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             lod.append(entity.__dict__)
         return lod
     
-    def store(self,limit=10000000,batchSize=250,append=False,fixNone=True,sampleRecordCount=-1)->str:
+    def store(self,limit=10000000,batchSize=250,append=False,fixNone=True,sampleRecordCount=-1,replace:bool=False)->str:
         '''
         store my list of dicts
         
@@ -300,14 +300,15 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             append(bool): True if records should be appended
             fixNone(bool): if True make sure the dicts are filled with None references for each record
             sampleRecordCount(int): the number of records to analyze for type information
+            replace(bool): if True allow replace for insert 
         
         Return:
             str: The cachefile being used
         '''
         lod=self.getLoD()
-        return self.storeLoD(lod,limit=limit,batchSize=batchSize,append=append,fixNone=fixNone,sampleRecordCount=sampleRecordCount)
+        return self.storeLoD(lod,limit=limit,batchSize=batchSize,append=append,fixNone=fixNone,sampleRecordCount=sampleRecordCount,replace=replace)
         
-    def storeLoD(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,append=False,fixNone=True,sampleRecordCount=1)->str:
+    def storeLoD(self,listOfDicts,limit=10000000,batchSize=250,cacheFile=None,append=False,fixNone=True,sampleRecordCount=1,replace:bool=False)->str:
         ''' 
         store my entities 
         
@@ -319,7 +320,7 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
             append(bool): True if records should be appended
             fixNone(bool): if True make sure the dicts are filled with None references for each record
             sampleRecordCount(int): the number of records to analyze for type information
-            
+            replace(bool): if True allow replace for insert 
         Return:
             str: The cachefile being used
         '''
@@ -358,8 +359,8 @@ SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate
                 withDrop=True
                 withCreate=True
             entityInfo=self.initSQLDB(sqldb,listOfDicts,withCreate=withCreate,withDrop=withDrop,sampleRecordCount=sampleRecordCount)
-            self.sqldb.store(listOfDicts, entityInfo,executeMany=self.executeMany,fixNone=fixNone)
+            self.sqldb.store(listOfDicts, entityInfo,executeMany=self.executeMany,fixNone=fixNone,replace=replace)
             self.showProgress ("store for %s done after %5.1f secs" % (self.name,time.time()-startTime))
         else:
-            raise Exception("unsupported store mode %s" % self.mode)  
+            raise Exception(f"unsupported store mode {self.mode}")  
         return cacheFile
