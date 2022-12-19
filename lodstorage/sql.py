@@ -124,7 +124,7 @@ class SQLDB(object):
                 debugInfo="\nrecord #%d" % index
         return debugInfo
                
-    def store(self,listOfRecords,entityInfo,executeMany=False,fixNone=False):
+    def store(self,listOfRecords,entityInfo,executeMany=False,fixNone=False,replace=False):
         '''
         store the given list of records based on the given entityInfo
         
@@ -134,8 +134,9 @@ class SQLDB(object):
            entityInfo(EntityInfo): the meta data to be used for storing
            executeMany(bool): if True the insert command is done with many/all records at once
            fixNone(bool): if True make sure empty columns in the listOfDict are filled with "None" values
+           replace(bool): if True allow replace for insert 
         '''
-        insertCmd=entityInfo.insertCmd
+        insertCmd=entityInfo.getInsertCmd(replace=replace)
         record=None
         index=0
         try:
@@ -507,12 +508,15 @@ class EntityInfo(object):
             print (ddlCmd)    
         return ddlCmd
         
-    def getInsertCmd(self):
+    def getInsertCmd(self,replace:bool=False)->str:
         '''
         get the INSERT command for this entityInfo
         
+        Args:
+             replace(bool): if True allow replace for insert 
+        
         Returns:
-            the INSERT INTO SQL command for his entityInfo e.g.
+            str: the INSERT INTO SQL command for his entityInfo e.g.
                  
         Example:   
       
@@ -523,7 +527,8 @@ class EntityInfo(object):
         '''
         columns =','.join(self.typeMap.keys())
         placeholders=':'+',:'.join(self.typeMap.keys())
-        insertCmd="INSERT INTO %s (%s) values (%s)" % (self.name, columns,placeholders)
+        replaceClause=" OR REPLACE" if replace else ""
+        insertCmd=f"INSERT{replaceClause} INTO {self.name} ({columns}) values ({placeholders})"
         if self.debug:
             print(insertCmd)
         return insertCmd

@@ -364,12 +364,24 @@ record  #3={'name': 'John Doe'}"""
         '''
         sqlDB=self.getSampleTableDB()
         tableDict=sqlDB.getTableDict()
-        if self.debug:
+        debug=self.debug
+        #debug=True
+        if debug:
             print (tableDict)
         self.assertTrue("sample" in tableDict)
         cols=tableDict["sample"]["columns"]
         self.assertTrue("pkey" in cols)
-       
+        
+    def testIssue110(self):
+        """
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/110
+        """
+        sqlDB=self.getSampleTableDB()
+        sample1=Sample.getSample(10)
+        sample2=Sample.getSample(10)
+        sample1.extend(sample2)
+        entityInfo=sqlDB.createTable(sample1,"sample1","pkey") 
+        sqlDB.store(sample1,entityInfo=entityInfo,replace=True)
         
         
 if __name__ == "__main__":
