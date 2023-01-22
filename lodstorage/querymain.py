@@ -4,6 +4,7 @@ Created on 2022-02-13
 @author: wf
 '''
 from lodstorage.version import Version
+from SPARQLWrapper.Wrapper import BASIC, DIGEST
 from pathlib import Path
 __version__ = Version.version
 __date__ = Version.date
@@ -79,6 +80,7 @@ class QueryMain:
         if queryCode:
             if debug or args.showQuery:
                 print(f"{args.language}:\n{queryCode}")
+            endpointConf=None
             if args.endpointName:
                 endpointConf=endpoints.get(args.endpointName)                
             if args.language=="sparql":
@@ -93,6 +95,13 @@ class QueryMain:
                 if args.method:
                     method=method
                 sparql=SPARQL(endPointUrl,method=method)
+                if endpointConf is not None and hasattr(endpointConf, "auth"):
+                    authMethod=None 
+                    if endpointConf.auth=="BASIC":
+                        authMethod=BASIC
+                    elif endpointConf.auth=="DIGEST":
+                        authMethod=DIGEST
+                    sparql.addAuthentication(endpointConf.user,endpointConf.passwd,method=authMethod)
                 if args.prefixes and endpointConf is not None:
                     queryCode = f"{endpointConf.prefixes}\n{queryCode}"
                 if args.raw:

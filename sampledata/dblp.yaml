@@ -1,0 +1,13 @@
+#
+# Sample Queries for dblp
+#
+# WF 2023-01-22
+'PredicatesByFrequency':
+    title:  All available dblp predicates by frequency
+    description: All available dblp predicates by frequency with percentage
+    sparql: |
+        SELECT ?p ?count ?percent WHERE {
+          { SELECT ?p (COUNT(?p) AS ?count) WHERE { ?s ?p ?o } GROUP BY ?p }
+          BIND(100 * ?count / SUM(?count) AS ?percent)
+        }
+        ORDER BY DESC(?count)

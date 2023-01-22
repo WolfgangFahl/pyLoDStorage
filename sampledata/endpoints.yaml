@@ -76,6 +76,14 @@
     PREFIX wdv: <http://www.wikidata.org/value/>
     PREFIX wikibase: <http://wikiba.se/ontology#>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+'qlever-dblp':
+  lang: sparql
+  method: POST
+  database: qlever
+  endpoint: https://qlever.cs.uni-freiburg.de/api/dblp
+  website: https://qlever.cs.uni-freiburg.de/dblp
+  prefixes: |
+    
 'wikidata-openlinksw':
     lang: sparql
     endpoint: https://wikidata.demo.openlinksw.com/sparql

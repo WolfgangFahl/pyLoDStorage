@@ -15,6 +15,7 @@ from lodstorage.querymain import QueryMain
 from lodstorage.sparql import SPARQL
 import tests.testSqlite3
 from tests.basetest import Basetest
+from bokeh.sampledata import haar_cascade
 
 class TestQueries(Basetest):
     '''
@@ -204,6 +205,33 @@ class TestQueries(Basetest):
         '''
         vfs=ValueFormatter.getFormats(ValueFormatter.formatsPath)
         self.assertTrue("wikidata" in vfs)
+        
+    def testIssue111(self):
+        """
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/111
+        add basicauth support for endpoints
+        """
+        debug=self.debug
+        debug=True
+        if not self.inPublicCI():
+            endpoints=EndpointManager.getEndpoints(lang="sparql")
+            #for endpoint in endpoints:
+            #    print(endpoint)
+            # queriesPath=f"{os.path.dirname(__file__)}/../sampledata/dblp.yaml"
+            for endpoint_name in [ "qlever-dblp","dblp" ]:
+                self.assertTrue(endpoint_name in endpoints)
+                endpoint=endpoints[endpoint_name]
+                if endpoint_name=="dblp":
+                    for attrname in "auth","user","passwd":
+                        self.assertTrue(hasattr(endpoint,attrname))
+                args=[
+                    #"-qp", f"{queriesPath}", 
+                    "-l" "sparql", "-en", f"{endpoint_name}","-qn", "propertyHistogramm", "-f","json","-sq"]
+                result=self.captureQueryMain(args)
+                debug=self.debug
+                debug=True
+                if debug:
+                    print(result)
        
     def testCommandLineUsage(self):
         '''

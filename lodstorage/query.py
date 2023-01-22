@@ -612,7 +612,6 @@ class Endpoint(JSONAble):
         '''
         self.method="POST"
         self.lang="SPARQL"
-        
     
     def __str__(self):
         '''
