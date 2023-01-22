@@ -15,7 +15,6 @@ from lodstorage.querymain import QueryMain
 from lodstorage.sparql import SPARQL
 import tests.testSqlite3
 from tests.basetest import Basetest
-from bokeh.sampledata import haar_cascade
 
 class TestQueries(Basetest):
     '''
