@@ -267,7 +267,12 @@ WHERE
   ?item schema:description ?itemDescription.
   FILTER(LANG(?itemDescription) = "{lang}")
 }}""" 
-        return sparql.getValues(query, ["itemLabel","itemDescription"])
+        try: 
+            labelAndDescription=sparql.getValues(query, ["itemLabel","itemDescription"])
+        except Exception as ex:
+            msg=f"getLabelAndDescription failed for wikidata Item {itemId}:{str(ex)}"
+            raise Exception(msg)
+        return labelAndDescription
         
     @classmethod
     def getItemsByLabel(cls,sparql:SPARQL,itemLabel:str,lang:str="en")->list:

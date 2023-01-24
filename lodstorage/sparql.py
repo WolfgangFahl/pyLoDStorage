@@ -109,6 +109,10 @@ class SPARQL(object):
     def getValues(self,sparqlQuery:str,attrList:list):
         '''
         get Values for the given sparlQuery and attribute list
+        
+        Args:
+            sparqlQuery(str): the query which did not return any values
+            attrList(list): the list of attributes
         '''
         if self.debug:
             print(sparqlQuery)
