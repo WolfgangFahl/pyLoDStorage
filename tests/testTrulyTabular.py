@@ -269,7 +269,7 @@ class TestTrulyTabular(unittest.TestCase):
         test the count function of truly tabular
         '''
         debug=self.debug  
-        #debug=True
+        debug=True
         qid="Q55488" # railway stations
         for endpointConf in self.endpointConfs:
             try:
