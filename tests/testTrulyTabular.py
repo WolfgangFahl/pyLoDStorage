@@ -26,11 +26,17 @@ class TestTrulyTabular(unittest.TestCase):
         pass
     
     def handleServiceUnavailable(self,ex,endpointConf):
+        """
+        handle service unavailable
+        
+        Args:
+            ex(Exception): the exception to handle
+            endpointConf(Endpoint): the endpoint for which there is a problem
+        """
         if "503" in str(ex):
-            print(f"{endpointConf.name} at {endpointConf.endpoint} returns 503 Service Unavailable")
+            print(f"{endpointConf.name} at {endpointConf.endpoint} returns 503 Service Unavailable",flush=True)
         else:
             raise(ex)
-
 
     def tearDown(self):
         pass
