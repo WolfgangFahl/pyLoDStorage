@@ -276,6 +276,8 @@ WHERE
             labelAndDescription=sparql.getValues(query, ["itemLabel","itemDescription"])
         except Exception as ex:
             msg=f"getLabelAndDescription failed for wikidata Item {itemId}:{str(ex)}"
+            if debug:
+                print(msg)
             raise Exception(msg)
         return labelAndDescription
         
