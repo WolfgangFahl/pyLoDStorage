@@ -22,7 +22,7 @@ from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
 from lodstorage.csv import CSV
-from lodstorage.query import Query,QueryManager, EndpointManager, Format, ValueFormatter
+from lodstorage.query import Query,QueryManager, Endpoint, EndpointManager, Format, ValueFormatter
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
 from lodstorage.xml import Lod2Xml
@@ -46,7 +46,6 @@ class QueryMain:
         qm=QueryManager(lang=args.language,debug=debug,queriesPath=args.queriesPath)
         query=None
         queryCode=args.query
-        endpointConf=None
         formats=None
         # preload ValueFormatter
         ValueFormatter.getFormats(args.formatsPath)
@@ -80,31 +79,22 @@ class QueryMain:
         if queryCode:
             if debug or args.showQuery:
                 print(f"{args.language}:\n{queryCode}")
-            endpointConf=None
+            endpointConf=Endpoint()
+            endpointConf.method='POST'
             if args.endpointName:
                 endpointConf=endpoints.get(args.endpointName)                
+                query.tryItUrl=endpointConf.website
+                query.database=endpointConf.database
+            else:
+                endpointConf.endpoint=query.endpoint
+            if args.method:
+                endpointConf.method=args.method
             if args.language=="sparql":
-                method='POST'
-                if args.endpointName:
-                    endPointUrl=endpointConf.endpoint
-                    method=endpointConf.method
-                    query.tryItUrl=endpointConf.website
-                    query.database=endpointConf.database
-                else:
-                    endPointUrl=query.endpoint
-                if args.method:
-                    method=method
-                sparql=SPARQL(endPointUrl,method=method)
-                if endpointConf is not None and hasattr(endpointConf, "auth"):
-                    authMethod=None 
-                    if endpointConf.auth=="BASIC":
-                        authMethod=BASIC
-                    elif endpointConf.auth=="DIGEST":
-                        authMethod=DIGEST
-                    sparql.addAuthentication(endpointConf.user,endpointConf.passwd,method=authMethod)
+                sparql=SPARQL.fromEndpointConf(endpointConf)
                 if args.prefixes and endpointConf is not None:
                     queryCode = f"{endpointConf.prefixes}\n{queryCode}"
                 if args.raw:
+                    endPointUrl=endpointConf.endpoint
                     qres = cls.rawQuery(endPointUrl, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
                     print(qres)
                     return
@@ -135,12 +125,12 @@ class QueryMain:
                 raise Exception(f"format {args.format} not supported yet") 
 
     @staticmethod
-    def rawQuery(endpoint, query, resultFormat, mimeType):
+    def rawQuery(endpointConf, query, resultFormat, mimeType):
         """
         returns raw result of the endpoint
 
         Args:
-            endpoint: url of the endpoint
+            endpointConf: EndPoint
             query(str): query
             resultFormat(str): format of the result
             mimeType(str): mimeType
@@ -159,8 +149,9 @@ class QueryMain:
             }
         else:
             headers={}
-
-        response = requests.request("GET", endpoint, headers=headers, data=payload, params=params)
+        endpoint=endpointConf.endpoint
+        method=endpointConf.method
+        response = requests.request(method, endpoint, headers=headers, data=payload, params=params)
         return response.text
                 
 def mainSQL(argv=None):

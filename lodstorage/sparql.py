@@ -47,6 +47,24 @@ class SPARQL(object):
         self.sparql=SPARQLWrapper2(url)
         self.method=method
         self.sparql.agent=agent
+        
+    @classmethod
+    def fromEndpointConf(cls,endpointConf)->"SPARQL":
+        """
+        create a SPARQL endpoint from the given EndpointConfiguration
+        
+        Args:
+            endpointConf(Endpoint): the endpoint configuration to be used
+        """
+        sparql=SPARQL(url=endpointConf.endpoint,method=endpointConf.method)
+        if hasattr(endpointConf, "auth"):
+            authMethod=None 
+            if endpointConf.auth=="BASIC":
+                authMethod=BASIC
+            elif endpointConf.auth=="DIGEST":
+                authMethod=DIGEST
+            sparql.addAuthentication(endpointConf.user,endpointConf.passwd,method=authMethod)
+        return sparql
 
     def addAuthentication(self, username:str, password:str, method: Union[BASIC, DIGEST] = BASIC):
         """

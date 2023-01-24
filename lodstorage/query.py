@@ -596,6 +596,15 @@ class Endpoint(JSONAble):
                 "database": "blazegraph",
                 "method": "POST",
                 "prefixes": "PREFIX bd: <http://www.bigdata.com/rdf#>\nPREFIX cc: <http://creativecommons.org/ns#>"
+            },
+            {
+                "name": "dbis-jena",
+                "lang": "sparql",
+                "endpoint": "https://confident.dbis.rwth-aachen.de/jena/",
+                "website": "https://confident.dbis.rwth-aachen.de",
+                "auth": "BASIC",
+                "user": "secret",
+                "password": "#not public - example not usable for access#",
             }
         ]
         return samples
