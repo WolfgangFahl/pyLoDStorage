@@ -411,7 +411,7 @@ class TestEndpoints(Basetest):
             if debug:
                 print (f"{i}:{name}")
             resultFormat="json"
-            jsonStr=QueryMain.rawQuery(endpoint.endpoint, query.query, resultFormat, mimeType=None)
+            jsonStr=QueryMain.rawQuery(endpoint, query.query, resultFormat, mimeType=None)
             if debug:
                 print(jsonStr)
 
