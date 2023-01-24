@@ -126,7 +126,7 @@ class TestTrulyTabular(unittest.TestCase):
         try getting items by label
         '''
         debug=self.debug
-        #debug=True
+        debug=True
         qLabels=["academic conference","scientific conference series","whisky distillery","human"]
         for endpointConf in self.endpointConfs:
             try:
@@ -134,6 +134,10 @@ class TestTrulyTabular(unittest.TestCase):
                 items={}
                 for qLabel in qLabels:
                     items4Label=WikidataItem.getItemsByLabel(sparql, qLabel)
+                    count=len(items4Label)
+                    if debug:
+                        print(f"found {count} items for label {qLabel}")
+                    self.assertTrue(count>0)
                     for i,item in enumerate(items4Label):
                         if debug:
                             print(f"{endpointConf.name} {i+1}:{item}")
