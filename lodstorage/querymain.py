@@ -4,7 +4,6 @@ Created on 2022-02-13
 @author: wf
 '''
 from lodstorage.version import Version
-from SPARQLWrapper.Wrapper import BASIC, DIGEST
 from pathlib import Path
 __version__ = Version.version
 __date__ = Version.date
@@ -94,8 +93,7 @@ class QueryMain:
                 if args.prefixes and endpointConf is not None:
                     queryCode = f"{endpointConf.prefixes}\n{queryCode}"
                 if args.raw:
-                    endPointUrl=endpointConf.endpoint
-                    qres = cls.rawQuery(endPointUrl, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
+                    qres = cls.rawQuery(endpointConf, query=query.query, resultFormat=args.format, mimeType=args.mimeType)
                     print(qres)
                     return
                 if "wikidata" in args.endpointName and formats is None:
