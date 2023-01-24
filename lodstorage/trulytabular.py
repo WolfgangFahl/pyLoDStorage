@@ -317,7 +317,7 @@ WHERE {{
         for record in qLod:
             url=record["item"] 
             qid=re.sub(r"http://www.wikidata.org/entity/(.*)",r"\1",url)
-            item=WikidataItem(qid)
+            item=WikidataItem(qid,debug=self.debug)
             item.url=url
             item.qlabel=record["itemLabel"]
             item.varname=Variable.validVarName(item.qlabel)
@@ -355,7 +355,7 @@ class TrulyTabular(object):
         self.subclassPredicate=subclassPredicate
         self.where=f"\n  {where}" if where is not None else ""
         self.lang=lang
-        self.item=WikidataItem(itemQid,sparql=self.sparql,lang=lang)
+        self.item=WikidataItem(itemQid,sparql=self.sparql,lang=lang,debug=self.debug)
         self.queryManager=TrulyTabular.getQueryManager(debug=self.debug)
         self.properties=WikidataProperty.getPropertiesByIds(self.sparql,propertyIds,lang)
         self.properties.update(WikidataProperty.getPropertiesByLabels(self.sparql, propertyLabels, lang))
