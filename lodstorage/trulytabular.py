@@ -153,7 +153,7 @@ class WikidataItem:
     '''
     a wikidata Item
     '''
-    def __init__(self,qid:str,lang:str="en",sparql:SPARQL=None):
+    def __init__(self,qid:str,lang:str="en",sparql:SPARQL=None,debug:bool=False):
         '''
         construct me with the given item id, language and optional SPARQL access
         
@@ -161,6 +161,7 @@ class WikidataItem:
             qid(str): the item Id
             lang(str): the language to use
             sparql(SPARQL): the sparql access to use
+            debug(bool): if True switch on debugging
         '''
         self.qid=qid
         # numeric qid
@@ -169,7 +170,7 @@ class WikidataItem:
         self.lang=lang
         self.sparql=sparql
         if sparql is not None:
-            self.qlabel,self.description=WikidataItem.getLabelAndDescription(sparql, self.qid, self.lang)
+            self.qlabel,self.description=WikidataItem.getLabelAndDescription(sparql, self.qid, self.lang,debug=debug)
             self.varname=Variable.validVarName(self.qlabel)
             self.itemVarname=f"{self.varname}Item"
             self.labelVarname=f"{self.varname}"
@@ -243,13 +244,14 @@ class WikidataItem:
         return sparql
 
     @classmethod
-    def getLabelAndDescription(cls,sparql:SPARQL, itemId:str,lang:str="en"):
+    def getLabelAndDescription(cls,sparql:SPARQL, itemId:str,lang:str="en",debug:bool=False):
         '''
         get  the label for the given item and language
         
         Args:
             itemId(str): the wikidata Q/P id
             lang(str): the language of the label 
+            debug(bool): if True output debug information
             
         Returns:
             (str,str): the label and description as a tuple
@@ -268,6 +270,9 @@ WHERE
   FILTER(LANG(?itemDescription) = "{lang}")
 }}""" 
         try: 
+            if debug:
+                msg=f"getLabelAndDescription for wikidata Item {itemId} with query:\n{query}"
+                print(msg)
             labelAndDescription=sparql.getValues(query, ["itemLabel","itemDescription"])
         except Exception as ex:
             msg=f"getLabelAndDescription failed for wikidata Item {itemId}:{str(ex)}"
