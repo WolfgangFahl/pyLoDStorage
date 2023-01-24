@@ -133,7 +133,7 @@ class TestTrulyTabular(unittest.TestCase):
                 sparql=SPARQL(endpointConf.endpoint,method=endpointConf.method)
                 items={}
                 for qLabel in qLabels:
-                    items4Label=WikidataItem.getItemsByLabel(sparql, qLabel)
+                    items4Label=WikidataItem.getItemsByLabel(sparql, qLabel,debug=debug)
                     count=len(items4Label)
                     if debug:
                         print(f"found {count} items for label {qLabel}")

@@ -282,7 +282,7 @@ WHERE
         return labelAndDescription
         
     @classmethod
-    def getItemsByLabel(cls,sparql:SPARQL,itemLabel:str,lang:str="en")->list:
+    def getItemsByLabel(cls,sparql:SPARQL,itemLabel:str,lang:str="en",debug:bool=False)->list:
         '''
         get a Wikidata items by the given label
         
@@ -290,6 +290,7 @@ WHERE
             sparql(SPARQL): the SPARQL endpoint to use
             itemLabel(str): the label of the items
             lang(str): the language of the label
+            debug(bool): if True show debugging information
             
         Returns:
             a list of potential items
@@ -319,7 +320,7 @@ WHERE {{
         for record in qLod:
             url=record["item"] 
             qid=re.sub(r"http://www.wikidata.org/entity/(.*)",r"\1",url)
-            item=WikidataItem(qid,debug=self.debug)
+            item=WikidataItem(qid,debug=debug)
             item.url=url
             item.qlabel=record["itemLabel"]
             item.varname=Variable.validVarName(item.qlabel)
