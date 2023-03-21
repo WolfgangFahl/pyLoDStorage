@@ -12,6 +12,7 @@ __updated__ = Version.updated
 DEBUG = 0
 
 import json
+import re
 import requests
 import sys
 import traceback
@@ -25,7 +26,6 @@ from lodstorage.query import Query,QueryManager, Endpoint, EndpointManager, Form
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
 from lodstorage.xml import Lod2Xml
-
 
 class QueryMain:
     '''
@@ -63,6 +63,8 @@ class QueryMain:
             if args.queryName not in qm.queriesByName:
                 raise Exception(f"named query {args.queryName} not available")
             query=qm.queriesByName[args.queryName]
+            if query.limit is None and args.limit is not None:
+                query.limit=args.limit
             formats=query.formats
             queryCode=query.query
             if debug or args.showQuery:
@@ -88,6 +90,11 @@ class QueryMain:
                 endpointConf.endpoint=query.endpoint
             if args.method:
                 endpointConf.method=args.method
+            if query.limit:
+                if "limit" in queryCode or "LIMIT" in queryCode:
+                    queryCode=re.sub(r"(limit|LIMIT)\s+(\d+)", f"LIMIT {query.limit}", queryCode)
+                else:
+                    queryCode+=f"\nLIMIT {query.limit}"
             if args.language=="sparql":
                 sparql=SPARQL.fromEndpointConf(endpointConf)
                 if args.prefixes and endpointConf is not None:
@@ -182,7 +189,7 @@ def main(argv=None,lang=None): # IGNORE:C0111
     program_license = '''%s
 
   Created by %s on %s.
-  Copyright 2020-2022 Wolfgang Fahl. All rights reserved.
+  Copyright 2020-2023 Wolfgang Fahl. All rights reserved.
 
   Licensed under the Apache License 2.0
   http://www.apache.org/licenses/LICENSE-2.0
@@ -203,6 +210,7 @@ USAGE
         parser.add_argument('--method',help="method to be used for SPARQL queries")
         parser.add_argument('-f','--format', type=Format, choices=list(Format))
         parser.add_argument('-li','--list',action="store_true",help="show the list of available queries")
+        parser.add_argument('--limit',type=int,default=None,help="set limit parameter of query")
         parser.add_argument('-le','--listEndpoints',action="store_true",help="show the list of available endpoints") 
         parser.add_argument("-m", "--mimeType",help="MIME-type to use for the raw query")
         parser.add_argument("-p", "--prefixes",action="store_true",help="add predefined prefixes for endpoint")

@@ -6,6 +6,7 @@ Created on 2021-01-29
 import unittest
 import copy
 import io
+import json
 import os
 
 from contextlib import redirect_stdout
@@ -92,7 +93,25 @@ class TestQueries(Basetest):
             queryMain(args)
             result = stdout.getvalue()
         return result
-             
+    
+    def testIssue115Limit(self):
+        """
+        test the limit argument
+        """
+        limit=5
+        args_list=[
+            ["-qn","10 Largest Cities Of The World","-l","sparql","--limit",f"{limit}"],
+            ["-qn","US President Nicknames","-l","sparql","--limit",f"{limit}"]
+        ]
+        debug=self.debug
+        #debug=True
+        for args in args_list:    
+            json_str=self.captureQueryMain(args)
+            json_data=json.loads(json_str)
+            if debug:
+                print(len(json_data))
+            self.assertEqual(limit,len(json_data))
+                     
     def testQueryCommandLine(self):
         '''
         test the sparql query command line

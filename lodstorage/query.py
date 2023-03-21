@@ -244,7 +244,7 @@ class QueryResultDocumentation():
 class Query(object):
     ''' a Query e.g. for SPAQRL '''
     
-    def __init__(self,name:str,query:str,lang='sparql',endpoint:str=None,database:str="blazegraph",title:str=None,description:str=None,prefixes=None,tryItUrl:str=None,formats:list=None,debug=False):
+    def __init__(self,name:str,query:str,lang='sparql',endpoint:str=None,database:str="blazegraph",title:str=None,description:str=None,limit:int=None,prefixes=None,tryItUrl:str=None,formats:list=None,debug=False):
         '''
         constructor 
         Args:
@@ -255,6 +255,7 @@ class Query(object):
             database(string): the type of database e.g. "blazegraph"
             title(string): the header/title of the query
             description(string): the description of the query
+            limit(int): the limit of the query default: None
             prefixes(list): list of prefixes to be resolved
             tryItUrl(str): the url of a "tryit" webpage
             formats(list): key,value pairs of ValueFormatters to be applied
@@ -269,6 +270,7 @@ class Query(object):
         
         self.title=title=name if title is None else title
         self.description="" if description is None else description
+        self.limit=limit
         self.prefixes=prefixes
         self.debug=debug
         self.formats=formats

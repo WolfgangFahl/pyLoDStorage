@@ -126,6 +126,19 @@
         ?item rdfs:label ?itemLabel.
         filter (lang(?itemLabel) = "en").
       }
+'UniversityLogos':
+  sparql: |
+    # University Logos
+    # WF 2023-03-11
+    SELECT ?item ?itemLabel ?logo
+    WHERE
+    {
+      ?item wdt:P31 wd:Q3918.
+      ?item rdfs:label ?itemLabel.
+      FILTER(LANG(?itemLabel)="en")
+      ?item wdt:P154 ?logo
+    }
+    ORDER BY ?itemLabel
 'MachadoDeAssis':
 # https://stackoverflow.com/questions/71809883/sparql-query-dates-json-results-in-the-same-format-that-in-web-portal
   sparql: |
@@ -134,7 +147,7 @@
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     SELECT ?author ?authorLabel ?birthDate
-    WHERE 
+    WHERE
     {
       VALUES ?authorLabel {
         "Machado de Assis"@pt
