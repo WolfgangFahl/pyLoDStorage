@@ -83,7 +83,13 @@
   endpoint: https://qlever.cs.uni-freiburg.de/api/dblp
   website: https://qlever.cs.uni-freiburg.de/dblp
   prefixes: |
-    
+'qlever-dblp-plus':
+  lang: sparql
+  method: POST
+  database: qlever
+  endpoint: https://qlever.cs.uni-freiburg.de/api/dblp-plus
+  website: https://qlever.cs.uni-freiburg.de/dblp-plus
+  prefixes: |
 'wikidata-openlinksw':
     lang: sparql
     endpoint: https://wikidata.demo.openlinksw.com/sparql
