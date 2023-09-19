@@ -9,7 +9,7 @@ PyYAML
 # https://pypi.org/project/pandas/
 pandas
 # https://pypi.org/project/matplotlib/
-matplotlib
+matplotlib>=3.6.2
 # tabulate
 tabulate
 # https://pypi.org/project/numpy/
