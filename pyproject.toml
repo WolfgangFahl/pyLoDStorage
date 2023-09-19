@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyLodStorage"
+authors = [
+  {name = "Wolfgang Fahl", email = "wf@bitplan.com"}
+]
+maintainers = [
+  {name = "Wolfgang Fahl", email = "wf@bitplan.com"}
+]
+readme = "README.md"
+license= "Apache-2.0"
+dependencies = [
+    "SPARQLWrapper~=1.8.5",
+    "PyYAML",
+    "pandas",
+    "matplotlib>=3.6.2",
+    "tabulate",
+    "numpy",
+    "jsonpickle==1.5.2",
+    "pylatexenc~=2.10",
+    "pygments",
+    "dicttoxml2"
+]
+requires-python = ">=3.7"
+classifiers=[
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
+dynamic = ["version", "description"]
+
+[tool.hatch.version]
+path = "lodstorage/__init__.py"
+
+[project.urls]
+Home = "https://github.com/WolfgangFahl/pyLodStorage"
+Documentation = "http://wiki.bitplan.com/index.php/PyLoDStorage"
+Source = "https://github.com/WolfgangFahl/pyLodStorage/blob/master/lodstorage/sql.py"
+IssueTracker = "https://github.com/WolfgangFahl/pyLodStorage/issues"
+
+[project.optional-dependencies]
+test = [
+  "green",
+]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["lodstorage","sampledata"]
+
+[tool.hatch.build.targets.wheel.sources]
+"lodstorage" = "lodstorage"
+"sampledata" = "sampledata"
+
+[project.scripts]
+sparqlquery = "lodstorage.querymain:mainSPARQL"
+sqlquery = "lodstorage.querymain:mainSQL"
+lodquery = "lodstorage.querymain:main"
