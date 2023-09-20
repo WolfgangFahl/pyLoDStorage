@@ -16,7 +16,8 @@ dependencies = [
     "SPARQLWrapper~=1.8.5",
     "PyYAML",
     "pandas",
-    "matplotlib>=3.6.2,<3.8.0",
+    # beware of https://github.com/matplotlib/matplotlib/issues/26827
+    "matplotlib>=3.6.2",
     "tabulate",
     "numpy",
     "jsonpickle==1.5.2",
