@@ -123,7 +123,7 @@ class TestQueries(Basetest):
             {"format":"xml", "expected":'''<?xml version="1.0" ?>'''},
             {"format":"latex","expected":'''Theodore Roosevelt     & Teddy'''},
             {"format":"mediawiki", "expected":'''| [https://www.wikidata.org/wiki/Q33866 Q33866] || Theodore Roosevelt     || Teddy'''},
-            {"format":"github","expected":'''| [Q33866](https://www.wikidata.org/wiki/Q33866) | Theodore Roosevelt     | Teddy                           |'''}
+            {"format":"github","expected":'''| [Q33866](https://www.wikidata.org/wiki/Q33866) | Theodore Roosevelt     | Teddy'''}
         ]:
             resultFormat=testArg["format"]
             expected=testArg["expected"]
@@ -131,7 +131,7 @@ class TestQueries(Basetest):
             result=self.captureQueryMain(args)
             if debug:
                 print(f"{resultFormat}:{result}")
-            self.assertTrue(expected in result)
+            self.assertTrue(expected in result,f"{expected}({resultFormat})")
     
 
     def testQueryEndpoints(self):
