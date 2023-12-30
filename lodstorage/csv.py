@@ -6,13 +6,15 @@ from lodstorage.lod import LOD
 
 
 class CSV(LOD):
-    '''
+    """
     helper for converting data in csv format to list of dicts (LoD) and vice versa
-    '''
+    """
 
     @staticmethod
-    def restoreFromCSVFile(filePath:str, headerNames:list=None, withPostfix:bool=False):
-        '''
+    def restoreFromCSVFile(
+        filePath: str, headerNames: list = None, withPostfix: bool = False
+    ):
+        """
         restore LOD from given csv file
 
         Args:
@@ -22,7 +24,7 @@ class CSV(LOD):
 
         Returns:
             list of dicts (LoD) containing the content of the given csv file
-        '''
+        """
         if not withPostfix:
             filePath += ".csv"
         csvStr = CSV.readFile(filePath)
@@ -30,8 +32,14 @@ class CSV(LOD):
         return lod
 
     @staticmethod
-    def fromCSV(csvString:str, fields:list=None, delimiter=",",quoting=csv.QUOTE_NONNUMERIC, **kwargs):
-        '''
+    def fromCSV(
+        csvString: str,
+        fields: list = None,
+        delimiter=",",
+        quoting=csv.QUOTE_NONNUMERIC,
+        **kwargs
+    ):
+        """
         convert given csv string to list of dicts (LOD)
 
         Args:
@@ -40,33 +48,42 @@ class CSV(LOD):
 
         Returns:
             list of dicts (LoD) containing the content of the given csv string
-        '''
-        csvStream=io.StringIO(csvString)
-        reader = csv.DictReader(csvStream, fieldnames=fields, delimiter=delimiter, quoting=quoting, **kwargs)
-        lod=list(reader)
+        """
+        csvStream = io.StringIO(csvString)
+        reader = csv.DictReader(
+            csvStream, fieldnames=fields, delimiter=delimiter, quoting=quoting, **kwargs
+        )
+        lod = list(reader)
         CSV.fixTypes(lod)
         return lod
 
     @staticmethod
-    def storeToCSVFile(lod:list, filePath:str, withPostfix:bool=False):
-        '''
-            converts the given lod to CSV file.
+    def storeToCSVFile(lod: list, filePath: str, withPostfix: bool = False):
+        """
+        converts the given lod to CSV file.
 
-            Args:
-                lod(list): lod that should be converted to csv file
-                filePath(str): file name the csv should be stored to
-                withPostfix(bool): If False the file type is appended to given filePath. Otherwise file type MUST be given with filePath.
-            Returns:
-                csv string of the given lod
-        '''
+        Args:
+            lod(list): lod that should be converted to csv file
+            filePath(str): file name the csv should be stored to
+            withPostfix(bool): If False the file type is appended to given filePath. Otherwise file type MUST be given with filePath.
+        Returns:
+            csv string of the given lod
+        """
         if not withPostfix:
             filePath += ".csv"
-        csvStr=CSV.toCSV(lod)
+        csvStr = CSV.toCSV(lod)
         CSV.writeFile(csvStr, filePath)
 
     @staticmethod
-    def toCSV(lod:list, includeFields:list=None, excludeFields:list=None, delimiter=",",quoting=csv.QUOTE_NONNUMERIC, **kwargs):
-        '''
+    def toCSV(
+        lod: list,
+        includeFields: list = None,
+        excludeFields: list = None,
+        delimiter=",",
+        quoting=csv.QUOTE_NONNUMERIC,
+        **kwargs
+    ):
+        """
         converts the given lod to CSV string.
         For details about the csv dialect parameters see https://docs.python.org/3/library/csv.html#csv-fmt-params
 
@@ -77,20 +94,22 @@ class CSV(LOD):
             kwargs: csv dialect parameters
         Returns:
             csv string of the given lod
-        '''
+        """
         if lod is None:
-            return ''
+            return ""
         if isinstance(lod[0], JSONAble):
-            lod=[vars(d) for d in lod]
+            lod = [vars(d) for d in lod]
         if excludeFields is not None:
-            lod=LOD.filterFields(lod, excludeFields)
+            lod = LOD.filterFields(lod, excludeFields)
         if includeFields is None:
             fields = LOD.getFields(lod)
         else:
-            fields=includeFields
-            lod=LOD.filterFields(lod, includeFields, reverse=True)
+            fields = includeFields
+            lod = LOD.filterFields(lod, includeFields, reverse=True)
         csvStream = io.StringIO()
-        dict_writer = csv.DictWriter(csvStream, fieldnames=fields, delimiter=delimiter, quoting=quoting, **kwargs)
+        dict_writer = csv.DictWriter(
+            csvStream, fieldnames=fields, delimiter=delimiter, quoting=quoting, **kwargs
+        )
         dict_writer.writeheader()
         dict_writer.writerows(lod)
         csvString = csvStream.getvalue()
@@ -106,12 +125,12 @@ class CSV(LOD):
         Returns:
             Content of the file as string
         """
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             content = file.read()
         return content
 
     @staticmethod
-    def writeFile(content:str, filename: str) -> str:
+    def writeFile(content: str, filename: str) -> str:
         """
         Write the given str to the given filename
         Args:
@@ -120,11 +139,11 @@ class CSV(LOD):
         Returns:
             Nothing
         """
-        with open(filename, 'w') as file:
+        with open(filename, "w") as file:
             file.write(content)
 
     @staticmethod
-    def fixTypes(lod:list):
+    def fixTypes(lod: list):
         """
         fixes the types of the given LoD.
 
@@ -132,6 +151,5 @@ class CSV(LOD):
         for record in lod:
             for key, value in record.items():
                 # fix empty csv value: "cell1,,cell3" converts the second value to empty string instead of None
-                if value == '':
+                if value == "":
                     record[key] = None
-
