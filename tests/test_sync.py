@@ -3,7 +3,7 @@ Created on 2023-12-27
 
 @author: wf
 """
-from ngwidgets.basetest import Basetest
+from tests.basetest import Basetest
 from lodstorage.sync import Sync, SyncPair
 
 
