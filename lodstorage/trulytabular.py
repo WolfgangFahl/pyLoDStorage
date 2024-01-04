@@ -173,6 +173,9 @@ class WikidataItem:
             sparql(SPARQL): the sparql access to use
             debug(bool): if True switch on debugging
         """
+        if not qid:
+            self.qid=None
+            return
         self.qid = qid
         # numeric qid
         self.qnumber = int(qid[1:])
@@ -201,7 +204,7 @@ class WikidataItem:
         Returns:
             str: a text representation of my content
         """
-        text = self.qid
+        text = self.qid or "❓"
         if hasattr(self, "qlabel"):
             text = f"{self.qlabel} ({self.qid})"
         if hasattr(self, "description"):
@@ -209,7 +212,7 @@ class WikidataItem:
             if wrapAt > 0:
                 desc = textwrap.fill(desc, width=wrapAt)
             text += f"☞{desc}"
-        if long:
+        if long and hasattr(self, "url"):
             text += f"→ {self.url}"
         return text
 
