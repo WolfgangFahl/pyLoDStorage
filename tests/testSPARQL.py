@@ -190,7 +190,7 @@ class TestSPARQL(Basetest):
         self.checkErrors(errors, 1)
         error = errors[0]
         print(f"error is {error}")
-        self.assertTrue("probably the sparql query is bad formed" in error)
+        self.assertTrue("Lexical error" in error)
 
     def testEscapeStringContent(self):
         """
