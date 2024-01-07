@@ -3,6 +3,7 @@ Created on 2022-03-4
 
 @author: wf
 """
+import json
 import unittest
 from pprint import pprint
 from urllib.error import HTTPError
@@ -35,9 +36,21 @@ class TestTrulyTabular(unittest.TestCase):
             ex(Exception): the exception to handle
             endpointConf(Endpoint): the endpoint for which there is a problem
         """
-        if "503" in str(ex):
+        self.handleEndpointErrors(ex, ex, endpointConf,endpointConf,"503","Service Unavailable")
+        
+    def handleEndpointErrors(self,ex, endpointConf, status_code:str,status_text:str):
+        """
+         handle Endpoint Errors
+         
+        Args:
+            ex(Exception): the exception to handle
+            endpointConf(Endpoint): the endpoint for which there is a problem
+            status_code(str): the status code to filter
+            status_text(str): the description of the status code
+        """
+        if status_code in str(ex):
             print(
-                f"{endpointConf.name} at {endpointConf.endpoint} returns 503 Service Unavailable",
+                f"{endpointConf.name} at {endpointConf.endpoint} returns {status_code} ({status_text})",
                 flush=True,
             )
         else:
@@ -338,6 +351,25 @@ class TestTrulyTabular(unittest.TestCase):
             except (Exception, HTTPError) as ex:
                 self.handleServiceUnavailable(ex, endpointConf)
 
+    def testGenWdPropertyStatistic(self):
+        """
+        test generating a Wikidata property statistics row
+        """
+        qid="Q44613" # monastery
+        debug=self.debug
+        debug=True
+        for endpointConf in self.endpointConfs:
+            try:
+                tt = TrulyTabular(qid, debug=debug)
+                for pid in ["P571","P6375"]:
+                    wdProperty=WikidataProperty.from_id(pid, sparql=tt.sparql)
+                    # 
+                    itemCount, _itemCountQuery = tt.count()
+                    statsRow = tt.genWdPropertyStatistic(wdProperty, itemCount)
+                    print(json.dumps(statsRow,indent=2))
+            except (Exception, HTTPError) as ex:
+                self.handleEndpointErrors(ex, endpointConf, "405","Method not allowed")
+        
     def testGenerateSparqlQuery(self):
         """
         test Generating a SPARQL query
