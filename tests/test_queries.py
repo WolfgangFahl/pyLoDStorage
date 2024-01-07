@@ -489,8 +489,7 @@ determines the number of instances available in the OpenStreetMap for the placeT
         if debug:
             print(result)
         self.assertTrue("WorksAndAuthor" in result)
-
-
+        
 class TestEndpoints(Basetest):
     """
     tests Endpoint

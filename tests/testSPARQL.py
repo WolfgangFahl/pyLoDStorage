@@ -39,6 +39,14 @@ class TestSPARQL(Basetest):
             profile=profile,
         )
         return jena
+    
+    def get_wikidata_endpoint(self)->SPARQL:
+        """
+        get the default wikidata query service endpoint
+        """
+        endpoint = "https://query.wikidata.org/sparql"
+        wd = SPARQL(endpoint)
+        return wd
 
     def testJenaQuery(self):
         """
@@ -272,8 +280,7 @@ WHERE {
         # if getpass.getuser()=="wf":
         #    # use 2018 wikidata copy
         #    endpoint="http://jena.zeus.bitplan.com/wikidata/"
-        endpoint = "https://query.wikidata.org/sparql"
-        wd = SPARQL(endpoint)
+        wd=self.get_wikidata_endpoint()
         queryString = """# get a list of whisky distilleries
 PREFIX wd: <http://www.wikidata.org/entity/>            
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -409,6 +416,40 @@ WHERE
         qres = sparql.queryAsListOfDicts(query)
         self.assertEqual(2, len(qres))
 
+    def testIssue199(self):
+        """
+        test https://github.com/WolfgangFahl/pyLoDStorage/issues/119
+        405 (Method not allowed) from endpoints for tt.genWdPropertyStatistic #
+        """
+        wd=self.get_wikidata_endpoint()
+        sparql_query="""# Count all Q44613:monastery items
+# with the given street address(P6375) https://www.wikidata.org/wiki/Property:P6375 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <http://schema.org/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?count (COUNT(?count) AS ?frequency) WHERE {{
+SELECT ?item ?itemLabel (COUNT (?value) AS ?count)
+WHERE
+{
+  # instance of monastery
+  ?item wdt:P31 wd:Q44613.
+  ?item rdfs:label ?itemLabel.
+  FILTER (LANG(?itemLabel) = "en").
+  # street address
+  ?item wdt:P6375 ?value.
+} GROUP BY ?item ?itemLabel
+
+}}
+GROUP BY ?count
+ORDER BY DESC (?frequency)
+"""
+        lod=wd.queryAsListOfDicts(sparql_query)
+        
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
