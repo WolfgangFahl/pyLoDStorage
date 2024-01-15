@@ -160,3 +160,41 @@
       # birthDate
       ?author wdt:P569 ?birthDate .
     }
+'PythonWebFrameworks':
+  sparql: |
+    # Python web frameworks
+    # WF 2024-01-14
+    # see https://w.wiki/8qJi
+
+    SELECT
+      (?itemLabel AS ?project)
+      (SAMPLE(?homepage) AS ?homepage) # Adding homepage link
+      (SAMPLE(?article) AS ?wikipedia) # Adding Wikipedia link
+      (?item AS ?wikidata)
+      (GROUP_CONCAT(DISTINCT ?instanceOf; separator=", ") AS ?tags) # Tags derived from instanceof
+      ?pypi
+    WHERE {
+      # web framework
+      ?item wdt:P31/wdt:P279* wd:Q1330336.
+      # programmed in Python
+      ?item wdt:P277 wd:Q28865.
+      ?item rdfs:label ?itemLabel.
+      OPTIONAL { ?item wdt:P31 ?instanceOfId. ?instanceOfId rdfs:label ?instanceOf. FILTER(LANG(?instanceOf) = "en") }
+      OPTIONAL {
+        # official website
+        ?item wdt:P856 ?homepage.
+      }
+      OPTIONAL {
+        ?article schema:about ?item.
+        ?article schema:inLanguage "en".
+        ?article schema:isPartOf <https://en.wikipedia.org/>.
+      }
+      FILTER(LANG(?itemLabel) = "en")
+      OPTIONAL {
+        # PyPi Packet
+        ?item wdt:P5568 ?pypi
+      }
+
+    }
+    GROUP BY ?item ?itemLabel ?pypi
+    ORDER BY ?project
