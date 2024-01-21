@@ -23,8 +23,14 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import requests
 
 from lodstorage.csv import CSV
-from lodstorage.query import (Endpoint, EndpointManager, Format, Query,
-                              QueryManager, ValueFormatter)
+from lodstorage.query import (
+    Endpoint,
+    EndpointManager,
+    Format,
+    Query,
+    QueryManager,
+    ValueFormatter,
+)
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
 from lodstorage.xml import Lod2Xml

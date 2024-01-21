@@ -3,8 +3,8 @@ Created on 2023-12-27
 
 @author: wf
 """
-from tests.basetest import Basetest
 from lodstorage.sync import Sync, SyncPair
+from tests.basetest import Basetest
 
 
 class TestSync(Basetest):
@@ -16,7 +16,7 @@ class TestSync(Basetest):
         """
         Test the Sync class with lists of dictionaries, using distinct keys for left and right data sources.
         """
-        debug=self.debug
+        debug = self.debug
         # Define lists of dictionaries for both local and wikidata to simulate data sources
         local_data = [
             {"id_l": "1", "lvalue": "a"},

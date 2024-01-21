@@ -105,19 +105,17 @@ class SPARQL(object):
         Returns:
             list: the raw query result as bindings
         """
-        queryString=self.fix_comments(queryString)
+        queryString = self.fix_comments(queryString)
         self.sparql.setQuery(queryString)
         self.sparql.method = method
         queryResult = self.sparql.query()
         return queryResult
-    
-    
+
     def fix_comments(self, query_string: str) -> str:
         """
         make sure broken SPARQLWrapper will find comments
         """
-        return "#\n"+query_string
-
+        return "#\n" + query_string
 
     def getValue(self, sparqlQuery: str, attr: str):
         """

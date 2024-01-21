@@ -39,8 +39,8 @@ class TestSPARQL(Basetest):
             profile=profile,
         )
         return jena
-    
-    def get_wikidata_endpoint(self)->SPARQL:
+
+    def get_wikidata_endpoint(self) -> SPARQL:
         """
         get the default wikidata query service endpoint
         """
@@ -280,7 +280,7 @@ WHERE {
         # if getpass.getuser()=="wf":
         #    # use 2018 wikidata copy
         #    endpoint="http://jena.zeus.bitplan.com/wikidata/"
-        wd=self.get_wikidata_endpoint()
+        wd = self.get_wikidata_endpoint()
         queryString = """# get a list of whisky distilleries
 PREFIX wd: <http://www.wikidata.org/entity/>            
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -421,8 +421,8 @@ WHERE
         test https://github.com/WolfgangFahl/pyLoDStorage/issues/119
         405 (Method not allowed) from endpoints for tt.genWdPropertyStatistic #
         """
-        wd=self.get_wikidata_endpoint()
-        sparql_query="""# Count all Q44613:monastery items
+        wd = self.get_wikidata_endpoint()
+        sparql_query = """# Count all Q44613:monastery items
 # with the given street address(P6375) https://www.wikidata.org/wiki/Property:P6375 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -448,8 +448,8 @@ WHERE
 GROUP BY ?count
 ORDER BY DESC (?frequency)
 """
-        lod=wd.queryAsListOfDicts(sparql_query)
-        
+        lod = wd.queryAsListOfDicts(sparql_query)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

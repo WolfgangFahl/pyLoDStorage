@@ -667,15 +667,15 @@ class EndpointManager(object):
         return endpoints
 
     @staticmethod
-    def getEndpointNames(endpointPath=None,lang:str=None) -> list:
+    def getEndpointNames(endpointPath=None, lang: str = None) -> list:
         """
         Returns a list of all available endpoint names
         Args:
             endpointPath(str): the path to the yaml file with the endpoint configurations
             lang(str): if lang is given filter by the given language
-  
+
         """
-        endpoints = EndpointManager.getEndpoints(endpointPath,lang=lang)
+        endpoints = EndpointManager.getEndpoints(endpointPath, lang=lang)
         return list(endpoints.keys())
 
 

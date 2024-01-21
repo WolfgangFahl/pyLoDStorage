@@ -36,12 +36,16 @@ class TestTrulyTabular(unittest.TestCase):
             ex(Exception): the exception to handle
             endpointConf(Endpoint): the endpoint for which there is a problem
         """
-        self.handleEndpointErrors(ex, ex, endpointConf,endpointConf,"503","Service Unavailable")
-        
-    def handleEndpointErrors(self,ex, endpointConf, status_code:str,status_text:str):
+        self.handleEndpointErrors(
+            ex, ex, endpointConf, endpointConf, "503", "Service Unavailable"
+        )
+
+    def handleEndpointErrors(
+        self, ex, endpointConf, status_code: str, status_text: str
+    ):
         """
          handle Endpoint Errors
-         
+
         Args:
             ex(Exception): the exception to handle
             endpointConf(Endpoint): the endpoint for which there is a problem
@@ -355,21 +359,21 @@ class TestTrulyTabular(unittest.TestCase):
         """
         test generating a Wikidata property statistics row
         """
-        qid="Q44613" # monastery
-        debug=self.debug
-        debug=True
+        qid = "Q44613"  # monastery
+        debug = self.debug
+        debug = True
         for endpointConf in self.endpointConfs:
             try:
                 tt = TrulyTabular(qid, debug=debug)
-                for pid in ["P571","P6375"]:
-                    wdProperty=WikidataProperty.from_id(pid, sparql=tt.sparql)
-                    # 
+                for pid in ["P571", "P6375"]:
+                    wdProperty = WikidataProperty.from_id(pid, sparql=tt.sparql)
+                    #
                     itemCount, _itemCountQuery = tt.count()
                     statsRow = tt.genWdPropertyStatistic(wdProperty, itemCount)
-                    print(json.dumps(statsRow,indent=2))
+                    print(json.dumps(statsRow, indent=2))
             except (Exception, HTTPError) as ex:
-                self.handleEndpointErrors(ex, endpointConf, "405","Method not allowed")
-        
+                self.handleEndpointErrors(ex, endpointConf, "405", "Method not allowed")
+
     def testGenerateSparqlQuery(self):
         """
         test Generating a SPARQL query

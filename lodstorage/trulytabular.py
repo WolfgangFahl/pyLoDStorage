@@ -95,26 +95,26 @@ SELECT ?property ?propertyLabel ?wbType WHERE {{
 }}"""
             cls.addPropertiesForQuery(wdProperties, sparql, query)
         return wdProperties
-    
+
     @classmethod
-    def from_id(cls,property_id:str,sparql,lang: str = "en")->'WikidataProperty':
+    def from_id(cls, property_id: str, sparql, lang: str = "en") -> "WikidataProperty":
         """
         construct a WikidataProperty from the given property_id
-        
+
         Args:
             property_id(str): a property ID e.g. "P6375"
             sparql(SPARQL): the SPARQL endpoint to use
             lang(str): the language for the label
         """
-        properties=cls.getPropertiesByIds(sparql, [property_id], lang)
-        prop_count=len(properties)
-        if prop_count==1:
+        properties = cls.getPropertiesByIds(sparql, [property_id], lang)
+        prop_count = len(properties)
+        if prop_count == 1:
             return list(properties.values())[0]
-        elif prop_count==0:
+        elif prop_count == 0:
             return None
         else:
-            property_labels=list(properties.keys())
-            msg=f"unexpected from_id result for property id {property_id}. Expected 0 or 1 results bot got:{property_labels}"
+            property_labels = list(properties.keys())
+            msg = f"unexpected from_id result for property id {property_id}. Expected 0 or 1 results bot got:{property_labels}"
             raise ValueError(msg)
         pass
 
@@ -196,7 +196,7 @@ class WikidataItem:
             debug(bool): if True switch on debugging
         """
         if not qid:
-            self.qid=None
+            self.qid = None
             return
         self.qid = qid
         # numeric qid
