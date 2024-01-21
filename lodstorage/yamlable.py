@@ -182,12 +182,4 @@ class YamlAble(Generic[T]):
         if not data:
             return None
         instance = from_dict(data_class=cls, data=data)
-        # dataclass_fields = {field.name for field in fields(cls)}
-        # filtered_data = {key: value for key, value in data.items() if key in dataclass_fields}
         return instance
-
-    def to_dict(self) -> dict:
-        """
-        Converts the current instance to a dictionary, typically used in serialization.
-        """
-        return asdict(self)
