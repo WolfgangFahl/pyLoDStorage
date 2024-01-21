@@ -9,16 +9,21 @@ from typing import List, Optional
 
 from dataclasses_json import dataclass_json
 
+from lodstorage.yamlable import yamlable
+
+
 class DateConvert:
     """
     date converter
     """
+
     @classmethod
-    def iso_date_to_datetime(cls,iso_date:str)->datetime.date:
-        date=datetime.strptime(iso_date, "%Y-%m-%d").date() if iso_date else None
+    def iso_date_to_datetime(cls, iso_date: str) -> datetime.date:
+        date = datetime.strptime(iso_date, "%Y-%m-%d").date() if iso_date else None
         return date
 
 
+@yamlable
 @dataclass_json
 @dataclass
 class Royal:
@@ -46,13 +51,13 @@ class Royal:
         self.age = int((end_date - self.born).days / 365.2425)
         self.of_age = self.age >= 18
         if self.wikidata_id:
-            self.wikidata_url=f"https://www.wikidata.org/wiki/{self.wikidata_id}" 
+            self.wikidata_url = f"https://www.wikidata.org/wiki/{self.wikidata_id}"
+
     @property
     def born(self) -> date:
         """Return the date of birth from the ISO date string."""
         born_date = DateConvert.iso_date_to_datetime(self.born_iso_date)
         return born_date
-   
 
     @property
     def died(self) -> Optional[date]:
@@ -60,6 +65,8 @@ class Royal:
         died_date = DateConvert.iso_date_to_datetime(self.died_iso_date)
         return died_date
 
+
+@yamlable
 @dataclass_json
 @dataclass
 class Royals:
