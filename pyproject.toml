@@ -26,6 +26,8 @@ dependencies = [
     "dicttoxml2",
     # https://pypi.org/project/dataclasses-json/
     "dataclasses-json>=0.6.1",
+    # https://pypi.org/project/dacite/
+    "dacite>=1.8.1"
 ]
 requires-python = ">=3.9"
 classifiers=[
