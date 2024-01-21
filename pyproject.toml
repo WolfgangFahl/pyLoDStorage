@@ -23,7 +23,9 @@ dependencies = [
     "jsonpickle==1.5.2",
     "pylatexenc~=2.10",
     "pygments",
-    "dicttoxml2"
+    "dicttoxml2",
+    # https://pypi.org/project/dataclasses-json/
+    "dataclasses-json>=0.6.1",
 ]
 requires-python = ">=3.9"
 classifiers=[
