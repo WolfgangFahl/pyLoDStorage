@@ -28,7 +28,18 @@ class DateConvert:
 @dataclass
 class Royal:
     """
-    A member of the royal family
+    Represents a member of the royal family, with various personal details.
+
+    Attributes:
+        name (str): The full name of the royal member.
+        wikidata_id (str): The Wikidata identifier associated with the royal member.
+        number_in_line (Optional[int]): The number in line to succession, if applicable.
+        born_iso_date (Optional[str]): The ISO date of birth.
+        died_iso_date (Optional[str]): The ISO date of death, if deceased.
+        last_modified_iso (str): ISO timestamp of the last modification.
+        age (Optional[int]): The age of the royal member.
+        of_age (Optional[bool]): Indicates whether the member is of legal age.
+        wikidata_url (Optional[str]): URL to the Wikidata page of the member.
     """
 
     name: str
@@ -71,24 +82,26 @@ class Royal:
 @dataclass
 class Royals:
     """
-    A collection of Royal family members
+    Represents a collection of Royal family members.
+
+    Attributes:
+        members (List[Royal]): A list of Royal family members.
     """
 
     members: List[Royal] = field(default_factory=list)
 
-
-class Sample:
-    """
-    Sample dataset provider
-    """
-
-    @staticmethod
-    def get(dataset_name: str):
+    @classmethod
+    def get_samples(cls) -> dict[str, "Royals"]:
         """
-        Get the given sample dataset name
+        Returns a dictionary of named samples
+        for 'specification by example' style
+        requirements management.
+
+        Returns:
+            dict: A dictionary with keys as sample names and values as `Royals` instances.
         """
-        if dataset_name == "royals":
-            return Royals(
+        samples = {
+            "QE2 heirs up to number in line 5": Royals(
                 members=[
                     Royal(
                         name="Elizabeth Alexandra Mary Windsor",
@@ -134,5 +147,22 @@ class Sample:
                     ),
                 ]
             )
+        }
+        return samples
+
+
+class Sample:
+    """
+    Sample dataset provider
+    """
+
+    @staticmethod
+    def get(dataset_name: str):
+        """
+        Get the given sample dataset name
+        """
+        if dataset_name == "royals":
+            samples = Royals.get_samples()
+            return samples
         else:
             raise ValueError("Unknown dataset name")

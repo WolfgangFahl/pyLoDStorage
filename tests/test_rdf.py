@@ -20,8 +20,11 @@ class TestTriplify(Basetest):
         """
         test creating RDF triples
         """
-        royals = Sample.get("royals")
+        royals_samples = Sample.get("royals")
         debug = self.debug
         debug = True
-        if debug:
-            print(royals.to_json(indent=2))
+        for name, royals in royals_samples.items():
+            json_str = royals.to_json(indent=2)
+            if debug:
+                print(f"Sample {name}:")
+                print(json_str)

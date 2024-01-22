@@ -133,40 +133,43 @@ class TestYamlAble(Basetest):
         """
         test yamlable decorator for the royals
         """
-        royals = Sample.get("royals")
-        yaml_str = royals.to_yaml()
-        debug = self.debug
-        # debug=True
-        if debug:
-            print(yaml_str)
+        royals_samples = Sample.get("royals")
+        for name, royals in royals_samples.items():
+            yaml_str = royals.to_yaml()
+            debug = self.debug
+            # debug=True
+            if debug:
+                print(f"Sample {name}:")
+                print(yaml_str)
 
     def test_royals_round_trip(self):
         """
         Test round-trip serialization and deserialization for the royals using YamlAble.
         """
-        # Get the original royals instance
-        original_royals = Sample.get("royals")
+        royals_samples = Sample.get("royals")
+        for name, original_royals in royals_samples.items():
+            # Serialize to YAML
+            yaml_str = original_royals.to_yaml()
+            # Optional: Print the YAML string in debug mode
+            debug = self.debug
+            # debug=True
+            if debug:
+                print(f"Original YAML String for {name}:")
+                print(yaml_str)
 
-        # Serialize to YAML
-        yaml_str = original_royals.to_yaml()
-        # Optional: Print the YAML string in debug mode
-        debug = self.debug
-        # debug=True
-        if debug:
-            print("Original YAML String:")
-            print(yaml_str)
+            # Deserialize back to Royals instance
+            deserialized_royals = Royals.from_yaml(yaml_str)
 
-        # Deserialize back to Royals instance
-        deserialized_royals = Royals.from_yaml(yaml_str)
-
-        # Assertions to check if deserialized royals match the original
-        self.assertEqual(len(deserialized_royals.members), len(original_royals.members))
-        for original, deserialized in zip(
-            original_royals.members, deserialized_royals.members
-        ):
-            self.assertEqual(original.name, deserialized.name)
-            self.assertEqual(original.wikidata_id, deserialized.wikidata_id)
-            self.assertEqual(original.number_in_line, deserialized.number_in_line)
-            self.assertEqual(original.born_iso_date, deserialized.born_iso_date)
-            self.assertEqual(original.died_iso_date, deserialized.died_iso_date)
-            # Add more assertions as necessary for other fields
+            # Assertions to check if deserialized royals match the original
+            self.assertEqual(
+                len(deserialized_royals.members), len(original_royals.members)
+            )
+            for original, deserialized in zip(
+                original_royals.members, deserialized_royals.members
+            ):
+                self.assertEqual(original.name, deserialized.name)
+                self.assertEqual(original.wikidata_id, deserialized.wikidata_id)
+                self.assertEqual(original.number_in_line, deserialized.number_in_line)
+                self.assertEqual(original.born_iso_date, deserialized.born_iso_date)
+                self.assertEqual(original.died_iso_date, deserialized.died_iso_date)
+                # Add more assertions as necessary for other fields

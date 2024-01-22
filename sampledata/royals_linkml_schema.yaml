@@ -1,0 +1,42 @@
+classes:
+  Royal:
+    description: "A member of the royal family"
+    slots:
+      - name
+      - wikidata_id
+      - number_in_line
+      - born_iso_date
+      - died_iso_date
+      - last_modified_iso
+      - age
+      - of_age
+      - wikidata_url
+
+slots:
+  name:
+    description: "Name of the royal family member"
+    range: string
+  wikidata_id:
+    description: "Wikidata identifier"
+    range: string
+  number_in_line:
+    description: "Number in line to the throne"
+    range: integer
+  born_iso_date:
+    description: "ISO date of birth"
+    range: string
+  died_iso_date:
+    description: "ISO date of death"
+    range: string
+  last_modified_iso:
+    description: "ISO timestamp of the last modification"
+    range: string
+  age:
+    description: "Age of the royal family member"
+    range: integer
+  of_age:
+    description: "Flag indicating if the member is of age"
+    range: boolean
+  wikidata_url:
+    description: "URL to the Wikidata page"
+    range: string
