@@ -7,7 +7,6 @@ from lodstorage.linkml_gen import LinkMLGen, Schema
 from lodstorage.sample2 import Sample
 from tests.basetest import Basetest
 
-
 class TestLinkMLConversion(Basetest):
     """
     Test class for generating LinkML YAML schema from Python data models.

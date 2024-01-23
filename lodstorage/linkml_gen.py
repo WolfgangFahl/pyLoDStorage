@@ -5,7 +5,7 @@ Created on 2024-01-21
 """
 from dataclasses import dataclass, field, fields, is_dataclass
 from collections.abc import Iterable, Mapping
-from typing import List, Dict, Optional
+from typing import List, Dict
 # Import necessary modules
 from dataclasses_json import dataclass_json
 
@@ -104,14 +104,17 @@ class LinkMLGen:
             multivalued = isinstance(value, (Iterable,Mapping))
             if multivalued:
                 if isinstance(value,Mapping):
-                    iterable=value.values()
+                    value_list=list(value.values())
                 else: 
-                    iterable=value
-                value_element = next(iterable)
-                if isinstance(value_element,dataclass):
-                    linkml_range=type(value_element)
-                else:
-                    linkml_range=self.python_to_linkml_ranges.get(type(value_element))
+                    value_list=value
+                if len(value_list)>0:
+                    value_element = value_list[0]
+                    if is_dataclass(value_element):
+                        linkml_range=type(value_element).__name__
+                        self.gen_schema(value_element)
+                        pass
+                    else:
+                        linkml_range=self.python_to_linkml_ranges.get(type(value_element))
                     
             attr_data=attributes.get(attr_name)
             new_class.slots.append(attr_name)
