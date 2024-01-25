@@ -280,7 +280,7 @@ class YamlAble(Generic[T]):
         return value
 
     @classmethod
-    def from_dict(cls: Type[T], data: dict) -> T:
+    def from_dict2(cls: Type[T], data: dict) -> T:
         """
         Creates an instance of a dataclass from a dictionary, typically used in deserialization.
         """

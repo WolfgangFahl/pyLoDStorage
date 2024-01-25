@@ -144,21 +144,22 @@ class TestSamples(Basetest):
                 print(f"Sample {name}:")
                 print(yaml_str)
 
-    def test_royals_round_trip(self):
+    def test_samples_round_trip(self):
         """
         Test round-trip serialization and deserialization for the royals using YamlAble.
         """
-        royals_samples = Sample.get("royals")
-        for name, original_royals in royals_samples.items():
-            # Serialize to YAML
-            yaml_str = original_royals.to_yaml()
-            # Optional: Print the YAML string in debug mode
-            debug = self.debug
-            # debug=True
-            if debug:
-                print(f"Original YAML String for {name}:")
-                print(yaml_str)
+        for sample_name,sample_class in [("royals",Royals),("countries",Countries)]:
+            samples=Sample.get(sample_name)
+            for name, original_item in samples.items():
+                # Serialize to YAML
+                yaml_str = original_item.to_yaml()
+                # Optional: Print the YAML string in debug mode
+                debug = self.debug
+                # debug=True
+                if debug:
+                    print(f"Original YAML String for {sample_name}/{name}:")
+                    print(yaml_str)
 
-            # Deserialize back to Royals instance
-            deserialized_royals = Royals.from_yaml(yaml_str)
-            self.check_sample(Royals,"royals",name, deserialized_royals)
+                # Deserialize back to sample class instance
+                deserialized_item = original_item.from_yaml(yaml_str)
+                self.check_sample(sample_class,sample_name,name, deserialized_item)

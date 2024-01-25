@@ -166,7 +166,7 @@ class Countries:
         get Erdem Ozkol's country list
         """
         country_json_url = "https://gist.githubusercontent.com/erdem/8c7d26765831d0f9a8c62f02782ae00d/raw/248037cd701af0a4957cce340dabb0fd04e38f4c/countries.json"
-        instance=cls.from_json_url(country_json_url)
+        instance=cls.load_from_json_url(country_json_url)
         return instance
         
     @classmethod
