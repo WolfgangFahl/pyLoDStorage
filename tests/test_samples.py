@@ -3,10 +3,10 @@ Created on 2024-01-25
 
 @author: wf
 """
+import os
 from lodstorage.sample2 import Sample, Royals, Countries
 from tests.basetest import Basetest
 from dataclasses import fields, is_dataclass
-
 
 class TestSamples(Basetest):
     """
@@ -15,8 +15,14 @@ class TestSamples(Basetest):
     
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
+        self.sample_cases= [
+            ("royals",Royals),
+            ("countries",Countries)
+        ]
+        self.tmp="/tmp/lod_storable"
+        os.makedirs(self.tmp,exist_ok=True)
     
-    def check_fields(self, check_instance, expected_instance, hint: str):
+    def check_fields(self, check_instance, expected_instance, hint: str,level:int=0):
         """
         Recursively check fields for both lists and dictionaries in a dataclass.
 
@@ -25,6 +31,10 @@ class TestSamples(Basetest):
             expected_instance: The expected instance for comparison.
             hint (str): A hint for context.
         """
+        if not is_dataclass(check_instance):
+            if level==0:
+                self.fail(f"{hint} is not a dataclass")
+            return
         for field_info in fields(check_instance):
             attr_name = field_info.name
             attr_value_check = getattr(check_instance, attr_name)
@@ -36,18 +46,18 @@ class TestSamples(Basetest):
 
             if is_dataclass(attr_value_check):
                 # Recursively check fields if the attribute is a dataclass
-                self.check_fields(attr_value_check, attr_value_expected, field_hint)
+                self.check_fields(attr_value_check, attr_value_expected, field_hint,level+1)
             elif isinstance(attr_value_check, list):
                 # Check lists recursively
                 self.assertEqual(len(attr_value_check), len(attr_value_expected), f"Length mismatch in {field_hint}")
                 for i, (item_check, item_expected) in enumerate(zip(attr_value_check, attr_value_expected)):
-                    self.check_fields(item_check, item_expected, f"{field_hint}[{i}]")
+                    self.check_fields(item_check, item_expected, f"{field_hint}[{i}]",level+1)
             elif isinstance(attr_value_check, dict):
                 # Check dictionaries recursively
                 self.assertDictEqual(attr_value_check, attr_value_expected, f"Dictionary mismatch in {field_hint}")
                 for key in attr_value_check:
                     if key in attr_value_expected:
-                        self.check_fields(attr_value_check[key], attr_value_expected[key], f"{field_hint}[{key}]")
+                        self.check_fields(attr_value_check[key], attr_value_expected[key], f"{field_hint}[{key}]",level+1)
             else:
                 state = attr_value_check == attr_value_expected
                 state_indicator = "✅" if state else "❌"
@@ -80,56 +90,6 @@ class TestSamples(Basetest):
         self.assertIsInstance(check_instance, clazz)
         self.check_fields(check_instance, sample_instance,hint)
         
-
-    def check_royals(self, royals: Royals) -> None:
-        """
-        Checks the attributes of each member in the given Royals instance against the sample data.
-
-        Args:
-            royals (Royals): The Royals instance to be checked.
-        """
-        # Retrieve the expected data from the sample
-        expected_royals = Sample.get("royals")[
-            "QE2 heirs up to number in line 5"
-        ].members
-
-        # Check if the number of members matches
-        self.assertEqual(
-            len(royals.members),
-            len(expected_royals),
-            "Number of members should match the expected data.",
-        )
-
-        # Check each member's attributes
-        for i, member in enumerate(royals.members):
-            expected_member = expected_royals[i]
-
-            self.assertEqual(
-                member.name, expected_member.name, f"Name of member {i} does not match."
-            )
-            self.assertEqual(
-                member.wikidata_id,
-                expected_member.wikidata_id,
-                f"Wikidata ID of member {i} does not match.",
-            )
-            self.assertEqual(
-                member.born_iso_date,
-                expected_member.born_iso_date,
-                f"Born date of member {i} does not match.",
-            )
-            self.assertEqual(
-                member.died_iso_date,
-                expected_member.died_iso_date,
-                f"Died date of member {i} does not match.",
-            )
-            self.assertEqual(
-                member.age, expected_member.age, f"Age of member {i} does not match."
-            )
-            self.assertEqual(
-                member.of_age,
-                expected_member.of_age,
-                f"Of age status of member {i} does not match.",
-            )
     def test_royals(self):
         """
         test lod_storable decorator for the royals
@@ -144,11 +104,14 @@ class TestSamples(Basetest):
                 print(f"Sample {name}:")
                 print(yaml_str)
 
-    def test_samples_round_trip(self):
+    def test_samples_yaml_round_trip(self):
         """
         Test round-trip serialization and deserialization for the royals using YamlAble.
         """
-        for sample_name,sample_class in [("royals",Royals),("countries",Countries)]:
+        for sample_name,sample_class in [
+            ("royals",Royals),
+            ("countries",Countries)
+        ]:
             samples=Sample.get(sample_name)
             for name, original_item in samples.items():
                 # Serialize to YAML
@@ -163,3 +126,47 @@ class TestSamples(Basetest):
                 # Deserialize back to sample class instance
                 deserialized_item = original_item.from_yaml(yaml_str)
                 self.check_sample(sample_class,sample_name,name, deserialized_item)
+
+    def test_json_serialization(self):
+        """
+        Test JSON serialization and deserialization.
+        """
+        for sample_name, sample_class in self.sample_cases:
+            samples = Sample.get(sample_name)
+            for name, original_item in samples.items():
+                # Serialize to JSON
+                json_str = original_item.to_json()
+    
+                # Deserialize back to sample class instance
+                deserialized_item = sample_class.from_json(json_str)
+                self.check_sample(sample_class, sample_name, name, deserialized_item)
+
+    def test_yaml_file_operations(self):
+        """
+        Test saving to and loading from YAML files.
+        """
+        for sample_name, sample_class in self.sample_cases:
+            samples = Sample.get(sample_name)
+            for name, original_item in samples.items():
+                filename=f"{self.tmp}/{sample_name}-{name}.yaml"
+                # Save to YAML file
+                original_item.save_to_yaml_file(filename)
+    
+                # Load from YAML file
+                loaded_item = sample_class.load_from_yaml_file(filename)
+                self.check_sample(sample_class, sample_name, name, loaded_item)
+
+    def test_json_file_operations(self):
+        """
+        Test saving to and loading from JSON files.
+        """
+        for sample_name, sample_class in self.sample_cases:
+            samples = Sample.get(sample_name)
+            for name, original_item in samples.items():
+                filename = f"{self.tmp}/{sample_name}-{name}.json"
+                # Save to JSON file
+                original_item.save_to_json_file(filename)
+    
+                # Load from JSON file
+                loaded_item = sample_class.load_from_json_file(filename)
+                self.check_sample(sample_class, sample_name, name, loaded_item)

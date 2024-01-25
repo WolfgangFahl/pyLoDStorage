@@ -1,19 +1,39 @@
 """
-Created on 2023-12-08, Extended on 2023-16-12
+Created on 2023-12-08, Extended on 2023-16-12 and 2024-01-25
 
 @author: wf, ChatGPT
 
 Prompts for the development and extension of the 'YamlAble' class within the 'yamable' module:
-1. Develop a Python class named 'YamAble' in a module called 'yamable'. This class should be useable as a mixin with a focus on converting dataclass instances to YAML format, specifically for use in object-oriented programming.
-2. Implement methods in the 'YamAble' class for formatting multi-line string attributes using YAML block scalar style and excluding attributes with None values from the YAML output.
-3. Add a method to handle multi-line strings in the 'YamlAble' class, ensuring they are formatted as block scalars in the YAML output.
-4. Include functionality to recursively remove None values from dataclass instances before conversion in the 'YamAble' class.
-5. The 'YamlAble' class should only process dataclass instances, with error handling to raise a ValueError for non-dataclass objects.
-6. Write a comprehensive test suite for the 'YamlAble' class within the context of the 'ngwidgets.basetest' framework. The tests should verify correct block scalar formatting, omission of None values, and general accuracy of the YAML conversion.
-7. Emphasize the use of Google-style docstrings, comprehensive comments, and type hints throughout the 'YamAble' class and its test suite.
-8. Adhere strictly to the provided instructions, and if there are any assumptions or uncertainties, seek clarification before proceeding.
+
+1. Develop 'YamlAble' class in 'yamable' module. It
+   should convert dataclass instances to/from YAML.
+2. Implement methods for YAML block scalar style and
+   exclude None values in 'YamlAble' class.
+3. Add functionality to remove None values from
+   dataclass instances before YAML conversion.
+4. Ensure 'YamlAble' processes only dataclass instances,
+   with error handling for non-dataclass objects.
+5. Extend 'YamlAble' for JSON serialization and
+   deserialization.
+6. Add methods for saving/loading dataclass instances
+   to/from YAML and JSON files in 'YamlAble'.
+7. Implement loading of dataclass instances from URLs
+   for both YAML and JSON in 'YamlAble'.
+8. Write tests for 'YamlAble' within the pyLodStorage context. 
+   Use 'samples 2' example from pyLoDStorage 
+   https://github.com/WolfgangFahl/pyLoDStorage/blob/master/lodstorage/sample2.py
+   as a reference. 
+9. Ensure tests cover YAML/JSON serialization, deserialization, 
+   and file I/O operations, using the sample-based approach..
+10. Use Google-style docstrings, comments, and type hints
+   in 'YamlAble' class and tests.
+11. Adhere to instructions and seek clarification for
+    any uncertainties.
+12. Add @lod_storable annotation support that will automatically
+    YamlAble support and add @dataclass and @dataclass_json 
+    prerequisite behavior to a class    
+    
 """
-import json
 import urllib.request
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime
@@ -184,21 +204,6 @@ class YamlAble(Generic[T]):
         with open(filename, "w") as file:
             file.write(yaml_content)
             
-    @classmethod
-    def from_json2(cls: Type[T], json_str: str) -> T:
-        """
-        Deserializes a JSON string to a dataclass instance.
-
-        Args:
-            json_str (str): A string containing JSON formatted data.
-
-        Returns:
-            T: An instance of the dataclass.
-        """
-        data: dict[str, Any] = json.loads(json_str)
-        instance: T = cls.from_dict(data)
-        return instance
-
     @classmethod
     def load_from_json_file(cls: Type[T], filename: str) -> T:
         """
