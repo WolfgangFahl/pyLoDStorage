@@ -130,6 +130,56 @@ class TestYamlAble(Basetest):
             "Python tuple notation should not appear in the YAML output.",
         )
 
+    def check_royals(self, royals: Royals) -> None:
+        """
+        Checks the attributes of each member in the given Royals instance against the sample data.
+
+        Args:
+            royals (Royals): The Royals instance to be checked.
+        """
+        # Retrieve the expected data from the sample
+        expected_royals = Sample.get("royals")[
+            "QE2 heirs up to number in line 5"
+        ].members
+
+        # Check if the number of members matches
+        self.assertEqual(
+            len(royals.members),
+            len(expected_royals),
+            "Number of members should match the expected data.",
+        )
+
+        # Check each member's attributes
+        for i, member in enumerate(royals.members):
+            expected_member = expected_royals[i]
+
+            self.assertEqual(
+                member.name, expected_member.name, f"Name of member {i} does not match."
+            )
+            self.assertEqual(
+                member.wikidata_id,
+                expected_member.wikidata_id,
+                f"Wikidata ID of member {i} does not match.",
+            )
+            self.assertEqual(
+                member.born_iso_date,
+                expected_member.born_iso_date,
+                f"Born date of member {i} does not match.",
+            )
+            self.assertEqual(
+                member.died_iso_date,
+                expected_member.died_iso_date,
+                f"Died date of member {i} does not match.",
+            )
+            self.assertEqual(
+                member.age, expected_member.age, f"Age of member {i} does not match."
+            )
+            self.assertEqual(
+                member.of_age,
+                expected_member.of_age,
+                f"Of age status of member {i} does not match.",
+            )
+
     def test_royals(self):
         """
         test yamlable decorator for the royals
@@ -137,8 +187,9 @@ class TestYamlAble(Basetest):
         royals_samples = Sample.get("royals")
         for name, royals in royals_samples.items():
             yaml_str = royals.to_yaml()
+            self.assertTrue("Charles" in yaml_str)
             debug = self.debug
-            debug=True
+            # debug=True
             if debug:
                 print(f"Sample {name}:")
                 print(yaml_str)
@@ -153,7 +204,7 @@ class TestYamlAble(Basetest):
             yaml_str = original_royals.to_yaml()
             # Optional: Print the YAML string in debug mode
             debug = self.debug
-            #debug=True
+            # debug=True
             if debug:
                 print(f"Original YAML String for {name}:")
                 print(yaml_str)
@@ -184,7 +235,7 @@ class TestYamlAble(Basetest):
             # Check if file is created
             self.assertTrue(os.path.exists(temp_file.name))
             # Optionally read back the file to check contents
-            with open(temp_file.name, 'r') as file:
+            with open(temp_file.name, "r") as file:
                 yaml_content = file.read()
                 self.assertIn("Example", yaml_content)
 
@@ -205,9 +256,7 @@ class TestYamlAble(Basetest):
         """
         Test loading a dataclass instance from a YAML string obtained from a URL.
         """
-        # Replace 'sample_url' with the URL of your hosted YAML file
-        sample_url = "https://example.com/sample.yaml"
-        loaded_instance = MockDataClass.load_from_yaml_url(sample_url)
-        # Verify that the loaded instance matches the expected values
-        self.assertEqual(loaded_instance.name, "Expected Name")
-        self.assertEqual(loaded_instance.id, 123)
+        # royals
+        royals_url = "https://raw.githubusercontent.com/WolfgangFahl/pyLoDStorage/master/sampledata/royals.yaml"
+        royals = Royals.load_from_yaml_url(royals_url)
+        self.check_royals(royals)

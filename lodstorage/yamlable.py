@@ -13,31 +13,52 @@ Prompts for the development and extension of the 'YamlAble' class within the 'ya
 7. Emphasize the use of Google-style docstrings, comprehensive comments, and type hints throughout the 'YamAble' class and its test suite.
 8. Adhere strictly to the provided instructions, and if there are any assumptions or uncertainties, seek clarification before proceeding.
 """
-
+import json
 import urllib.request
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict, dataclass, is_dataclass
+from datetime import datetime
 from typing import Any, Generic, Type, TypeVar
 
 import yaml
 from dacite import from_dict
+from dataclasses_json import dataclass_json
 
 T = TypeVar("T")
 
 
-def yamlable(cls):
+def lod_storable(cls):
     """
-    Decorator to make a class YamlAble by inheriting from YamlAble.
+    Decorator to make a class LoDStorable by
+    inheriting from YamlAble.
+    This decorator also ensures the class is a
+    dataclass and has JSON serialization/deserialization
+    capabilities.
     """
-    if not is_dataclass(cls):
-        raise TypeError("The @yamlable decorator can only be used with dataclasses.")
+    cls = dataclass(cls)  # Apply the @dataclass decorator
+    cls = dataclass_json(cls)  # Apply the @dataclass_json decorator
 
-    class YamlAbleClass(YamlAble, cls):
+    class LoDStorable(YamlAble, cls):
+        """
+        decorator class
+        """
+
         pass
 
-    YamlAbleClass.__name__ = cls.__name__
-    YamlAbleClass.__doc__ = cls.__doc__
+    LoDStorable.__name__ = cls.__name__
+    LoDStorable.__doc__ = cls.__doc__
 
-    return YamlAbleClass
+    return LoDStorable
+
+
+class DateConvert:
+    """
+    date converter
+    """
+
+    @classmethod
+    def iso_date_to_datetime(cls, iso_date: str) -> datetime.date:
+        date = datetime.strptime(iso_date, "%Y-%m-%d").date() if iso_date else None
+        return date
 
 
 class YamlAble(Generic[T]):
@@ -72,12 +93,6 @@ class YamlAble(Generic[T]):
         if "\n" in data:
             return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
         return dumper.represent_scalar("tag:yaml.org,2002:str", data)
-
-    def represent_tuple(self, dumper: yaml.Dumper, data: tuple) -> yaml.Node:
-        """
-        Custom representer for converting tuples to regular YAML lists.
-        """
-        return dumper.represent_sequence("tag:yaml.org,2002:seq", data)
 
     def to_yaml(
         self,
@@ -114,38 +129,129 @@ class YamlAble(Generic[T]):
         return yaml_str
 
     @classmethod
-    def from_yaml(cls, yaml_str: str) -> T:
+    def from_yaml(cls: Type[T], yaml_str: str) -> T:
         """
         Deserializes a YAML string to a dataclass instance.
+
+        Args:
+            yaml_str (str): A string containing YAML formatted data.
+
+        Returns:
+            T: An instance of the dataclass.
         """
-        data = yaml.safe_load(yaml_str)
-        return cls.from_dict(data)
+        data: dict[str, Any] = yaml.safe_load(yaml_str)
+        instance: T = cls.from_dict(data)
+        return instance
 
     @classmethod
-    def load_from_yaml_file(cls, filename: str) -> T:
+    def load_from_yaml_file(cls: Type[T], filename: str) -> T:
         """
         Loads a dataclass instance from a YAML file.
+
+        Args:
+            filename (str): The path to the YAML file.
+
+        Returns:
+            T: An instance of the dataclass.
         """
         with open(filename, "r") as file:
-            return cls.from_yaml(file.read())
+            yaml_str: str = file.read()
+        instance: T = cls.from_yaml(yaml_str)
+        return instance
 
     @classmethod
-    def load_from_yaml_url(cls, url: str) -> T:
+    def load_from_yaml_url(cls: Type[T], url: str) -> T:
         """
         Loads a dataclass instance from a YAML string obtained from a URL.
+
+        Args:
+            url (str): The URL pointing to the YAML data.
+
+        Returns:
+            T: An instance of the dataclass.
         """
-        with urllib.request.urlopen(url) as response:
-            if response.status == 200:
-                return cls.from_yaml(response.read().decode())
-            else:
-                raise Exception(f"Unable to load data from URL: {url}")
+        yaml_str: str = cls.read_from_url(url)
+        instance: T = cls.from_yaml(yaml_str)
+        return instance
 
     def save_to_yaml_file(self, filename: str):
         """
         Saves the current dataclass instance to a YAML file.
+
+        Args:
+            filename (str): The path where the YAML file will be saved.
         """
+        yaml_content: str = self.to_yaml()
         with open(filename, "w") as file:
-            file.write(self.to_yaml())
+            file.write(yaml_content)
+            
+    @classmethod
+    def from_json2(cls: Type[T], json_str: str) -> T:
+        """
+        Deserializes a JSON string to a dataclass instance.
+
+        Args:
+            json_str (str): A string containing JSON formatted data.
+
+        Returns:
+            T: An instance of the dataclass.
+        """
+        data: dict[str, Any] = json.loads(json_str)
+        instance: T = cls.from_dict(data)
+        return instance
+
+    @classmethod
+    def load_from_json_file(cls: Type[T], filename: str) -> T:
+        """
+        Loads a dataclass instance from a JSON file.
+
+        Args:
+            filename (str): The path to the JSON file.
+
+        Returns:
+            T: An instance of the dataclass.
+        """
+        with open(filename, "r") as file:
+            json_str: str = file.read()
+        instance: T = cls.from_json(json_str)
+        return instance
+
+    @classmethod
+    def load_from_json_url(cls: Type[T], url: str) -> T:
+        """
+        Loads a dataclass instance from a JSON string obtained from a URL.
+
+        Args:
+            url (str): The URL pointing to the JSON data.
+
+        Returns:
+            T: An instance of the dataclass.
+        """
+        json_str: str = cls.read_from_url(url)
+        instance: T = cls.from_json(json_str)
+        return instance
+
+    def save_to_json_file(self, filename: str):
+        """
+        Saves the current dataclass instance to a JSON file.
+
+        Args:
+            filename (str): The path where the JSON file will be saved.
+        """
+        json_content: str = self.to_json()
+        with open(filename, "w") as file:
+            file.write(json_content)
+
+    @classmethod
+    def read_from_url(cls, url: str) -> str:
+        """
+        Helper method to fetch content from a URL.
+        """
+        with urllib.request.urlopen(url) as response:
+            if response.status == 200:
+                return response.read().decode()
+            else:
+                raise Exception(f"Unable to load data from URL: {url}")
 
     @staticmethod
     def remove_ignored_values(

@@ -43,13 +43,10 @@ class DocstringParser:
         )
 
         # Updated class_docstring pattern to correctly handle multi-line class descriptions
-        self.class_docstring = (
-            class_docstring
-            + Optional(
-                OneOrMore(~attribute_start + restOfLine)("class_description")
-                + attribute_start
-                + OneOrMore(self.attribute)("attributes")
-            )
+        self.class_docstring = class_docstring + Optional(
+            OneOrMore(~attribute_start + restOfLine)("class_description")
+            + attribute_start
+            + OneOrMore(self.attribute)("attributes")
         )
 
     def parse(self, docstring: str):
@@ -59,11 +56,7 @@ class DocstringParser:
         result = self.class_docstring.parseString(docstring, parseAll=True)
         class_description = " ".join(result.class_description).strip()
         attributes = {
-            attr.name: {
-                "type": attr.type, 
-                "description": attr.description.strip()}
+            attr.name: {"type": attr.type, "description": attr.description.strip()}
             for attr in result.attributes
         }
         return class_description, attributes
-
-

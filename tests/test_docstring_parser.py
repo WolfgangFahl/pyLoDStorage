@@ -3,9 +3,11 @@ Created on 2024-01-21
 
 @author: wf
 """
+import json
+
 from lodstorage.docstring_parser import DocstringParser
 from tests.basetest import Basetest
-import json
+
 
 class TestDocstringParser(Basetest):
     """
@@ -32,11 +34,11 @@ class TestDocstringParser(Basetest):
         """
         parser = DocstringParser()
         class_description, attributes = parser.parse(docstring)
-        debug=self.debug
-        debug=True
+        debug = self.debug
+        debug = True
         if debug:
             print(class_description)
-            print(json.dumps(attributes,indent=2))
+            print(json.dumps(attributes, indent=2))
         # Assertions to check if the parser is working correctly
         self.assertEqual(
             "Represents a member of the royal family, with various personal details.",

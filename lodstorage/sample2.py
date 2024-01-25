@@ -3,29 +3,14 @@ Created on 2024-01-21
 
 @author: wf
 """
-from dataclasses import dataclass, field
+from dataclasses import field
 from datetime import date, datetime
 from typing import List, Optional
 
-from dataclasses_json import dataclass_json
-
-from lodstorage.yamlable import yamlable
+from lodstorage.yamlable import DateConvert, lod_storable
 
 
-class DateConvert:
-    """
-    date converter
-    """
-
-    @classmethod
-    def iso_date_to_datetime(cls, iso_date: str) -> datetime.date:
-        date = datetime.strptime(iso_date, "%Y-%m-%d").date() if iso_date else None
-        return date
-
-
-@yamlable
-@dataclass_json
-@dataclass
+@lod_storable
 class Royal:
     """
     Represents a member of the royal family, with various personal details.
@@ -77,9 +62,7 @@ class Royal:
         return died_date
 
 
-@yamlable
-@dataclass_json
-@dataclass
+@lod_storable
 class Royals:
     """
     Represents a collection of Royal family members.

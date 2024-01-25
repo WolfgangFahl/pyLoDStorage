@@ -7,6 +7,7 @@ from lodstorage.linkml_gen import LinkMLGen, Schema
 from lodstorage.sample2 import Sample
 from tests.basetest import Basetest
 
+
 class TestLinkMLConversion(Basetest):
     """
     Test class for generating LinkML YAML schema from Python data models.
@@ -21,7 +22,7 @@ class TestLinkMLConversion(Basetest):
         """
         # Retrieve the data model instances
         royals_samples = Sample.get("royals")
-        royals= list(royals_samples.values())[0]
+        royals = list(royals_samples.values())[0]
         debug = self.debug
         debug = True
         schema = Schema(
@@ -29,11 +30,11 @@ class TestLinkMLConversion(Basetest):
             name="royals",
             description="Royal family member schema",
             default_prefix="royals",
-            prefixes = {
-                  "linkml": "https://w3id.org/linkml/",
-                  "royals": "http://royal-family.bitplan.com/royals-schema"
+            prefixes={
+                "linkml": "https://w3id.org/linkml/",
+                "royals": "http://royal-family.bitplan.com/royals-schema",
             },
-            imports = ["linkml:types"]
+            imports=["linkml:types"],
         )
         linkml_gen = LinkMLGen(schema)
         # Introspect the data model and generate YAML schema
