@@ -11,12 +11,9 @@ from typing import Dict, List
 from dataclasses_json import dataclass_json
 
 from lodstorage.docstring_parser import DocstringParser
-from lodstorage.yamlable import yamlable
+from lodstorage.yamlable import lod_storable
 
-
-@yamlable
-@dataclass_json
-@dataclass
+@lod_storable
 class Slot:
     """
     Represents a slot in the LinkML schema, equivalent to a field or property.
@@ -27,9 +24,7 @@ class Slot:
     multivalued: bool = False
 
 
-@yamlable
-@dataclass_json
-@dataclass
+@lod_storable
 class Class:
     """
     Represents a class in the LinkML schema.
@@ -39,9 +34,7 @@ class Class:
     slots: List[Slot]
 
 
-@yamlable
-@dataclass_json
-@dataclass
+@lod_storable
 class Schema:
     """
     Represents the entire LinkML schema.

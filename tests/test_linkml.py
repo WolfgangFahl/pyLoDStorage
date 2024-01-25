@@ -7,7 +7,6 @@ from lodstorage.linkml_gen import LinkMLGen, Schema
 from lodstorage.sample2 import Sample
 from tests.basetest import Basetest
 
-
 class TestLinkMLConversion(Basetest):
     """
     Test class for generating LinkML YAML schema from Python data models.
@@ -41,4 +40,4 @@ class TestLinkMLConversion(Basetest):
         linkml_schema = linkml_gen.gen_schema(royals)
         if debug:
             print(linkml_schema.to_yaml())
-        linkml_schema.save_to_file("/tmp/royals_linkml_schema.yaml")
+        linkml_schema.save_to_yaml_file("/tmp/royals_linkml_schema.yaml")
