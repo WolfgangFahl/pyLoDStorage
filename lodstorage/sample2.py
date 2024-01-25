@@ -9,7 +9,6 @@ from typing import List, Optional
 
 from lodstorage.yamlable import DateConvert, lod_storable
 
-
 @lod_storable
 class Royal:
     """
@@ -132,8 +131,58 @@ class Royals:
             )
         }
         return samples
+    
+@lod_storable
+class Country:
+    """
+    Represents a country with its details.
 
+    Attributes:
+        name (str): The name of the country.
+        country_code (str): The country code.
+        capital (str): The capital city of the country.
+        timezones (List[str]): List of timezones in the country.
+        latlng (List[float]): Latitude and longitude of the country.
+    """
+    name: str
+    country_code: str
+    capital: str
+    timezones: List[str]
+    latlng: List[float]
 
+@lod_storable
+class Countries:
+    """
+    Represents a collection of country instances.
+
+    Attributes:
+        countries (List[Country]): A list of Country instances.
+    """
+    countries: List[Country]
+    
+    @classmethod 
+    def get_countries_erdem(cls)->'Countries':
+        """
+        get Erdem Ozkol's country list
+        """
+        country_json_url = "https://gist.githubusercontent.com/erdem/8c7d26765831d0f9a8c62f02782ae00d/raw/248037cd701af0a4957cce340dabb0fd04e38f4c/countries.json"
+        instance=cls.from_json_url(country_json_url)
+        return instance
+        
+    @classmethod
+    def get_samples(cls) -> dict[str, "Counties"]:
+        """
+        Returns a dictionary of named samples
+        for 'specification by example' style
+        requirements management.
+
+        Returns:
+            dict: A dictionary with keys as sample names 
+            and values as `Countries` instances.
+        """
+        samples = {"Erdem Ozkol's country list":cls.get_countries_erdem()}
+        return samples
+        
 class Sample:
     """
     Sample dataset provider
@@ -144,8 +193,12 @@ class Sample:
         """
         Get the given sample dataset name
         """
+        samples=None
         if dataset_name == "royals":
             samples = Royals.get_samples()
+        elif dataset_name == "countries":
+            Countries.get_samples()
             return samples
         else:
             raise ValueError("Unknown dataset name")
+        return samples

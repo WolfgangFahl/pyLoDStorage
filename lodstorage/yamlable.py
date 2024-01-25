@@ -78,7 +78,6 @@ class YamlAble(Generic[T]):
             self._yaml_dumper.ignore_aliases = lambda *_args: True
             self._yaml_dumper.add_representer(type(None), self.represent_none)
             self._yaml_dumper.add_representer(str, self.represent_literal)
-            self._yaml_dumper.add_representer(tuple, self.represent_tuple)
 
     def represent_none(self, _, __) -> yaml.Node:
         """
