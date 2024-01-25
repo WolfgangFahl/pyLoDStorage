@@ -7,7 +7,8 @@ Prompts:
 - Implement a YAML conversion class for dataclasses with specific handling for multi-line strings and omission of None values.
 - Create a test suite for the YAML conversion class, ensuring proper formatting and functionality.
 """
-
+import os
+import tempfile
 from dataclasses import dataclass
 
 from lodstorage.sample2 import Royals, Sample
@@ -137,7 +138,7 @@ class TestYamlAble(Basetest):
         for name, royals in royals_samples.items():
             yaml_str = royals.to_yaml()
             debug = self.debug
-            # debug=True
+            debug=True
             if debug:
                 print(f"Sample {name}:")
                 print(yaml_str)
@@ -152,7 +153,7 @@ class TestYamlAble(Basetest):
             yaml_str = original_royals.to_yaml()
             # Optional: Print the YAML string in debug mode
             debug = self.debug
-            # debug=True
+            #debug=True
             if debug:
                 print(f"Original YAML String for {name}:")
                 print(yaml_str)
@@ -173,3 +174,40 @@ class TestYamlAble(Basetest):
                 self.assertEqual(original.born_iso_date, deserialized.born_iso_date)
                 self.assertEqual(original.died_iso_date, deserialized.died_iso_date)
                 # Add more assertions as necessary for other fields
+
+    def test_save_to_yaml_file(self) -> None:
+        """
+        Test saving a dataclass instance to a YAML file.
+        """
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            self.mock_data.save_to_yaml_file(temp_file.name)
+            # Check if file is created
+            self.assertTrue(os.path.exists(temp_file.name))
+            # Optionally read back the file to check contents
+            with open(temp_file.name, 'r') as file:
+                yaml_content = file.read()
+                self.assertIn("Example", yaml_content)
+
+    def test_load_from_yaml_file(self) -> None:
+        """
+        Test loading a dataclass instance from a YAML file.
+        """
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            self.mock_data.save_to_yaml_file(temp_file.name)
+            loaded_instance = MockDataClass.load_from_yaml_file(temp_file.name)
+            # Check if the loaded instance matches the original
+            self.assertEqual(loaded_instance.name, self.mock_data.name)
+            self.assertEqual(loaded_instance.id, self.mock_data.id)
+            # Clean up the temp file
+            os.remove(temp_file.name)
+
+    def test_load_from_yaml_url(self) -> None:
+        """
+        Test loading a dataclass instance from a YAML string obtained from a URL.
+        """
+        # Replace 'sample_url' with the URL of your hosted YAML file
+        sample_url = "https://example.com/sample.yaml"
+        loaded_instance = MockDataClass.load_from_yaml_url(sample_url)
+        # Verify that the loaded instance matches the expected values
+        self.assertEqual(loaded_instance.name, "Expected Name")
+        self.assertEqual(loaded_instance.id, 123)

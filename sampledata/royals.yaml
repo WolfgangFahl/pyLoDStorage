@@ -1,0 +1,60 @@
+# pyLoDstorage yamable example
+# see https://github.com/WolfgangFahl/pyLoDStorage/tree/master/sampledata
+# Sample QE2 heirs up to number in line 5:
+members:
+- name: Elizabeth Alexandra Mary Windsor
+  wikidata_id: Q9682
+  born_iso_date: '1926-04-21'
+  died_iso_date: '2022-09-08'
+  last_modified_iso: '2024-01-25T07:18:00Z'
+  age: 96
+  of_age: true
+  wikidata_url: https://www.wikidata.org/wiki/Q9682
+- name: Charles III of the United Kingdom
+  wikidata_id: Q43274
+  number_in_line: 0
+  born_iso_date: '1948-11-14'
+  last_modified_iso: '2024-01-25T07:18:00Z'
+  age: 75
+  of_age: true
+  wikidata_url: https://www.wikidata.org/wiki/Q43274
+- name: William, Duke of Cambridge
+  wikidata_id: Q36812
+  number_in_line: 1
+  born_iso_date: '1982-06-21'
+  last_modified_iso: '2024-01-25T07:18:00Z'
+  age: 41
+  of_age: true
+  wikidata_url: https://www.wikidata.org/wiki/Q36812
+- name: Prince George of Wales
+  wikidata_id: Q13590412
+  number_in_line: 2
+  born_iso_date: '2013-07-22'
+  last_modified_iso: '2024-01-25T07:18:00Z'
+  age: 10
+  of_age: false
+  wikidata_url: https://www.wikidata.org/wiki/Q13590412
+- name: Princess Charlotte of Wales
+  wikidata_id: Q18002970
+  number_in_line: 3
+  born_iso_date: '2015-05-02'
+  last_modified_iso: '2024-01-25T07:18:00Z'
+  age: 8
+  of_age: false
+  wikidata_url: https://www.wikidata.org/wiki/Q18002970
+- name: Prince Louis of Wales
+  wikidata_id: Q38668629
+  number_in_line: 4
+  born_iso_date: '2018-04-23'
+  last_modified_iso: '2024-01-25T07:18:00Z'
+  age: 5
+  of_age: false
+  wikidata_url: https://www.wikidata.org/wiki/Q38668629
+- name: Harry Duke of Sussex
+  wikidata_id: Q152316
+  number_in_line: 5
+  born_iso_date: '1984-09-15'
+  last_modified_iso: '2024-01-25T07:18:00Z'
+  age: 39
+  of_age: true
+  wikidata_url: https://www.wikidata.org/wiki/Q152316

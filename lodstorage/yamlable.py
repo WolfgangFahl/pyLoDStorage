@@ -122,7 +122,7 @@ class YamlAble(Generic[T]):
         return cls.from_dict(data)
 
     @classmethod
-    def load_from_file(cls, filename: str) -> T:
+    def load_from_yaml_file(cls, filename: str) -> T:
         """
         Loads a dataclass instance from a YAML file.
         """
@@ -130,7 +130,7 @@ class YamlAble(Generic[T]):
             return cls.from_yaml(file.read())
 
     @classmethod
-    def load_from_url(cls, url: str) -> T:
+    def load_from_yaml_url(cls, url: str) -> T:
         """
         Loads a dataclass instance from a YAML string obtained from a URL.
         """
@@ -140,7 +140,7 @@ class YamlAble(Generic[T]):
             else:
                 raise Exception(f"Unable to load data from URL: {url}")
 
-    def save_to_file(self, filename: str):
+    def save_to_yaml_file(self, filename: str):
         """
         Saves the current dataclass instance to a YAML file.
         """
