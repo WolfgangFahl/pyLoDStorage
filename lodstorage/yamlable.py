@@ -54,10 +54,10 @@ def lod_storable(cls):
     dataclass and has JSON serialization/deserialization
     capabilities.
     """
-    cls = dataclass(cls)  # Apply the @dataclass decorator
-    cls = dataclass_json(cls)  # Apply the @dataclass_json decorator
+    d_cls = dataclass(cls)  # Apply the @dataclass decorator
+    dj_cls = dataclass_json(d_cls)  # Apply the @dataclass_json decorator
 
-    class LoDStorable(YamlAble, cls):
+    class LoDStorable(YamlAble, dj_cls):
         """
         decorator class
         """

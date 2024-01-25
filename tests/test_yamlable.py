@@ -9,9 +9,8 @@ Prompts:
 """
 import os
 import tempfile
-from dataclasses import dataclass
 
-from lodstorage.yamlable import YamlAble,lod_storable
+from lodstorage.yamlable import lod_storable
 from tests.basetest import Basetest
 
 
