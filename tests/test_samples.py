@@ -13,7 +13,7 @@ class TestSamples(Basetest):
     test the samples
     """
     
-    def setUp(self, debug=True, profile=True):
+    def setUp(self, debug=False, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
         self.sample_cases= [
             ("royals",Royals),
@@ -170,3 +170,12 @@ class TestSamples(Basetest):
                 # Load from JSON file
                 loaded_item = sample_class.load_from_json_file(filename)
                 self.check_sample(sample_class, sample_name, name, loaded_item)
+                
+    def test_load_from_yaml_url(self) -> None:
+        """
+        Test loading a dataclass instance from a YAML string obtained from a URL.
+        """
+        # royals
+        royals_url = "https://raw.githubusercontent.com/WolfgangFahl/pyLoDStorage/master/sampledata/royals.yaml"
+        royals = Royals.load_from_yaml_url(royals_url)
+        self.check_sample(Royals,"royals","QE2 heirs up to number in line 5",royals)

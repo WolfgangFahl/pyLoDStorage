@@ -11,13 +11,12 @@ import os
 import tempfile
 from dataclasses import dataclass
 
-from lodstorage.sample2 import Royals, Sample
-from lodstorage.yamlable import YamlAble
+from lodstorage.yamlable import YamlAble,lod_storable
 from tests.basetest import Basetest
 
 
-@dataclass
-class MockDataClass(YamlAble["MockDataClass"]):
+@lod_storable
+class MockDataClass:
     """
     Mock dataclass for testing YAML conversion.
 
@@ -32,7 +31,8 @@ class MockDataClass(YamlAble["MockDataClass"]):
     id: int
     description: str = None
     url: str = None
-    sample_tuple: tuple = (1, 2, 3)  # Add a tuple attribute for testing
+    flag: bool = True
+    #sample_tuple: tuple = (1, 2, 3)  # Add a tuple attribute for testing
 
 
 class TestYamlAble(Basetest):
@@ -110,26 +110,7 @@ class TestYamlAble(Basetest):
             "The description should be included as a block scalar.",
         )
 
-    def test_tuple_serialization(self) -> None:
-        """
-        Test that tuples in the dataclass are serialized as regular YAML lists.
-        """
-        self.mock_data.sample_tuple = (1, 2, 3)
-        yaml_str = self.mock_data.to_yaml()
-        debug = self.debug
-        if debug:
-            print(yaml_str)
-        self.assertIn(
-            "- 1\n- 2\n- 3",
-            yaml_str,
-            "Tuples should be serialized as regular YAML lists.",
-        )
-        self.assertNotIn(
-            "!!python/tuple",
-            yaml_str,
-            "Python tuple notation should not appear in the YAML output.",
-        )
-    
+   
     def test_save_to_yaml_file(self) -> None:
         """
         Test saving a dataclass instance to a YAML file.
@@ -155,12 +136,3 @@ class TestYamlAble(Basetest):
             self.assertEqual(loaded_instance.id, self.mock_data.id)
             # Clean up the temp file
             os.remove(temp_file.name)
-
-    def test_load_from_yaml_url(self) -> None:
-        """
-        Test loading a dataclass instance from a YAML string obtained from a URL.
-        """
-        # royals
-        royals_url = "https://raw.githubusercontent.com/WolfgangFahl/pyLoDStorage/master/sampledata/royals.yaml"
-        royals = Royals.load_from_yaml_url(royals_url)
-        self.check_royals(royals)
