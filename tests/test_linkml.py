@@ -4,7 +4,7 @@ Created on 2024-01-21
 @author: wf
 """
 from lodstorage.linkml_gen import LinkMLGen, Schema
-from lodstorage.sample2 import Sample
+from lodstorage.sample2 import Sample, Royals
 from tests.basetest import Basetest
 
 class TestLinkMLConversion(Basetest):
@@ -37,7 +37,7 @@ class TestLinkMLConversion(Basetest):
         )
         linkml_gen = LinkMLGen(schema)
         # Introspect the data model and generate YAML schema
-        linkml_schema = linkml_gen.gen_schema(royals)
+        linkml_schema = linkml_gen.gen_schema(Royals)
         if debug:
             print(linkml_schema.to_yaml())
         linkml_schema.save_to_yaml_file("/tmp/royals_linkml_schema.yaml")

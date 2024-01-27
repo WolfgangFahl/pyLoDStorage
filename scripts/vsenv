@@ -62,6 +62,18 @@ cat > "$PROJECT_ROOT/.vscode/launch.json" << EOF
             "env": {
                 "PYTHONPATH": "\${workspaceFolder}\${pathSeparator}\${env:PYTHONPATH}"
             }
+        },
+        {
+            "name": "Python: Debug Unittests",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "cwd": "\${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "\${workspaceFolder}\${pathSeparator}\${env:PYTHONPATH}"
+            },
+            "purpose": ["debug-test"],
+            "justMyCode": true
         }
     ]
 }

@@ -5,7 +5,7 @@ Created on 2024-01-21
 """
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, fields, is_dataclass
-from typing import Dict, List
+from typing import Dict, List, Optional, Union
 
 # Import necessary modules
 from dataclasses_json import dataclass_json
@@ -74,7 +74,55 @@ class LinkMLGen:
             dict: "dictionary",
         }
 
-    def gen_schema(self, data_model_instance) -> Schema:
+    def gen_schema(self, data_model_class) -> Schema:
+        # Use DocstringParser to extract class description
+        parser = DocstringParser()
+        class_description, doc_attributes = parser.parse(data_model_class.__doc__)
+
+        class_name = data_model_class.__name__
+        new_class = Class(description=class_description, slots=[])
+
+        # Iterate over the fields of the dataclass
+        for field_info in fields(data_model_class):
+            attr_name = field_info.name
+            attr_type = field_info.type
+
+            # Handle Optional and List types
+            is_optional = False
+            is_list = False
+            content_type = None
+            if hasattr(attr_type, "__origin__"):
+                if attr_type.__origin__ is Union and type(None) in attr_type.__args__:
+                    is_optional = True
+                    attr_type = [t for t in attr_type.__args__ if t is not type(None)][0]  # unwrap Optional type
+                elif attr_type.__origin__ is list:
+                    is_list = True
+                    content_type = attr_type.__args__[0]  # unwrap List type
+                elif attr_type.__origin__ is dict:
+                    # Assuming dictionary values are of interest, keys are strings
+                    content_type = attr_type.__args__[1]  # unwrap Dict type, focusing on value type
+
+            # Map Python type to LinkML type
+            linkml_range = self.get_linkml_range(attr_type)
+
+            # Check and handle nested dataclasses for lists or dicts
+            if is_dataclass(content_type):
+                # Recursive call to handle nested dataclass
+                self.gen_schema(content_type)
+
+            # Extract description from doc_attributes
+            description = doc_attributes.get(attr_name, {}).get("description", f"{attr_name} - missing description")
+
+            # Create a new slot for the field
+            new_slot = Slot(description=description, range=linkml_range, multivalued=is_list)
+            self.schema.slots[attr_name] = new_slot
+            new_class.slots.append(attr_name)
+
+        self.schema.classes[class_name] = new_class
+        return self.schema
+
+
+    def gen_schema_from_instance(self, data_model_instance) -> Schema:
         """
         Generate a LinkML YAML schema from a Python data model using dataclasses.
 
@@ -111,6 +159,13 @@ class LinkMLGen:
                 new_slot = Slot(description=description, range=linkml_range, multivalued=multivalued)
                 self.schema.slots[attr_name] = new_slot
                 new_class.slots.append(attr_name)
+
+            if multivalued:
+                # recursive call if type of list or dict is a dataclass
+                if hasattr(attr_type, "__args__"):
+                    content_type = attr_type.__args__[0]  # Get the declared content type
+                    if is_dataclass(content_type):
+                        self.gen_schema(content_type)
 
         self.schema.classes[class_name] = new_class
         return self.schema
