@@ -102,13 +102,20 @@ class LinkMLGen:
                     # Assuming dictionary values are of interest, keys are strings
                     content_type = attr_type.__args__[1]  # unwrap Dict type, focusing on value type
 
-            # Map Python type to LinkML type
-            linkml_range = self.get_linkml_range(attr_type)
-
             # Check and handle nested dataclasses for lists or dicts
             if is_dataclass(content_type):
                 # Recursive call to handle nested dataclass
                 self.gen_schema(content_type)
+                # Set the range to the name of the dataclass
+                linkml_range = content_type.__name__  # Use the name of the dataclass as the range
+            elif is_list:
+                # If it's a list, get the LinkML range for the base type
+                # Use self.get_linkml_range to ensure consistent type mapping
+                linkml_range = self.get_linkml_range(content_type)
+            else:
+                # For non-list and non-dataclass types, use self.get_linkml_range for consistent type mapping
+                linkml_range = self.get_linkml_range(attr_type)
+                                
 
             # Extract description from doc_attributes
             description = doc_attributes.get(attr_name, {}).get("description", f"{attr_name} - missing description")
