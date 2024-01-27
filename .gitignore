@@ -138,3 +138,4 @@ lib
 plots
 #  Mac OS
 .DS_Store
+.vscode

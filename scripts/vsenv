@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# Stop on first error
+set -e
+
+# Define your project root directory here
+PROJECT_ROOT="$(pwd)"
+VENV_DIR="$PROJECT_ROOT/venv"
+
+echo "Setting up Python virtual environment..."
+# Check if the virtual environment directory exists
+if [ ! -d "$VENV_DIR" ]; then
+    # Create a virtual environment
+    python3 -m venv "$VENV_DIR"
+fi
+
+# Activate the virtual environment
+source "$VENV_DIR/bin/activate"
+
+echo "Installing the project and its dependencies..."
+# Install the project in editable mode along with its dependencies
+pip install -e .
+
+echo "Setting up .env file..."
+# Create or overwrite the .env file
+echo "PYTHONPATH=$PROJECT_ROOT" > "$PROJECT_ROOT/.env"
+
+echo "Setting up VS Code configuration files..."
+# Create .vscode directory if it doesn't exist
+mkdir -p "$PROJECT_ROOT/.vscode"
+
+# Create or overwrite settings.json
+cat > "$PROJECT_ROOT/.vscode/settings.json" << EOF
+{
+    "python.pythonPath": "$VENV_DIR/bin/python",
+    "python.envFile": "\${workspaceFolder}/.env",
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./tests",
+        "-p",
+        "test_*.py"
+    ]
+}
+EOF
+
+# Create or overwrite launch.json
+cat > "$PROJECT_ROOT/.vscode/launch.json" << EOF
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "\${file}",
+            "console": "integratedTerminal",
+            "cwd": "\${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "\${workspaceFolder}\${pathSeparator}\${env:PYTHONPATH}"
+            }
+        }
+    ]
+}
+EOF
+
+echo "Setup complete. Please restart VS Code."
+
