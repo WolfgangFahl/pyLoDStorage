@@ -34,6 +34,7 @@ Prompts for the development and extension of the 'YamlAble' class within the 'ya
     prerequisite behavior to a class    
     
 """
+from collections.abc import Iterable, Mapping
 import urllib.request
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime
@@ -54,10 +55,10 @@ def lod_storable(cls):
     dataclass and has JSON serialization/deserialization
     capabilities.
     """
-    d_cls = dataclass(cls)  # Apply the @dataclass decorator
-    dj_cls = dataclass_json(d_cls)  # Apply the @dataclass_json decorator
+    cls = dataclass(cls)  # Apply the @dataclass decorator
+    cls = dataclass_json(cls)  # Apply the @dataclass_json decorator
 
-    class LoDStorable(YamlAble, dj_cls):
+    class LoDStorable(YamlAble, cls):
         """
         decorator class
         """
@@ -257,8 +258,9 @@ class YamlAble(Generic[T]):
             else:
                 raise Exception(f"Unable to load data from URL: {url}")
 
-    @staticmethod
+    @classmethod
     def remove_ignored_values(
+        cls,
         value: Any, 
         ignore_none: bool = True, 
         ignore_underscore: bool = False,
@@ -272,22 +274,30 @@ class YamlAble(Generic[T]):
             value: The value to process (dictionary, list, or other).
             ignore_none: Flag to indicate whether None values should be removed.
             ignore_underscore: Flag to indicate whether keys starting with an underscore should be removed.
-            ignore_empty: Flag to indicate whether empty lists and empty dictionaries should be removed.
+            ignore_empty: Flag to indicate whether empty collections should be removed.
         """
-        if isinstance(value, dict):
+        def is_valid(v):
+            """Check if the value is valid based on the specified flags."""
+            if ignore_none and v is None:
+                return False
+            if ignore_empty:
+                if isinstance(v, Mapping) and not v:
+                    return False  # Empty dictionary
+                if isinstance(v, Iterable) and not isinstance(v, (str, bytes)) and not v:
+                    return False  # Empty list, set, tuple, etc., but not string or bytes
+            return True
+
+    
+        if isinstance(value, Mapping):
             value = {
                 k: YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore, ignore_empty)
                 for k, v in value.items()
-                if (not ignore_none or v is not None)
-                and (not ignore_underscore or not k.startswith("_"))
-                and (not ignore_empty or v)  # Check for non-empty value
+                if is_valid(v) and (not ignore_underscore or not k.startswith("_"))
             }
-        elif isinstance(value, list):
-            # Remove empty elements from the list, and apply the function recursively
+        elif isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
             value = [
                 YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore, ignore_empty)
-                for v in value
-                if (not ignore_empty or v)  # Check for non-empty value
+                for v in value if is_valid(v)
             ]
         return value
 

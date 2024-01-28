@@ -42,9 +42,11 @@ class TestSamples(Basetest):
             attr_value_expected = getattr(expected_instance, attr_name)
             field_hint = f"{hint}.{attr_name}"  # Field-specific hint
 
-            # Check type equality
+            same_type= type(attr_value_check) == type(attr_value_expected)           # Check type equality
+            if not same_type:
+                pass
             self.assertTrue(
-                type(attr_value_check) == type(attr_value_expected),
+                same_type,
                 f"Type mismatch in {field_hint}: {type(attr_value_check)} ↔ {type(attr_value_expected)}",
             )
 
