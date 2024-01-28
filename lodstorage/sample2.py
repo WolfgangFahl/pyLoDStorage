@@ -55,7 +55,7 @@ class Royal:
         Generates a unique identifier for the Royal instance.
         The identifier is a combination of a slugified name and the Wikidata ID (if available).
         """
-        slugified_name = slugify(self.name, lowercase=False, regex_pattern=r'[^\w\s\-]')
+        slugified_name = slugify(self.name, lowercase=False, regex_pattern=r'[^\w\-]')
         if self.wikidata_id:
             return f"{slugified_name}-{self.wikidata_id}"
         return slugified_name

@@ -28,7 +28,6 @@ class Class:
     """
     Represents a class in the LinkML schema.
     """
-
     description: str
     slots: List[Slot]
     

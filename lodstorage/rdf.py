@@ -4,12 +4,13 @@ Created on 2024-01-27
 @author: wf, using ChatGPT-4 prompting
 """
 from dataclasses import fields
+from collections.abc import Iterable, Mapping
 
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF
 
 from lodstorage.linkml_gen import PythonTypes, Schema
-
+from typing import Any
 
 class RDFDumper:
     """
@@ -51,31 +52,66 @@ class RDFDumper:
             str: The serialized RDF graph.
         """
         return self.graph.serialize(format=rdf_format)
+    
+
+    def value_iterator(self, value: Any):
+        """
+        Iterates over values in a mapping or iterable.
+
+        Args:
+            value: The value to iterate over. It can be a mapping, iterable, or a single value.
+
+        Yields:
+            Tuples of (key, value) from the input value. For single values, key is None.
+        """
+        if isinstance(value, Mapping):
+            yield from value.items()
+        elif isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
+            yield from ((None, v) for v in value)
+        else:
+            yield (None, value)
 
     def process_class(self, class_name: str, instance_data: object):
-        class_obj = self.schema.classes[class_name]
-        class_uri = URIRef(self.namespaces[self.schema.default_prefix][class_name])
-
+        # Get the base namespace URI
+        self.base_uri = self.namespaces[self.schema.default_prefix]
+        # get the class object
+        # class_obj = self.schema.classes[class_name]
+        # Construct class_uri using the namespace and class_name with a separator
+        class_uri = URIRef(f"{self.base_uri}:{class_name}")
+        
         # Create a unique URI or a Blank Node for the instance
-        instance_uri = self.get_instance_uri(class_obj, instance_data)
+        instance_uri = self.get_instance_uri(instance_data)
 
         # Type the instance with its class
         self.graph.add((instance_uri, RDF.type, class_uri))
 
-        # loop over all fields
         for field_info in fields(instance_data):
             slot_name = field_info.name
+            # assure we only work on fields defined
+            # in our schema
             slot_obj = self.schema.slots.get(slot_name)
             if not slot_obj:
                 continue
 
-            field_uri = URIRef(self.namespaces[self.schema.default_prefix][slot_name])
+            # Combine the namespace with the slot name to form the field URI
+            field_uri = URIRef(f"{self.base_uri}:{slot_name}")
             field_value = getattr(instance_data, slot_name, None)
 
-            if field_value is not None:
-                if isinstance(field_value, list):
-                    # Handle multivalued fields
-                    for item in field_value:
+            # Use value_iterator to handle different types of values
+            for key, item in self.value_iterator(field_value):
+                if key is not None:
+                    # Handle as a mapping
+                    key_uri = URIRef(self.namespaces[self.schema.default_prefix][key])
+                    self.graph.add((instance_uri, field_uri, key_uri))
+                    self.graph.add((key_uri, RDF.value, self.convert_to_literal(item, slot_obj)))
+                else:
+                    # Handle as a single value or an item from an iterable
+                    # Check if item has an 'identifier' property
+                    if hasattr(item, 'identifier') and getattr(item, 'identifier'):
+                        item_uri = self.get_instance_uri(item)
+                        self.graph.add((instance_uri, field_uri, item_uri))
+                        self.process_class(item.__class__.__name__, item)
+                    else:
                         self.graph.add(
                             (
                                 instance_uri,
@@ -83,25 +119,15 @@ class RDFDumper:
                                 self.convert_to_literal(item, slot_obj),
                             )
                         )
-                else:
-                    # Handle single valued fields
-                    self.graph.add(
-                        (
-                            instance_uri,
-                            field_uri,
-                            self.convert_to_literal(field_value, slot_obj),
-                        )
-                    )
 
-    def get_instance_uri(self, class_obj, instance_data):
+    def get_instance_uri(self, instance_data):
         """
         Generates a URI for an instance. If the instance has an 'identifier' property, it uses that as part of the URI.
         Otherwise, it generates or retrieves a unique URI.
         """
-        base_uri = self.namespaces[self.schema.default_prefix]
         if hasattr(instance_data, 'identifier') and getattr(instance_data, 'identifier'):
             identifier = getattr(instance_data, 'identifier')
-            return URIRef(f"{base_uri}{identifier}")
+            return URIRef(f"{self.base_uri}:{identifier}")
         else:
             # Fallback to a blank node if no identifier is found
             return BNode()
