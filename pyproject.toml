@@ -29,7 +29,10 @@ dependencies = [
     # https://pypi.org/project/dacite/
     "dacite>=1.8.1",
     # https://pypi.org/project/pyparsing/
-    "pyparsing>=3.1.1"
+    "pyparsing>=3.1.1",
+    # https://github.com/un33k/python-slugify
+	# https://pypi.org/project/python-slugify/
+	"python-slugify>=8.0.1"
 ]
 requires-python = ">=3.9"
 classifiers=[

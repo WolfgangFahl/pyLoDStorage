@@ -20,6 +20,7 @@ class Slot:
     description: str
     range: str = "string"
     multivalued: bool = False
+    identifier: bool = False 
 
 
 @lod_storable

@@ -62,7 +62,7 @@ def lod_storable(cls):
         """
         decorator class
         """
-
+        __qualname__ = cls.__qualname__
         pass
 
     LoDStorable.__name__ = cls.__name__

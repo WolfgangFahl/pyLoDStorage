@@ -40,36 +40,7 @@ class RDFDumper:
         if instance_class in self.schema.classes:
             self.process_class(instance_class, self.instance)
 
-    def process_class(self, class_name: str, instance_data: object):
-        """
-        Processes a single class instance, converting its fields and the corresponding slot data into RDF triples.
-
-        Args:
-            class_name (str): The name of the class being processed.
-            instance_data (object): The instance data corresponding to the class.
-        """
-        class_obj = self.schema.classes[class_name]
-        class_uri = URIRef(self.namespaces[self.schema.default_prefix][class_name])
-
-        for field_info in fields(instance_data):
-            slot_name = field_info.name
-            slot_obj = self.schema.slots.get(slot_name)
-            if not slot_obj:
-                continue
-
-            field_uri = URIRef(self.namespaces[self.schema.default_prefix][slot_name])
-            field_value = getattr(instance_data, slot_name, None)
-
-            if field_value is not None:
-                if isinstance(field_value, list):
-                    # Handle multivalued fields
-                    for item in field_value:
-                        self.graph.add((class_uri, field_uri, Literal(item)))
-                else:
-                    # Handle single valued fields
-                    self.graph.add((class_uri, field_uri, Literal(field_value)))
-
-    def serialize(self, format: str = "turtle") -> str:
+    def serialize(self, rdf_format: str = "turtle") -> str:
         """
         Serializes the RDF graph into a string representation in the specified format.
 
@@ -79,18 +50,19 @@ class RDFDumper:
         Returns:
             str: The serialized RDF graph.
         """
-        return self.graph.serialize(format=format)
+        return self.graph.serialize(format=rdf_format)
 
-    def process_class2(self, class_name: str, instance_data: object):
+    def process_class(self, class_name: str, instance_data: object):
         class_obj = self.schema.classes[class_name]
         class_uri = URIRef(self.namespaces[self.schema.default_prefix][class_name])
 
         # Create a unique URI or a Blank Node for the instance
-        instance_uri = self._get_instance_uri(class_obj, instance_data)
+        instance_uri = self.get_instance_uri(class_obj, instance_data)
 
         # Type the instance with its class
         self.graph.add((instance_uri, RDF.type, class_uri))
 
+        # loop over all fields
         for field_info in fields(instance_data):
             slot_name = field_info.name
             slot_obj = self.schema.slots.get(slot_name)
@@ -108,7 +80,7 @@ class RDFDumper:
                             (
                                 instance_uri,
                                 field_uri,
-                                self._convert_to_literal(item, slot_obj),
+                                self.convert_to_literal(item, slot_obj),
                             )
                         )
                 else:
@@ -117,16 +89,23 @@ class RDFDumper:
                         (
                             instance_uri,
                             field_uri,
-                            self._convert_to_literal(field_value, slot_obj),
+                            self.convert_to_literal(field_value, slot_obj),
                         )
                     )
 
     def get_instance_uri(self, class_obj, instance_data):
         """
-        Generates a URI for an instance. You can modify this to use a field from your data as a unique identifier.
+        Generates a URI for an instance. If the instance has an 'identifier' property, it uses that as part of the URI.
+        Otherwise, it generates or retrieves a unique URI.
         """
-        # Placeholder for generating or retrieving a unique URI
-        return BNode()  # or URIRef("http://example.org/" + unique_identifier)
+        base_uri = self.namespaces[self.schema.default_prefix]
+        if hasattr(instance_data, 'identifier') and getattr(instance_data, 'identifier'):
+            identifier = getattr(instance_data, 'identifier')
+            return URIRef(f"{base_uri}{identifier}")
+        else:
+            # Fallback to a blank node if no identifier is found
+            return BNode()
+
 
     def convert_to_literal(self, value, slot_obj):
         """
