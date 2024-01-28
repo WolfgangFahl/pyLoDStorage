@@ -3,11 +3,13 @@ Created on 2024-01-21
 
 @author: wf
 """
+import json
 from dataclasses import field
 from datetime import date, datetime
 from typing import List, Optional
-import json
+
 from lodstorage.yamlable import DateConvert, lod_storable
+
 
 @lod_storable
 class Royal:
@@ -131,7 +133,8 @@ class Royals:
             )
         }
         return samples
-    
+
+
 @lod_storable
 class Country:
     """
@@ -144,11 +147,13 @@ class Country:
         timezones (List[str]): List of timezones in the country.
         latlng (List[float]): Latitude and longitude of the country.
     """
+
     name: str
     country_code: str
     capital: Optional[str] = None
     timezones: List[str] = field(default_factory=list)
     latlng: List[float] = field(default_factory=list)
+
 
 @lod_storable
 class Countries:
@@ -158,20 +163,21 @@ class Countries:
     Attributes:
         countries (List[Country]): A list of Country instances.
     """
+
     countries: List[Country]
-    
-    @classmethod 
-    def get_countries_erdem(cls)->'Countries':
+
+    @classmethod
+    def get_countries_erdem(cls) -> "Countries":
         """
         get Erdem Ozkol's country list
         """
         countries_json_url = "https://gist.githubusercontent.com/erdem/8c7d26765831d0f9a8c62f02782ae00d/raw/248037cd701af0a4957cce340dabb0fd04e38f4c/countries.json"
-        json_str=cls.read_from_url(countries_json_url)
-        countries_list=json.loads(json_str)
-        countries_dict={"countries": countries_list}
-        instance=cls.from_dict(countries_dict)
+        json_str = cls.read_from_url(countries_json_url)
+        countries_list = json.loads(json_str)
+        countries_dict = {"countries": countries_list}
+        instance = cls.from_dict(countries_dict)
         return instance
-        
+
     @classmethod
     def get_samples(cls) -> dict[str, "Countries"]:
         """
@@ -180,15 +186,13 @@ class Countries:
         requirements management.
 
         Returns:
-            dict: A dictionary with keys as sample names 
+            dict: A dictionary with keys as sample names
             and values as `Countries` instances.
         """
-        samples = {
-            "country list provided by Erdem Ozkol":
-            cls.get_countries_erdem()
-        }
+        samples = {"country list provided by Erdem Ozkol": cls.get_countries_erdem()}
         return samples
-        
+
+
 class Sample:
     """
     Sample dataset provider
@@ -199,11 +203,11 @@ class Sample:
         """
         Get the given sample dataset name
         """
-        samples=None
+        samples = None
         if dataset_name == "royals":
             samples = Royals.get_samples()
         elif dataset_name == "countries":
-            samples=Countries.get_samples()
+            samples = Countries.get_samples()
         else:
             raise ValueError("Unknown dataset name")
         return samples

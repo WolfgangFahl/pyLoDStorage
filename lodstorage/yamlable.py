@@ -203,7 +203,7 @@ class YamlAble(Generic[T]):
         yaml_content: str = self.to_yaml()
         with open(filename, "w") as file:
             file.write(yaml_content)
-            
+
     @classmethod
     def load_from_json_file(cls: Type[T], filename: str) -> T:
         """
@@ -259,7 +259,10 @@ class YamlAble(Generic[T]):
 
     @staticmethod
     def remove_ignored_values(
-        value: Any, ignore_none: bool = True, ignore_underscore: bool = False
+        value: Any, 
+        ignore_none: bool = True, 
+        ignore_underscore: bool = False,
+        ignore_empty: bool = True
     ) -> Any:
         """
         Recursively removes specified types of values from a dictionary or list.
@@ -269,18 +272,22 @@ class YamlAble(Generic[T]):
             value: The value to process (dictionary, list, or other).
             ignore_none: Flag to indicate whether None values should be removed.
             ignore_underscore: Flag to indicate whether keys starting with an underscore should be removed.
+            ignore_empty: Flag to indicate whether empty lists and empty dictionaries should be removed.
         """
         if isinstance(value, dict):
-            return {
-                k: YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore)
+            value = {
+                k: YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore, ignore_empty)
                 for k, v in value.items()
                 if (not ignore_none or v is not None)
                 and (not ignore_underscore or not k.startswith("_"))
+                and (not ignore_empty or v)  # Check for non-empty value
             }
         elif isinstance(value, list):
-            return [
-                YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore)
+            # Remove empty elements from the list, and apply the function recursively
+            value = [
+                YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore, ignore_empty)
                 for v in value
+                if (not ignore_empty or v)  # Check for non-empty value
             ]
         return value
 

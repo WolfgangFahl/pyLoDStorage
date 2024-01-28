@@ -3,52 +3,13 @@ Created on 2024-01-21
 
 @author: wf
 """
-from collections.abc import Iterable, Mapping
-from dataclasses import dataclass, field, fields, is_dataclass
-from typing import Dict, List, Optional, Union
 
-# Import necessary modules
-from dataclasses_json import dataclass_json
+from collections.abc import Iterable, Mapping
+from dataclasses import fields, is_dataclass
+from typing import Union
 
 from lodstorage.docstring_parser import DocstringParser
-from lodstorage.yamlable import lod_storable
-
-@lod_storable
-class Slot:
-    """
-    Represents a slot in the LinkML schema, equivalent to a field or property.
-    """
-
-    description: str
-    range: str = "string"
-    multivalued: bool = False
-
-
-@lod_storable
-class Class:
-    """
-    Represents a class in the LinkML schema.
-    """
-
-    description: str
-    slots: List[Slot]
-
-
-@lod_storable
-class Schema:
-    """
-    Represents the entire LinkML schema.
-    """
-
-    id: str
-    name: str
-    description: str
-    default_prefix: str
-    prefixes: Dict[str, str] = field(default_factory=dict)
-    imports: List[str] = field(default_factory=list)
-    default_range: str = "string"
-    classes: Dict[str, Class] = field(default_factory=dict)
-    slots: Dict[str, Slot] = field(default_factory=dict)
+from lodstorage.linkml import Class, PythonTypes, Schema, Slot
 
 
 class LinkMLGen:
@@ -64,15 +25,6 @@ class LinkMLGen:
             schema (Schema): The LinkML schema to be generated.
         """
         self.schema = schema
-        # Define a mapping from Python types to LinkML ranges
-        self.python_to_linkml_ranges = {
-            str: "string",
-            int: "integer",
-            float: "float",
-            bool: "boolean",
-            list: "list",
-            dict: "dictionary",
-        }
 
     def gen_schema(self, data_model_class) -> Schema:
         # Use DocstringParser to extract class description
@@ -94,40 +46,48 @@ class LinkMLGen:
             if hasattr(attr_type, "__origin__"):
                 if attr_type.__origin__ is Union and type(None) in attr_type.__args__:
                     is_optional = True
-                    attr_type = [t for t in attr_type.__args__ if t is not type(None)][0]  # unwrap Optional type
+                    attr_type = [t for t in attr_type.__args__ if t is not type(None)][
+                        0
+                    ]  # unwrap Optional type
                 elif attr_type.__origin__ is list:
                     is_list = True
                     content_type = attr_type.__args__[0]  # unwrap List type
                 elif attr_type.__origin__ is dict:
                     # Assuming dictionary values are of interest, keys are strings
-                    content_type = attr_type.__args__[1]  # unwrap Dict type, focusing on value type
+                    content_type = attr_type.__args__[
+                        1
+                    ]  # unwrap Dict type, focusing on value type
 
             # Check and handle nested dataclasses for lists or dicts
             if is_dataclass(content_type):
                 # Recursive call to handle nested dataclass
                 self.gen_schema(content_type)
                 # Set the range to the name of the dataclass
-                linkml_range = content_type.__name__  # Use the name of the dataclass as the range
+                linkml_range = (
+                    content_type.__name__
+                )  # Use the name of the dataclass as the range
             elif is_list:
                 # If it's a list, get the LinkML range for the base type
                 # Use self.get_linkml_range to ensure consistent type mapping
-                linkml_range = self.get_linkml_range(content_type)
+                linkml_range = PythonTypes.get_linkml_range(content_type)
             else:
                 # For non-list and non-dataclass types, use self.get_linkml_range for consistent type mapping
-                linkml_range = self.get_linkml_range(attr_type)
-                                
+                linkml_range = PythonTypes.get_linkml_range(attr_type)
 
             # Extract description from doc_attributes
-            description = doc_attributes.get(attr_name, {}).get("description", f"{attr_name} - missing description")
+            description = doc_attributes.get(attr_name, {}).get(
+                "description", f"{attr_name} - missing description"
+            )
 
             # Create a new slot for the field
-            new_slot = Slot(description=description, range=linkml_range, multivalued=is_list)
+            new_slot = Slot(
+                description=description, range=linkml_range, multivalued=is_list
+            )
             self.schema.slots[attr_name] = new_slot
             new_class.slots.append(attr_name)
 
         self.schema.classes[class_name] = new_class
         return self.schema
-
 
     def gen_schema_from_instance(self, data_model_instance) -> Schema:
         """
@@ -151,39 +111,45 @@ class LinkMLGen:
             attr_type = field_info.type
 
             # Extract field type/range
-            linkml_range = self.get_linkml_range(attr_type)
+            linkml_range = PythonTypes.get_linkml_range(attr_type)
 
             # Check values for multivalued and type consistency
             attr_value = getattr(data_model_instance, attr_name)
             multivalued, actual_type = self.check_value(attr_value)
 
             # Ensure documentation, declaration, and value type are consistent
-            self.ensure_consistency(attr_name, linkml_range, actual_type, doc_attributes)
+            self.ensure_consistency(
+                attr_name, linkml_range, actual_type, doc_attributes
+            )
 
             # Prepare slot
-            description = doc_attributes.get(attr_name, {}).get("description", f"{attr_name} - missing description")
+            description = doc_attributes.get(attr_name, {}).get(
+                "description", f"{attr_name} - missing description"
+            )
             if attr_name not in self.schema.slots:
-                new_slot = Slot(description=description, range=linkml_range, multivalued=multivalued)
+                new_slot = Slot(
+                    description=description, range=linkml_range, multivalued=multivalued
+                )
                 self.schema.slots[attr_name] = new_slot
                 new_class.slots.append(attr_name)
 
             if multivalued:
                 # recursive call if type of list or dict is a dataclass
                 if hasattr(attr_type, "__args__"):
-                    content_type = attr_type.__args__[0]  # Get the declared content type
+                    content_type = attr_type.__args__[
+                        0
+                    ]  # Get the declared content type
                     if is_dataclass(content_type):
                         self.gen_schema(content_type)
 
         self.schema.classes[class_name] = new_class
         return self.schema
 
-    def get_linkml_range(self, attr_type):
-        # Method to determine the LinkML range from attribute type
-        return self.python_to_linkml_ranges.get(attr_type, "string")
-
     def check_value(self, value):
         # Method to check if the value is multivalued and determine its type
-        multivalued = isinstance(value, (Iterable, Mapping)) and not isinstance(value, (str, bytes))
+        multivalued = isinstance(value, (Iterable, Mapping)) and not isinstance(
+            value, (str, bytes)
+        )
         value_type = type(value).__name__
         return multivalued, value_type
 
@@ -191,16 +157,17 @@ class LinkMLGen:
         # Adjust this method to handle complex types like list, dict, etc.
 
         # Check if the actual type is a list or dict, and if so, get the type of its elements
-        if actual_type == 'list' or actual_type == 'dict':
+        if actual_type == "list" or actual_type == "dict":
             # You may need a more complex logic here to handle lists of custom dataclasses
             # For simplicity, let's assume it's a list of strings for now
-            actual_type = 'string'
+            actual_type = "string"
 
         # Now compare the adjusted actual type with the declared type
         if declared_type != actual_type:
-            raise ValueError(f"Type mismatch for '{name}': declared as '{declared_type}', actual type is '{actual_type}'")
+            raise ValueError(
+                f"Type mismatch for '{name}': declared as '{declared_type}', actual type is '{actual_type}'"
+            )
 
         # Check for documentation
         if name not in doc_attributes:
             raise ValueError(f"Missing documentation for field '{name}'")
-

@@ -31,7 +31,7 @@ class MockDataClass:
     description: str = None
     url: str = None
     flag: bool = True
-    #sample_tuple: tuple = (1, 2, 3)  # Add a tuple attribute for testing
+    # sample_tuple: tuple = (1, 2, 3)  # Add a tuple attribute for testing
 
 
 class TestYamlAble(Basetest):
@@ -109,7 +109,6 @@ class TestYamlAble(Basetest):
             "The description should be included as a block scalar.",
         )
 
-   
     def test_save_to_yaml_file(self) -> None:
         """
         Test saving a dataclass instance to a YAML file.
