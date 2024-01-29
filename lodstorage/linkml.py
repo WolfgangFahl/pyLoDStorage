@@ -20,7 +20,7 @@ class Slot:
     description: str
     range: str = "string"
     multivalued: bool = False
-    identifier: bool = False 
+    identifier: bool = False
 
 
 @lod_storable
@@ -28,14 +28,17 @@ class Class:
     """
     Represents a class in the LinkML schema.
     """
+
     description: str
     slots: List[Slot]
-    
+
+
 @lod_storable
 class Type:
     """
     Represents a type in the LinkML schema.
     """
+
     uri: str
     base: str
     description: Optional[str]
@@ -44,7 +47,7 @@ class Type:
     close_mappings: Optional[List[str]] = field(default_factory=list)
     broad_mappings: Optional[List[str]] = field(default_factory=list)
     mappings: Optional[str] = field(init=False, default=None, repr=False)
-    
+
     def __post_init__(self):
         # Take the first item from exact_mappings, close_mappings, or broad_mappings, in that order
         if self.exact_mappings:
@@ -60,15 +63,16 @@ class Schema:
     """
     Represents the entire LinkML schema.
     """
+
     name: str
     id: str
     description: str
     title: Optional[str] = None
     version: Optional[str] = None
     license: Optional[str] = None
-    
+
     default_prefix: Optional[str] = None
-    
+
     prefixes: Dict[str, str] = field(default_factory=dict)
     imports: List[str] = field(default_factory=list)
     default_range: str = "string"
@@ -79,6 +83,7 @@ class Schema:
     def __post_init__(self):
         if not self.title:
             self.title = self.name
+
 
 class PythonTypes:
     """

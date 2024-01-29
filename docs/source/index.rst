@@ -1,5 +1,5 @@
 .. pyLoDStorage documentation master file, created by
-   sphinx-quickstart on Mon Jun 20 07:21:06 2022.
+   sphinx-quickstart on Mon Jan 29 06:44:02 2024.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -10,8 +10,8 @@ Welcome to pyLoDStorage's documentation!
    :maxdepth: 4
    :caption: Contents:
 
+   lodstorage
    sampledata
-   setup
    tests
 
 

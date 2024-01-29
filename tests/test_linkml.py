@@ -22,7 +22,7 @@ class TestLinkMLConversion(Basetest):
         royals_samples = Sample.get("royals")
         self.royals = list(royals_samples.values())[0]
         pass
-     
+
     def get_linkml_schema(self):
         """
         get the example Royals LinkML schema
@@ -83,7 +83,7 @@ class TestLinkMLConversion(Basetest):
         """
         test the LinkML Schema driven RDF Dumper
         """
-        
+
         linkml_schema = self.get_linkml_schema()
 
         # Step 1: Instantiate RDFDumper with the generated schema and a sample instance

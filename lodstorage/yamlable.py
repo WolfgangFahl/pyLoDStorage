@@ -34,8 +34,8 @@ Prompts for the development and extension of the 'YamlAble' class within the 'ya
     prerequisite behavior to a class    
     
 """
-from collections.abc import Iterable, Mapping
 import urllib.request
+from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime
 from typing import Any, Generic, Type, TypeVar
@@ -62,6 +62,7 @@ def lod_storable(cls):
         """
         decorator class
         """
+
         __qualname__ = cls.__qualname__
         pass
 
@@ -261,10 +262,10 @@ class YamlAble(Generic[T]):
     @classmethod
     def remove_ignored_values(
         cls,
-        value: Any, 
-        ignore_none: bool = True, 
+        value: Any,
+        ignore_none: bool = True,
         ignore_underscore: bool = False,
-        ignore_empty: bool = True
+        ignore_empty: bool = True,
     ) -> Any:
         """
         Recursively removes specified types of values from a dictionary or list.
@@ -276,6 +277,7 @@ class YamlAble(Generic[T]):
             ignore_underscore: Flag to indicate whether keys starting with an underscore should be removed.
             ignore_empty: Flag to indicate whether empty collections should be removed.
         """
+
         def is_valid(v):
             """Check if the value is valid based on the specified flags."""
             if ignore_none and v is None:
@@ -283,21 +285,31 @@ class YamlAble(Generic[T]):
             if ignore_empty:
                 if isinstance(v, Mapping) and not v:
                     return False  # Empty dictionary
-                if isinstance(v, Iterable) and not isinstance(v, (str, bytes)) and not v:
-                    return False  # Empty list, set, tuple, etc., but not string or bytes
+                if (
+                    isinstance(v, Iterable)
+                    and not isinstance(v, (str, bytes))
+                    and not v
+                ):
+                    return (
+                        False  # Empty list, set, tuple, etc., but not string or bytes
+                    )
             return True
 
-    
         if isinstance(value, Mapping):
             value = {
-                k: YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore, ignore_empty)
+                k: YamlAble.remove_ignored_values(
+                    v, ignore_none, ignore_underscore, ignore_empty
+                )
                 for k, v in value.items()
                 if is_valid(v) and (not ignore_underscore or not k.startswith("_"))
             }
         elif isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
             value = [
-                YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore, ignore_empty)
-                for v in value if is_valid(v)
+                YamlAble.remove_ignored_values(
+                    v, ignore_none, ignore_underscore, ignore_empty
+                )
+                for v in value
+                if is_valid(v)
             ]
         return value
 

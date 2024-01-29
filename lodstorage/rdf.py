@@ -3,14 +3,15 @@ Created on 2024-01-27
 
 @author: wf, using ChatGPT-4 prompting
 """
-from dataclasses import fields
 from collections.abc import Iterable, Mapping
+from dataclasses import fields
+from typing import Any
 
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF
 
 from lodstorage.linkml_gen import PythonTypes, Schema
-from typing import Any
+
 
 class RDFDumper:
     """
@@ -52,7 +53,6 @@ class RDFDumper:
             str: The serialized RDF graph.
         """
         return self.graph.serialize(format=rdf_format)
-    
 
     def value_iterator(self, value: Any):
         """
@@ -78,14 +78,14 @@ class RDFDumper:
         # class_obj = self.schema.classes[class_name]
         # Construct class_uri using the namespace and class_name with a separator
         class_uri = URIRef(f"{self.base_uri}:{class_name}")
-        
+
         # Create a unique URI or a Blank Node for the instance
         instance_uri = self.get_instance_uri(instance_data)
 
         # Type the instance with its class
         self.graph.add((instance_uri, RDF.type, class_uri))
 
-        #loop over all fieds of the instance data
+        # loop over all fieds of the instance data
         for field_info in fields(instance_data):
             slot_name = field_info.name
             # assure we only work on fields defined
@@ -104,11 +104,13 @@ class RDFDumper:
                     # Handle as a mapping
                     key_uri = URIRef(self.namespaces[self.schema.default_prefix][key])
                     self.graph.add((instance_uri, field_uri, key_uri))
-                    self.graph.add((key_uri, RDF.value, self.convert_to_literal(item, slot_obj)))
+                    self.graph.add(
+                        (key_uri, RDF.value, self.convert_to_literal(item, slot_obj))
+                    )
                 else:
                     # Handle as a single value or an item from an iterable
                     # Check if item has an 'identifier' property
-                    if hasattr(item, 'identifier') and getattr(item, 'identifier'):
+                    if hasattr(item, "identifier") and getattr(item, "identifier"):
                         item_uri = self.get_instance_uri(item)
                         self.graph.add((instance_uri, field_uri, item_uri))
                         self.process_class(item.__class__.__name__, item)
@@ -126,13 +128,14 @@ class RDFDumper:
         Generates a URI for an instance. If the instance has an 'identifier' property, it uses that as part of the URI.
         Otherwise, it generates or retrieves a unique URI.
         """
-        if hasattr(instance_data, 'identifier') and getattr(instance_data, 'identifier'):
-            identifier = getattr(instance_data, 'identifier')
+        if hasattr(instance_data, "identifier") and getattr(
+            instance_data, "identifier"
+        ):
+            identifier = getattr(instance_data, "identifier")
             return URIRef(f"{self.base_uri}:{identifier}")
         else:
             # Fallback to a blank node if no identifier is found
             return BNode()
-
 
     def convert_to_literal(self, value, slot_obj):
         """

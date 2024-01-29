@@ -7,7 +7,9 @@ import json
 from dataclasses import field
 from datetime import date, datetime
 from typing import List, Optional
+
 from slugify import slugify
+
 from lodstorage.yamlable import DateConvert, lod_storable
 
 
@@ -27,6 +29,7 @@ class Royal:
         of_age (Optional[bool]): Indicates whether the member is of legal age.
         wikidata_url (Optional[str]): URL to the Wikidata page of the member.
     """
+
     name: str
     wikidata_id: str
     number_in_line: Optional[int] = None
@@ -50,16 +53,16 @@ class Royal:
             self.wikidata_url = f"https://www.wikidata.org/wiki/{self.wikidata_id}"
 
     @property
-    def identifier(self)->str:
+    def identifier(self) -> str:
         """
         Generates a unique identifier for the Royal instance.
         The identifier is a combination of a slugified name and the Wikidata ID (if available).
         """
-        slugified_name = slugify(self.name, lowercase=False, regex_pattern=r'[^\w\-]')
+        slugified_name = slugify(self.name, lowercase=False, regex_pattern=r"[^\w\-]")
         if self.wikidata_id:
             return f"{slugified_name}-{self.wikidata_id}"
         return slugified_name
-        
+
     @property
     def born(self) -> date:
         """Return the date of birth from the ISO date string."""

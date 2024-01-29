@@ -84,6 +84,30 @@ tests.test\_csv module
    :undoc-members:
    :show-inheritance:
 
+tests.test\_docstring\_parser module
+------------------------------------
+
+.. automodule:: tests.test_docstring_parser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_linkml module
+-------------------------
+
+.. automodule:: tests.test_linkml
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_linkml\_schema module
+---------------------------------
+
+.. automodule:: tests.test_linkml_schema
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tests.test\_lod module
 ----------------------
 
@@ -96,6 +120,38 @@ tests.test\_queries module
 --------------------------
 
 .. automodule:: tests.test_queries
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_rdf module
+----------------------
+
+.. automodule:: tests.test_rdf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_samples module
+--------------------------
+
+.. automodule:: tests.test_samples
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_sync module
+-----------------------
+
+.. automodule:: tests.test_sync
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_yamlable module
+---------------------------
+
+.. automodule:: tests.test_yamlable
    :members:
    :undoc-members:
    :show-inheritance:

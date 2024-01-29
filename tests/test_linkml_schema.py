@@ -3,9 +3,11 @@ Created on 2024-01-28
 
 @author: wf
 """
-from tests.basetest import Basetest
-from lodstorage.linkml import Schema
 import json
+
+from lodstorage.linkml import Schema
+from tests.basetest import Basetest
+
 
 class TestLinkMLSchema(Basetest):
     """
@@ -17,8 +19,8 @@ class TestLinkMLSchema(Basetest):
         test reading official LinkML types
         """
         uri = "https://raw.githubusercontent.com/linkml/linkml-runtime/main/linkml_runtime/linkml_model/model/schema/types.yaml"
-        schema=Schema.load_from_yaml_url(uri)
-        debug=True
+        schema = Schema.load_from_yaml_url(uri)
+        debug = True
         if debug:
-            print(json.dumps(schema.to_dict(),indent=2,default=str))
+            print(json.dumps(schema.to_dict(), indent=2, default=str))
             print(schema.to_yaml())

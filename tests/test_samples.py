@@ -42,7 +42,9 @@ class TestSamples(Basetest):
             attr_value_expected = getattr(expected_instance, attr_name)
             field_hint = f"{hint}.{attr_name}"  # Field-specific hint
 
-            same_type= type(attr_value_check) == type(attr_value_expected)           # Check type equality
+            same_type = type(attr_value_check) == type(
+                attr_value_expected
+            )  # Check type equality
             if not same_type:
                 pass
             self.assertTrue(
@@ -140,7 +142,7 @@ class TestSamples(Basetest):
                 yaml_str = original_item.to_yaml()
                 # Optional: Print the YAML string in debug mode
                 debug = self.debug
-                debug=True
+                debug = True
                 if debug:
                     print(f"Original YAML String for {sample_name}/{name}:")
                     print(yaml_str)
