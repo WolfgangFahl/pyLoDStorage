@@ -30,7 +30,7 @@ class TestSPARQL(Basetest):
            typedLiterals(boolean): True if INSERT DATA SPARQL commands should use typed literals
            profile(boolean): True if profile/timing information should be shown
         """
-        endpoint = "http://localhost:3030/example"
+        endpoint = "http://localhost:3030/example/sparql"
         jena = SPARQL(
             endpoint,
             mode=mode,
