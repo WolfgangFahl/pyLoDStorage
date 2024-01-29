@@ -85,6 +85,7 @@ class RDFDumper:
         # Type the instance with its class
         self.graph.add((instance_uri, RDF.type, class_uri))
 
+        #loop over all fieds of the instance data
         for field_info in fields(instance_data):
             slot_name = field_info.name
             # assure we only work on fields defined

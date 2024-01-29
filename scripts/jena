@@ -2,7 +2,7 @@
 # WF 2020-06-25
 # Jena Fuseki server installation
 # see https://jena.apache.org/documentation/fuseki2/fuseki-run.html
-version=3.17.0
+version=4.9.0
 fuseki=apache-jena-fuseki-$version
 jena=apache-jena-$version
 
