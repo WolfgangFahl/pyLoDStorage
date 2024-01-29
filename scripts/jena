@@ -157,6 +157,21 @@ backup() {
   $tdbbackup --loc $dataPath
 }
 
+#
+# clear the data directory
+#
+clearData() {
+  # remove the data directory if it exists
+  if [ -d data ]
+  then
+     color_msg $blue "removing data directory"
+     rm -rf data
+  else
+     color_msg $green "data directory does not exist yet"
+     color_msg $blue "creating data directory"
+     mkdir data
+  fi
+}
 # set operating system specific environment variables
 os=$(uname)
 case $os in
@@ -165,7 +180,7 @@ case $os in
     sudo="sudo"
   ;;
   Darwin)
-    pkill="pkill -fla"
+    pkill="pkill -fl"
     sudo=""
     ;;
   *)
@@ -179,6 +194,9 @@ do
   case $option in
     -b|--backup)
       backup
+      ;;
+    -c|--clear)
+      clearData
       ;;
     -f|--fuseki)
       shift

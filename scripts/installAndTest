@@ -1,11 +1,13 @@
 #!/bin/bash
 # WF 2021-06-12
 # install and test
+# kill running jena
+scripts/jena -k
+# remove the data directory if it exists
+scripts/jena -c
 # install apache jena and load example data
 scripts/jena -l sampledata/example.ttl
 # command to run tests
-# kill running jena
-scripts/jena -k
 # run apache jena fuseki server
 scripts/jena -f example
 # command to install dependencies
