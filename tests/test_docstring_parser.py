@@ -35,7 +35,7 @@ class TestDocstringParser(Basetest):
         parser = DocstringParser()
         class_description, attributes = parser.parse(docstring)
         debug = self.debug
-        debug = True
+        #debug = True
         if debug:
             print(class_description)
             print(json.dumps(attributes, indent=2))

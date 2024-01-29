@@ -28,7 +28,7 @@ class TestLinkMLConversion(Basetest):
         get the example Royals LinkML schema
         """
         debug = self.debug
-        debug = True
+        #debug = True
         schema = Schema(
             id="http://royal-family.bitplan.com",
             name="royals",
@@ -94,7 +94,7 @@ class TestLinkMLConversion(Basetest):
 
         # Step 3: Serialize the RDF graph for debugging or saving
         rdf_output = rdf_dumper.serialize()
-        debug = True
+        #debug = True
         if debug:
             print(rdf_output)
         # Optionally, save the RDF graph to a file
