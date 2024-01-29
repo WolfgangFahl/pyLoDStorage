@@ -182,8 +182,8 @@ case $os in
     sudo="sudo"
   ;;
   Darwin)
-    pkill="pkill -fl"
-    pgrep="pgrep -fl"
+    pkill="pkill -f"
+    pgrep="pgrep -f"
     sudo=""
     ;;
   *)
