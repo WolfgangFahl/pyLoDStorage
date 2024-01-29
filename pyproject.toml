@@ -13,7 +13,8 @@ maintainers = [
 readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
-    "SPARQLWrapper>=2.0.0",
+    #"SPARQLWrapper>=2.0.0",
+    "SPARQLWrapper==1.8.5",
     "PyYAML",
     "pandas",
     # beware of https://github.com/matplotlib/matplotlib/issues/26827

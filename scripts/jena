@@ -64,6 +64,7 @@ usage() {
   echo "$0 [-b|--backup|-f|--fuseki|-h|--help|-k|--kill|-l|--load]"
   echo ""
   echo "-b | --backup: create a backup"
+  echo "-c | --clear: clear data directory"
   echo "-f | --fuseki [dataset]: download and start fuseki server with the given dataset"
   echo "-h | --help: show this usage"
   echo "-k | --kill: kill the running fuseki server"
