@@ -370,7 +370,8 @@ class TestTrulyTabular(unittest.TestCase):
                     #
                     itemCount, _itemCountQuery = tt.count()
                     statsRow = tt.genWdPropertyStatistic(wdProperty, itemCount)
-                    print(json.dumps(statsRow, indent=2))
+                    if debug:
+                        print(json.dumps(statsRow, indent=2))
             except (Exception, HTTPError) as ex:
                 self.handleEndpointErrors(ex, endpointConf, "405", "Method not allowed")
 
