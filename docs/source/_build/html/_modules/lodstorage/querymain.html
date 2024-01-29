@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.querymain &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.querymain</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2022-02-13</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">lodstorage.version</span> <span class="kn">import</span> <span class="n">Version</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="n">Version</span><span class="o">.</span><span class="n">version</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="n">Version</span><span class="o">.</span><span class="n">date</span>
+<span class="n">__updated__</span> <span class="o">=</span> <span class="n">Version</span><span class="o">.</span><span class="n">updated</span>
+
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">RawDescriptionHelpFormatter</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">lodstorage.csv</span> <span class="kn">import</span> <span class="n">CSV</span>
+<span class="kn">from</span> <span class="nn">lodstorage.query</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Endpoint</span><span class="p">,</span>
+    <span class="n">EndpointManager</span><span class="p">,</span>
+    <span class="n">Format</span><span class="p">,</span>
+    <span class="n">Query</span><span class="p">,</span>
+    <span class="n">QueryManager</span><span class="p">,</span>
+    <span class="n">ValueFormatter</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sparql</span> <span class="kn">import</span> <span class="n">SPARQL</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sql</span> <span class="kn">import</span> <span class="n">SQLDB</span>
+<span class="kn">from</span> <span class="nn">lodstorage.xml</span> <span class="kn">import</span> <span class="n">Lod2Xml</span>
+
+
+<div class="viewcode-block" id="QueryMain">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.querymain.QueryMain">[docs]</a>
+<span class="k">class</span> <span class="nc">QueryMain</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Commandline handler</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="QueryMain.main">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.querymain.QueryMain.main">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        command line activation with parsed args</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args(list): the command line arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">debug</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">debug</span>
+        <span class="n">endpoints</span> <span class="o">=</span> <span class="n">EndpointManager</span><span class="o">.</span><span class="n">getEndpoints</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">endpointPath</span><span class="p">)</span>
+        <span class="n">qm</span> <span class="o">=</span> <span class="n">QueryManager</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span> <span class="n">queriesPath</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">queriesPath</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">queryCode</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">query</span>
+        <span class="n">formats</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># preload ValueFormatter</span>
+        <span class="n">ValueFormatter</span><span class="o">.</span><span class="n">getFormats</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">formatsPath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">qm</span><span class="o">.</span><span class="n">queriesByName</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">listEndpoints</span><span class="p">:</span>
+            <span class="c1"># list endpoints</span>
+            <span class="k">for</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">endpoints</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="s2">&quot;lang&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">lang</span> <span class="o">==</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">endpoint</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">queryName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">showQuery</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;named query </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">queryName</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">queryName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qm</span><span class="o">.</span><span class="n">queriesByName</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;named query </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">queryName</span><span class="si">}</span><span class="s2"> not available&quot;</span><span class="p">)</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">qm</span><span class="o">.</span><span class="n">queriesByName</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">queryName</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">limit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">query</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">limit</span>
+            <span class="n">formats</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">formats</span>
+            <span class="n">queryCode</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">query</span>
+            <span class="k">if</span> <span class="n">debug</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">showQuery</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">query</span><span class="o">.</span><span class="n">description</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span>
+            <span class="k">if</span> <span class="n">queryCode</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">queryFile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">queryFilePath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">queryFile</span><span class="p">)</span>
+                <span class="n">queryCode</span> <span class="o">=</span> <span class="n">queryFilePath</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">queryFilePath</span><span class="o">.</span><span class="n">stem</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">queryCode</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">queryCode</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">showQuery</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{</span><span class="n">queryCode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">endpointConf</span> <span class="o">=</span> <span class="n">Endpoint</span><span class="p">()</span>
+            <span class="n">endpointConf</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;POST&quot;</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">endpointName</span><span class="p">:</span>
+                <span class="n">endpointConf</span> <span class="o">=</span> <span class="n">endpoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">endpointName</span><span class="p">)</span>
+                <span class="n">query</span><span class="o">.</span><span class="n">tryItUrl</span> <span class="o">=</span> <span class="n">endpointConf</span><span class="o">.</span><span class="n">website</span>
+                <span class="n">query</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">endpointConf</span><span class="o">.</span><span class="n">database</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">endpointConf</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">endpoint</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
+                <span class="n">endpointConf</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span>
+            <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">limit</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;limit&quot;</span> <span class="ow">in</span> <span class="n">queryCode</span> <span class="ow">or</span> <span class="s2">&quot;LIMIT&quot;</span> <span class="ow">in</span> <span class="n">queryCode</span><span class="p">:</span>
+                    <span class="n">queryCode</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                        <span class="sa">r</span><span class="s2">&quot;(limit|LIMIT)\s+(\d+)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;LIMIT </span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">limit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">queryCode</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">queryCode</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">LIMIT </span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">limit</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s2">&quot;sparql&quot;</span><span class="p">:</span>
+                <span class="n">sparql</span> <span class="o">=</span> <span class="n">SPARQL</span><span class="o">.</span><span class="n">fromEndpointConf</span><span class="p">(</span><span class="n">endpointConf</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">prefixes</span> <span class="ow">and</span> <span class="n">endpointConf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">queryCode</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpointConf</span><span class="o">.</span><span class="n">prefixes</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">queryCode</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">raw</span><span class="p">:</span>
+                    <span class="n">qres</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">rawQuery</span><span class="p">(</span>
+                        <span class="n">endpointConf</span><span class="p">,</span>
+                        <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">,</span>
+                        <span class="n">resultFormat</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+                        <span class="n">mimeType</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mimeType</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">qres</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="k">if</span> <span class="s2">&quot;wikidata&quot;</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">endpointName</span> <span class="ow">and</span> <span class="n">formats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">formats</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;*:wikidata&quot;</span><span class="p">]</span>
+                <span class="n">qlod</span> <span class="o">=</span> <span class="n">sparql</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">queryCode</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s2">&quot;sql&quot;</span><span class="p">:</span>
+                <span class="n">sqlDB</span> <span class="o">=</span> <span class="n">SQLDB</span><span class="p">(</span><span class="n">endpointConf</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+                <span class="n">qlod</span> <span class="o">=</span> <span class="n">sqlDB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">queryCode</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;language </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s2"> not known/supported&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="n">Format</span><span class="o">.</span><span class="n">csv</span><span class="p">:</span>
+                <span class="n">csv</span> <span class="o">=</span> <span class="n">CSV</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="n">qlod</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Format</span><span class="o">.</span><span class="n">latex</span><span class="p">,</span> <span class="n">Format</span><span class="o">.</span><span class="n">github</span><span class="p">,</span> <span class="n">Format</span><span class="o">.</span><span class="n">mediawiki</span><span class="p">]:</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">documentQueryResult</span><span class="p">(</span>
+                    <span class="n">qlod</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">),</span> <span class="n">floatfmt</span><span class="o">=</span><span class="s2">&quot;.0f&quot;</span>
+                <span class="p">)</span>
+                <span class="n">docstr</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">asText</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">docstr</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Format</span><span class="o">.</span><span class="n">json</span><span class="p">]</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># set as default</span>
+                <span class="c1"># https://stackoverflow.com/a/36142844/1497139</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">qlod</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Format</span><span class="o">.</span><span class="n">xml</span><span class="p">]:</span>
+                <span class="n">lod2xml</span> <span class="o">=</span> <span class="n">Lod2Xml</span><span class="p">(</span><span class="n">qlod</span><span class="p">)</span>
+                <span class="n">xml</span> <span class="o">=</span> <span class="n">lod2xml</span><span class="o">.</span><span class="n">asXml</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;format </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2"> not supported yet&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryMain.rawQuery">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.querymain.QueryMain.rawQuery">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rawQuery</span><span class="p">(</span><span class="n">endpointConf</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">resultFormat</span><span class="p">,</span> <span class="n">mimeType</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns raw result of the endpoint</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            endpointConf: EndPoint</span>
+<span class="sd">            query(str): query</span>
+<span class="sd">            resultFormat(str): format of the result</span>
+<span class="sd">            mimeType(str): mimeType</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            raw result of the query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="n">resultFormat</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">mimeType</span><span class="p">:</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">mimeType</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpointConf</span><span class="o">.</span><span class="n">endpoint</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">endpointConf</span><span class="o">.</span><span class="n">method</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+            <span class="n">method</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="mainSQL">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.querymain.mainSQL">[docs]</a>
+<span class="k">def</span> <span class="nf">mainSQL</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    commandline for SQL queries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;sql&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="mainSPARQL">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.querymain.mainSPARQL">[docs]</a>
+<span class="k">def</span> <span class="nf">mainSPARQL</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    commandline for SPARQL queries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;sparql&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.querymain.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># IGNORE:C0111</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    main program.</span>
+
+<span class="sd">    commandline access to List of Dicts / Linked Open Data Queries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">argv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">program_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">program_version</span> <span class="o">=</span> <span class="s2">&quot;v</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">__version__</span>
+    <span class="n">program_build_date</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">__updated__</span><span class="p">)</span>
+    <span class="n">program_version_message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%%</span><span class="s2">(prog)s </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">program_version</span><span class="p">,</span>
+        <span class="n">program_build_date</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">program_shortdesc</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;commandline query of endpoints in diverse languages such as SPARQL/SQL&quot;</span>
+    <span class="p">)</span>
+    <span class="n">user_name</span> <span class="o">=</span> <span class="s2">&quot;Wolfgang Fahl&quot;</span>
+    <span class="n">program_license</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="si">%s</span>
+
+<span class="s2">  Created by </span><span class="si">%s</span><span class="s2"> on </span><span class="si">%s</span><span class="s2">.</span>
+<span class="s2">  Copyright 2020-2023 Wolfgang Fahl. All rights reserved.</span>
+
+<span class="s2">  Licensed under the Apache License 2.0</span>
+<span class="s2">  http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="s2">  Distributed on an &quot;AS IS&quot; basis without warranties</span>
+<span class="s2">  or conditions of any kind, either express or implied.</span>
+
+<span class="s2">USAGE</span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">program_shortdesc</span><span class="p">,</span>
+        <span class="n">user_name</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">__date__</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Setup argument parser</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">program_license</span><span class="p">,</span> <span class="n">formatter_class</span><span class="o">=</span><span class="n">RawDescriptionHelpFormatter</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--debug&quot;</span><span class="p">,</span>
+            <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;set debug [default: </span><span class="si">%(default)s</span><span class="s2">]&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-ep&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--endpointPath&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to yaml file to configure endpoints to use for queries&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-fp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--formatsPath&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="n">ValueFormatter</span><span class="o">.</span><span class="n">formatsPath</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to yaml file to configure formats to use for querie result documentation&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-en&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--endpointName&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="s2">&quot;wikidata&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Name of the endpoint to use for queries. Available by default: </span><span class="si">{</span><span class="n">EndpointManager</span><span class="o">.</span><span class="n">getEndpointNames</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--method&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;method to be used for SPARQL queries&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;--format&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Format</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">Format</span><span class="p">))</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-li&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--list&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show the list of available queries&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--limit&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;set limit parameter of query&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-le&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--listEndpoints&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show the list of available endpoints&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;--mimeType&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;MIME-type to use for the raw query&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-p&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--prefixes&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;add predefined prefixes for endpoint&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-sq&quot;</span><span class="p">,</span> <span class="s2">&quot;--showQuery&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show the query&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-qp&quot;</span><span class="p">,</span> <span class="s2">&quot;--queriesPath&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to YAML file with query definitions&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-q&quot;</span><span class="p">,</span> <span class="s2">&quot;--query&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the query to run&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-qf&quot;</span><span class="p">,</span> <span class="s2">&quot;--queryFile&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the query file to run&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-qn&quot;</span><span class="p">,</span> <span class="s2">&quot;--queryName&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run a named query&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-raw&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;return the raw query result from the endpoint. (MIME type defined over -f or -m)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">program_version_message</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+                <span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="s2">&quot;--language&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the query language to use&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">lang</span>
+        <span class="n">QueryMain</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="c1">### handle keyboard interrupt ###</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">program_name</span><span class="p">)</span> <span class="o">*</span> <span class="s2">&quot; &quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">program_name</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;  for help use --help&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">return</span> <span class="mi">2</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-d&quot;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

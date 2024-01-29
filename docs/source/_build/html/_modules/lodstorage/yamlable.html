@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.yamlable &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.yamlable</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2023-12-08, Extended on 2023-16-12 and 2024-01-25</span>
+
+<span class="sd">@author: wf, ChatGPT</span>
+
+<span class="sd">Prompts for the development and extension of the &#39;YamlAble&#39; class within the &#39;yamable&#39; module:</span>
+
+<span class="sd">1. Develop &#39;YamlAble&#39; class in &#39;yamable&#39; module. It</span>
+<span class="sd">   should convert dataclass instances to/from YAML.</span>
+<span class="sd">2. Implement methods for YAML block scalar style and</span>
+<span class="sd">   exclude None values in &#39;YamlAble&#39; class.</span>
+<span class="sd">3. Add functionality to remove None values from</span>
+<span class="sd">   dataclass instances before YAML conversion.</span>
+<span class="sd">4. Ensure &#39;YamlAble&#39; processes only dataclass instances,</span>
+<span class="sd">   with error handling for non-dataclass objects.</span>
+<span class="sd">5. Extend &#39;YamlAble&#39; for JSON serialization and</span>
+<span class="sd">   deserialization.</span>
+<span class="sd">6. Add methods for saving/loading dataclass instances</span>
+<span class="sd">   to/from YAML and JSON files in &#39;YamlAble&#39;.</span>
+<span class="sd">7. Implement loading of dataclass instances from URLs</span>
+<span class="sd">   for both YAML and JSON in &#39;YamlAble&#39;.</span>
+<span class="sd">8. Write tests for &#39;YamlAble&#39; within the pyLodStorage context. </span>
+<span class="sd">   Use &#39;samples 2&#39; example from pyLoDStorage </span>
+<span class="sd">   https://github.com/WolfgangFahl/pyLoDStorage/blob/master/lodstorage/sample2.py</span>
+<span class="sd">   as a reference. </span>
+<span class="sd">9. Ensure tests cover YAML/JSON serialization, deserialization, </span>
+<span class="sd">   and file I/O operations, using the sample-based approach..</span>
+<span class="sd">10. Use Google-style docstrings, comments, and type hints</span>
+<span class="sd">   in &#39;YamlAble&#39; class and tests.</span>
+<span class="sd">11. Adhere to instructions and seek clarification for</span>
+<span class="sd">    any uncertainties.</span>
+<span class="sd">12. Add @lod_storable annotation support that will automatically</span>
+<span class="sd">    YamlAble support and add @dataclass and @dataclass_json </span>
+<span class="sd">    prerequisite behavior to a class    </span>
+<span class="sd">    </span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">is_dataclass</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">dacite</span> <span class="kn">import</span> <span class="n">from_dict</span>
+<span class="kn">from</span> <span class="nn">dataclasses_json</span> <span class="kn">import</span> <span class="n">dataclass_json</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="lod_storable">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.lod_storable">[docs]</a>
+<span class="k">def</span> <span class="nf">lod_storable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to make a class LoDStorable by</span>
+<span class="sd">    inheriting from YamlAble.</span>
+<span class="sd">    This decorator also ensures the class is a</span>
+<span class="sd">    dataclass and has JSON serialization/deserialization</span>
+<span class="sd">    capabilities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>  <span class="c1"># Apply the @dataclass decorator</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">dataclass_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>  <span class="c1"># Apply the @dataclass_json decorator</span>
+
+    <span class="k">class</span> <span class="nc">LoDStorable</span><span class="p">(</span><span class="n">YamlAble</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        decorator class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="vm">__qualname__</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__qualname__</span>
+        <span class="k">pass</span>
+
+    <span class="n">LoDStorable</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">LoDStorable</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__doc__</span>
+
+    <span class="k">return</span> <span class="n">LoDStorable</span></div>
+
+
+
+<div class="viewcode-block" id="DateConvert">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.DateConvert">[docs]</a>
+<span class="k">class</span> <span class="nc">DateConvert</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    date converter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DateConvert.iso_date_to_datetime">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.DateConvert.iso_date_to_datetime">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">iso_date_to_datetime</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">iso_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">iso_date</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">if</span> <span class="n">iso_date</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">date</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="YamlAble">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble">[docs]</a>
+<span class="k">class</span> <span class="nc">YamlAble</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An extended YAML handler class for converting dataclass objects to and from YAML format,</span>
+<span class="sd">    and handling loading from and saving to files and URLs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_yaml_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the YamAble handler, setting up custom representers and preparing it for various operations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;I must be a dataclass instance.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_yaml_dumper&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_yaml_dumper</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_yaml_dumper</span><span class="o">.</span><span class="n">ignore_aliases</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_args</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_yaml_dumper</span><span class="o">.</span><span class="n">add_representer</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">represent_none</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_yaml_dumper</span><span class="o">.</span><span class="n">add_representer</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">represent_literal</span><span class="p">)</span>
+
+<div class="viewcode-block" id="YamlAble.represent_none">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.represent_none">[docs]</a>
+    <span class="k">def</span> <span class="nf">represent_none</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">__</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">yaml</span><span class="o">.</span><span class="n">Node</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Custom representer for ignoring None values in the YAML output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_yaml_dumper</span><span class="o">.</span><span class="n">represent_scalar</span><span class="p">(</span><span class="s2">&quot;tag:yaml.org,2002:null&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.represent_literal">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.represent_literal">[docs]</a>
+    <span class="k">def</span> <span class="nf">represent_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dumper</span><span class="p">:</span> <span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">yaml</span><span class="o">.</span><span class="n">Node</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Custom representer for block scalar style for strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dumper</span><span class="o">.</span><span class="n">represent_scalar</span><span class="p">(</span><span class="s2">&quot;tag:yaml.org,2002:str&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dumper</span><span class="o">.</span><span class="n">represent_scalar</span><span class="p">(</span><span class="s2">&quot;tag:yaml.org,2002:str&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.to_yaml">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.to_yaml">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ignore_none</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">ignore_underscore</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">allow_unicode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sort_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts this dataclass object to a YAML string, with options to omit None values and/or underscore-prefixed variables,</span>
+<span class="sd">        and using block scalar style for strings.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ignore_none: Flag to indicate whether None values should be removed from the YAML output.</span>
+<span class="sd">            ignore_underscore: Flag to indicate whether attributes starting with an underscore should be excluded from the YAML output.</span>
+<span class="sd">            allow_unicode: Flag to indicate whether to allow unicode characters in the output.</span>
+<span class="sd">            sort_keys: Flag to indicate whether to sort the dictionary keys in the output.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A string representation of the dataclass object in YAML format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj_dict</span> <span class="o">=</span> <span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_yaml_setup</span><span class="p">()</span>
+        <span class="n">clean_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_ignored_values</span><span class="p">(</span>
+            <span class="n">obj_dict</span><span class="p">,</span> <span class="n">ignore_none</span><span class="p">,</span> <span class="n">ignore_underscore</span>
+        <span class="p">)</span>
+        <span class="n">yaml_str</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+            <span class="n">clean_dict</span><span class="p">,</span>
+            <span class="n">Dumper</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_yaml_dumper</span><span class="p">,</span>
+            <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">allow_unicode</span><span class="o">=</span><span class="n">allow_unicode</span><span class="p">,</span>
+            <span class="n">sort_keys</span><span class="o">=</span><span class="n">sort_keys</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">yaml_str</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.from_yaml">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.from_yaml">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">yaml_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deserializes a YAML string to a dataclass instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            yaml_str (str): A string containing YAML formatted data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            T: An instance of the dataclass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">yaml_str</span><span class="p">)</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.load_from_yaml_file">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.load_from_yaml_file">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_from_yaml_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a dataclass instance from a YAML file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): The path to the YAML file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            T: An instance of the dataclass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">yaml_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_yaml</span><span class="p">(</span><span class="n">yaml_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.load_from_yaml_url">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.load_from_yaml_url">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_from_yaml_url</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a dataclass instance from a YAML string obtained from a URL.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The URL pointing to the YAML data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            T: An instance of the dataclass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yaml_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">read_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_yaml</span><span class="p">(</span><span class="n">yaml_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.save_to_yaml_file">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.save_to_yaml_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_to_yaml_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the current dataclass instance to a YAML file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): The path where the YAML file will be saved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yaml_content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">yaml_content</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.load_from_json_file">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.load_from_json_file">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_from_json_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a dataclass instance from a JSON file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): The path to the JSON file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            T: An instance of the dataclass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">json_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.load_from_json_url">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.load_from_json_url">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_from_json_url</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a dataclass instance from a JSON string obtained from a URL.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The URL pointing to the JSON data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            T: An instance of the dataclass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">json_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">read_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.save_to_json_file">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.save_to_json_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_to_json_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the current dataclass instance to a JSON file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): The path where the JSON file will be saved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">json_content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_content</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.read_from_url">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.read_from_url">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">read_from_url</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to fetch content from a URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to load data from URL: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.remove_ignored_values">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.remove_ignored_values">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">remove_ignored_values</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> 
+        <span class="n">ignore_none</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
+        <span class="n">ignore_underscore</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ignore_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively removes specified types of values from a dictionary or list.</span>
+<span class="sd">        By default, it removes keys with None values. Optionally, it can also remove keys starting with an underscore.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: The value to process (dictionary, list, or other).</span>
+<span class="sd">            ignore_none: Flag to indicate whether None values should be removed.</span>
+<span class="sd">            ignore_underscore: Flag to indicate whether keys starting with an underscore should be removed.</span>
+<span class="sd">            ignore_empty: Flag to indicate whether empty collections should be removed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Check if the value is valid based on the specified flags.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">ignore_none</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">ignore_empty</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Empty dictionary</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Empty list, set, tuple, etc., but not string or bytes</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">YamlAble</span><span class="o">.</span><span class="n">remove_ignored_values</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">ignore_none</span><span class="p">,</span> <span class="n">ignore_underscore</span><span class="p">,</span> <span class="n">ignore_empty</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">is_valid</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ignore_underscore</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">))</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">YamlAble</span><span class="o">.</span><span class="n">remove_ignored_values</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">ignore_none</span><span class="p">,</span> <span class="n">ignore_underscore</span><span class="p">,</span> <span class="n">ignore_empty</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span> <span class="k">if</span> <span class="n">is_valid</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="YamlAble.from_dict2">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.yamlable.YamlAble.from_dict2">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict2</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an instance of a dataclass from a dictionary, typically used in deserialization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">from_dict</span><span class="p">(</span><span class="n">data_class</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
