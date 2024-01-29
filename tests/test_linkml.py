@@ -94,6 +94,7 @@ class TestLinkMLConversion(Basetest):
 
         # Step 3: Serialize the RDF graph for debugging or saving
         rdf_output = rdf_dumper.serialize()
+        debug=self.debug
         #debug = True
         if debug:
             print(rdf_output)

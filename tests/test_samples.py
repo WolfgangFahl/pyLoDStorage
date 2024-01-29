@@ -142,7 +142,7 @@ class TestSamples(Basetest):
                 yaml_str = original_item.to_yaml()
                 # Optional: Print the YAML string in debug mode
                 debug = self.debug
-                debug = True
+                #debug = True
                 if debug:
                     print(f"Original YAML String for {sample_name}/{name}:")
                     print(yaml_str)
