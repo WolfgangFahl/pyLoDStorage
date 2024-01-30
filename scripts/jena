@@ -4,7 +4,7 @@
 # see https://jena.apache.org/documentation/fuseki2/fuseki-run.html
 #version=3.17.0
 # fails as of 2024-01-29
-version=4.9.0
+version=4.10.0
 fuseki=apache-jena-fuseki-$version
 jena=apache-jena-$version
 
@@ -145,7 +145,7 @@ startFuseki() {
   color_msg $blue "starting fuseki server"
   cd $libPath/$fuseki
   log=$dataPath/fuseki.log
-  nohup $sudo java -jar $libPath/$fuseki/fuseki-server.jar --tdb2 --loc=$dataPath /$l_dataset >$log 2>&1 &
+  nohup $sudo java -jar $libPath/$fuseki/fuseki-server.jar --tdb2 --update --loc=$dataPath /$l_dataset >$log 2>&1 &
   sleep 2
   tail $log
 }

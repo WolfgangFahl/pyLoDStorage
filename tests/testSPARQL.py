@@ -30,7 +30,11 @@ class TestSPARQL(Basetest):
            typedLiterals(boolean): True if INSERT DATA SPARQL commands should use typed literals
            profile(boolean): True if profile/timing information should be shown
         """
-        endpoint = "http://localhost:3030/example/sparql"
+        endpoint = "http://localhost:3030/example/"
+        if mode == "query":
+            endpoint += "sparql"
+        elif mode == "update":
+            endpoint += "update"
         jena = SPARQL(
             endpoint,
             mode=mode,
@@ -67,30 +71,31 @@ class TestSPARQL(Basetest):
         insertCommands = [
             """
         PREFIX cr: <http://cr.bitplan.com/>
-        INSERT DATA { 
-          cr:version cr:author "Wolfgang Fahl". 
+        INSERT DATA {
+          cr:version cr:author "Wolfgang Fahl".
         }
         """,
-            "INVALID COMMAND",
+            "INSERT DATA { INVALID COMMAND } ",
         ]
         for index, insertCommand in enumerate(insertCommands):
-            if index != 0:
-                warnings.simplefilter("ignore")
+            with self.subTest(insertCommand=insertCommand):
+                if index != 0:
+                    warnings.simplefilter("ignore")
 
-            result, ex = jena.insert(insertCommand)
-            if index == 0:
-                if ex:
-                    print(f"Exception: {ex}")
-                self.assertTrue(ex is None)
-                if self.debug:
-                    print(result)
-            else:
-                msg = ex.args[0]
-                if self.debug:
-                    print(msg)
-                self.assertTrue("QueryBadFormed" in msg)
-                # self.assertTrue("Error 400" in msg)
-                pass
+                result, ex = jena.insert(insertCommand)
+                if index == 0:
+                    if ex:
+                        print(f"Exception: {ex}")
+                    self.assertIsNone(ex)
+                    if self.debug:
+                        print(result)
+                else:
+                    msg = ex.args[0]
+                    if self.debug:
+                        print(msg)
+                    self.assertTrue("QueryBadFormed" in msg)
+                    # self.assertTrue("Error 400" in msg)
+                    pass
 
     def checkErrors(self, errors, expected=0):
         """

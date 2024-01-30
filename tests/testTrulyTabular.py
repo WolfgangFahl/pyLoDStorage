@@ -24,7 +24,7 @@ class TestTrulyTabular(unittest.TestCase):
         qleverEndpoint.name = "qlever-wikidata"
         qleverEndpoint.method = "POST"
         qleverEndpoint.database = "qlever"
-        qleverEndpoint.endpoint = "https://qlever.cs.uni-freiburg.de/api/wikidata"
+        qleverEndpoint.endpoint = "http://qlever-api.wikidata.dbis.rwth-aachen.de"
         self.endpointConfs = {qleverEndpoint, Endpoint.getDefault()}
         pass
 
