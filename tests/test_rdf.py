@@ -22,7 +22,7 @@ class TestTriplify(Basetest):
         """
         royals_samples = Sample.get("royals")
         debug = self.debug
-        #debug = True
+        # debug = True
         for name, royals in royals_samples.items():
             json_str = royals.to_json(indent=2)
             if debug:

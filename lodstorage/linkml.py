@@ -43,7 +43,7 @@ class Type:
     base: str
     description: Optional[str]
     notes: Optional[str]
-    conforms_to: Optional[str]=None
+    conforms_to: Optional[str] = None
     comments: Optional[List[str]] = field(default_factory=list)
     exact_mappings: Optional[List[str]] = field(default_factory=list)
     close_mappings: Optional[List[str]] = field(default_factory=list)

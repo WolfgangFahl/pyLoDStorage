@@ -59,8 +59,8 @@ class TestSPARQL(Basetest):
         jena = self.getJena()
         queryString = "SELECT * WHERE { ?s ?p ?o. }"
         results = jena.query(queryString)
-        result_count=len(results)
-        self.assertTrue( result_count>=20)
+        result_count = len(results)
+        self.assertTrue(result_count >= 20)
         pass
 
     def testJenaInsert(self):

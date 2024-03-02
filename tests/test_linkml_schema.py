@@ -20,8 +20,8 @@ class TestLinkMLSchema(Basetest):
         """
         uri = "https://raw.githubusercontent.com/linkml/linkml-runtime/main/linkml_runtime/linkml_model/model/schema/types.yaml"
         schema = Schema.load_from_yaml_url(uri)
-        debug=self.debug
-        #debug = True
+        debug = self.debug
+        # debug = True
         if debug:
             print(json.dumps(schema.to_dict(), indent=2, default=str))
             print(schema.to_yaml())
