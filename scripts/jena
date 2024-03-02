@@ -4,7 +4,10 @@
 # see https://jena.apache.org/documentation/fuseki2/fuseki-run.html
 #version=3.17.0
 # fails as of 2024-01-29
-version=4.10.0
+# version=4.10.0
+# fails as of 2024-03-02
+# see https://stackoverflow.com/questions/78092735/what-happened-to-apache-jena-4-10
+version=4.9
 fuseki=apache-jena-fuseki-$version
 jena=apache-jena-$version
 
