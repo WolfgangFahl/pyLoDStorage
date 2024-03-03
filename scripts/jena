@@ -101,6 +101,8 @@ checkOrGetJenaParts() {
       else
         color_msg $green $tgz already downloaded
       fi
+      ls -l ""$tgz"
+      file -b "$tgz"
       color_msg $blue "unpacking $tgz"
       tar xvfz $tgz
     else
