@@ -92,10 +92,10 @@ checkOrGetJenaParts() {
   do
     if [ ! -d $jpart ]
     then
-      tgz=$jpart.tar.gz
+      local tgz="$jpart.tar.gz"
       if [ ! -f "$tgz" ]
       then
-        local url=http://archive.apache.org/dist/jena/binaries/$tgz
+        local url="http://archive.apache.org/dist/jena/binaries/$tgz"
         color_msg $blue "downloading $tgz from $url"
         curl $url -o "$tgz"
       else
