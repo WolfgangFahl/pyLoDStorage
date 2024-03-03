@@ -79,9 +79,8 @@ usage() {
 #  get all parts of jena
 #
 checkOrGetJenaParts() {
-  for part in lib data
+  for path in $libPath $dataPath
   do
-    path=$scriptPath/../$part
     if [ ! -d $path ]
     then
       color_msg $blue "creating $path"
@@ -94,17 +93,17 @@ checkOrGetJenaParts() {
     if [ ! -d $jpart ]
     then
       tgz=$jpart.tar.gz
-     if [ ! -f $tgz ]
-     then
-       color_msg $blue "downloading $tgz"
-       curl  http://archive.apache.org/dist/jena/binaries/$tgz -o $tgz
-     else
-     color_msg $green $tgz already downloaded
-     fi
-     color_msg $blue "unpacking $tgz"
-     tar xvfz $tgz
+      if [ ! -f $tgz ]
+      then
+        color_msg $blue "downloading $tgz"
+        curl  http://archive.apache.org/dist/jena/binaries/$tgz -o $tgz
+      else
+        color_msg $green $tgz already downloaded
+      fi
+      color_msg $blue "unpacking $tgz"
+      tar xvfz $tgz
     else
-     color_msg $green $jpart already downloaded and unpacked
+      color_msg $green "$jpart already downloaded and unpacked"
     fi
   done
 }
