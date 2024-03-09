@@ -33,7 +33,9 @@ dependencies = [
     "pyparsing>=3.1.1",
     # https://github.com/un33k/python-slugify
 	# https://pypi.org/project/python-slugify/
-	"python-slugify>=8.0.1"
+	"python-slugify>=8.0.1",
+	# https://pypi.org/project/orjson/
+	'orjson>=3.9.15',
 ]
 requires-python = ">=3.9"
 classifiers=[

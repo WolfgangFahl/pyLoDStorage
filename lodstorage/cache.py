@@ -65,6 +65,9 @@ class CacheManager:
     """
     name: str
     caches: Dict[str, Cache] = field(default_factory=dict)
+    
+    def __post_init__(self):
+        self.base_dir=None
 
     def base_path(self) -> str:
         """Fetches the base path for this cache manager.
@@ -81,7 +84,7 @@ class CacheManager:
         os.makedirs(base_path, exist_ok=True)
         return base_path
 
-    def get_cache_by_name(self,lod_name,ext)->Cache:
+    def get_cache_by_name(self,lod_name,ext=".json")->Cache:
         """
         Retrieves or creates a cache object by name and extension.
     
