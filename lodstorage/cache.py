@@ -34,11 +34,16 @@ class Cache:
     count_attr: str = None
     count: Optional[int] = None   
     
-    def set_path(self,base_path):
+    def set_path(self,base_path:str):
         """
-        set my path
+        Set my path based on the given base_path and ensure the parent directory is created.
+        
+        Args:
+            base_path (str): The base path where the directory should be created.
         """
         self.path = Path(f"{base_path}/{self.name}{self.extension}")
+        # Ensure parent directory is created
+        self.path.parent.mkdir(parents=True, exist_ok=True)
     
     @property
     def is_stored(self) -> bool:
