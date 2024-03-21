@@ -144,14 +144,18 @@
 'cities':
     title: 'German cities by population'
     sparql: |
-          SELECT DISTINCT ?name ?population WHERE {
-            ?city wdt:P31/wdt:P279* wd:Q515 .
-            ?city wdt:P17 wd:Q183 .
-            ?city wdt:P1082 ?population .
-            ?city rdfs:label ?name .
-            FILTER (LANG(?name) = "en")
-          }
-          ORDER BY DESC(?population)
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX wd: <http://www.wikidata.org/entity/>
+        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        SELECT ?city_id ?name (MAX(?population_claim) AS ?population) WHERE {
+          ?city_id wdt:P31/wdt:P279* wd:Q515 .
+          ?city_id wdt:P17 wd:Q183 .
+          ?city_id wdt:P1082 ?population_claim .
+          ?city_id rdfs:label ?name .
+          FILTER (LANG(?name) = "en")
+        }
+        GROUP BY ?city_id ?name
+        ORDER BY DESC(?population)
 
 'FirstTriple':
     title: First Triple

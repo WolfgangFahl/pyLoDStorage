@@ -36,6 +36,8 @@ dependencies = [
 	"python-slugify>=8.0.1",
 	# https://pypi.org/project/orjson/
 	'orjson>=3.9.15',
+	# https://pypi.org/project/sqlmodel/
+   	'sqlmodel>=0.0.16'
 ]
 requires-python = ">=3.9"
 classifiers=[
