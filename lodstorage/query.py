@@ -630,10 +630,11 @@ class QueryManager(object):
         queriesPaths = YamlPath.getPaths("queries.yaml", queriesPath)
         queries = {}
         for queriesPath in queriesPaths:
-            with open(queriesPath, "r") as stream:
-                lqueries = yaml.safe_load(stream)
-                for key in lqueries:
-                    queries[key] = lqueries[key]
+            if os.path.isfile(queriesPath):
+                with open(queriesPath, "r") as stream:
+                    lqueries = yaml.safe_load(stream)
+                    for key in lqueries:
+                        queries[key] = lqueries[key]
         return queries
 
 

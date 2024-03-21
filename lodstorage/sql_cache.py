@@ -5,9 +5,9 @@ Created on 2024-03-16
 """
 from typing import Any, Dict, List, Type
 
-from lodstorage.profiler import Profiler
 from sqlmodel import Session, create_engine, select
 
+from lodstorage.profiler import Profiler
 from lodstorage.query import QueryManager
 from lodstorage.sparql import SPARQL
 
