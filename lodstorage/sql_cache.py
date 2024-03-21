@@ -5,7 +5,7 @@ Created on 2024-03-16
 """
 from typing import Any, Dict, List, Type
 
-from ngwidgets.profiler import Profiler
+from lodstorage.profiler import Profiler
 from sqlmodel import Session, create_engine, select
 
 from lodstorage.query import QueryManager
