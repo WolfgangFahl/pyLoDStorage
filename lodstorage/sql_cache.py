@@ -3,6 +3,7 @@ Created on 2024-03-16
 
 @author: wf
 """
+import copy
 from typing import Any, Dict, List, Type
 
 from sqlmodel import Session, create_engine, select
@@ -14,11 +15,11 @@ from lodstorage.sparql import SPARQL
 
 class SqlDB:
     """
-    general SQL database
+    general SQL database access using SQL Alchemy
     """
 
     def __init__(self, sqlite_file_path: str, debug: bool = False):
-        debug = debug
+        self.debug = debug
         sqlite_url = f"sqlite:///{sqlite_file_path}"
         connect_args = {"check_same_thread": False}
         self.engine = create_engine(sqlite_url, echo=debug, connect_args=connect_args)
@@ -99,22 +100,29 @@ class Cached:
         with self.sql_db.get_session() as session:
             result = session.exec(select(self.clazz)).first()
             return result is not None
-
-    def fetch_from_local(self)->List[Dict]:
+    
+    def fetch_from_local(self) -> List[Dict]:
         """
         Fetches data from the local SQL database.
-        
+    
+        Ensures 'self.entities' are proper instances by deep copying them from the fetched ORM objects,
+        thus avoiding issues related to detached instances or lazy loading.
+        'self.lod' is populated with dictionary representations of these instances.
+    
         Returns:
-            List: list of records from the SQL database
+            List[Dict]: List of records from the SQL database in dictionary form.
         """
         profiler = Profiler(f"fetch {self.query_name} from local", profile=self.debug)
         with self.sql_db.get_session() as session:
-            self.entities = session.exec(select(self.clazz)).all()
+            fetched_entities = session.exec(select(self.clazz)).all()
+            # Use deep copy to create proper instances from fetched ORM objects
+            self.entities = [copy.deepcopy(entity) for entity in fetched_entities]
             self.lod = [entity.dict() for entity in self.entities]
             if self.debug:
                 print(f"Loaded {len(self.entities)} records from local cache")
         profiler.time()
         return self.lod
+
 
     def get_lod(self, qm: QueryManager) -> List[Dict]:
         """
