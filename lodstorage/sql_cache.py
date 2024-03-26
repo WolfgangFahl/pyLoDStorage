@@ -137,17 +137,17 @@ class Cached:
             print(f"Found {len(self.lod)} records for {self.query_name}")
         return self.lod
 
-    def to_entities(self, max_errors: int = None,forced:bool=False) -> List[Any]:
+    def to_entities(self, max_errors: int = None,cached:bool=True) -> List[Any]:
         """
         Converts records fetched from the LOD into entity instances, applying validation.
 
         Args:
             max_errors (int, optional): Maximum allowed validation errors. Defaults to 0.
-
+            cached(bool): if True use existing entries
         Returns:
             List[Any]: A list of entity instances that have passed validation.
         """
-        if forced:
+        if not cached:
             self.entities = []
             self.errors = []
         elif self.fetched:
@@ -186,7 +186,7 @@ class Cached:
 
         """
         profiler = Profiler(f"store {self.query_name}", profile=self.debug)
-        self.to_entities(max_errors=max_errors,force=True)
+        self.to_entities(max_errors=max_errors,cached=False)
         with self.sql_db.get_session() as session:
             session.add_all(self.entities)
             session.commit()
