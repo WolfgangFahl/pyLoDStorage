@@ -66,10 +66,11 @@ class Cached:
         self.debug = debug
         self.entities = []
         self.errors = []
+        self.fetched=False
         # Ensure the table for the class exists
         clazz.metadata.create_all(self.sql_db.engine)
 
-    def fetch_or_query(self, qm, force_query=False):
+    def fetch_or_query(self, qm, force_query=False)->List[Dict]:
         """
         Fetches data from the local cache if available.
         If the data is not in the cache or if force_query is True,
@@ -78,12 +79,15 @@ class Cached:
         Args:
             qm (QueryManager): The query manager object used for making SPARQL queries.
             force_query (bool, optional): A flag to force querying via SPARQL even if the data exists in the local cache. Defaults to False.
+        Returns:
+            List: list of records from the SQL database    
         """
         if not force_query and self.check_local_cache():
-            self.fetch_from_local()
+            lod=self.fetch_from_local()
         else:
-            self.get_lod(qm)
+            lod=self.get_lod(qm)
             self.store()
+        return lod
 
     def check_local_cache(self) -> bool:
         """
@@ -96,9 +100,12 @@ class Cached:
             result = session.exec(select(self.clazz)).first()
             return result is not None
 
-    def fetch_from_local(self):
+    def fetch_from_local(self)->List[Dict]:
         """
         Fetches data from the local SQL database.
+        
+        Returns:
+            List: list of records from the SQL database
         """
         profiler = Profiler(f"fetch {self.query_name} from local", profile=self.debug)
         with self.sql_db.get_session() as session:
@@ -107,6 +114,7 @@ class Cached:
             if self.debug:
                 print(f"Loaded {len(self.entities)} records from local cache")
         profiler.time()
+        return self.lod
 
     def get_lod(self, qm: QueryManager) -> List[Dict]:
         """
@@ -129,7 +137,7 @@ class Cached:
             print(f"Found {len(self.lod)} records for {self.query_name}")
         return self.lod
 
-    def to_entities(self, max_errors: int = None) -> List[Any]:
+    def to_entities(self, max_errors: int = None,forced:bool=False) -> List[Any]:
         """
         Converts records fetched from the LOD into entity instances, applying validation.
 
@@ -139,8 +147,12 @@ class Cached:
         Returns:
             List[Any]: A list of entity instances that have passed validation.
         """
-        self.entities = []
-        self.errors = []
+        if forced:
+            self.entities = []
+            self.errors = []
+        elif self.fetched:
+            return self.entities
+                
         error_records = []
         if max_errors is None:
             max_errors = self.max_errors
@@ -159,6 +171,7 @@ class Cached:
                 for i, e in enumerate(self.errors):
                     print(f"{i}:{str(e)} for \n{error_records[i]}")
             raise Exception(msg)
+        self.fetched=True
         return self.entities
 
     def store(self, max_errors: int = None) -> List[Any]:
@@ -173,7 +186,7 @@ class Cached:
 
         """
         profiler = Profiler(f"store {self.query_name}", profile=self.debug)
-        self.to_entities(max_errors=max_errors)
+        self.to_entities(max_errors=max_errors,force=True)
         with self.sql_db.get_session() as session:
             session.add_all(self.entities)
             session.commit()
