@@ -121,7 +121,7 @@ class TestQueries(Basetest):
             ["-qn", "US President Nicknames", "-l", "sparql", "--limit", f"{limit}"],
         ]
         debug = self.debug
-        # debug=True
+        debug=True
         for args in args_list:
             json_str = self.captureQueryMain(args)
             json_data = json.loads(json_str)

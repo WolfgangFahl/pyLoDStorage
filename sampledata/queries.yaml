@@ -123,7 +123,7 @@
         # see also http://wiki.bitplan.com/index.php/PyLoDStorage#Examples
         SELECT DISTINCT ?city ?cityLabel ?population ?country ?countryLabel
         WHERE {
-          VALUES ?cityClass { wd:Q1637706}.
+          VALUES ?cityClass { wd:Q1549591 }. # big city - million city does not work any more
           ?city wdt:P31 ?cityClass .
           ?city wdt:P1082 ?population .
           ?city wdt:P17 ?country .
