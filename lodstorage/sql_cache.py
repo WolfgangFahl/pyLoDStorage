@@ -3,7 +3,6 @@ Created on 2024-03-16
 
 @author: wf
 """
-import copy
 from typing import Any, Dict, List, Type
 
 from sqlmodel import Session, create_engine, select
@@ -11,7 +10,6 @@ from sqlmodel import Session, create_engine, select
 from lodstorage.profiler import Profiler
 from lodstorage.query import QueryManager
 from lodstorage.sparql import SPARQL
-
 
 class SqlDB:
     """
@@ -103,20 +101,14 @@ class Cached:
     
     def fetch_from_local(self) -> List[Dict]:
         """
-        Fetches data from the local SQL database.
-    
-        Ensures 'self.entities' are proper instances by deep copying them from the fetched ORM objects,
-        thus avoiding issues related to detached instances or lazy loading.
-        'self.lod' is populated with dictionary representations of these instances.
-    
+        Fetches data from the local SQL database as list of dicts and entities.
+     
         Returns:
             List[Dict]: List of records from the SQL database in dictionary form.
         """
         profiler = Profiler(f"fetch {self.query_name} from local", profile=self.debug)
         with self.sql_db.get_session() as session:
-            fetched_entities = session.exec(select(self.clazz)).all()
-            # Use deep copy to create proper instances from fetched ORM objects
-            self.entities = [copy.deepcopy(entity) for entity in fetched_entities]
+            self.entities = session.exec(select(self.clazz)).all()
             self.lod = [entity.dict() for entity in self.entities]
             if self.debug:
                 print(f"Loaded {len(self.entities)} records from local cache")
