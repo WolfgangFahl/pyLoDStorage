@@ -501,7 +501,7 @@ class TestEndpoints(Basetest):
         tests getting and rawQuerying Endpoints
         """
         debug = self.debug
-        # debug=True
+        debug=True
         endpoints = EndpointManager.getEndpoints(lang="sparql")
         qm = QueryManager(lang="sparql", debug=False)
         query = qm.queriesByName["FirstTriple"]
@@ -516,8 +516,3 @@ class TestEndpoints(Basetest):
             )
             if debug:
                 print(jsonStr)
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

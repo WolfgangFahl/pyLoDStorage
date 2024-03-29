@@ -148,7 +148,7 @@ class QueryMain:
                 raise Exception(f"format {args.format} not supported yet")
 
     @staticmethod
-    def rawQuery(endpointConf, query, resultFormat, mimeType):
+    def rawQuery(endpointConf, query, resultFormat, mimeType, timeout:float=10.0):
         """
         returns raw result of the endpoint
 
@@ -157,6 +157,7 @@ class QueryMain:
             query(str): query
             resultFormat(str): format of the result
             mimeType(str): mimeType
+            timoeout(float): timeout in seconds
 
         Returns:
             raw result of the query
@@ -170,7 +171,7 @@ class QueryMain:
         endpoint = endpointConf.endpoint
         method = endpointConf.method
         response = requests.request(
-            method, endpoint, headers=headers, data=payload, params=params
+            method, endpoint, headers=headers, data=payload, params=params,timeout=timeout
         )
         return response.text
 
