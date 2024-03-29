@@ -39,7 +39,7 @@ dependencies = [
 	# https://pypi.org/project/sqlmodel/
   'sqlmodel>=0.0.16',
   # https://pypi.org/project/requests/
-  'requests>2.31.0'
+  'requests>=2.31.0'
 ]
 requires-python = ">=3.9"
 classifiers=[
