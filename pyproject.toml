@@ -13,31 +13,33 @@ maintainers = [
 readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
-    "SPARQLWrapper>=2.0.0",
-    #"SPARQLWrapper==1.8.5",
-    "PyYAML",
-    "pandas",
-    # beware of https://github.com/matplotlib/matplotlib/issues/26827
-    "matplotlib>=3.8.2",
-    "tabulate",
-    "numpy",
-    "jsonpickle==1.5.2",
-    "pylatexenc~=2.10",
-    "pygments",
-    "dicttoxml2",
-    # https://pypi.org/project/dataclasses-json/
-    "dataclasses-json>=0.6.3",
-    # https://pypi.org/project/dacite/
-    "dacite>=1.8.1",
-    # https://pypi.org/project/pyparsing/
-    "pyparsing>=3.1.1",
-    # https://github.com/un33k/python-slugify
+  "SPARQLWrapper>=2.0.0",
+  #"SPARQLWrapper==1.8.5",
+  "PyYAML",
+  "pandas",
+  # beware of https://github.com/matplotlib/matplotlib/issues/26827
+  "matplotlib>=3.8.2",
+  "tabulate",
+  "numpy",
+  "jsonpickle==1.5.2",
+  "pylatexenc~=2.10",
+  "pygments",
+  "dicttoxml2",
+  # https://pypi.org/project/dataclasses-json/
+  "dataclasses-json>=0.6.3",
+  # https://pypi.org/project/dacite/
+  "dacite>=1.8.1",
+  # https://pypi.org/project/pyparsing/
+  "pyparsing>=3.1.1",
+  # https://github.com/un33k/python-slugify
 	# https://pypi.org/project/python-slugify/
 	"python-slugify>=8.0.1",
 	# https://pypi.org/project/orjson/
 	'orjson>=3.9.15',
 	# https://pypi.org/project/sqlmodel/
-   	'sqlmodel>=0.0.16'
+  'sqlmodel>=0.0.16',
+  # https://pypi.org/project/requests/
+  'requests>2.31.0'
 ]
 requires-python = ">=3.9"
 classifiers=[
