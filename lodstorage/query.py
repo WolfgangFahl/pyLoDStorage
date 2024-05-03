@@ -34,6 +34,7 @@ class Format(Enum):
 
     csv = "csv"
     json = "json"
+    html = "html"
     xml = "xml"
     tsv = "tsv"
     latex = "latex"
