@@ -39,6 +39,7 @@ class Format(Enum):
     tsv = "tsv"
     latex = "latex"
     mediawiki = "mediawiki"
+    raw = "raw"
     github = "github"
 
     def __str__(self):
