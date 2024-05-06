@@ -388,7 +388,7 @@ ORDER BY ?itemLabel ?sLabel"""
         """
         https://stackoverflow.com/questions/71444069/create-csv-from-result-of-a-for-google-colab/71548650#71548650
         """
-        from lodstorage.csv import CSV
+        from lodstorage.lod_csv import CSV
         from lodstorage.sparql import SPARQL
 
         sparqlQuery = """SELECT ?org ?orgLabel

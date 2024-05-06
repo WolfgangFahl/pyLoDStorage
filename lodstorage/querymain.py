@@ -5,6 +5,7 @@ Created on 2022-02-13
 """
 from pathlib import Path
 
+from lodstorage.params import Params, StoreDictKeyPair
 from lodstorage.version import Version
 
 __version__ = Version.version
@@ -22,7 +23,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 import requests
 
-from lodstorage.csv import CSV
+from lodstorage.lod_csv import CSV
 from lodstorage.query import (
     Endpoint,
     EndpointManager,
@@ -86,9 +87,18 @@ class QueryMain:
                 queryCode = queryFilePath.read_text()
                 name = queryFilePath.stem
             query = Query(name="?", query=queryCode, lang=args.language)
+
         if queryCode:
+            params = Params(query.query)
+            if params.has_params:
+                if not args.params:
+                    raise Exception(f"{query.name} needs parameters")
+                else:
+                    params.set(args.params)
+                    query.query = params.apply_parameters()
+                    queryCode=query.query
             if debug or args.showQuery:
-                print(f"{args.language}:\n{queryCode}")
+                print(f"{args.language}:\n{query.query}")
             endpointConf = Endpoint()
             endpointConf.method = "POST"
             if args.endpointName:
@@ -148,7 +158,7 @@ class QueryMain:
                 raise Exception(f"format {args.format} not supported yet")
 
     @staticmethod
-    def rawQuery(endpointConf, query, resultFormat, mimeType, timeout:float=10.0):
+    def rawQuery(endpointConf, query, resultFormat, mimeType, timeout: float = 10.0):
         """
         returns raw result of the endpoint
 
@@ -171,7 +181,12 @@ class QueryMain:
         endpoint = endpointConf.endpoint
         method = endpointConf.method
         response = requests.request(
-            method, endpoint, headers=headers, data=payload, params=params,timeout=timeout
+            method,
+            endpoint,
+            headers=headers,
+            data=payload,
+            params=params,
+            timeout=timeout,
         )
         return response.text
 
@@ -268,6 +283,11 @@ USAGE
         )
         parser.add_argument(
             "--limit", type=int, default=None, help="set limit parameter of query"
+        )
+        parser.add_argument(
+            "--params",
+            action=StoreDictKeyPair,
+            help="query parameters as Key-value pairs in the format key1=value1,key2=value2",
         )
         parser.add_argument(
             "-le",

@@ -115,6 +115,8 @@ class SPARQL(object):
         """
         make sure broken SPARQLWrapper will find comments
         """
+        if query_string is None:
+            return None
         return "#\n" + query_string
 
     def getValue(self, sparqlQuery: str, attr: str):

@@ -7,7 +7,6 @@ import copy
 import io
 import json
 import os
-import unittest
 from contextlib import redirect_stdout
 
 import tests.testSqlite3
@@ -121,7 +120,7 @@ class TestQueries(Basetest):
             ["-qn", "US President Nicknames", "-l", "sparql", "--limit", f"{limit}"],
         ]
         debug = self.debug
-        debug=True
+        debug = True
         for args in args_list:
             json_str = self.captureQueryMain(args)
             json_data = json.loads(json_str)
@@ -501,7 +500,7 @@ class TestEndpoints(Basetest):
         tests getting and rawQuerying Endpoints
         """
         debug = self.debug
-        debug=True
+        debug = True
         endpoints = EndpointManager.getEndpoints(lang="sparql")
         qm = QueryManager(lang="sparql", debug=False)
         query = qm.queriesByName["FirstTriple"]
