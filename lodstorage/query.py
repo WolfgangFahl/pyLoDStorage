@@ -48,15 +48,23 @@ class Format(Enum):
 
 class YamlPath:
     @staticmethod
-    def getPaths(yamlFileName: str, yamlPath: str = None):
+    def getPaths(yamlFileName: str, yamlPath: str = None, with_default:bool=True):
+        """
+        Args:
+            yamlFileName (str): The name of the YAML file to read from if (any) - legacy way to specify name
+            yamlPath (str, optional): The full path to read from. Defaults to None.
+            with_default (bool, optional): Whether to include paths from the default location .pylodstorage in the Home directory. Defaults to True.
+
+        """
         if yamlPath is None:
             yamlPath = f"{os.path.dirname(__file__)}/../sampledata/{yamlFileName}"
         yamlPaths = [yamlPath]
-        home = str(Path.home())
-        # additional yamls from users yaml configuration
-        homepath = f"{home}/.pylodstorage/{yamlFileName}"
-        if os.path.isfile(homepath):
-            yamlPaths.append(homepath)
+        if with_default:
+            home = str(Path.home())
+            # additional yamls from users yaml configuration
+            homepath = f"{home}/.pylodstorage/{yamlFileName}"
+            if os.path.isfile(homepath):
+                yamlPaths.append(homepath)
         return yamlPaths
 
 
@@ -596,19 +604,21 @@ class QueryManager(object):
     manages pre packaged Queries
     """
 
-    def __init__(self, lang: str = None, debug=False, queriesPath=None):
+    def __init__(self, lang: str = None, debug=False, queriesPath=None,with_defaults:bool=True):
         """
         Constructor
         Args:
-            lang(string): the language to use for the queries sql or sparql
-            debug(boolean): True if debug information should be shown
+            lang(str): the language to use for the queries sql or sparql
+            queriesPath(str): the path of the yaml file to load queries from
+            debug(bool): True if debug information should be shown
+            with_default(bool): if True also load the default yaml file
         """
         if lang is None:
             lang = "sql"
         self.queriesByName = {}
         self.lang = lang
         self.debug = debug
-        queries = QueryManager.getQueries(queriesPath=queriesPath)
+        queries = QueryManager.getQueries(queriesPath=queriesPath,with_default=with_default)
         for name, queryDict in queries.items():
             if self.lang in queryDict:
                 queryText = queryDict.pop(self.lang)
@@ -625,11 +635,16 @@ class QueryManager(object):
                 self.queriesByName[name] = query
 
     @staticmethod
-    def getQueries(queriesPath=None):
+    def getQueries(queriesPath=None, with_default:bool=True):
         """
         get the queries for the given queries Path
+        
+        Args:
+            queriesPath(str): the path of the yaml file to load queries from
+            with_default(bool): if True also load the default yaml file
+     
         """
-        queriesPaths = YamlPath.getPaths("queries.yaml", queriesPath)
+        queriesPaths = YamlPath.getPaths("queries.yaml", queriesPath, with_default=with_default)
         queries = {}
         for queriesPath in queriesPaths:
             if os.path.isfile(queriesPath):
