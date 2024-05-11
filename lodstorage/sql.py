@@ -639,3 +639,48 @@ class EntityInfo(object):
                     dt = datetime.datetime.strptime(record[key], "%Y-%m-%d")
                     dateValue = dt.date()
                     record[key] = dateValue
+
+# sqlite2 adapters as needed as of python 3.12
+def adapt_date_iso(val: datetime.date):
+    """Adapt datetime.date to ISO 8601 date."""
+    return val.isoformat()
+
+def adapt_datetime_iso(val: datetime.datetime):
+    """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
+    return val.isoformat()
+
+def adapt_datetime_epoch(val: datetime.datetime):
+    """Adapt datetime.datetime to Unix timestamp."""
+    return float(val.timestamp())*10**6
+
+def adapt_boolean(val: bool):
+    """Adapt boolean to int"""
+    return 1 if val else 0
+
+sqlite3.register_adapter(datetime.date, adapt_date_iso)
+sqlite3.register_adapter(datetime.datetime, adapt_datetime_iso)
+sqlite3.register_adapter(datetime.datetime, adapt_datetime_epoch)
+sqlite3.register_adapter(bool, adapt_boolean)
+
+def convert_date(val: bytes):
+    """Convert ISO 8601 date to datetime.date object."""
+    return datetime.date.fromisoformat(val.decode())
+
+def convert_datetime(val: bytes):
+    """Convert ISO 8601 datetime to datetime.datetime object."""
+    return datetime.datetime.fromisoformat(val.decode())
+
+def convert_timestamp(val: bytes):
+    """Convert Unix epoch timestamp to datetime.datetime object."""
+    return datetime.datetime.fromtimestamp(float(val)/10**6)
+
+def convert_boolean(val: bytes):
+    """
+    Convert 0 or 1 to boolean
+    """
+    return True if int(val) == 1 else False
+
+sqlite3.register_converter("date", convert_date)
+sqlite3.register_converter("datetime", convert_datetime)
+sqlite3.register_converter("timestamp", convert_timestamp)
+sqlite3.register_converter("boolean", convert_boolean)
