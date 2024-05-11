@@ -121,7 +121,7 @@ class ValueFormatter:
             valueFormats = {}
             formatPaths = YamlPath.getPaths("formats.yaml", formatsPath)
             for formatPath in formatPaths:
-                with open(formatPath, "r") as stream:
+                with open(formatPath, "r", encoding="utf-8") as stream:
                     valueFormatRecords = yaml.safe_load(stream)
                     for valueFormatKey, valueFormatRecord in valueFormatRecords.items():
                         valueFormats[valueFormatKey] = ValueFormatter.fromDict(

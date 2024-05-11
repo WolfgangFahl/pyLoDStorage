@@ -147,7 +147,7 @@ class CacheManager:
                         cache.path
                     )  # Adjusted for class method
                 else:
-                    with open(cache.path) as json_file:
+                    with open(cache.path, encoding="utf-8") as json_file:
                         result = orjson.loads(json_file.read())
             elif ext == ".yaml":
                 if cls and hasattr(cls, "load_from_yaml_file"):

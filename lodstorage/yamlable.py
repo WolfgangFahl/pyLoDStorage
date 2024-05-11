@@ -38,7 +38,8 @@ import urllib.request
 from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime
-from typing import Any, Generic, Type, TypeVar
+from pathlib import Path
+from typing import Any, Generic, Type, TypeVar, Union
 
 import yaml
 from dacite import from_dict
@@ -203,11 +204,11 @@ class YamlAble(Generic[T]):
             filename (str): The path where the YAML file will be saved.
         """
         yaml_content: str = self.to_yaml()
-        with open(filename, "w") as file:
+        with open(filename, "w", encoding="utf-8") as file:
             file.write(yaml_content)
 
     @classmethod
-    def load_from_json_file(cls: Type[T], filename: str) -> T:
+    def load_from_json_file(cls: Type[T], filename: Union[str, Path]) -> T:
         """
         Loads a dataclass instance from a JSON file.
 
@@ -217,7 +218,7 @@ class YamlAble(Generic[T]):
         Returns:
             T: An instance of the dataclass.
         """
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             json_str: str = file.read()
         instance: T = cls.from_json(json_str)
         return instance
@@ -246,7 +247,7 @@ class YamlAble(Generic[T]):
             **kwargs: Additional keyword arguments for the `to_json` method.
         """
         json_content: str = self.to_json(**kwargs)
-        with open(filename, "w") as file:
+        with open(filename, "w", encoding="utf-8") as file:
             file.write(json_content)
 
     @classmethod
