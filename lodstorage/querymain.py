@@ -96,7 +96,7 @@ class QueryMain:
                 else:
                     params.set(args.params)
                     query.query = params.apply_parameters()
-                    queryCode=query.query
+                    queryCode = query.query
             if debug or args.showQuery:
                 print(f"{args.language}:\n{query.query}")
             endpointConf = Endpoint()

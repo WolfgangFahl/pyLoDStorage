@@ -1,8 +1,8 @@
 import tempfile
 
-from lodstorage.lod_csv import CSV
 from lodstorage.jsonable import JSONAble, JSONAbleList
 from lodstorage.lod import LOD
+from lodstorage.lod_csv import CSV
 from lodstorage.sample import Sample
 from tests.basetest import Basetest
 

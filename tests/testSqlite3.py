@@ -3,15 +3,16 @@ Created on 2020-08-24
 
 @author: wf
 """
+import logging
 import os
 import sys
 import time
-import unittest
+from io import StringIO
 from datetime import datetime
 
 from lodstorage.sample import Sample
 from lodstorage.schema import Schema
-from lodstorage.sql import SQLDB, EntityInfo
+from lodstorage.sql import SQLDB, DatetimeAdapter, EntityInfo, convert_timestamp
 from lodstorage.uml import UML
 from tests.basetest import Basetest
 
@@ -20,6 +21,11 @@ class TestSQLDB(Basetest):
     """
     Test the SQLDB database wrapper
     """
+    
+    def setUp(self, debug=False, profile=True):
+        Basetest.setUp(self, debug=debug, profile=profile)
+        logging.basicConfig(level=logging.WARNING)
+        self.logger = logging.getLogger()
 
     def checkListOfRecords(
         self,
@@ -448,7 +454,43 @@ record  #3={'name': 'John Doe'}"""
         entityInfo = sqlDB.createTable(sample1, "sample1", "pkey")
         sqlDB.store(sample1, entityInfo=entityInfo, replace=True)
 
+    def testIssue127And55(self):
+        """
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/127
+        sqlite3 default adapter and converter deprecated as of python 3.12
 
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testSqllit3']
-    unittest.main()
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/55
+        datetime handling sqlite error should lead to warning and not raise an exception
+
+        """
+        log_stream = StringIO()
+        handler = logging.StreamHandler(log_stream)
+        logger = logging.getLogger()
+        logger.addHandler(handler)
+        logger.setLevel(logging.WARNING)
+        _dta = DatetimeAdapter(lenient=True)
+        examples = [
+            (b"not-a-timestamp", None),
+            (b"725811479000000", datetime.fromtimestamp(725811479)),  # Correct microseconds to seconds
+            (b"1995-04-07 00:00:00", datetime(1995, 4, 7, 0, 0)),
+        ]
+
+        for val, expected in examples:
+            with self.subTest(val=val):
+                result = convert_timestamp(val)
+                if expected is None:
+                    self.assertIsNone(result, "Expected None for invalid timestamp input")
+                    # Check if the expected log message is in log_stream
+                    self.assertIn("Failed to convert", log_stream.getvalue())
+                    # Clear log stream after checking
+                    log_stream.truncate(0)
+                    log_stream.seek(0)
+                else:
+                    self.assertEqual(
+                        result,
+                        expected,
+                        f"Expected correct datetime conversion for {val}",
+                    )
+        # Remove the handler after the test to clean up
+        logger.removeHandler(handler)
+        log_stream.close()

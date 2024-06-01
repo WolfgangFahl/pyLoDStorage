@@ -13,7 +13,7 @@ class Params:
     parameter handling
     """
 
-    def __init__(self, query: str, illegal_chars:str=""""[;<>&|]"'"""):
+    def __init__(self, query: str, illegal_chars: str = """"[;<>&|]"'"""):
         """
         constructor
 
@@ -21,7 +21,7 @@ class Params:
             query(str): the query to analyze for parameters
             illegal_chars: chars that may not be in the values
         """
-        self.illegal_chars=illegal_chars
+        self.illegal_chars = illegal_chars
         self.query = query
         self.pattern = re.compile(r"{{\s*(\w+)\s*}}")
         self.params = self.pattern.findall(query)
@@ -33,18 +33,20 @@ class Params:
         set my params
         """
         self.params_dict = params_dict
-        
+
     def audit(self) -> None:
         """
         Audit the usage of parameters in the query.
-    
+
         Raises:
             ValueError: If potentially malicious values are detected in the parameter dictionary.
         """
         for param, value in self.params_dict.items():
             for char in self.illegal_chars:
                 if char in value:
-                    raise ValueError(f"Potentially malicious value detected for parameter '{param}'")
+                    raise ValueError(
+                        f"Potentially malicious value detected for parameter '{param}'"
+                    )
 
     def apply_parameters(self) -> str:
         """

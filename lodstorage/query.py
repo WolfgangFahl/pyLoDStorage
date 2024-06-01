@@ -667,7 +667,9 @@ class EndpointManager(object):
     """
 
     @staticmethod
-    def getEndpoints(endpointPath: str = None, lang: str = None,with_default:bool=True):
+    def getEndpoints(
+        endpointPath: str = None, lang: str = None, with_default: bool = True
+    ):
         """
         get the endpoints for the given endpointPath
 
@@ -676,7 +678,9 @@ class EndpointManager(object):
             lang(str): if lang is given filter by the given language
             with_default(bool): if True include the default endpoints
         """
-        endpointPaths = YamlPath.getPaths("endpoints.yaml", endpointPath,with_default=with_default)
+        endpointPaths = YamlPath.getPaths(
+            "endpoints.yaml", endpointPath, with_default=with_default
+        )
         endpoints = {}
         for lEndpointPath in endpointPaths:
             with open(lEndpointPath, "r") as stream:
