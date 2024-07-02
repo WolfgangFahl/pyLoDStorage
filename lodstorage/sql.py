@@ -83,6 +83,29 @@ class SQLDB(object):
         """
         self.c.execute(ddlCmd)
 
+    def createTable4EntityInfo(self, entityInfo, withDrop=False, withCreate=True):
+        """
+        Create a table based on the provided EntityInfo.
+
+        Args:
+            entityInfo (EntityInfo): The EntityInfo object containing table metadata.
+            withDrop (bool): If True, drop the existing table before creation.
+            withCreate (bool): If True, execute the CREATE TABLE command.
+
+        Returns:
+            EntityInfo: The provided EntityInfo object.
+        """
+        if withDrop:
+            self.c.execute(entityInfo.dropTableCmd)
+        if withCreate:
+            try:
+                self.c.execute(entityInfo.createTableCmd)
+            except sqlite3.OperationalError as oe:
+                raise Exception(
+                    f"createTable failed with error {oe} for {entityInfo.createTableCmd}"
+                )
+        return entityInfo
+
     def createTable(
         self,
         listOfRecords,
@@ -94,47 +117,35 @@ class SQLDB(object):
         failIfTooFew=True,
     ):
         """
-        derive  Data Definition Language CREATE TABLE command from list of Records by examining first recorda
-        as defining sample record and execute DDL command
-
-        auto detect column types see e.g. https://stackoverflow.com/a/57072280/1497139
+        Derive Data Definition Language CREATE TABLE command from list of Records by examining first record
+        as defining sample record and execute DDL command.
 
         Args:
-           listOfRecords(list): a list of Dicts
-           entityName(string): the entity / table name to use
-           primaryKey(string): the key/column to use as a  primary key
-           withDrop(boolean): true if the existing Table should be dropped
-           withCreate(boolean): true if the create Table command should be executed - false if only the entityInfo should be returned
-           sampleRecords(int): number of sampleRecords expected and to be inspected
-           failIfTooFew(boolean): raise an Exception if to few sampleRecords else warn only
+            listOfRecords (list): A list of Dicts.
+            entityName (str): The entity / table name to use.
+            primaryKey (str): The key/column to use as a primary key.
+            withDrop (bool): True if the existing Table should be dropped.
+            withCreate (bool): True if the create Table command should be executed.
+            sampleRecordCount (int): Number of sample records expected and to be inspected.
+            failIfTooFew (bool): Raise an Exception if too few sample records, else warn only.
+
         Returns:
-           EntityInfo: meta data information for the created table
+            EntityInfo: Meta data information for the created table.
         """
         l = len(listOfRecords)
         if sampleRecordCount < 0:
             sampleRecordCount = l
         if l < sampleRecordCount:
-            msg = "only %d/%d of needed sample records to createTable available" % (
-                l,
-                sampleRecordCount,
-            )
+            msg = f"only {l}/{sampleRecordCount} of needed sample records to createTable available"
             if failIfTooFew:
                 raise Exception(msg)
-            else:
-                if self.debug:
-                    self.logError(msg)
+            elif self.debug:
+                self.logError(msg)
+
         sampleRecords = listOfRecords[:sampleRecordCount]
         entityInfo = EntityInfo(sampleRecords, entityName, primaryKey, debug=self.debug)
-        if withDrop:
-            self.c.execute(entityInfo.dropTableCmd)
-        if withCreate:
-            try:
-                self.c.execute(entityInfo.createTableCmd)
-            except sqlite3.OperationalError as oe:
-                raise Exception(
-                    f"createTable failed with error {oe} for {entityInfo.createTableCmd}"
-                )
-        return entityInfo
+
+        return self.createTable4EntityInfo(entityInfo, withDrop, withCreate)
 
     def getDebugInfo(self, record, index, executeMany):
         """
@@ -665,7 +676,8 @@ def adapt_boolean(val: bool):
 
 sqlite3.register_adapter(datetime.date, adapt_date_iso)
 sqlite3.register_adapter(datetime.datetime, adapt_datetime_iso)
-sqlite3.register_adapter(datetime.datetime, adapt_datetime_epoch)
+# alternative way of storing datetimes
+# sqlite3.register_adapter(datetime.datetime, adapt_datetime_epoch)
 sqlite3.register_adapter(bool, adapt_boolean)
 
 

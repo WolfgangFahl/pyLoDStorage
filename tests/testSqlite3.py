@@ -7,8 +7,8 @@ import logging
 import os
 import sys
 import time
+from datetime import datetime, timezone
 from io import StringIO
-from datetime import datetime
 
 from lodstorage.sample import Sample
 from lodstorage.schema import Schema
@@ -21,7 +21,7 @@ class TestSQLDB(Basetest):
     """
     Test the SQLDB database wrapper
     """
-    
+
     def setUp(self, debug=False, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
         logging.basicConfig(level=logging.WARNING)
@@ -471,7 +471,10 @@ record  #3={'name': 'John Doe'}"""
         _dta = DatetimeAdapter(lenient=True)
         examples = [
             (b"not-a-timestamp", None),
-            (b"725811479000000", datetime.fromtimestamp(725811479)),  # Correct microseconds to seconds
+            (
+                b"725811479000000",
+                datetime.fromtimestamp(725811479),
+            ),  # Correct microseconds to seconds
             (b"1995-04-07 00:00:00", datetime(1995, 4, 7, 0, 0)),
         ]
 
@@ -479,7 +482,9 @@ record  #3={'name': 'John Doe'}"""
             with self.subTest(val=val):
                 result = convert_timestamp(val)
                 if expected is None:
-                    self.assertIsNone(result, "Expected None for invalid timestamp input")
+                    self.assertIsNone(
+                        result, "Expected None for invalid timestamp input"
+                    )
                     # Check if the expected log message is in log_stream
                     self.assertIn("Failed to convert", log_stream.getvalue())
                     # Clear log stream after checking
@@ -494,3 +499,44 @@ record  #3={'name': 'John Doe'}"""
         # Remove the handler after the test to clean up
         logger.removeHandler(handler)
         log_stream.close()
+
+    def testMultipleAdapters(self):
+        """
+        Test the behavior of multiple registered adapters for datetime.datetime
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/[issue_number]
+        """
+
+        # Test data
+        naive_dt = datetime(2023, 1, 1, 12, 0, 0)
+        aware_dt = datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+
+        # Create SQLDB instance
+        sqlDB = SQLDB(":memory:", debug=self.debug)
+
+        # Create table and insert data
+        entityInfo = sqlDB.createTable(
+            [{"id": 1, "naive_date": naive_dt, "aware_date": aware_dt}],
+            "test_dates",
+            "id",
+        )
+        sqlDB.store(
+            [{"id": 1, "naive_date": naive_dt, "aware_date": aware_dt}], entityInfo
+        )
+
+        # Query the data
+        result = sqlDB.query("SELECT * FROM test_dates")[0]
+
+        # Check if both datetime types are stored and retrieved correctly
+        self.assertEqual(naive_dt, result["naive_date"])
+        self.assertEqual(aware_dt, result["aware_date"])
+
+        # Test with a timezone-aware datetime as the primary key
+        entityInfo = sqlDB.createTable(
+            [{"dt": aware_dt, "value": "test"}], "test_dates_pk", "dt"
+        )
+        sqlDB.store([{"dt": aware_dt, "value": "test"}], entityInfo)
+
+        result = sqlDB.query("SELECT * FROM test_dates_pk")[0]
+        self.assertEqual(aware_dt, result["dt"])
+
+        sqlDB.close()
