@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.sync &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.sync</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2023-12-27</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+
+
+<div class="viewcode-block" id="SyncPair">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sync.SyncPair">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SyncPair</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">       A class to represent a pair of data sources for synchronization.</span>
+
+<span class="sd">       Attributes:</span>
+<span class="sd">           title (str): The title of the synchronization pair.</span>
+<span class="sd">           l_name (str): Name of the left data source (e.g., &#39;local&#39;).</span>
+<span class="sd">           r_name (str): Name of the right data source (e.g., &#39;wikidata&#39;).</span>
+<span class="sd">           l_data (List[Dict[str, Any]]): A list of dictionaries from the left data source.</span>
+<span class="sd">           r_data (List[Dict[str, Any]]): A list of dictionaries from the right data source.</span>
+<span class="sd">           l_key (str): The field name in the left data source dictionaries used as a unique identifier for synchronization.</span>
+<span class="sd">           r_key (str): The field name in the right data source dictionaries used as a unique identifier for synchronization.</span>
+<span class="sd">           l_pkey(str): the primary key field of the left data source</span>
+<span class="sd">           r_pkey(str): the primary key field of the right data source</span>
+
+<span class="sd">    Example usage:</span>
+<span class="sd">    l_data = [{&#39;id_l&#39;: &#39;1&#39;, &#39;value&#39;: &#39;a&#39;}, {&#39;id_l&#39;: &#39;2&#39;, &#39;value&#39;: &#39;b&#39;}]</span>
+<span class="sd">    r_data = [{&#39;id_r&#39;: &#39;2&#39;, &#39;value&#39;: &#39;b&#39;}, {&#39;id_r&#39;: &#39;3&#39;, &#39;value&#39;: &#39;c&#39;}]</span>
+<span class="sd">    pair = SyncPair(&quot;Title&quot;, &quot;local&quot;, &quot;wikidata&quot;, l_data, r_data, &#39;id_l&#39;, &#39;id_r&#39;)</span>
+<span class="sd">    sync = Sync(pair)</span>
+<span class="sd">    print(sync.status_table())</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">l_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">r_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">l_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">r_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">l_key</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">r_key</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">l_pkey</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">r_pkey</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Add dictionaries for quick primary key access</span>
+    <span class="n">l_by_pkey</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">r_by_pkey</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Set the l_pkey to l_key if not provided</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_pkey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">l_pkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_key</span>
+        <span class="c1"># Set the r_pkey to r_key if not provided</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_pkey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">r_pkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_by_pkey</span> <span class="o">=</span> <span class="p">{</span><span class="n">d</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">l_pkey</span><span class="p">]:</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_data</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_pkey</span> <span class="ow">in</span> <span class="n">d</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_by_pkey</span> <span class="o">=</span> <span class="p">{</span><span class="n">d</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">r_pkey</span><span class="p">]:</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_data</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_pkey</span> <span class="ow">in</span> <span class="n">d</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="Sync">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sync.Sync">[docs]</a>
+<span class="k">class</span> <span class="nc">Sync</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to help with synchronization between two sets of data, each represented as a list of dictionaries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pair</span><span class="p">:</span> <span class="n">SyncPair</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Sync class with the given Synchronization Pair.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pair</span> <span class="o">=</span> <span class="n">pair</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sync_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_sync_dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;←&quot;</span><span class="p">,</span> <span class="s2">&quot;↔&quot;</span><span class="p">,</span> <span class="s2">&quot;→&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sides</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;left&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;←&quot;</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">],</span> <span class="s2">&quot;right&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;→&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]}</span>
+
+<div class="viewcode-block" id="Sync.handle_direction_error">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sync.Sync.handle_direction_error">[docs]</a>
+    <span class="k">def</span> <span class="nf">handle_direction_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">invalid_direction_msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid direction &#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2">&#39;. Use </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directions</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">invalid_direction_msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sync.handle_side_error">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sync.Sync.handle_side_error">[docs]</a>
+    <span class="k">def</span> <span class="nf">handle_side_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">side</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">invalid_side_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid side &#39;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s2">&#39;. Use </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sides</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> for left or </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sides</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> for right.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">invalid_side_msg</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_create_sync_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a dictionary representing the synchronization state between left and right data sources.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l_keys</span> <span class="o">=</span> <span class="p">{</span><span class="n">d</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">l_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">l_data</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">l_key</span> <span class="ow">in</span> <span class="n">d</span><span class="p">}</span>
+        <span class="n">r_keys</span> <span class="o">=</span> <span class="p">{</span><span class="n">d</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">r_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">r_data</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">r_key</span> <span class="ow">in</span> <span class="n">d</span><span class="p">}</span>
+
+        <span class="n">sync_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;←&quot;</span><span class="p">:</span> <span class="n">r_keys</span> <span class="o">-</span> <span class="n">l_keys</span><span class="p">,</span>  <span class="c1"># Present in right but not in left</span>
+            <span class="s2">&quot;↔&quot;</span><span class="p">:</span> <span class="n">l_keys</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">r_keys</span><span class="p">),</span>  <span class="c1"># Present in both</span>
+            <span class="s2">&quot;→&quot;</span><span class="p">:</span> <span class="n">l_keys</span> <span class="o">-</span> <span class="n">r_keys</span><span class="p">,</span>  <span class="c1"># Present in left but not in right</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sync_dict</span>
+
+<div class="viewcode-block" id="Sync.get_record_by_pkey">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sync.Sync.get_record_by_pkey">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_record_by_pkey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">side</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pkey</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves a record by primary key from the appropriate data source as specified by direction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            side (str): The side of data source, &quot;←&quot;,&quot;l&quot; or &quot;left&quot; for left and &quot;→&quot;,&quot;r&quot; or &quot;right&quot; for right.</span>
+<span class="sd">            pkey (str): The primary key of the record to retrieve.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[Dict[str, Any]]: The record if found, otherwise None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">side</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sides</span><span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">]:</span>  <span class="c1"># retrieve from left</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">l_by_pkey</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pkey</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">side</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sides</span><span class="p">[</span><span class="s2">&quot;right&quot;</span><span class="p">]:</span>  <span class="c1"># retrieve from right</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">r_by_pkey</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pkey</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handle_side_error</span><span class="p">(</span><span class="n">side</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">record</span></div>
+
+
+<div class="viewcode-block" id="Sync.get_record_by_key">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sync.Sync.get_record_by_key">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_record_by_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">side</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves a record by the given unique key from the appropriate data source as specified by direction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            side (str): The side of data source, &quot;←&quot;,&quot;l&quot; or &quot;left&quot; for left and &quot;→&quot;,&quot;r&quot; or &quot;right&quot; for right.</span>
+<span class="sd">            key (str): The unique key of the record to retrieve.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[Dict[str, Any]]: The record if found, otherwise None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the provided direction is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">side</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;←&quot;</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">]:</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">l_data</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">l_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">),</span>
+                <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">side</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;→&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]:</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">r_data</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">r_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">),</span>
+                <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handle_side_error</span><span class="p">(</span><span class="n">side</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">record</span></div>
+
+
+<div class="viewcode-block" id="Sync.get_keys">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sync.Sync.get_keys">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the keys for a given direction of synchronization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_dict</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handle_direction_error</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sync.status_table">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sync.Sync.status_table">[docs]</a>
+    <span class="k">def</span> <span class="nf">status_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;grid&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a table representing the synchronization status.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total_records</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">total_records</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Avoid division by zero</span>
+            <span class="n">total_records</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">table_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">direction</span><span class="p">,</span> <span class="n">keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">num_records</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+            <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_records</span> <span class="o">/</span> <span class="n">total_records</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+            <span class="n">table_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;left&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">l_name</span><span class="p">,</span>
+                    <span class="s2">&quot;↔&quot;</span><span class="p">:</span> <span class="n">direction</span><span class="p">,</span>
+                    <span class="s2">&quot;right&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">r_name</span><span class="p">,</span>
+                    <span class="s2">&quot;#&quot;</span><span class="p">:</span> <span class="n">num_records</span><span class="p">,</span>
+                    <span class="s2">&quot;%&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">percentage</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="n">markup</span> <span class="o">=</span> <span class="n">tabulate</span><span class="p">(</span>
+            <span class="n">table_data</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span>
+            <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">,</span>
+            <span class="n">colalign</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">markup</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

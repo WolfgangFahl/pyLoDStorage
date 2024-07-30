@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.sample2 &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.sample2</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2024-01-21</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">slugify</span> <span class="kn">import</span> <span class="n">slugify</span>
+<span class="kn">from</span> <span class="nn">lodstorage.yamlable</span> <span class="kn">import</span> <span class="n">DateConvert</span><span class="p">,</span> <span class="n">lod_storable</span>
+
+
+<span class="nd">@lod_storable</span>
+<span class="k">class</span> <span class="nc">Royal</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a member of the royal family, with various personal details.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): The full name of the royal member.</span>
+<span class="sd">        wikidata_id (str): The Wikidata identifier associated with the royal member.</span>
+<span class="sd">        number_in_line (Optional[int]): The number in line to succession, if applicable.</span>
+<span class="sd">        born_iso_date (Optional[str]): The ISO date of birth.</span>
+<span class="sd">        died_iso_date (Optional[str]): The ISO date of death, if deceased.</span>
+<span class="sd">        last_modified_iso (str): ISO timestamp of the last modification.</span>
+<span class="sd">        age (Optional[int]): The age of the royal member.</span>
+<span class="sd">        of_age (Optional[bool]): Indicates whether the member is of legal age.</span>
+<span class="sd">        wikidata_url (Optional[str]): URL to the Wikidata page of the member.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">wikidata_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">number_in_line</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">born_iso_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">died_iso_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">last_modified_iso</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">of_age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">wikidata_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        init calculated fields</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lastmodified</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_modified_iso</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastmodified</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%SZ&quot;</span><span class="p">)</span>
+        <span class="n">end_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">died</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">died</span> <span class="k">else</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">end_date</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">born</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">/</span> <span class="mf">365.2425</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">of_age</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">18</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wikidata_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wikidata_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.wikidata.org/wiki/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">wikidata_id</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a unique identifier for the Royal instance.</span>
+<span class="sd">        The identifier is a combination of a slugified name and the Wikidata ID (if available).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">slugified_name</span> <span class="o">=</span> <span class="n">slugify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">lowercase</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">regex_pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;[^\w\-]&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wikidata_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">slugified_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">wikidata_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">slugified_name</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">born</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">date</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the date of birth from the ISO date string.&quot;&quot;&quot;</span>
+        <span class="n">born_date</span> <span class="o">=</span> <span class="n">DateConvert</span><span class="o">.</span><span class="n">iso_date_to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">born_iso_date</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">born_date</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">died</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">date</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the date of death from the ISO date string, if available.&quot;&quot;&quot;</span>
+        <span class="n">died_date</span> <span class="o">=</span> <span class="n">DateConvert</span><span class="o">.</span><span class="n">iso_date_to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">died_iso_date</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">died_date</span>
+
+
+<span class="nd">@lod_storable</span>
+<span class="k">class</span> <span class="nc">Royals</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a collection of Royal family members.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        members (List[Royal]): A list of Royal family members.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">members</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Royal</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Royals&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary of named samples</span>
+<span class="sd">        for &#39;specification by example&#39; style</span>
+<span class="sd">        requirements management.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary with keys as sample names and values as `Royals` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;QE2 heirs up to number in line 5&quot;</span><span class="p">:</span> <span class="n">Royals</span><span class="p">(</span>
+                <span class="n">members</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">Royal</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Elizabeth Alexandra Mary Windsor&quot;</span><span class="p">,</span>
+                        <span class="n">born_iso_date</span><span class="o">=</span><span class="s2">&quot;1926-04-21&quot;</span><span class="p">,</span>
+                        <span class="n">died_iso_date</span><span class="o">=</span><span class="s2">&quot;2022-09-08&quot;</span><span class="p">,</span>
+                        <span class="n">wikidata_id</span><span class="o">=</span><span class="s2">&quot;Q9682&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">Royal</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Charles III of the United Kingdom&quot;</span><span class="p">,</span>
+                        <span class="n">born_iso_date</span><span class="o">=</span><span class="s2">&quot;1948-11-14&quot;</span><span class="p">,</span>
+                        <span class="n">number_in_line</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">wikidata_id</span><span class="o">=</span><span class="s2">&quot;Q43274&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">Royal</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;William, Duke of Cambridge&quot;</span><span class="p">,</span>
+                        <span class="n">born_iso_date</span><span class="o">=</span><span class="s2">&quot;1982-06-21&quot;</span><span class="p">,</span>
+                        <span class="n">number_in_line</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">wikidata_id</span><span class="o">=</span><span class="s2">&quot;Q36812&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">Royal</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Prince George of Wales&quot;</span><span class="p">,</span>
+                        <span class="n">born_iso_date</span><span class="o">=</span><span class="s2">&quot;2013-07-22&quot;</span><span class="p">,</span>
+                        <span class="n">number_in_line</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">wikidata_id</span><span class="o">=</span><span class="s2">&quot;Q13590412&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">Royal</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Princess Charlotte of Wales&quot;</span><span class="p">,</span>
+                        <span class="n">born_iso_date</span><span class="o">=</span><span class="s2">&quot;2015-05-02&quot;</span><span class="p">,</span>
+                        <span class="n">number_in_line</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                        <span class="n">wikidata_id</span><span class="o">=</span><span class="s2">&quot;Q18002970&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">Royal</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Prince Louis of Wales&quot;</span><span class="p">,</span>
+                        <span class="n">born_iso_date</span><span class="o">=</span><span class="s2">&quot;2018-04-23&quot;</span><span class="p">,</span>
+                        <span class="n">number_in_line</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                        <span class="n">wikidata_id</span><span class="o">=</span><span class="s2">&quot;Q38668629&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">Royal</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Harry Duke of Sussex&quot;</span><span class="p">,</span>
+                        <span class="n">born_iso_date</span><span class="o">=</span><span class="s2">&quot;1984-09-15&quot;</span><span class="p">,</span>
+                        <span class="n">number_in_line</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                        <span class="n">wikidata_id</span><span class="o">=</span><span class="s2">&quot;Q152316&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">samples</span>
+
+
+<span class="nd">@lod_storable</span>
+<span class="k">class</span> <span class="nc">Country</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a country with its details.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): The name of the country.</span>
+<span class="sd">        country_code (str): The country code.</span>
+<span class="sd">        capital (Optional[str]): The capital city of the country.</span>
+<span class="sd">        timezones (List[str]): List of timezones in the country.</span>
+<span class="sd">        latlng (List[float]): Latitude and longitude of the country.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">country_code</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">capital</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">timezones</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">latlng</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+
+<span class="nd">@lod_storable</span>
+<span class="k">class</span> <span class="nc">Countries</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a collection of country instances.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        countries (List[Country]): A list of Country instances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">countries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Country</span><span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_countries_erdem</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Countries&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get Erdem Ozkol&#39;s country list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">countries_json_url</span> <span class="o">=</span> <span class="s2">&quot;https://gist.githubusercontent.com/erdem/8c7d26765831d0f9a8c62f02782ae00d/raw/248037cd701af0a4957cce340dabb0fd04e38f4c/countries.json&quot;</span>
+        <span class="n">json_str</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">read_from_url</span><span class="p">(</span><span class="n">countries_json_url</span><span class="p">)</span>
+        <span class="n">countries_list</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+        <span class="n">countries_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;countries&quot;</span><span class="p">:</span> <span class="n">countries_list</span><span class="p">}</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">countries_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Countries&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary of named samples</span>
+<span class="sd">        for &#39;specification by example&#39; style</span>
+<span class="sd">        requirements management.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary with keys as sample names</span>
+<span class="sd">            and values as `Countries` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;country list provided by Erdem Ozkol&quot;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_countries_erdem</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">samples</span>
+
+
+<div class="viewcode-block" id="Sample">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample2.Sample">[docs]</a>
+<span class="k">class</span> <span class="nc">Sample</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sample dataset provider</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Sample.get">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample2.Sample.get">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the given sample dataset name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">dataset_name</span> <span class="o">==</span> <span class="s2">&quot;royals&quot;</span><span class="p">:</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">Royals</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">dataset_name</span> <span class="o">==</span> <span class="s2">&quot;countries&quot;</span><span class="p">:</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">Countries</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown dataset name&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">samples</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

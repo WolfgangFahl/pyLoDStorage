@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.sql &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.sql</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2020-08-24</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="c1"># python standard library</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">lodstorage.lod</span> <span class="kn">import</span> <span class="n">LOD</span>
+
+
+<div class="viewcode-block" id="SQLDB">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB">[docs]</a>
+<span class="k">class</span> <span class="nc">SQLDB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Structured Query Language Database wrapper</span>
+
+<span class="sd">    :ivar dbname(string): name of the database</span>
+<span class="sd">    :ivar debug(boolean): True if debug info should be provided</span>
+<span class="sd">    :ivar errorDebug(boolean): True if debug info should be provided on errors (should not be used for production since it might reveal data)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">RAM</span> <span class="o">=</span> <span class="s2">&quot;:memory:&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dbname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;:memory:&quot;</span><span class="p">,</span>
+        <span class="n">connection</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">check_same_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">errorDebug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct me for the given dbname and debug</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">           dbname(string): name of the database - default is a RAM based database</span>
+<span class="sd">           connection(Connection): an optional connection to be reused</span>
+<span class="sd">           check_same_thread(boolean): True if object handling needs to be on the same thread see https://stackoverflow.com/a/48234567/1497139</span>
+<span class="sd">           timeout(float): number of seconds for connection timeout</span>
+<span class="sd">           debug(boolean): if True switch on debug</span>
+<span class="sd">           errorDebug(boolean): True if debug info should be provided on errors (should not be used for production since it might reveal data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbname</span> <span class="o">=</span> <span class="n">dbname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errorDebug</span> <span class="o">=</span> <span class="n">errorDebug</span>
+        <span class="k">if</span> <span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="n">dbname</span><span class="p">,</span>
+                <span class="n">detect_types</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_DECLTYPES</span><span class="p">,</span>
+                <span class="n">check_same_thread</span><span class="o">=</span><span class="n">check_same_thread</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">connection</span>
+
+<div class="viewcode-block" id="SQLDB.logError">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.logError">[docs]</a>
+    <span class="k">def</span> <span class="nf">logError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        log the given error message to stderr</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg(str): the error messsage to display</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.close">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.close">[docs]</a>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;close my connection&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.execute">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.execute">[docs]</a>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ddlCmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        execute the given Data Definition Command</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ddlCmd(string): e.g. a CREATE TABLE or CREATE View command</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">ddlCmd</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.createTable">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.createTable">[docs]</a>
+    <span class="k">def</span> <span class="nf">createTable</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">listOfRecords</span><span class="p">,</span>
+        <span class="n">entityName</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">primaryKey</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">withCreate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">withDrop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">sampleRecordCount</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">failIfTooFew</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        derive  Data Definition Language CREATE TABLE command from list of Records by examining first recorda</span>
+<span class="sd">        as defining sample record and execute DDL command</span>
+
+<span class="sd">        auto detect column types see e.g. https://stackoverflow.com/a/57072280/1497139</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           listOfRecords(list): a list of Dicts</span>
+<span class="sd">           entityName(string): the entity / table name to use</span>
+<span class="sd">           primaryKey(string): the key/column to use as a  primary key</span>
+<span class="sd">           withDrop(boolean): true if the existing Table should be dropped</span>
+<span class="sd">           withCreate(boolean): true if the create Table command should be executed - false if only the entityInfo should be returned</span>
+<span class="sd">           sampleRecords(int): number of sampleRecords expected and to be inspected</span>
+<span class="sd">           failIfTooFew(boolean): raise an Exception if to few sampleRecords else warn only</span>
+<span class="sd">        Returns:</span>
+<span class="sd">           EntityInfo: meta data information for the created table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sampleRecordCount</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sampleRecordCount</span> <span class="o">=</span> <span class="n">l</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="n">sampleRecordCount</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;only </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2"> of needed sample records to createTable available&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">l</span><span class="p">,</span>
+                <span class="n">sampleRecordCount</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">failIfTooFew</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">sampleRecords</span> <span class="o">=</span> <span class="n">listOfRecords</span><span class="p">[:</span><span class="n">sampleRecordCount</span><span class="p">]</span>
+        <span class="n">entityInfo</span> <span class="o">=</span> <span class="n">EntityInfo</span><span class="p">(</span><span class="n">sampleRecords</span><span class="p">,</span> <span class="n">entityName</span><span class="p">,</span> <span class="n">primaryKey</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">withDrop</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">entityInfo</span><span class="o">.</span><span class="n">dropTableCmd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">withCreate</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">entityInfo</span><span class="o">.</span><span class="n">createTableCmd</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">OperationalError</span> <span class="k">as</span> <span class="n">oe</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;createTable failed with error </span><span class="si">{</span><span class="n">oe</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">entityInfo</span><span class="o">.</span><span class="n">createTableCmd</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">entityInfo</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.getDebugInfo">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.getDebugInfo">[docs]</a>
+    <span class="k">def</span> <span class="nf">getDebugInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">executeMany</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the debug info for the given record at the given index depending on the state of executeMany</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            record(dict): the record to show</span>
+<span class="sd">            index(int): the index of the record</span>
+<span class="sd">            executeMany(boolean): if True the record may be valid else not</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">debugInfo</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">executeMany</span><span class="p">:</span>
+            <span class="c1"># shall we shoe the details of the record (which might be a security risk)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorDebug</span><span class="p">:</span>
+                <span class="c1"># show details of record</span>
+                <span class="n">debugInfo</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">record  #</span><span class="si">%d</span><span class="s2">=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">record</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># show only index</span>
+                <span class="n">debugInfo</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">record #</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">index</span>
+        <span class="k">return</span> <span class="n">debugInfo</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.store">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.store">[docs]</a>
+    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">listOfRecords</span><span class="p">,</span> <span class="n">entityInfo</span><span class="p">,</span> <span class="n">executeMany</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fixNone</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        store the given list of records based on the given entityInfo</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">           listOfRecords(list): the list of Dicts to be stored</span>
+<span class="sd">           entityInfo(EntityInfo): the meta data to be used for storing</span>
+<span class="sd">           executeMany(bool): if True the insert command is done with many/all records at once</span>
+<span class="sd">           fixNone(bool): if True make sure empty columns in the listOfDict are filled with &quot;None&quot; values</span>
+<span class="sd">           replace(bool): if True allow replace for insert</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">insertCmd</span> <span class="o">=</span> <span class="n">entityInfo</span><span class="o">.</span><span class="n">getInsertCmd</span><span class="p">(</span><span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">executeMany</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fixNone</span><span class="p">:</span>
+                    <span class="n">LOD</span><span class="o">.</span><span class="n">setNone4List</span><span class="p">(</span><span class="n">listOfRecords</span><span class="p">,</span> <span class="n">entityInfo</span><span class="o">.</span><span class="n">typeMap</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="n">insertCmd</span><span class="p">,</span> <span class="n">listOfRecords</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">listOfRecords</span><span class="p">:</span>
+                    <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">fixNone</span><span class="p">:</span>
+                        <span class="n">LOD</span><span class="o">.</span><span class="n">setNone</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">entityInfo</span><span class="o">.</span><span class="n">typeMap</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">insertCmd</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">ProgrammingError</span> <span class="k">as</span> <span class="n">pe</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;You did not supply a value for binding&quot;</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;:&quot;</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+                    <span class="c1"># sqlite now returns the parameter name not the number</span>
+                    <span class="c1"># You did not supply a value for binding parameter :type.</span>
+                    <span class="n">columnName</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;:([a-zA-Z][a-zA-Z0-9_]*)&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">columnName</span> <span class="o">=</span> <span class="n">columnName</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># pre python 3.10</span>
+                    <span class="c1"># You did not supply a value for binding 2.</span>
+                    <span class="n">columnIndex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">columnName</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">entityInfo</span><span class="o">.</span><span class="n">typeMap</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">columnIndex</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">debugInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDebugInfo</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">executeMany</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">failed: no value supplied for column &#39;</span><span class="si">%s</span><span class="s2">&#39;</span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">insertCmd</span><span class="p">,</span> <span class="n">columnName</span><span class="p">,</span> <span class="n">debugInfo</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">pe</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ie</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;Error binding parameter&quot;</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="n">columnName</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;:[_a-zA-Z]\w*&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">debugInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDebugInfo</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">executeMany</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">failed: error binding column &#39;</span><span class="si">%s</span><span class="s2">&#39;</span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">insertCmd</span><span class="p">,</span> <span class="n">columnName</span><span class="p">,</span> <span class="n">debugInfo</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ie</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">debugInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDebugInfo</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">executeMany</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">failed:</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">insertCmd</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">),</span> <span class="n">debugInfo</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.queryGen">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.queryGen">[docs]</a>
+    <span class="k">def</span> <span class="nf">queryGen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sqlQuery</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        run the given sqlQuery a a generator for dicts</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            sqlQuery(string): the SQL query to be executed</span>
+<span class="sd">            params(tuple): the query params, if any</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a generator of dicts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">sqlQuery</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># https://stackoverflow.com/a/13735506/1497139</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sqlQuery</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sqlQuery</span><span class="p">)</span>
+        <span class="n">colname</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">query</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># loop over all rows</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
+                <span class="n">record</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">colname</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
+                <span class="k">yield</span> <span class="n">record</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">pass</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.query">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.query">[docs]</a>
+    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sqlQuery</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        run the given sqlQuery and return a list of Dicts</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            sqlQuery(string): the SQL query to be executed</span>
+<span class="sd">            params(tuple): the query params, if any</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: a list of Dicts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resultList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queryGen</span><span class="p">(</span><span class="n">sqlQuery</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+            <span class="n">resultList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resultList</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.queryAll">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.queryAll">[docs]</a>
+    <span class="k">def</span> <span class="nf">queryAll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entityInfo</span><span class="p">,</span> <span class="n">fixDates</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        query all records for the given entityName/tableName</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           entityName(string): name of the entity/table to qury</span>
+<span class="sd">           fixDates(boolean): True if date entries should be returned as such and not as strings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sqlQuery</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">entityInfo</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">resultList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sqlQuery</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fixDates</span><span class="p">:</span>
+            <span class="n">entityInfo</span><span class="o">.</span><span class="n">fixDates</span><span class="p">(</span><span class="n">resultList</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resultList</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.getTableList">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.getTableList">[docs]</a>
+    <span class="k">def</span> <span class="nf">getTableList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tableType</span><span class="o">=</span><span class="s2">&quot;table&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the schema information from this database</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tableType(str): table or view</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            list: a list as derived from PRAGMA table_info</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tableQuery</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT name FROM sqlite_master WHERE type=&#39;</span><span class="si">{</span><span class="n">tableType</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="n">tableList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">tableQuery</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tableList</span><span class="p">:</span>
+            <span class="n">tableName</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="n">columnQuery</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PRAGMA table_info(&#39;</span><span class="si">{</span><span class="n">tableName</span><span class="si">}</span><span class="s2">&#39;)&quot;</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">columnQuery</span><span class="p">)</span>
+            <span class="n">table</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns</span>
+        <span class="k">return</span> <span class="n">tableList</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.getTableDict">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.getTableDict">[docs]</a>
+    <span class="k">def</span> <span class="nf">getTableDict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tableType</span><span class="o">=</span><span class="s2">&quot;table&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the schema information from this database as a dict</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tableType(str): table or view</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Lookup map of tables with columns also being converted to dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tableDict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getTableList</span><span class="p">(</span><span class="n">tableType</span><span class="o">=</span><span class="n">tableType</span><span class="p">):</span>
+            <span class="n">colDict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]:</span>
+                <span class="n">colDict</span><span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">col</span>
+            <span class="n">table</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">colDict</span>
+            <span class="n">tableDict</span><span class="p">[</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">table</span>
+        <span class="k">return</span> <span class="n">tableDict</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.restoreProgress">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.restoreProgress">[docs]</a>
+    <span class="k">def</span> <span class="nf">restoreProgress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">total</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="p">(</span><span class="s2">&quot;Restore&quot;</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.backupProgress">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.backupProgress">[docs]</a>
+    <span class="k">def</span> <span class="nf">backupProgress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">total</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="p">(</span><span class="s2">&quot;Backup&quot;</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.progress">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.progress">[docs]</a>
+    <span class="k">def</span> <span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">remaining</span><span class="p">,</span> <span class="n">total</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        show progress</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> at </span><span class="si">%5.0f%%</span><span class="s2">&quot;</span>
+            <span class="o">%</span> <span class="p">(</span>
+                <span class="n">action</span><span class="p">,</span>
+                <span class="s2">&quot;... &quot;</span> <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;done&quot;</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="n">remaining</span><span class="p">)</span> <span class="o">/</span> <span class="n">total</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.backup">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.backup">[docs]</a>
+    <span class="k">def</span> <span class="nf">backup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">backupDB</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;Backup&quot;</span><span class="p">,</span>
+        <span class="n">profile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">showProgress</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+        <span class="n">doClose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        create backup of this SQLDB to the given backup db</span>
+
+<span class="sd">        see https://stackoverflow.com/a/59042442/1497139</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            backupDB(string): the path to the backupdb or SQLDB.RAM for in memory</span>
+<span class="sd">            action(string): the action to display</span>
+<span class="sd">            profile(boolean): True if timing information shall be shown</span>
+<span class="sd">            showProgress(int): show progress at each showProgress page (0=show no progress)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;backup via stdlibrary not available in python &lt;=3.6 use copyToDB instead&quot;</span>
+            <span class="p">)</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">bck</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">backupDB</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">showProgress</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;Restore&quot;</span><span class="p">:</span>
+                <span class="n">progress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restoreProgress</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">progress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backupProgress</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">with</span> <span class="n">bck</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span><span class="n">bck</span><span class="p">,</span> <span class="n">pages</span><span class="o">=</span><span class="n">showProgress</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span>
+        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2"> took </span><span class="si">%5.1f</span><span class="s2"> s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">backupDB</span><span class="p">,</span> <span class="n">elapsed</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">doClose</span><span class="p">:</span>
+            <span class="n">bck</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bck</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.showDump">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.showDump">[docs]</a>
+    <span class="k">def</span> <span class="nf">showDump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dump</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        show the given dump up to the given limit</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dump(string): the SQL dump to show</span>
+<span class="sd">            limit(int): the maximum number of lines to display</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;=</span> <span class="n">limit</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.executeDump">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.executeDump">[docs]</a>
+    <span class="k">def</span> <span class="nf">executeDump</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">dump</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">maxErrors</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">errorDisplayLimit</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        execute the given dump for the given connection</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            connection(Connection): the sqlite3 connection to use</span>
+<span class="sd">            dump(string): the SQL commands for the dump</span>
+<span class="sd">            title(string): the title of the dump</span>
+<span class="sd">            maxErrors(int): maximum number of errors to be tolerated before stopping and doing a rollback</span>
+<span class="sd">            profile(boolean): True if profiling information should be shown</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            a list of errors</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showDump</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dump of </span><span class="si">%s</span><span class="s2"> has size </span><span class="si">%4.1f</span><span class="s2"> MB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">))</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># fixes https://github.com/WolfgangFahl/ProceedingsTitleParser/issues/37</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">dump</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">OperationalError</span> <span class="k">as</span> <span class="n">soe</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;SQL error </span><span class="si">%s</span><span class="s2"> in line </span><span class="si">%d</span><span class="s2">:</span><span class="se">\n\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">soe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">errorDisplayLimit</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">maxErrors</span><span class="p">:</span>
+                    <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;ROLLBACK;&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;finished executing dump </span><span class="si">%s</span><span class="s2"> with </span><span class="si">%d</span><span class="s2"> lines and </span><span class="si">%d</span><span class="s2"> errors in </span><span class="si">%5.1f</span><span class="s2"> s&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">),</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">errors</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.copyTo">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.copyTo">[docs]</a>
+    <span class="k">def</span> <span class="nf">copyTo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">copyDB</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        copy my content to another database</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">           copyDB(Connection): the target database</span>
+<span class="sd">           profile(boolean): if True show profile information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">dump</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">iterdump</span><span class="p">())</span>
+        <span class="c1"># cursor.executescript(dump)</span>
+        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;finished getting dump of </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%5.1f</span><span class="s2"> s&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbname</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">dumpErrors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executeDump</span><span class="p">(</span><span class="n">copyDB</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">dump</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbname</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dumpErrors</span></div>
+
+
+<div class="viewcode-block" id="SQLDB.restore">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.SQLDB.restore">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="n">backupDB</span><span class="p">,</span> <span class="n">restoreDB</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showProgress</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        restore the restoreDB from the given backup DB</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            backupDB(string): path to the backupDB e.g. backup.db</span>
+<span class="sd">            restoreDB(string): path to the restoreDB or in Memory SQLDB.RAM</span>
+<span class="sd">            profile(boolean): True if timing information should be shown</span>
+<span class="sd">            showProgress(int): show progress at each showProgress page (0=show no progress)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">backupSQLDB</span> <span class="o">=</span> <span class="n">SQLDB</span><span class="p">(</span><span class="n">backupDB</span><span class="p">)</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="n">backupSQLDB</span><span class="o">.</span><span class="n">backup</span><span class="p">(</span>
+            <span class="n">restoreDB</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;Restore&quot;</span><span class="p">,</span>
+            <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">,</span>
+            <span class="n">showProgress</span><span class="o">=</span><span class="n">showProgress</span><span class="p">,</span>
+            <span class="n">doClose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">restoreSQLDB</span> <span class="o">=</span> <span class="n">SQLDB</span><span class="p">(</span><span class="n">restoreDB</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">restoreSQLDB</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EntityInfo">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.EntityInfo">[docs]</a>
+<span class="k">class</span> <span class="nc">EntityInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    holds entity meta Info</span>
+
+<span class="sd">    :ivar name(string): entity name = table name</span>
+
+<span class="sd">    :ivar primaryKey(string): the name of the primary key column</span>
+
+<span class="sd">    :ivar typeMap(dict): maps column names to python types</span>
+
+<span class="sd">    :ivar debug(boolean): True if debug information should be shown</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampleRecords</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">primaryKey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        construct me from the given name and primary key</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           name(string): the name of the entity</span>
+<span class="sd">           primaryKey(string): the name of the primary key column</span>
+<span class="sd">           debug(boolean): True if debug information should be shown</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampleRecords</span> <span class="o">=</span> <span class="n">sampleRecords</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">primaryKey</span> <span class="o">=</span> <span class="n">primaryKey</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">typeMap</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sqlTypeMap</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">createTableCmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCreateTableCmd</span><span class="p">(</span><span class="n">sampleRecords</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropTableCmd</span> <span class="o">=</span> <span class="s2">&quot;DROP TABLE IF EXISTS </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insertCmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInsertCmd</span><span class="p">()</span>
+
+<div class="viewcode-block" id="EntityInfo.getCreateTableCmd">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.EntityInfo.getCreateTableCmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">getCreateTableCmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampleRecords</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the CREATE TABLE DDL command for the given sample records</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sampleRecords(list): a list of Dicts of sample Records</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            string: CREATE TABLE DDL command for this entity info</span>
+
+<span class="sd">        Example:</span>
+
+<span class="sd">        .. code-block:: sql</span>
+
+<span class="sd">            CREATE TABLE Person(name TEXT PRIMARY KEY,born DATE,numberInLine INTEGER,wikidataurl TEXT,age FLOAT,ofAge BOOLEAN)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ddlCmd</span> <span class="o">=</span> <span class="s2">&quot;CREATE TABLE </span><span class="si">%s</span><span class="s2">(&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">delim</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">sampleRecord</span> <span class="ow">in</span> <span class="n">sampleRecords</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sampleRecord</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">sqlType</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">valueType</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sampleRecords</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="s2">&quot;Warning sampleRecord column </span><span class="si">%s</span><span class="s2"> is None - using TEXT as type&quot;</span>
+                            <span class="o">%</span> <span class="n">key</span>
+                        <span class="p">)</span>
+                        <span class="n">valueType</span> <span class="o">=</span> <span class="nb">str</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">valueType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">valueType</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                    <span class="n">sqlType</span> <span class="o">=</span> <span class="s2">&quot;TEXT&quot;</span>
+                <span class="k">elif</span> <span class="n">valueType</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                    <span class="n">sqlType</span> <span class="o">=</span> <span class="s2">&quot;INTEGER&quot;</span>
+                <span class="k">elif</span> <span class="n">valueType</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                    <span class="n">sqlType</span> <span class="o">=</span> <span class="s2">&quot;FLOAT&quot;</span>
+                <span class="k">elif</span> <span class="n">valueType</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+                    <span class="n">sqlType</span> <span class="o">=</span> <span class="s2">&quot;BOOLEAN&quot;</span>
+                <span class="k">elif</span> <span class="n">valueType</span> <span class="o">==</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+                    <span class="n">sqlType</span> <span class="o">=</span> <span class="s2">&quot;DATE&quot;</span>
+                <span class="k">elif</span> <span class="n">valueType</span> <span class="o">==</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">:</span>
+                    <span class="n">sqlType</span> <span class="o">=</span> <span class="s2">&quot;TIMESTAMP&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">valueType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;warning: unsupported type </span><span class="si">%s</span><span class="s2"> for column </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="n">valueType</span><span class="p">),</span>
+                            <span class="n">key</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sqlType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">valueType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addType</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">valueType</span><span class="p">,</span> <span class="n">sqlType</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">sqlType</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sqlTypeMap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ddlCmd</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2"> </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">delim</span><span class="p">,</span>
+                <span class="n">key</span><span class="p">,</span>
+                <span class="n">sqlType</span><span class="p">,</span>
+                <span class="s2">&quot; PRIMARY KEY&quot;</span> <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">primaryKey</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">delim</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span>
+        <span class="n">ddlCmd</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">ddlCmd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ddlCmd</span></div>
+
+
+<div class="viewcode-block" id="EntityInfo.getInsertCmd">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.EntityInfo.getInsertCmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">getInsertCmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the INSERT command for this entityInfo</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">             replace(bool): if True allow replace for insert</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the INSERT INTO SQL command for his entityInfo e.g.</span>
+
+<span class="sd">        Example:</span>
+
+<span class="sd">        .. code-block:: sql</span>
+
+<span class="sd">            INSERT INTO Person (name,born,numberInLine,wikidataurl,age,ofAge) values (?,?,?,?,?,?).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typeMap</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="s2">&quot;,:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typeMap</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">replaceClause</span> <span class="o">=</span> <span class="s2">&quot; OR REPLACE&quot;</span> <span class="k">if</span> <span class="n">replace</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">insertCmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT</span><span class="si">{</span><span class="n">replaceClause</span><span class="si">}</span><span class="s2"> INTO </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) values (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">insertCmd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">insertCmd</span></div>
+
+
+<div class="viewcode-block" id="EntityInfo.addType">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.EntityInfo.addType">[docs]</a>
+    <span class="k">def</span> <span class="nf">addType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">valueType</span><span class="p">,</span> <span class="n">sqlType</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        add the python type for the given column to the typeMap</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           column(string): the name of the column</span>
+
+<span class="sd">           valueType(type): the python type of the column</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">typeMap</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">typeMap</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">valueType</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sqlTypeMap</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">sqlType</span></div>
+
+
+<div class="viewcode-block" id="EntityInfo.fixDates">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sql.EntityInfo.fixDates">[docs]</a>
+    <span class="k">def</span> <span class="nf">fixDates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resultList</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        fix date entries in the given resultList by parsing the date content e.g.</span>
+<span class="sd">        converting &#39;1926-04-21&#39; back to datetime.date(1926, 4, 21)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resultList(list): the list of records to be fixed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">resultList</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">valueType</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">typeMap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">valueType</span> <span class="o">==</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+                    <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">dateValue</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+                    <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dateValue</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

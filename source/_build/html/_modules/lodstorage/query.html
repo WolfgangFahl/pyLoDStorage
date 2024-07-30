@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.query &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.query</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2020-08-22</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">pygments</span> <span class="kn">import</span> <span class="n">highlight</span>
+<span class="kn">from</span> <span class="nn">pygments.formatters.html</span> <span class="kn">import</span> <span class="n">HtmlFormatter</span>
+<span class="kn">from</span> <span class="nn">pygments.formatters.latex</span> <span class="kn">import</span> <span class="n">LatexFormatter</span>
+<span class="kn">from</span> <span class="nn">pygments.lexers</span> <span class="kn">import</span> <span class="n">get_lexer_by_name</span>
+<span class="kn">from</span> <span class="nn">pylatexenc.latexencode</span> <span class="kn">import</span> <span class="n">unicode_to_latex</span>
+<span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+
+<span class="c1"># from wikibot.mwTable import MediaWikiTable</span>
+<span class="c1"># redundant copy in this library to avoid dependency issues</span>
+<span class="c1"># original is at</span>
+<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span>
+<span class="kn">from</span> <span class="nn">lodstorage.mwTable</span> <span class="kn">import</span> <span class="n">MediaWikiTable</span>
+
+
+<div class="viewcode-block" id="Format">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Format">[docs]</a>
+<span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    the supported formats for the results to be delivered</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">csv</span> <span class="o">=</span> <span class="s2">&quot;csv&quot;</span>
+    <span class="n">json</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span>
+    <span class="n">xml</span> <span class="o">=</span> <span class="s2">&quot;xml&quot;</span>
+    <span class="n">tsv</span> <span class="o">=</span> <span class="s2">&quot;tsv&quot;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="s2">&quot;latex&quot;</span>
+    <span class="n">mediawiki</span> <span class="o">=</span> <span class="s2">&quot;mediawiki&quot;</span>
+    <span class="n">github</span> <span class="o">=</span> <span class="s2">&quot;github&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+
+
+
+<div class="viewcode-block" id="YamlPath">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.YamlPath">[docs]</a>
+<span class="k">class</span> <span class="nc">YamlPath</span><span class="p">:</span>
+<div class="viewcode-block" id="YamlPath.getPaths">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.YamlPath.getPaths">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getPaths</span><span class="p">(</span><span class="n">yamlFileName</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">yamlPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">yamlPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">yamlPath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="si">}</span><span class="s2">/../sampledata/</span><span class="si">{</span><span class="n">yamlFileName</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">yamlPaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">yamlPath</span><span class="p">]</span>
+        <span class="n">home</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">())</span>
+        <span class="c1"># additional yamls from users yaml configuration</span>
+        <span class="n">homepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">home</span><span class="si">}</span><span class="s2">/.pylodstorage/</span><span class="si">{</span><span class="n">yamlFileName</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">homepath</span><span class="p">):</span>
+            <span class="n">yamlPaths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">homepath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">yamlPaths</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ValueFormatter">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.ValueFormatter">[docs]</a>
+<span class="k">class</span> <span class="nc">ValueFormatter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a value Formatter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">home</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">())</span>
+    <span class="c1"># additional endpoints from users endpoint configuration</span>
+    <span class="n">formatsPath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="si">}</span><span class="s2">/../sampledata/formats.yaml&quot;</span>
+    <span class="n">valueFormats</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">formatString</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">regexps</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fstring(str): the format String to use</span>
+<span class="sd">            regexps(list): the regular expressions to apply</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regexps</span> <span class="o">=</span> <span class="n">regexps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatString</span> <span class="o">=</span> <span class="n">formatString</span>
+
+<div class="viewcode-block" id="ValueFormatter.fromDict">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.ValueFormatter.fromDict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromDict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        create a ValueFormatter from the given dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;regexps&quot;</span> <span class="ow">in</span> <span class="n">record</span><span class="p">:</span>
+            <span class="n">regexps</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;regexps&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">regexps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vf</span> <span class="o">=</span> <span class="n">ValueFormatter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">formatString</span><span class="o">=</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">],</span> <span class="n">regexps</span><span class="o">=</span><span class="n">regexps</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vf</span></div>
+
+
+<div class="viewcode-block" id="ValueFormatter.getFormats">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.ValueFormatter.getFormats">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getFormats</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">formatsPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the available ValueFormatters</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            formatsPath(str): the path to the yaml file to read the format specs from</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: a map for ValueFormatters by formatter Name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">valueFormats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">valueFormats</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">formatPaths</span> <span class="o">=</span> <span class="n">YamlPath</span><span class="o">.</span><span class="n">getPaths</span><span class="p">(</span><span class="s2">&quot;formats.yaml&quot;</span><span class="p">,</span> <span class="n">formatsPath</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">formatPath</span> <span class="ow">in</span> <span class="n">formatPaths</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">formatPath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+                    <span class="n">valueFormatRecords</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">valueFormatKey</span><span class="p">,</span> <span class="n">valueFormatRecord</span> <span class="ow">in</span> <span class="n">valueFormatRecords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">valueFormats</span><span class="p">[</span><span class="n">valueFormatKey</span><span class="p">]</span> <span class="o">=</span> <span class="n">ValueFormatter</span><span class="o">.</span><span class="n">fromDict</span><span class="p">(</span>
+                            <span class="n">name</span><span class="o">=</span><span class="n">valueFormatKey</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">valueFormatRecord</span>
+                        <span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">valueFormats</span> <span class="o">=</span> <span class="n">valueFormats</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">valueFormats</span></div>
+
+
+<div class="viewcode-block" id="ValueFormatter.applyFormat">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.ValueFormatter.applyFormat">[docs]</a>
+    <span class="k">def</span> <span class="nf">applyFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">resultFormat</span><span class="p">:</span> <span class="n">Format</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        apply the given format to the given record</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            record(dict): the record to handle</span>
+<span class="sd">            key(str): the property key</span>
+<span class="sd">            resultFormat(str): the resultFormat Style to apply</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">record</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="c1"># if there are no regular expressions specified always format</span>
+                <span class="n">doformat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regexps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">regexp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regexps</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">vmatch</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">vmatch</span><span class="p">:</span>
+                            <span class="c1"># we found a match and will format it if the value is not none</span>
+                            <span class="n">doformat</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">vmatch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;ValueFormatter: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">Invalid regular expression:</span><span class="si">{</span><span class="n">regexp</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+                        <span class="p">)</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">doformat</span><span class="p">:</span>
+                    <span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatString</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+                    <span class="n">newValue</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="n">resultFormat</span> <span class="o">==</span> <span class="s2">&quot;github&quot;</span><span class="p">:</span>
+                        <span class="n">newValue</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">](</span><span class="si">{</span><span class="n">link</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="k">elif</span> <span class="n">resultFormat</span> <span class="o">==</span> <span class="s2">&quot;mediawiki&quot;</span><span class="p">:</span>
+                        <span class="n">newValue</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">link</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">]&quot;</span>
+                    <span class="k">elif</span> <span class="n">resultFormat</span> <span class="o">==</span> <span class="s2">&quot;latex&quot;</span><span class="p">:</span>
+                        <span class="n">newValue</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;\href</span><span class="se">{{</span><span class="si">{</span><span class="n">link</span><span class="si">}</span><span class="se">}}{{</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
+                    <span class="k">if</span> <span class="n">newValue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">newValue</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="QuerySyntaxHighlight">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QuerySyntaxHighlight">[docs]</a>
+<span class="k">class</span> <span class="nc">QuerySyntaxHighlight</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Syntax highlighting for queries with pygments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">highlightFormat</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;html&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        construct me for the given query and highlightFormat</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query(Query): the query to do the syntax highlighting for</span>
+<span class="sd">            highlightFormat(str): the highlight format to be used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlightFormat</span> <span class="o">=</span> <span class="n">highlightFormat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lexer</span> <span class="o">=</span> <span class="n">get_lexer_by_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">lang</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">highlightFormat</span> <span class="o">==</span> <span class="s2">&quot;html&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">HtmlFormatter</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">highlightFormat</span> <span class="o">==</span> <span class="s2">&quot;latex&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">LatexFormatter</span><span class="p">()</span>
+
+<div class="viewcode-block" id="QuerySyntaxHighlight.highlight">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QuerySyntaxHighlight.highlight">[docs]</a>
+    <span class="k">def</span> <span class="nf">highlight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the result of the syntax highlighting with pygments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">syntaxResult</span> <span class="o">=</span> <span class="n">highlight</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lexer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">syntaxResult</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="QueryResultDocumentation">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QueryResultDocumentation">[docs]</a>
+<span class="k">class</span> <span class="nc">QueryResultDocumentation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    documentation of a query result</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">query</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tablefmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tryItMarkup</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">sourceCodeHeader</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">sourceCode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">resultHeader</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query(Query): the query to be documented</span>
+<span class="sd">            title(str): the title markup</span>
+<span class="sd">            tablefmt(str): the tableformat that has been used</span>
+<span class="sd">            tryItMarkup: the &quot;try it!&quot; markup to show</span>
+<span class="sd">            sourceCodeHeader(str): the header title to use for the sourceCode</span>
+<span class="sd">            sourceCode(str): the sourceCode</span>
+<span class="sd">            resultCodeHeader(str): the header title to use for the result</span>
+<span class="sd">            result(str): the result header</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tablefmt</span> <span class="o">=</span> <span class="n">tablefmt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tryItMarkup</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">tryItMarkup</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceCodeHeader</span> <span class="o">=</span> <span class="n">sourceCodeHeader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceCode</span> <span class="o">=</span> <span class="n">sourceCode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resultHeader</span> <span class="o">=</span> <span class="n">resultHeader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="QueryResultDocumentation.uniCode2Latex">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QueryResultDocumentation.uniCode2Latex">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">uniCode2Latex</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">withConvert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        converts unicode text to latex and</span>
+<span class="sd">        fixes UTF-8 chars for latex in a certain range:</span>
+<span class="sd">            ₀:$_0$ ... ₉:$_9$</span>
+
+<span class="sd">        see https://github.com/phfaist/pylatexenc/issues/72</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text(str): the string to fix</span>
+<span class="sd">            withConvert(bool): if unicode to latex libary conversion should be used</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            str: latex presentation of UTF-8 char</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8320</span><span class="p">,</span> <span class="mi">8330</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="n">code</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;$_</span><span class="si">{</span><span class="n">code</span><span class="o">-</span><span class="mi">8320</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">withConvert</span><span class="p">:</span>
+            <span class="n">latex</span> <span class="o">=</span> <span class="n">unicode_to_latex</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="c1"># workaround {\textbackslash} being returned</span>
+            <span class="c1"># latex=latex.replace(&quot;{\\textbackslash}&quot;,&#39;\\&#39;)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">latex</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        simple string representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asText</span><span class="p">()</span>
+
+<div class="viewcode-block" id="QueryResultDocumentation.asText">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QueryResultDocumentation.asText">[docs]</a>
+    <span class="k">def</span> <span class="nf">asText</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return my text representation</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: description, sourceCodeHeader, sourceCode, tryIt link and result table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceCodeHeader</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceCode</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">tryItMarkup</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">resultHeader</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">fixedStr</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uniCode2Latex</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tablefmt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;latex&quot;</span> <span class="k">else</span> <span class="n">text</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fixedStr</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Query">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query">[docs]</a>
+<span class="k">class</span> <span class="nc">Query</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;a Query e.g. for SPAQRL&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;sparql&quot;</span><span class="p">,</span>
+        <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;blazegraph&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tryItUrl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">formats</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        constructor</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name(string): the name/label of the query</span>
+<span class="sd">            query(string): the native Query text e.g. in SPARQL</span>
+<span class="sd">            lang(string): the language of the query e.g. SPARQL</span>
+<span class="sd">            endpoint(string): the endpoint url to use</span>
+<span class="sd">            database(string): the type of database e.g. &quot;blazegraph&quot;</span>
+<span class="sd">            title(string): the header/title of the query</span>
+<span class="sd">            description(string): the description of the query</span>
+<span class="sd">            limit(int): the limit of the query default: None</span>
+<span class="sd">            prefixes(list): list of prefixes to be resolved</span>
+<span class="sd">            tryItUrl(str): the url of a &quot;tryit&quot; webpage</span>
+<span class="sd">            formats(list): key,value pairs of ValueFormatters to be applied</span>
+<span class="sd">            debug(boolean): true if debug mode should be switched on</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tryItUrl</span> <span class="o">=</span> <span class="n">tryItUrl</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">description</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefixes</span> <span class="o">=</span> <span class="n">prefixes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formats</span> <span class="o">=</span> <span class="n">formats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatCallBacks</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">queryStr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">queryStr</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<div class="viewcode-block" id="Query.addFormatCallBack">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.addFormatCallBack">[docs]</a>
+    <span class="k">def</span> <span class="nf">addFormatCallBack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatCallBacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Query.preFormatWithCallBacks">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.preFormatWithCallBacks">[docs]</a>
+    <span class="k">def</span> <span class="nf">preFormatWithCallBacks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lod</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        run the configured call backs to pre-format the given list of dicts for the given tableformat</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lod(list): the list of dicts to handle</span>
+<span class="sd">            tablefmt(str): the table format (according to tabulate) to apply</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">formatCallBack</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatCallBacks</span><span class="p">:</span>
+                        <span class="n">formatCallBack</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Query.formatWithValueFormatters">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.formatWithValueFormatters">[docs]</a>
+    <span class="k">def</span> <span class="nf">formatWithValueFormatters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lod</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        format the given list of Dicts with the ValueFormatters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># is there anything to do?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">formats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># no</span>
+            <span class="k">return</span>
+        <span class="c1"># get the value Formatters that might apply here</span>
+        <span class="n">valueFormatters</span> <span class="o">=</span> <span class="n">ValueFormatter</span><span class="o">.</span><span class="n">getFormats</span><span class="p">()</span>
+        <span class="n">formatsToApply</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">valueFormatSpec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">valueFormatSpec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+            <span class="c1"># e.g. president:wikidata</span>
+            <span class="n">keytoformat</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">formatName</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">formatName</span> <span class="ow">in</span> <span class="n">valueFormatters</span><span class="p">:</span>
+                <span class="n">formatsToApply</span><span class="p">[</span><span class="n">keytoformat</span><span class="p">]</span> <span class="o">=</span> <span class="n">valueFormatters</span><span class="p">[</span><span class="n">formatName</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">keytoformat</span> <span class="ow">in</span> <span class="n">formatsToApply</span><span class="p">:</span>
+                <span class="n">valueFormatter</span> <span class="o">=</span> <span class="n">formatsToApply</span><span class="p">[</span><span class="n">keytoformat</span><span class="p">]</span>
+                <span class="c1"># format all key values</span>
+                <span class="k">if</span> <span class="n">keytoformat</span> <span class="o">==</span> <span class="s2">&quot;*&quot;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">record</span><span class="p">:</span>
+                        <span class="n">valueFormatter</span><span class="o">.</span><span class="n">applyFormat</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">)</span>
+                <span class="c1"># or just a selected one</span>
+                <span class="k">elif</span> <span class="n">keytoformat</span> <span class="ow">in</span> <span class="n">record</span><span class="p">:</span>
+                    <span class="n">valueFormatter</span><span class="o">.</span><span class="n">applyFormat</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">keytoformat</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">)</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Query.getTryItUrl">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.getTryItUrl">[docs]</a>
+    <span class="k">def</span> <span class="nf">getTryItUrl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baseurl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;blazegraph&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return the &quot;try it!&quot; url for the given baseurl</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            baseurl(str): the baseurl to used</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the &quot;try it!&quot; url for the given query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># https://stackoverflow.com/a/9345102/1497139</span>
+        <span class="n">quoted</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;blazegraph&quot;</span><span class="p">:</span>
+            <span class="n">delim</span> <span class="o">=</span> <span class="s2">&quot;/#&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delim</span> <span class="o">=</span> <span class="s2">&quot;?query=&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">baseurl</span><span class="si">}{</span><span class="n">delim</span><span class="si">}{</span><span class="n">quoted</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">url</span></div>
+
+
+<div class="viewcode-block" id="Query.getLink">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.getLink">[docs]</a>
+    <span class="k">def</span> <span class="nf">getLink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convert the given url and title to a link for the given tablefmt</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url(str): the url to convert</span>
+<span class="sd">            title(str): the title to show</span>
+<span class="sd">            tablefmt(str): the table format to use</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># create a safe url</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">markup</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;mediawiki&quot;</span><span class="p">:</span>
+            <span class="n">markup</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">]&quot;</span>
+        <span class="k">elif</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;github&quot;</span><span class="p">:</span>
+            <span class="n">markup</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">](</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">elif</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;latex&quot;</span><span class="p">:</span>
+            <span class="n">markup</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\href{</span><span class="si">%s</span><span class="s2">}{</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">markup</span></div>
+
+
+<div class="viewcode-block" id="Query.prefixToLink">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.prefixToLink">[docs]</a>
+    <span class="k">def</span> <span class="nf">prefixToLink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lod</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convert url prefixes to link according to the given table format</span>
+<span class="sd">        TODO - refactor as preFormat callback</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lod(list): the list of dicts to convert</span>
+<span class="sd">            prefix(str): the prefix to strip</span>
+<span class="sd">            tablefmt(str): the tabulate tableformat to use</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">uqitem</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;latex&quot;</span><span class="p">:</span>
+                        <span class="n">link</span> <span class="o">=</span> <span class="n">uqitem</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLink</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">uqitem</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">)</span>
+                    <span class="n">record</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">link</span></div>
+
+
+<div class="viewcode-block" id="Query.asYaml">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.asYaml">[docs]</a>
+    <span class="k">def</span> <span class="nf">asYaml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">yamlMarkup</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">yamlMarkup</span></div>
+
+
+<div class="viewcode-block" id="Query.asWikiSourceMarkup">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.asWikiSourceMarkup">[docs]</a>
+    <span class="k">def</span> <span class="nf">asWikiSourceMarkup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convert me to Mediawiki markup for syntax highlighting using the &quot;source&quot; tag</span>
+
+
+<span class="sd">        Returns:</span>
+<span class="sd">            string: the Markup</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">markup</span> <span class="o">=</span> <span class="s2">&quot;&lt;source lang=&#39;</span><span class="si">%s</span><span class="s2">&#39;&gt;</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&lt;/source&gt;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">markup</span></div>
+
+
+<div class="viewcode-block" id="Query.asWikiMarkup">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.asWikiMarkup">[docs]</a>
+    <span class="k">def</span> <span class="nf">asWikiMarkup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listOfDicts</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convert the given listOfDicts result to MediaWiki markup</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            listOfDicts(list): the list of Dicts to convert to MediaWiki markup</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            string: the markup</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>
+        <span class="n">mwTable</span> <span class="o">=</span> <span class="n">MediaWikiTable</span><span class="p">()</span>
+        <span class="n">mwTable</span><span class="o">.</span><span class="n">fromListOfDicts</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>
+        <span class="n">markup</span> <span class="o">=</span> <span class="n">mwTable</span><span class="o">.</span><span class="n">asWikiMarkup</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">markup</span></div>
+
+
+<div class="viewcode-block" id="Query.documentQueryResult">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Query.documentQueryResult">[docs]</a>
+    <span class="k">def</span> <span class="nf">documentQueryResult</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">qlod</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tablefmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mediawiki&quot;</span><span class="p">,</span>
+        <span class="n">tryItUrl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">withSourceCode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwArgs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        document the given query results - note that a copy of the whole list is going to be created for being able to format</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            qlod: the list of dicts result</span>
+<span class="sd">            limit(int): the maximum number of records to display in result tabulate</span>
+<span class="sd">            tablefmt(str): the table format to use</span>
+<span class="sd">            tryItUrl: the &quot;try it!&quot; url to show</span>
+<span class="sd">            withSourceCode(bool): if True document the source code</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            str: the documentation tabular text for the given parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sourceCode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span>
+        <span class="n">tryItMarkup</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">sourceCodeHeader</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">resultHeader</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lod</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">qlod</span><span class="p">[:</span><span class="n">limit</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lod</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">qlod</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preFormatWithCallBacks</span><span class="p">(</span><span class="n">lod</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatWithValueFormatters</span><span class="p">(</span><span class="n">lod</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">lod</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwArgs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tryItUrl</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;tryItUrl&quot;</span><span class="p">):</span>
+            <span class="n">tryItUrl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tryItUrl</span>
+        <span class="k">if</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;github&quot;</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;## </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">resultHeader</span> <span class="o">=</span> <span class="s2">&quot;## result&quot;</span>
+        <span class="k">elif</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;mediawiki&quot;</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;== </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2"> ==&quot;</span>
+            <span class="n">resultHeader</span> <span class="o">=</span> <span class="s2">&quot;=== result ===&quot;</span>
+        <span class="k">elif</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;latex&quot;</span><span class="p">:</span>
+            <span class="n">resultHeader</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;\begin</span><span class="si">{table}</span>
+<span class="s2">            \caption{</span><span class="si">%s</span><span class="s2">}</span>
+<span class="s2">            \label{tab:</span><span class="si">%s</span><span class="s2">}</span>
+<span class="s2">            </span><span class="si">%s</span>
+<span class="s2">            \end</span><span class="si">{table}</span>
+<span class="s2">            &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">result</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">resultHeader</span> <span class="o">=</span> <span class="s2">&quot;result:&quot;</span>
+        <span class="k">if</span> <span class="n">withSourceCode</span><span class="p">:</span>
+            <span class="n">tryItUrlEncoded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getTryItUrl</span><span class="p">(</span><span class="n">tryItUrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">)</span>
+            <span class="n">tryItMarkup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLink</span><span class="p">(</span><span class="n">tryItUrlEncoded</span><span class="p">,</span> <span class="s2">&quot;try it!&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;github&quot;</span><span class="p">:</span>
+                <span class="n">sourceCodeHeader</span> <span class="o">=</span> <span class="s2">&quot;### query&quot;</span>
+                <span class="n">sourceCode</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;```</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="si">}</span>
+<span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="si">}</span>
+<span class="s2">```&quot;&quot;&quot;</span>
+            <span class="k">elif</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;mediawiki&quot;</span><span class="p">:</span>
+                <span class="n">sourceCodeHeader</span> <span class="o">=</span> <span class="s2">&quot;=== query ===&quot;</span>
+                <span class="n">sourceCode</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;source lang=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="si">}</span><span class="s2">&#39;&gt;</span>
+<span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="si">}</span>
+<span class="s2">&lt;/source&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+            <span class="k">elif</span> <span class="n">tablefmt</span> <span class="o">==</span> <span class="s2">&quot;latex&quot;</span><span class="p">:</span>
+                <span class="n">sourceCodeHeader</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;see query listing \ref{listing:</span><span class="si">%s</span><span class="s2">} and result table \ref{tab:</span><span class="si">%s</span><span class="s2">}&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">sourceCode</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;\begin</span><span class="si">{listing}</span><span class="s2">[ht]</span>
+<span class="s2">\caption{</span><span class="si">%s</span><span class="s2">}</span>
+<span class="s2">\label{listing:</span><span class="si">%s</span><span class="s2">}</span>
+<span class="s2">\begin</span><span class="si">{minted}</span><span class="s2">{</span><span class="si">%s</span><span class="s2">}</span>
+<span class="si">%s</span>
+<span class="s2">\end</span><span class="si">{minted}</span>
+<span class="si">%s</span>
+<span class="s2">\end</span><span class="si">{listing}</span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">,</span>
+                    <span class="n">tryItMarkup</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sourceCodeHeader</span> <span class="o">=</span> <span class="s2">&quot;query:&quot;</span>
+                <span class="n">sourceCode</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">!=</span> <span class="s2">&quot;sparql&quot;</span><span class="p">:</span>
+            <span class="n">tryItMarkup</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">queryResultDocumentation</span> <span class="o">=</span> <span class="n">QueryResultDocumentation</span><span class="p">(</span>
+            <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">tablefmt</span><span class="o">=</span><span class="n">tablefmt</span><span class="p">,</span>
+            <span class="n">tryItMarkup</span><span class="o">=</span><span class="n">tryItMarkup</span><span class="p">,</span>
+            <span class="n">sourceCodeHeader</span><span class="o">=</span><span class="n">sourceCodeHeader</span><span class="p">,</span>
+            <span class="n">sourceCode</span><span class="o">=</span><span class="n">sourceCode</span><span class="p">,</span>
+            <span class="n">resultHeader</span><span class="o">=</span><span class="n">resultHeader</span><span class="p">,</span>
+            <span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">queryResultDocumentation</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="QueryManager">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QueryManager">[docs]</a>
+<span class="k">class</span> <span class="nc">QueryManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    manages pre packaged Queries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">queriesPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+<span class="sd">        Args:</span>
+<span class="sd">            lang(string): the language to use for the queries sql or sparql</span>
+<span class="sd">            debug(boolean): True if debug information should be shown</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lang</span> <span class="o">=</span> <span class="s2">&quot;sql&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queriesByName</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="n">queries</span> <span class="o">=</span> <span class="n">QueryManager</span><span class="o">.</span><span class="n">getQueries</span><span class="p">(</span><span class="n">queriesPath</span><span class="o">=</span><span class="n">queriesPath</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">queryDict</span> <span class="ow">in</span> <span class="n">queries</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="ow">in</span> <span class="n">queryDict</span><span class="p">:</span>
+                <span class="n">queryText</span> <span class="o">=</span> <span class="n">queryDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">qformat</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sparql&quot;</span><span class="p">,</span> <span class="s2">&quot;sql&quot;</span><span class="p">]:</span>  <span class="c1"># drop not needed query variants</span>
+                    <span class="k">if</span> <span class="n">qformat</span> <span class="ow">in</span> <span class="n">queryDict</span><span class="p">:</span>
+                        <span class="n">queryDict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">qformat</span><span class="p">)</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">query</span><span class="o">=</span><span class="n">queryText</span><span class="p">,</span>
+                    <span class="n">lang</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">queryDict</span><span class="p">,</span>
+                    <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">queriesByName</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">query</span>
+
+<div class="viewcode-block" id="QueryManager.getQueries">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.QueryManager.getQueries">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getQueries</span><span class="p">(</span><span class="n">queriesPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the queries for the given queries Path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">queriesPaths</span> <span class="o">=</span> <span class="n">YamlPath</span><span class="o">.</span><span class="n">getPaths</span><span class="p">(</span><span class="s2">&quot;queries.yaml&quot;</span><span class="p">,</span> <span class="n">queriesPath</span><span class="p">)</span>
+        <span class="n">queries</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">queriesPath</span> <span class="ow">in</span> <span class="n">queriesPaths</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">queriesPath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+                <span class="n">lqueries</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">lqueries</span><span class="p">:</span>
+                    <span class="n">queries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">lqueries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">queries</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EndpointManager">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.EndpointManager">[docs]</a>
+<span class="k">class</span> <span class="nc">EndpointManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    manages a set of SPARQL endpoints</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EndpointManager.getEndpoints">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.EndpointManager.getEndpoints">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getEndpoints</span><span class="p">(</span><span class="n">endpointPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the endpoints for the given endpointPath</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            endpointPath(str): the path to the yaml file with the endpoint configurations</span>
+<span class="sd">            lang(str): if lang is given filter by the given language</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpointPaths</span> <span class="o">=</span> <span class="n">YamlPath</span><span class="o">.</span><span class="n">getPaths</span><span class="p">(</span><span class="s2">&quot;endpoints.yaml&quot;</span><span class="p">,</span> <span class="n">endpointPath</span><span class="p">)</span>
+        <span class="n">endpoints</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">lEndpointPath</span> <span class="ow">in</span> <span class="n">endpointPaths</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lEndpointPath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+                <span class="n">endpointRecords</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">endpointRecords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">select</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">select</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;lang&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">lang</span>
+                    <span class="k">if</span> <span class="n">select</span><span class="p">:</span>
+                        <span class="n">endpoint</span> <span class="o">=</span> <span class="n">Endpoint</span><span class="p">()</span>
+                        <span class="n">endpoint</span><span class="o">.</span><span class="n">fromDict</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">record</span><span class="p">})</span>
+                        <span class="n">endpoints</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">endpoint</span>
+        <span class="k">return</span> <span class="n">endpoints</span></div>
+
+
+<div class="viewcode-block" id="EndpointManager.getEndpointNames">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.EndpointManager.getEndpointNames">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getEndpointNames</span><span class="p">(</span><span class="n">endpointPath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of all available endpoint names</span>
+<span class="sd">        Args:</span>
+<span class="sd">            endpointPath(str): the path to the yaml file with the endpoint configurations</span>
+<span class="sd">            lang(str): if lang is given filter by the given language</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoints</span> <span class="o">=</span> <span class="n">EndpointManager</span><span class="o">.</span><span class="n">getEndpoints</span><span class="p">(</span><span class="n">endpointPath</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">endpoints</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Endpoint">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Endpoint">[docs]</a>
+<span class="k">class</span> <span class="nc">Endpoint</span><span class="p">(</span><span class="n">JSONAble</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a query endpoint</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Endpoint.getSamples">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Endpoint.getSamples">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getSamples</span><span class="p">():</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;wikidata&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;sparql&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;https://query.wikidata.org/sparql&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;website&quot;</span><span class="p">:</span> <span class="s2">&quot;https://query.wikidata.org/&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;blazegraph&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefixes&quot;</span><span class="p">:</span> <span class="s2">&quot;PREFIX bd: &lt;http://www.bigdata.com/rdf#&gt;</span><span class="se">\n</span><span class="s2">PREFIX cc: &lt;http://creativecommons.org/ns#&gt;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dbis-jena&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;lang&quot;</span><span class="p">:</span> <span class="s2">&quot;sparql&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;https://confident.dbis.rwth-aachen.de/jena/&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;website&quot;</span><span class="p">:</span> <span class="s2">&quot;https://confident.dbis.rwth-aachen.de&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;auth&quot;</span><span class="p">:</span> <span class="s2">&quot;BASIC&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;#not public - example not usable for access#&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">samples</span></div>
+
+
+<div class="viewcode-block" id="Endpoint.getDefault">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.query.Endpoint.getDefault">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getDefault</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">endpointConf</span> <span class="o">=</span> <span class="n">Endpoint</span><span class="p">()</span>
+        <span class="n">endpointConf</span><span class="o">.</span><span class="n">fromDict</span><span class="p">(</span><span class="n">Endpoint</span><span class="o">.</span><span class="n">getSamples</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">endpointConf</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        constructor for setting defaults</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;POST&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="s2">&quot;SPARQL&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: a string representation of this Endpoint</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">website</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

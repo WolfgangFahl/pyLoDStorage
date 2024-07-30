@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Welcome to pyLoDStorage’s documentation! &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=cb25574f" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lodstorage package" href="lodstorage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="welcome-to-pylodstorage-s-documentation">
+<h1>Welcome to pyLoDStorage’s documentation!<a class="headerlink" href="#welcome-to-pylodstorage-s-documentation" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lodstorage.html">lodstorage package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.csv">lodstorage.csv module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.csv.CSV"><code class="docutils literal notranslate"><span class="pre">CSV</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.csv.CSV.fixTypes"><code class="docutils literal notranslate"><span class="pre">CSV.fixTypes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.csv.CSV.fromCSV"><code class="docutils literal notranslate"><span class="pre">CSV.fromCSV()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.csv.CSV.readFile"><code class="docutils literal notranslate"><span class="pre">CSV.readFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.csv.CSV.restoreFromCSVFile"><code class="docutils literal notranslate"><span class="pre">CSV.restoreFromCSVFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.csv.CSV.storeToCSVFile"><code class="docutils literal notranslate"><span class="pre">CSV.storeToCSVFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.csv.CSV.toCSV"><code class="docutils literal notranslate"><span class="pre">CSV.toCSV()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.csv.CSV.writeFile"><code class="docutils literal notranslate"><span class="pre">CSV.writeFile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.docstring_parser">lodstorage.docstring_parser module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.docstring_parser.DocstringParser"><code class="docutils literal notranslate"><span class="pre">DocstringParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.docstring_parser.DocstringParser.parse"><code class="docutils literal notranslate"><span class="pre">DocstringParser.parse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.entity">lodstorage.entity module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager"><code class="docutils literal notranslate"><span class="pre">EntityManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.fromCache"><code class="docutils literal notranslate"><span class="pre">EntityManager.fromCache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.fromStore"><code class="docutils literal notranslate"><span class="pre">EntityManager.fromStore()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.getCacheFile"><code class="docutils literal notranslate"><span class="pre">EntityManager.getCacheFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.getLoD"><code class="docutils literal notranslate"><span class="pre">EntityManager.getLoD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.getSQLDB"><code class="docutils literal notranslate"><span class="pre">EntityManager.getSQLDB()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.initSQLDB"><code class="docutils literal notranslate"><span class="pre">EntityManager.initSQLDB()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.isCached"><code class="docutils literal notranslate"><span class="pre">EntityManager.isCached()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.removeCacheFile"><code class="docutils literal notranslate"><span class="pre">EntityManager.removeCacheFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.setNone"><code class="docutils literal notranslate"><span class="pre">EntityManager.setNone()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.showProgress"><code class="docutils literal notranslate"><span class="pre">EntityManager.showProgress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.store"><code class="docutils literal notranslate"><span class="pre">EntityManager.store()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.storeLoD"><code class="docutils literal notranslate"><span class="pre">EntityManager.storeLoD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.entity.EntityManager.storeMode"><code class="docutils literal notranslate"><span class="pre">EntityManager.storeMode()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.jsonable">lodstorage.jsonable module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble"><code class="docutils literal notranslate"><span class="pre">JSONAble</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.asJSON"><code class="docutils literal notranslate"><span class="pre">JSONAble.asJSON()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.checkExtension"><code class="docutils literal notranslate"><span class="pre">JSONAble.checkExtension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.fromDict"><code class="docutils literal notranslate"><span class="pre">JSONAble.fromDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.fromJson"><code class="docutils literal notranslate"><span class="pre">JSONAble.fromJson()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.getJSONValue"><code class="docutils literal notranslate"><span class="pre">JSONAble.getJSONValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.getJsonTypeSamples"><code class="docutils literal notranslate"><span class="pre">JSONAble.getJsonTypeSamples()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.getJsonTypeSamplesForClass"><code class="docutils literal notranslate"><span class="pre">JSONAble.getJsonTypeSamplesForClass()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.getPluralname"><code class="docutils literal notranslate"><span class="pre">JSONAble.getPluralname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.readJsonFromFile"><code class="docutils literal notranslate"><span class="pre">JSONAble.readJsonFromFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.reprDict"><code class="docutils literal notranslate"><span class="pre">JSONAble.reprDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.restoreFromJsonFile"><code class="docutils literal notranslate"><span class="pre">JSONAble.restoreFromJsonFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuote"><code class="docutils literal notranslate"><span class="pre">JSONAble.singleQuoteToDoubleQuote()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuoteUsingBracketLoop"><code class="docutils literal notranslate"><span class="pre">JSONAble.singleQuoteToDoubleQuoteUsingBracketLoop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.singleQuoteToDoubleQuoteUsingRegex"><code class="docutils literal notranslate"><span class="pre">JSONAble.singleQuoteToDoubleQuoteUsingRegex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.storeJsonToFile"><code class="docutils literal notranslate"><span class="pre">JSONAble.storeJsonToFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.storeToJsonFile"><code class="docutils literal notranslate"><span class="pre">JSONAble.storeToJsonFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.toJSON"><code class="docutils literal notranslate"><span class="pre">JSONAble.toJSON()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAble.toJsonAbleValue"><code class="docutils literal notranslate"><span class="pre">JSONAble.toJsonAbleValue()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList"><code class="docutils literal notranslate"><span class="pre">JSONAbleList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.asJSON"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.asJSON()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.fromJson"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.fromJson()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.fromLoD"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.fromLoD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.getJsonData"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.getJsonData()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.getList"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.getList()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.getLoDfromJson"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.getLoDfromJson()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.getLookup"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.getLookup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.readLodFromJsonFile"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.readLodFromJsonFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.readLodFromJsonStr"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.readLodFromJsonStr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.restoreFromJsonFile"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.restoreFromJsonFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.restoreFromJsonStr"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.restoreFromJsonStr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.setListFromLoD"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.setListFromLoD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleList.toJsonAbleValue"><code class="docutils literal notranslate"><span class="pre">JSONAbleList.toJsonAbleValue()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleSettings"><code class="docutils literal notranslate"><span class="pre">JSONAbleSettings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleSettings.indent"><code class="docutils literal notranslate"><span class="pre">JSONAbleSettings.indent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.JSONAbleSettings.singleQuoteRegex"><code class="docutils literal notranslate"><span class="pre">JSONAbleSettings.singleQuoteRegex</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types"><code class="docutils literal notranslate"><span class="pre">Types</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types.addType"><code class="docutils literal notranslate"><span class="pre">Types.addType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types.fixListOfDicts"><code class="docutils literal notranslate"><span class="pre">Types.fixListOfDicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types.fixTypes"><code class="docutils literal notranslate"><span class="pre">Types.fixTypes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types.forTable"><code class="docutils literal notranslate"><span class="pre">Types.forTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types.getType"><code class="docutils literal notranslate"><span class="pre">Types.getType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types.getTypes"><code class="docutils literal notranslate"><span class="pre">Types.getTypes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types.getTypesForItems"><code class="docutils literal notranslate"><span class="pre">Types.getTypesForItems()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonable.Types.typeName2Type"><code class="docutils literal notranslate"><span class="pre">Types.typeName2Type</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.jsonpicklemixin">lodstorage.jsonpicklemixin module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.jsonpicklemixin.JsonPickleMixin"><code class="docutils literal notranslate"><span class="pre">JsonPickleMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonpicklemixin.JsonPickleMixin.asJsonPickle"><code class="docutils literal notranslate"><span class="pre">JsonPickleMixin.asJsonPickle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonpicklemixin.JsonPickleMixin.checkExtension"><code class="docutils literal notranslate"><span class="pre">JsonPickleMixin.checkExtension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonpicklemixin.JsonPickleMixin.debug"><code class="docutils literal notranslate"><span class="pre">JsonPickleMixin.debug</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonpicklemixin.JsonPickleMixin.readJsonPickle"><code class="docutils literal notranslate"><span class="pre">JsonPickleMixin.readJsonPickle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.jsonpicklemixin.JsonPickleMixin.writeJsonPickle"><code class="docutils literal notranslate"><span class="pre">JsonPickleMixin.writeJsonPickle()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.linkml">lodstorage.linkml module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.linkml.PythonTypes"><code class="docutils literal notranslate"><span class="pre">PythonTypes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.linkml.PythonTypes.get_linkml_range"><code class="docutils literal notranslate"><span class="pre">PythonTypes.get_linkml_range()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.linkml.PythonTypes.get_rdf_datatype"><code class="docutils literal notranslate"><span class="pre">PythonTypes.get_rdf_datatype()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.linkml.PythonTypes.to_linkml_ranges"><code class="docutils literal notranslate"><span class="pre">PythonTypes.to_linkml_ranges</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.linkml.PythonTypes.to_rdf_datatypes"><code class="docutils literal notranslate"><span class="pre">PythonTypes.to_rdf_datatypes</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.linkml_gen">lodstorage.linkml_gen module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.linkml_gen.LinkMLGen"><code class="docutils literal notranslate"><span class="pre">LinkMLGen</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.linkml_gen.LinkMLGen.check_value"><code class="docutils literal notranslate"><span class="pre">LinkMLGen.check_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.linkml_gen.LinkMLGen.ensure_consistency"><code class="docutils literal notranslate"><span class="pre">LinkMLGen.ensure_consistency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.linkml_gen.LinkMLGen.gen_schema"><code class="docutils literal notranslate"><span class="pre">LinkMLGen.gen_schema()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.linkml_gen.LinkMLGen.gen_schema_from_instance"><code class="docutils literal notranslate"><span class="pre">LinkMLGen.gen_schema_from_instance()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.lod">lodstorage.lod module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD"><code class="docutils literal notranslate"><span class="pre">LOD</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.addLookup"><code class="docutils literal notranslate"><span class="pre">LOD.addLookup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.filterFields"><code class="docutils literal notranslate"><span class="pre">LOD.filterFields()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.getFields"><code class="docutils literal notranslate"><span class="pre">LOD.getFields()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.getLookup"><code class="docutils literal notranslate"><span class="pre">LOD.getLookup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.handleListTypes"><code class="docutils literal notranslate"><span class="pre">LOD.handleListTypes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.intersect"><code class="docutils literal notranslate"><span class="pre">LOD.intersect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.setNone"><code class="docutils literal notranslate"><span class="pre">LOD.setNone()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.setNone4List"><code class="docutils literal notranslate"><span class="pre">LOD.setNone4List()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.lod.LOD.sortKey"><code class="docutils literal notranslate"><span class="pre">LOD.sortKey()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.mwTable">lodstorage.mwTable module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.mwTable.MediaWikiTable"><code class="docutils literal notranslate"><span class="pre">MediaWikiTable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.mwTable.MediaWikiTable.addHeader"><code class="docutils literal notranslate"><span class="pre">MediaWikiTable.addHeader()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.mwTable.MediaWikiTable.addRow4Dict"><code class="docutils literal notranslate"><span class="pre">MediaWikiTable.addRow4Dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.mwTable.MediaWikiTable.asWikiMarkup"><code class="docutils literal notranslate"><span class="pre">MediaWikiTable.asWikiMarkup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.mwTable.MediaWikiTable.fromListOfDicts"><code class="docutils literal notranslate"><span class="pre">MediaWikiTable.fromListOfDicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.mwTable.MediaWikiTable.noneReplace"><code class="docutils literal notranslate"><span class="pre">MediaWikiTable.noneReplace()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.plot">lodstorage.plot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.plot.Plot"><code class="docutils literal notranslate"><span class="pre">Plot</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.plot.Plot.barchart"><code class="docutils literal notranslate"><span class="pre">Plot.barchart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.plot.Plot.hist"><code class="docutils literal notranslate"><span class="pre">Plot.hist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.plot.Plot.showDebug"><code class="docutils literal notranslate"><span class="pre">Plot.showDebug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.plot.Plot.showMe"><code class="docutils literal notranslate"><span class="pre">Plot.showMe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.plot.Plot.titleMe"><code class="docutils literal notranslate"><span class="pre">Plot.titleMe()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.query">lodstorage.query module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.Endpoint"><code class="docutils literal notranslate"><span class="pre">Endpoint</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Endpoint.getDefault"><code class="docutils literal notranslate"><span class="pre">Endpoint.getDefault()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Endpoint.getSamples"><code class="docutils literal notranslate"><span class="pre">Endpoint.getSamples()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.EndpointManager"><code class="docutils literal notranslate"><span class="pre">EndpointManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.EndpointManager.getEndpointNames"><code class="docutils literal notranslate"><span class="pre">EndpointManager.getEndpointNames()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.EndpointManager.getEndpoints"><code class="docutils literal notranslate"><span class="pre">EndpointManager.getEndpoints()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.Format"><code class="docutils literal notranslate"><span class="pre">Format</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Format.csv"><code class="docutils literal notranslate"><span class="pre">Format.csv</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Format.github"><code class="docutils literal notranslate"><span class="pre">Format.github</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Format.json"><code class="docutils literal notranslate"><span class="pre">Format.json</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Format.latex"><code class="docutils literal notranslate"><span class="pre">Format.latex</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Format.mediawiki"><code class="docutils literal notranslate"><span class="pre">Format.mediawiki</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Format.tsv"><code class="docutils literal notranslate"><span class="pre">Format.tsv</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Format.xml"><code class="docutils literal notranslate"><span class="pre">Format.xml</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query"><code class="docutils literal notranslate"><span class="pre">Query</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.addFormatCallBack"><code class="docutils literal notranslate"><span class="pre">Query.addFormatCallBack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.asWikiMarkup"><code class="docutils literal notranslate"><span class="pre">Query.asWikiMarkup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.asWikiSourceMarkup"><code class="docutils literal notranslate"><span class="pre">Query.asWikiSourceMarkup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.asYaml"><code class="docutils literal notranslate"><span class="pre">Query.asYaml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.documentQueryResult"><code class="docutils literal notranslate"><span class="pre">Query.documentQueryResult()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.formatWithValueFormatters"><code class="docutils literal notranslate"><span class="pre">Query.formatWithValueFormatters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.getLink"><code class="docutils literal notranslate"><span class="pre">Query.getLink()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.getTryItUrl"><code class="docutils literal notranslate"><span class="pre">Query.getTryItUrl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.preFormatWithCallBacks"><code class="docutils literal notranslate"><span class="pre">Query.preFormatWithCallBacks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.Query.prefixToLink"><code class="docutils literal notranslate"><span class="pre">Query.prefixToLink()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.QueryManager"><code class="docutils literal notranslate"><span class="pre">QueryManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.QueryManager.getQueries"><code class="docutils literal notranslate"><span class="pre">QueryManager.getQueries()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.QueryResultDocumentation"><code class="docutils literal notranslate"><span class="pre">QueryResultDocumentation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.QueryResultDocumentation.asText"><code class="docutils literal notranslate"><span class="pre">QueryResultDocumentation.asText()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.QueryResultDocumentation.uniCode2Latex"><code class="docutils literal notranslate"><span class="pre">QueryResultDocumentation.uniCode2Latex()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.QuerySyntaxHighlight"><code class="docutils literal notranslate"><span class="pre">QuerySyntaxHighlight</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.QuerySyntaxHighlight.highlight"><code class="docutils literal notranslate"><span class="pre">QuerySyntaxHighlight.highlight()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.ValueFormatter"><code class="docutils literal notranslate"><span class="pre">ValueFormatter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.ValueFormatter.applyFormat"><code class="docutils literal notranslate"><span class="pre">ValueFormatter.applyFormat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.ValueFormatter.formatsPath"><code class="docutils literal notranslate"><span class="pre">ValueFormatter.formatsPath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.ValueFormatter.fromDict"><code class="docutils literal notranslate"><span class="pre">ValueFormatter.fromDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.ValueFormatter.getFormats"><code class="docutils literal notranslate"><span class="pre">ValueFormatter.getFormats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.ValueFormatter.home"><code class="docutils literal notranslate"><span class="pre">ValueFormatter.home</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.ValueFormatter.valueFormats"><code class="docutils literal notranslate"><span class="pre">ValueFormatter.valueFormats</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.query.YamlPath"><code class="docutils literal notranslate"><span class="pre">YamlPath</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.query.YamlPath.getPaths"><code class="docutils literal notranslate"><span class="pre">YamlPath.getPaths()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.querymain">lodstorage.querymain module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.querymain.QueryMain"><code class="docutils literal notranslate"><span class="pre">QueryMain</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.querymain.QueryMain.main"><code class="docutils literal notranslate"><span class="pre">QueryMain.main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.querymain.QueryMain.rawQuery"><code class="docutils literal notranslate"><span class="pre">QueryMain.rawQuery()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.querymain.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.querymain.mainSPARQL"><code class="docutils literal notranslate"><span class="pre">mainSPARQL()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.querymain.mainSQL"><code class="docutils literal notranslate"><span class="pre">mainSQL()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.rdf">lodstorage.rdf module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.rdf.RDFDumper"><code class="docutils literal notranslate"><span class="pre">RDFDumper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.rdf.RDFDumper.convert_to_literal"><code class="docutils literal notranslate"><span class="pre">RDFDumper.convert_to_literal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.rdf.RDFDumper.convert_to_rdf"><code class="docutils literal notranslate"><span class="pre">RDFDumper.convert_to_rdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.rdf.RDFDumper.get_instance_uri"><code class="docutils literal notranslate"><span class="pre">RDFDumper.get_instance_uri()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.rdf.RDFDumper.process_class"><code class="docutils literal notranslate"><span class="pre">RDFDumper.process_class()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.rdf.RDFDumper.serialize"><code class="docutils literal notranslate"><span class="pre">RDFDumper.serialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.rdf.RDFDumper.value_iterator"><code class="docutils literal notranslate"><span class="pre">RDFDumper.value_iterator()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.sample">lodstorage.sample module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Cities"><code class="docutils literal notranslate"><span class="pre">Cities</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Royal"><code class="docutils literal notranslate"><span class="pre">Royal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Royal.getSamples"><code class="docutils literal notranslate"><span class="pre">Royal.getSamples()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Royals"><code class="docutils literal notranslate"><span class="pre">Royals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sample.RoyalsORMList"><code class="docutils literal notranslate"><span class="pre">RoyalsORMList</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Sample"><code class="docutils literal notranslate"><span class="pre">Sample</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Sample.cityList"><code class="docutils literal notranslate"><span class="pre">Sample.cityList</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Sample.dob"><code class="docutils literal notranslate"><span class="pre">Sample.dob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Sample.getCities"><code class="docutils literal notranslate"><span class="pre">Sample.getCities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Sample.getCountries"><code class="docutils literal notranslate"><span class="pre">Sample.getCountries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Sample.getRoyals"><code class="docutils literal notranslate"><span class="pre">Sample.getRoyals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Sample.getRoyalsInstances"><code class="docutils literal notranslate"><span class="pre">Sample.getRoyalsInstances()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample.Sample.getSample"><code class="docutils literal notranslate"><span class="pre">Sample.getSample()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.sample2">lodstorage.sample2 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sample2.Sample"><code class="docutils literal notranslate"><span class="pre">Sample</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sample2.Sample.get"><code class="docutils literal notranslate"><span class="pre">Sample.get()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.schema">lodstorage.schema module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.schema.Schema"><code class="docutils literal notranslate"><span class="pre">Schema</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.schema.Schema.generalizeColumn"><code class="docutils literal notranslate"><span class="pre">Schema.generalizeColumn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.schema.Schema.getGeneral"><code class="docutils literal notranslate"><span class="pre">Schema.getGeneral()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.schema.Schema.getGeneralViewDDL"><code class="docutils literal notranslate"><span class="pre">Schema.getGeneralViewDDL()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.schema.SchemaManager"><code class="docutils literal notranslate"><span class="pre">SchemaManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.sparql">lodstorage.sparql module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL"><code class="docutils literal notranslate"><span class="pre">SPARQL</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.addAuthentication"><code class="docutils literal notranslate"><span class="pre">SPARQL.addAuthentication()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.asListOfDicts"><code class="docutils literal notranslate"><span class="pre">SPARQL.asListOfDicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.controlChars"><code class="docutils literal notranslate"><span class="pre">SPARQL.controlChars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.controlEscape"><code class="docutils literal notranslate"><span class="pre">SPARQL.controlEscape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.fix_comments"><code class="docutils literal notranslate"><span class="pre">SPARQL.fix_comments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.fromEndpointConf"><code class="docutils literal notranslate"><span class="pre">SPARQL.fromEndpointConf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.getFirst"><code class="docutils literal notranslate"><span class="pre">SPARQL.getFirst()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.getLocalName"><code class="docutils literal notranslate"><span class="pre">SPARQL.getLocalName()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.getResults"><code class="docutils literal notranslate"><span class="pre">SPARQL.getResults()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.getValue"><code class="docutils literal notranslate"><span class="pre">SPARQL.getValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.getValues"><code class="docutils literal notranslate"><span class="pre">SPARQL.getValues()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.insert"><code class="docutils literal notranslate"><span class="pre">SPARQL.insert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.insertListOfDicts"><code class="docutils literal notranslate"><span class="pre">SPARQL.insertListOfDicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.insertListOfDictsBatch"><code class="docutils literal notranslate"><span class="pre">SPARQL.insertListOfDictsBatch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.printErrors"><code class="docutils literal notranslate"><span class="pre">SPARQL.printErrors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.query"><code class="docutils literal notranslate"><span class="pre">SPARQL.query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.queryAsListOfDicts"><code class="docutils literal notranslate"><span class="pre">SPARQL.queryAsListOfDicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.rawQuery"><code class="docutils literal notranslate"><span class="pre">SPARQL.rawQuery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sparql.SPARQL.strToDatetime"><code class="docutils literal notranslate"><span class="pre">SPARQL.strToDatetime()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.sql">lodstorage.sql module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sql.EntityInfo"><code class="docutils literal notranslate"><span class="pre">EntityInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.EntityInfo.addType"><code class="docutils literal notranslate"><span class="pre">EntityInfo.addType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.EntityInfo.fixDates"><code class="docutils literal notranslate"><span class="pre">EntityInfo.fixDates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.EntityInfo.getCreateTableCmd"><code class="docutils literal notranslate"><span class="pre">EntityInfo.getCreateTableCmd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.EntityInfo.getInsertCmd"><code class="docutils literal notranslate"><span class="pre">EntityInfo.getInsertCmd()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB"><code class="docutils literal notranslate"><span class="pre">SQLDB</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.RAM"><code class="docutils literal notranslate"><span class="pre">SQLDB.RAM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.backup"><code class="docutils literal notranslate"><span class="pre">SQLDB.backup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.backupProgress"><code class="docutils literal notranslate"><span class="pre">SQLDB.backupProgress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.close"><code class="docutils literal notranslate"><span class="pre">SQLDB.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.copyTo"><code class="docutils literal notranslate"><span class="pre">SQLDB.copyTo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.createTable"><code class="docutils literal notranslate"><span class="pre">SQLDB.createTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.execute"><code class="docutils literal notranslate"><span class="pre">SQLDB.execute()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.executeDump"><code class="docutils literal notranslate"><span class="pre">SQLDB.executeDump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.getDebugInfo"><code class="docutils literal notranslate"><span class="pre">SQLDB.getDebugInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.getTableDict"><code class="docutils literal notranslate"><span class="pre">SQLDB.getTableDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.getTableList"><code class="docutils literal notranslate"><span class="pre">SQLDB.getTableList()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.logError"><code class="docutils literal notranslate"><span class="pre">SQLDB.logError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.progress"><code class="docutils literal notranslate"><span class="pre">SQLDB.progress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.query"><code class="docutils literal notranslate"><span class="pre">SQLDB.query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.queryAll"><code class="docutils literal notranslate"><span class="pre">SQLDB.queryAll()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.queryGen"><code class="docutils literal notranslate"><span class="pre">SQLDB.queryGen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.restore"><code class="docutils literal notranslate"><span class="pre">SQLDB.restore()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.restoreProgress"><code class="docutils literal notranslate"><span class="pre">SQLDB.restoreProgress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.showDump"><code class="docutils literal notranslate"><span class="pre">SQLDB.showDump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sql.SQLDB.store"><code class="docutils literal notranslate"><span class="pre">SQLDB.store()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.storageconfig">lodstorage.storageconfig module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig"><code class="docutils literal notranslate"><span class="pre">StorageConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getCachePath"><code class="docutils literal notranslate"><span class="pre">StorageConfig.getCachePath()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getDefault"><code class="docutils literal notranslate"><span class="pre">StorageConfig.getDefault()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getJSON"><code class="docutils literal notranslate"><span class="pre">StorageConfig.getJSON()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getJsonPickle"><code class="docutils literal notranslate"><span class="pre">StorageConfig.getJsonPickle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getSPARQL"><code class="docutils literal notranslate"><span class="pre">StorageConfig.getSPARQL()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getSQL"><code class="docutils literal notranslate"><span class="pre">StorageConfig.getSQL()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StorageConfig.getYaml"><code class="docutils literal notranslate"><span class="pre">StorageConfig.getYaml()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StoreMode"><code class="docutils literal notranslate"><span class="pre">StoreMode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StoreMode.JSON"><code class="docutils literal notranslate"><span class="pre">StoreMode.JSON</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StoreMode.JSONPICKLE"><code class="docutils literal notranslate"><span class="pre">StoreMode.JSONPICKLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StoreMode.SPARQL"><code class="docutils literal notranslate"><span class="pre">StoreMode.SPARQL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StoreMode.SQL"><code class="docutils literal notranslate"><span class="pre">StoreMode.SQL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.storageconfig.StoreMode.YAML"><code class="docutils literal notranslate"><span class="pre">StoreMode.YAML</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.sync">lodstorage.sync module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sync.Sync"><code class="docutils literal notranslate"><span class="pre">Sync</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.Sync.get_keys"><code class="docutils literal notranslate"><span class="pre">Sync.get_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.Sync.get_record_by_key"><code class="docutils literal notranslate"><span class="pre">Sync.get_record_by_key()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.Sync.get_record_by_pkey"><code class="docutils literal notranslate"><span class="pre">Sync.get_record_by_pkey()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.Sync.handle_direction_error"><code class="docutils literal notranslate"><span class="pre">Sync.handle_direction_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.Sync.handle_side_error"><code class="docutils literal notranslate"><span class="pre">Sync.handle_side_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.Sync.status_table"><code class="docutils literal notranslate"><span class="pre">Sync.status_table()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair"><code class="docutils literal notranslate"><span class="pre">SyncPair</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.l_by_pkey"><code class="docutils literal notranslate"><span class="pre">SyncPair.l_by_pkey</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.l_data"><code class="docutils literal notranslate"><span class="pre">SyncPair.l_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.l_key"><code class="docutils literal notranslate"><span class="pre">SyncPair.l_key</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.l_name"><code class="docutils literal notranslate"><span class="pre">SyncPair.l_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.l_pkey"><code class="docutils literal notranslate"><span class="pre">SyncPair.l_pkey</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.r_by_pkey"><code class="docutils literal notranslate"><span class="pre">SyncPair.r_by_pkey</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.r_data"><code class="docutils literal notranslate"><span class="pre">SyncPair.r_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.r_key"><code class="docutils literal notranslate"><span class="pre">SyncPair.r_key</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.r_name"><code class="docutils literal notranslate"><span class="pre">SyncPair.r_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.r_pkey"><code class="docutils literal notranslate"><span class="pre">SyncPair.r_pkey</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.sync.SyncPair.title"><code class="docutils literal notranslate"><span class="pre">SyncPair.title</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.tabulateCounter">lodstorage.tabulateCounter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.tabulateCounter.TabulateCounter"><code class="docutils literal notranslate"><span class="pre">TabulateCounter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.tabulateCounter.TabulateCounter.mostCommonTable"><code class="docutils literal notranslate"><span class="pre">TabulateCounter.mostCommonTable()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.trulytabular">lodstorage.trulytabular module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular"><code class="docutils literal notranslate"><span class="pre">TrulyTabular</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.addStatsColWithPercent"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.addStatsColWithPercent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.asText"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.asText()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.count"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.genPropertyStatistics"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.genPropertyStatistics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.genWdPropertyStatistic"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.genWdPropertyStatistic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.generateSparqlQuery"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.generateSparqlQuery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.getItemText"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.getItemText()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.getPropertyStatistics"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.getPropertyStatistics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.getQueryManager"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.getQueryManager()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.mostFrequentPropertiesQuery"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.mostFrequentPropertiesQuery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.noneTabular"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.noneTabular()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.TrulyTabular.noneTabularQuery"><code class="docutils literal notranslate"><span class="pre">TrulyTabular.noneTabularQuery()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.Variable"><code class="docutils literal notranslate"><span class="pre">Variable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.Variable.validVarName"><code class="docutils literal notranslate"><span class="pre">Variable.validVarName()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataItem"><code class="docutils literal notranslate"><span class="pre">WikidataItem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataItem.asText"><code class="docutils literal notranslate"><span class="pre">WikidataItem.asText()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataItem.getItemsByLabel"><code class="docutils literal notranslate"><span class="pre">WikidataItem.getItemsByLabel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataItem.getLabelAndDescription"><code class="docutils literal notranslate"><span class="pre">WikidataItem.getLabelAndDescription()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataItem.getPrefixes"><code class="docutils literal notranslate"><span class="pre">WikidataItem.getPrefixes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataProperty"><code class="docutils literal notranslate"><span class="pre">WikidataProperty</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataProperty.addPropertiesForQuery"><code class="docutils literal notranslate"><span class="pre">WikidataProperty.addPropertiesForQuery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataProperty.from_id"><code class="docutils literal notranslate"><span class="pre">WikidataProperty.from_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataProperty.getPredicate"><code class="docutils literal notranslate"><span class="pre">WikidataProperty.getPredicate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataProperty.getPropertiesByIds"><code class="docutils literal notranslate"><span class="pre">WikidataProperty.getPropertiesByIds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.trulytabular.WikidataProperty.getPropertiesByLabels"><code class="docutils literal notranslate"><span class="pre">WikidataProperty.getPropertiesByLabels()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.uml">lodstorage.uml module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.uml.UML"><code class="docutils literal notranslate"><span class="pre">UML</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.uml.UML.mergeSchema"><code class="docutils literal notranslate"><span class="pre">UML.mergeSchema()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.uml.UML.skinparams"><code class="docutils literal notranslate"><span class="pre">UML.skinparams</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.uml.UML.tableListToPlantUml"><code class="docutils literal notranslate"><span class="pre">UML.tableListToPlantUml()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.version">lodstorage.version module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.version.Version"><code class="docutils literal notranslate"><span class="pre">Version</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.version.Version.date"><code class="docutils literal notranslate"><span class="pre">Version.date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.version.Version.description"><code class="docutils literal notranslate"><span class="pre">Version.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.version.Version.name"><code class="docutils literal notranslate"><span class="pre">Version.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.version.Version.updated"><code class="docutils literal notranslate"><span class="pre">Version.updated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.version.Version.version"><code class="docutils literal notranslate"><span class="pre">Version.version</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.xml">lodstorage.xml module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.xml.Lod2Xml"><code class="docutils literal notranslate"><span class="pre">Lod2Xml</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.xml.Lod2Xml.asXml"><code class="docutils literal notranslate"><span class="pre">Lod2Xml.asXml()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.yamlable">lodstorage.yamlable module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.DateConvert"><code class="docutils literal notranslate"><span class="pre">DateConvert</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.DateConvert.iso_date_to_datetime"><code class="docutils literal notranslate"><span class="pre">DateConvert.iso_date_to_datetime()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble"><code class="docutils literal notranslate"><span class="pre">YamlAble</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.from_dict2"><code class="docutils literal notranslate"><span class="pre">YamlAble.from_dict2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.from_yaml"><code class="docutils literal notranslate"><span class="pre">YamlAble.from_yaml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.load_from_json_file"><code class="docutils literal notranslate"><span class="pre">YamlAble.load_from_json_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.load_from_json_url"><code class="docutils literal notranslate"><span class="pre">YamlAble.load_from_json_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.load_from_yaml_file"><code class="docutils literal notranslate"><span class="pre">YamlAble.load_from_yaml_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.load_from_yaml_url"><code class="docutils literal notranslate"><span class="pre">YamlAble.load_from_yaml_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.read_from_url"><code class="docutils literal notranslate"><span class="pre">YamlAble.read_from_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.remove_ignored_values"><code class="docutils literal notranslate"><span class="pre">YamlAble.remove_ignored_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.represent_literal"><code class="docutils literal notranslate"><span class="pre">YamlAble.represent_literal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.represent_none"><code class="docutils literal notranslate"><span class="pre">YamlAble.represent_none()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.save_to_json_file"><code class="docutils literal notranslate"><span class="pre">YamlAble.save_to_json_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.save_to_yaml_file"><code class="docutils literal notranslate"><span class="pre">YamlAble.save_to_yaml_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.YamlAble.to_yaml"><code class="docutils literal notranslate"><span class="pre">YamlAble.to_yaml()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.yamlable.lod_storable"><code class="docutils literal notranslate"><span class="pre">lod_storable()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage.yamlablemixin">lodstorage.yamlablemixin module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lodstorage.html#lodstorage.yamlablemixin.YamlAbleMixin"><code class="docutils literal notranslate"><span class="pre">YamlAbleMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlablemixin.YamlAbleMixin.debug"><code class="docutils literal notranslate"><span class="pre">YamlAbleMixin.debug</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlablemixin.YamlAbleMixin.readYaml"><code class="docutils literal notranslate"><span class="pre">YamlAbleMixin.readYaml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lodstorage.html#lodstorage.yamlablemixin.YamlAbleMixin.writeYaml"><code class="docutils literal notranslate"><span class="pre">YamlAbleMixin.writeYaml()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lodstorage.html#module-lodstorage">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sampledata.html">sampledata package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sampledata.html#module-sampledata">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-basetest-module">tests.basetest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-testentitymanager-module">tests.testEntityManager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-testjson-module">tests.testJson module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-testpandas-module">tests.testPandas module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-testsparql-module">tests.testSPARQL module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-testsqlite3-module">tests.testSqlite3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-testtrulytabular-module">tests.testTrulyTabular module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-plot-module">tests.test_Plot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-tabulate-module">tests.test_Tabulate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-csv-module">tests.test_csv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-docstring-parser-module">tests.test_docstring_parser module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-linkml-module">tests.test_linkml module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-linkml-schema-module">tests.test_linkml_schema module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-lod-module">tests.test_lod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-queries-module">tests.test_queries module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-rdf-module">tests.test_rdf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-samples-module">tests.test_samples module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-sync-module">tests.test_sync module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests-test-yamlable-module">tests.test_yamlable module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="lodstorage.html" title="next chapter">lodstorage package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

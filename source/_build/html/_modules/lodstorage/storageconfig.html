@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.storageconfig &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.storageconfig</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2020-08-29</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+
+<div class="viewcode-block" id="StoreMode">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StoreMode">[docs]</a>
+<span class="k">class</span> <span class="nc">StoreMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    possible supported storage modes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">JSONPICKLE</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># JSON Pickle</span>
+    <span class="n">JSON</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">SQL</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">SPARQL</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">YAML</span> <span class="o">=</span> <span class="mi">5</span></div>
+
+
+
+<div class="viewcode-block" id="StorageConfig">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StorageConfig">[docs]</a>
+<span class="k">class</span> <span class="nc">StorageConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a storage configuration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StorageConfig.getCachePath">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StorageConfig.getCachePath">[docs]</a>
+    <span class="k">def</span> <span class="nf">getCachePath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensureExists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the path to the default cache</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name(str): the name of the cache to use</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cachedir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cacheRootDir</span><span class="si">}</span><span class="s2">/.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cacheDirName</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="n">ensureExists</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cachedir</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">cachedir</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cachedir</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">,</span>
+        <span class="n">cacheRootDir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cacheDirName</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lodstorage&quot;</span><span class="p">,</span>
+        <span class="n">cacheFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">withShowProgress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">errorDebug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mode(StoreMode): the storage mode e.g. sql</span>
+<span class="sd">            cacheRootDir(str): the cache root directory to use - if None the home directory will be used</span>
+<span class="sd">            cacheFile(string): the common cacheFile to use (if any)</span>
+<span class="sd">            withShowProgress(boolean): True if progress should be shown</span>
+<span class="sd">            profile(boolean): True if timing / profiling information should be shown</span>
+<span class="sd">            debug(boolean): True if debugging information should be shown</span>
+<span class="sd">            errorDebug(boolean): True if debug info should be provided on errors (should not be used for production since it might reveal data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cacheRootDir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">home</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cacheRootDir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">home</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cacheRootDir</span> <span class="o">=</span> <span class="n">cacheRootDir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cacheDirName</span> <span class="o">=</span> <span class="n">cacheDirName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cacheFile</span> <span class="o">=</span> <span class="n">cacheFile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">profile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">withShowProgress</span> <span class="o">=</span> <span class="n">withShowProgress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errorDebug</span> <span class="o">=</span> <span class="n">errorDebug</span>
+
+<div class="viewcode-block" id="StorageConfig.getDefault">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StorageConfig.getDefault">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getDefault</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">StorageConfig</span><span class="o">.</span><span class="n">getSQL</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StorageConfig.getSQL">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StorageConfig.getSQL">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getSQL</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">StorageConfig</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">tableName</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+
+<div class="viewcode-block" id="StorageConfig.getJSON">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StorageConfig.getJSON">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getJSON</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">StorageConfig</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">JSON</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+
+<div class="viewcode-block" id="StorageConfig.getJsonPickle">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StorageConfig.getJsonPickle">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getJsonPickle</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">StorageConfig</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">JSONPICKLE</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+
+<div class="viewcode-block" id="StorageConfig.getSPARQL">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StorageConfig.getSPARQL">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getSPARQL</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">StorageConfig</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">SPARQL</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+
+<div class="viewcode-block" id="StorageConfig.getYaml">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.storageconfig.StorageConfig.getYaml">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getYaml</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">StorageConfig</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">YAML</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

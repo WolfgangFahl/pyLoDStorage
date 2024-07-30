@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.linkml_gen &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.linkml_gen</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2024-01-21</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">lodstorage.docstring_parser</span> <span class="kn">import</span> <span class="n">DocstringParser</span>
+<span class="kn">from</span> <span class="nn">lodstorage.linkml</span> <span class="kn">import</span> <span class="n">Class</span><span class="p">,</span> <span class="n">PythonTypes</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">Slot</span>
+
+
+<div class="viewcode-block" id="LinkMLGen">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.linkml_gen.LinkMLGen">[docs]</a>
+<span class="k">class</span> <span class="nc">LinkMLGen</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for generating LinkML YAML schema from Python data models using dataclasses.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Schema</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the LinkMLGen.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            schema (Schema): The LinkML schema to be generated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span>
+
+<div class="viewcode-block" id="LinkMLGen.gen_schema">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.linkml_gen.LinkMLGen.gen_schema">[docs]</a>
+    <span class="k">def</span> <span class="nf">gen_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_model_class</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Schema</span><span class="p">:</span>
+        <span class="c1"># Use DocstringParser to extract class description</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">DocstringParser</span><span class="p">()</span>
+        <span class="n">class_description</span><span class="p">,</span> <span class="n">doc_attributes</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data_model_class</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">data_model_class</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">new_class</span> <span class="o">=</span> <span class="n">Class</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">class_description</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="c1"># Iterate over the fields of the dataclass</span>
+        <span class="k">for</span> <span class="n">field_info</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">data_model_class</span><span class="p">):</span>
+            <span class="n">attr_name</span> <span class="o">=</span> <span class="n">field_info</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">attr_type</span> <span class="o">=</span> <span class="n">field_info</span><span class="o">.</span><span class="n">type</span>
+
+            <span class="c1"># Handle Optional and List types</span>
+            <span class="n">is_optional</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">is_list</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">attr_type</span><span class="p">,</span> <span class="s2">&quot;__origin__&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">attr_type</span><span class="o">.</span><span class="n">__origin__</span> <span class="ow">is</span> <span class="n">Union</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">attr_type</span><span class="o">.</span><span class="n">__args__</span><span class="p">:</span>
+                    <span class="n">is_optional</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">attr_type</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">attr_type</span><span class="o">.</span><span class="n">__args__</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)][</span>
+                        <span class="mi">0</span>
+                    <span class="p">]</span>  <span class="c1"># unwrap Optional type</span>
+                <span class="k">elif</span> <span class="n">attr_type</span><span class="o">.</span><span class="n">__origin__</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                    <span class="n">is_list</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">content_type</span> <span class="o">=</span> <span class="n">attr_type</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># unwrap List type</span>
+                <span class="k">elif</span> <span class="n">attr_type</span><span class="o">.</span><span class="n">__origin__</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+                    <span class="c1"># Assuming dictionary values are of interest, keys are strings</span>
+                    <span class="n">content_type</span> <span class="o">=</span> <span class="n">attr_type</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span>
+                        <span class="mi">1</span>
+                    <span class="p">]</span>  <span class="c1"># unwrap Dict type, focusing on value type</span>
+
+            <span class="c1"># Check and handle nested dataclasses for lists or dicts</span>
+            <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">content_type</span><span class="p">):</span>
+                <span class="c1"># Recursive call to handle nested dataclass</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gen_schema</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span>
+                <span class="c1"># Set the range to the name of the dataclass</span>
+                <span class="n">linkml_range</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">content_type</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="p">)</span>  <span class="c1"># Use the name of the dataclass as the range</span>
+            <span class="k">elif</span> <span class="n">is_list</span><span class="p">:</span>
+                <span class="c1"># If it&#39;s a list, get the LinkML range for the base type</span>
+                <span class="c1"># Use self.get_linkml_range to ensure consistent type mapping</span>
+                <span class="n">linkml_range</span> <span class="o">=</span> <span class="n">PythonTypes</span><span class="o">.</span><span class="n">get_linkml_range</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># For non-list and non-dataclass types, use self.get_linkml_range for consistent type mapping</span>
+                <span class="n">linkml_range</span> <span class="o">=</span> <span class="n">PythonTypes</span><span class="o">.</span><span class="n">get_linkml_range</span><span class="p">(</span><span class="n">attr_type</span><span class="p">)</span>
+
+            <span class="c1"># Extract description from doc_attributes</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">doc_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attr_name</span><span class="si">}</span><span class="s2"> - missing description&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create a new slot for the field</span>
+            <span class="n">new_slot</span> <span class="o">=</span> <span class="n">Slot</span><span class="p">(</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="n">linkml_range</span><span class="p">,</span> <span class="n">multivalued</span><span class="o">=</span><span class="n">is_list</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">slots</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_slot</span>
+            <span class="n">new_class</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">classes</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_class</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span></div>
+
+
+<div class="viewcode-block" id="LinkMLGen.gen_schema_from_instance">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.linkml_gen.LinkMLGen.gen_schema_from_instance">[docs]</a>
+    <span class="k">def</span> <span class="nf">gen_schema_from_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_model_instance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Schema</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a LinkML YAML schema from a Python data model using dataclasses.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data_model_instance: An instance of the Python data model.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Schema: The LinkML schema generated from the data model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use DocstringParser to extract class description and attributes</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">DocstringParser</span><span class="p">()</span>
+        <span class="n">class_description</span><span class="p">,</span> <span class="n">doc_attributes</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data_model_instance</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">data_model_instance</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">new_class</span> <span class="o">=</span> <span class="n">Class</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">class_description</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="k">for</span> <span class="n">field_info</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">data_model_instance</span><span class="p">):</span>
+            <span class="n">attr_name</span> <span class="o">=</span> <span class="n">field_info</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">attr_type</span> <span class="o">=</span> <span class="n">field_info</span><span class="o">.</span><span class="n">type</span>
+
+            <span class="c1"># Extract field type/range</span>
+            <span class="n">linkml_range</span> <span class="o">=</span> <span class="n">PythonTypes</span><span class="o">.</span><span class="n">get_linkml_range</span><span class="p">(</span><span class="n">attr_type</span><span class="p">)</span>
+
+            <span class="c1"># Check values for multivalued and type consistency</span>
+            <span class="n">attr_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data_model_instance</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
+            <span class="n">multivalued</span><span class="p">,</span> <span class="n">actual_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_value</span><span class="p">(</span><span class="n">attr_value</span><span class="p">)</span>
+
+            <span class="c1"># Ensure documentation, declaration, and value type are consistent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensure_consistency</span><span class="p">(</span>
+                <span class="n">attr_name</span><span class="p">,</span> <span class="n">linkml_range</span><span class="p">,</span> <span class="n">actual_type</span><span class="p">,</span> <span class="n">doc_attributes</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Prepare slot</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">doc_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attr_name</span><span class="si">}</span><span class="s2"> - missing description&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">attr_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">slots</span><span class="p">:</span>
+                <span class="n">new_slot</span> <span class="o">=</span> <span class="n">Slot</span><span class="p">(</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="n">linkml_range</span><span class="p">,</span> <span class="n">multivalued</span><span class="o">=</span><span class="n">multivalued</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">slots</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_slot</span>
+                <span class="n">new_class</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">multivalued</span><span class="p">:</span>
+                <span class="c1"># recursive call if type of list or dict is a dataclass</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">attr_type</span><span class="p">,</span> <span class="s2">&quot;__args__&quot;</span><span class="p">):</span>
+                    <span class="n">content_type</span> <span class="o">=</span> <span class="n">attr_type</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span>
+                        <span class="mi">0</span>
+                    <span class="p">]</span>  <span class="c1"># Get the declared content type</span>
+                    <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">content_type</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">gen_schema</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">classes</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_class</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span></div>
+
+
+<div class="viewcode-block" id="LinkMLGen.check_value">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.linkml_gen.LinkMLGen.check_value">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># Method to check if the value is multivalued and determine its type</span>
+        <span class="n">multivalued</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">value_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">return</span> <span class="n">multivalued</span><span class="p">,</span> <span class="n">value_type</span></div>
+
+
+<div class="viewcode-block" id="LinkMLGen.ensure_consistency">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.linkml_gen.LinkMLGen.ensure_consistency">[docs]</a>
+    <span class="k">def</span> <span class="nf">ensure_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">declared_type</span><span class="p">,</span> <span class="n">actual_type</span><span class="p">,</span> <span class="n">doc_attributes</span><span class="p">):</span>
+        <span class="c1"># Adjust this method to handle complex types like list, dict, etc.</span>
+
+        <span class="c1"># Check if the actual type is a list or dict, and if so, get the type of its elements</span>
+        <span class="k">if</span> <span class="n">actual_type</span> <span class="o">==</span> <span class="s2">&quot;list&quot;</span> <span class="ow">or</span> <span class="n">actual_type</span> <span class="o">==</span> <span class="s2">&quot;dict&quot;</span><span class="p">:</span>
+            <span class="c1"># You may need a more complex logic here to handle lists of custom dataclasses</span>
+            <span class="c1"># For simplicity, let&#39;s assume it&#39;s a list of strings for now</span>
+            <span class="n">actual_type</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+        <span class="c1"># Now compare the adjusted actual type with the declared type</span>
+        <span class="k">if</span> <span class="n">declared_type</span> <span class="o">!=</span> <span class="n">actual_type</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Type mismatch for &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;: declared as &#39;</span><span class="si">{</span><span class="n">declared_type</span><span class="si">}</span><span class="s2">&#39;, actual type is &#39;</span><span class="si">{</span><span class="n">actual_type</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check for documentation</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc_attributes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing documentation for field &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

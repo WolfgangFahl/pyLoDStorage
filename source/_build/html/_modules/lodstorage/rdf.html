@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.rdf &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.rdf</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2024-01-27</span>
+
+<span class="sd">@author: wf, using ChatGPT-4 prompting</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">fields</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+
+<span class="kn">from</span> <span class="nn">rdflib</span> <span class="kn">import</span> <span class="n">BNode</span><span class="p">,</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">URIRef</span>
+<span class="kn">from</span> <span class="nn">rdflib.namespace</span> <span class="kn">import</span> <span class="n">RDF</span>
+
+<span class="kn">from</span> <span class="nn">lodstorage.linkml_gen</span> <span class="kn">import</span> <span class="n">PythonTypes</span><span class="p">,</span> <span class="n">Schema</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<div class="viewcode-block" id="RDFDumper">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.rdf.RDFDumper">[docs]</a>
+<span class="k">class</span> <span class="nc">RDFDumper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to convert instances of data models (based on a LinkML schema) into an RDF graph.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="nb">object</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the RDFDumper.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            schema (Schema): The LinkML schema defining the structure of the data models.</span>
+<span class="sd">            instance (object): The instance of the data model to be converted into RDF.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespaces</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">prefix</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span> <span class="k">for</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">prefixes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="RDFDumper.convert_to_rdf">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.rdf.RDFDumper.convert_to_rdf">[docs]</a>
+    <span class="k">def</span> <span class="nf">convert_to_rdf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the provided instance into RDF triples based on the LinkML schema.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Process the instance data according to its class in the schema</span>
+        <span class="n">instance_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">if</span> <span class="n">instance_class</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">classes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_class</span><span class="p">(</span><span class="n">instance_class</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RDFDumper.serialize">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.rdf.RDFDumper.serialize">[docs]</a>
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rdf_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;turtle&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Serializes the RDF graph into a string representation in the specified format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            format (str): The serialization format (e.g., &#39;turtle&#39;, &#39;xml&#39;, &#39;json-ld&#39;).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The serialized RDF graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="n">rdf_format</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="RDFDumper.value_iterator">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.rdf.RDFDumper.value_iterator">[docs]</a>
+    <span class="k">def</span> <span class="nf">value_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterates over values in a mapping or iterable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: The value to iterate over. It can be a mapping, iterable, or a single value.</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Tuples of (key, value) from the input value. For single values, key is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="k">yield from</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+            <span class="k">yield from</span> <span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RDFDumper.process_class">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.rdf.RDFDumper.process_class">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instance_data</span><span class="p">:</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="c1"># Get the base namespace URI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespaces</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">default_prefix</span><span class="p">]</span>
+        <span class="c1"># get the class object</span>
+        <span class="c1"># class_obj = self.schema.classes[class_name]</span>
+        <span class="c1"># Construct class_uri using the namespace and class_name with a separator</span>
+        <span class="n">class_uri</span> <span class="o">=</span> <span class="n">URIRef</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_uri</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Create a unique URI or a Blank Node for the instance</span>
+        <span class="n">instance_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_instance_uri</span><span class="p">(</span><span class="n">instance_data</span><span class="p">)</span>
+
+        <span class="c1"># Type the instance with its class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">instance_uri</span><span class="p">,</span> <span class="n">RDF</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">class_uri</span><span class="p">))</span>
+
+        <span class="c1">#loop over all fieds of the instance data</span>
+        <span class="k">for</span> <span class="n">field_info</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">instance_data</span><span class="p">):</span>
+            <span class="n">slot_name</span> <span class="o">=</span> <span class="n">field_info</span><span class="o">.</span><span class="n">name</span>
+            <span class="c1"># assure we only work on fields defined</span>
+            <span class="c1"># in our schema</span>
+            <span class="n">slot_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slot_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">slot_obj</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Combine the namespace with the slot name to form the field URI</span>
+            <span class="n">field_uri</span> <span class="o">=</span> <span class="n">URIRef</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_uri</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">slot_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">field_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">instance_data</span><span class="p">,</span> <span class="n">slot_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="c1"># Use value_iterator to handle different types of values</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_iterator</span><span class="p">(</span><span class="n">field_value</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Handle as a mapping</span>
+                    <span class="n">key_uri</span> <span class="o">=</span> <span class="n">URIRef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">namespaces</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">default_prefix</span><span class="p">][</span><span class="n">key</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">instance_uri</span><span class="p">,</span> <span class="n">field_uri</span><span class="p">,</span> <span class="n">key_uri</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">key_uri</span><span class="p">,</span> <span class="n">RDF</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_literal</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">slot_obj</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Handle as a single value or an item from an iterable</span>
+                    <span class="c1"># Check if item has an &#39;identifier&#39; property</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;identifier&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;identifier&#39;</span><span class="p">):</span>
+                        <span class="n">item_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_instance_uri</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">instance_uri</span><span class="p">,</span> <span class="n">field_uri</span><span class="p">,</span> <span class="n">item_uri</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">process_class</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                            <span class="p">(</span>
+                                <span class="n">instance_uri</span><span class="p">,</span>
+                                <span class="n">field_uri</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_literal</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">slot_obj</span><span class="p">),</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RDFDumper.get_instance_uri">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.rdf.RDFDumper.get_instance_uri">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_instance_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a URI for an instance. If the instance has an &#39;identifier&#39; property, it uses that as part of the URI.</span>
+<span class="sd">        Otherwise, it generates or retrieves a unique URI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">instance_data</span><span class="p">,</span> <span class="s1">&#39;identifier&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">instance_data</span><span class="p">,</span> <span class="s1">&#39;identifier&#39;</span><span class="p">):</span>
+            <span class="n">identifier</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">instance_data</span><span class="p">,</span> <span class="s1">&#39;identifier&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">URIRef</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_uri</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">identifier</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Fallback to a blank node if no identifier is found</span>
+            <span class="k">return</span> <span class="n">BNode</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="RDFDumper.convert_to_literal">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.rdf.RDFDumper.convert_to_literal">[docs]</a>
+    <span class="k">def</span> <span class="nf">convert_to_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">slot_obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a value to an RDFLib Literal with appropriate datatype.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: The value to be converted.</span>
+<span class="sd">            slot_obj: The slot object containing information about the field.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An RDFLib Literal with the value and appropriate datatype.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Determine the datatype based on the Python type of the value</span>
+        <span class="n">datatype</span> <span class="o">=</span> <span class="n">PythonTypes</span><span class="o">.</span><span class="n">get_rdf_datatype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="c1"># Create and return the literal</span>
+        <span class="k">return</span> <span class="n">Literal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datatype</span><span class="o">=</span><span class="n">datatype</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

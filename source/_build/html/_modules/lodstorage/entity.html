@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.entity &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.entity</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2020-08-19</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span><span class="p">,</span> <span class="n">JSONAbleList</span>
+<span class="kn">from</span> <span class="nn">lodstorage.jsonpicklemixin</span> <span class="kn">import</span> <span class="n">JsonPickleMixin</span>
+<span class="kn">from</span> <span class="nn">lodstorage.lod</span> <span class="kn">import</span> <span class="n">LOD</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sparql</span> <span class="kn">import</span> <span class="n">SPARQL</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sql</span> <span class="kn">import</span> <span class="n">SQLDB</span>
+<span class="kn">from</span> <span class="nn">lodstorage.storageconfig</span> <span class="kn">import</span> <span class="n">StorageConfig</span><span class="p">,</span> <span class="n">StoreMode</span>
+<span class="kn">from</span> <span class="nn">lodstorage.yamlablemixin</span> <span class="kn">import</span> <span class="n">YamlAbleMixin</span>
+
+
+<div class="viewcode-block" id="EntityManager">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager">[docs]</a>
+<span class="k">class</span> <span class="nc">EntityManager</span><span class="p">(</span><span class="n">YamlAbleMixin</span><span class="p">,</span> <span class="n">JsonPickleMixin</span><span class="p">,</span> <span class="n">JSONAbleList</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    generic entity manager</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">entityName</span><span class="p">,</span>
+        <span class="n">entityPluralName</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">listName</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">clazz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tableName</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">primaryKey</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">handleInvalidListTypes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">filterInvalidListTypes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">listSeparator</span><span class="o">=</span><span class="s2">&quot;⇹&quot;</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name(string): name of this eventManager</span>
+<span class="sd">            entityName(string): entityType to be managed e.g. Country</span>
+<span class="sd">            entityPluralName(string): plural of the the entityType e.g. Countries</span>
+<span class="sd">            config(StorageConfig): the configuration to be used if None a default configuration will be used</span>
+<span class="sd">            handleInvalidListTypes(bool): True if invalidListTypes should be converted or filtered</span>
+<span class="sd">            filterInvalidListTypes(bool): True if invalidListTypes should be deleted</span>
+<span class="sd">            listSeparator(str): the symbol to use as a list separator</span>
+<span class="sd">            debug(boolean): override debug setting when default of config is used via config=None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entityName</span> <span class="o">=</span> <span class="n">entityName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entityPluralName</span> <span class="o">=</span> <span class="n">entityPluralName</span>
+        <span class="k">if</span> <span class="n">listName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">listName</span> <span class="o">=</span> <span class="n">entityPluralName</span>
+        <span class="k">if</span> <span class="n">tableName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tableName</span> <span class="o">=</span> <span class="n">entityName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">primaryKey</span> <span class="o">=</span> <span class="n">primaryKey</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">StorageConfig</span><span class="o">.</span><span class="n">getDefault</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EntityManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">listName</span><span class="o">=</span><span class="n">listName</span><span class="p">,</span>
+            <span class="n">clazz</span><span class="o">=</span><span class="n">clazz</span><span class="p">,</span>
+            <span class="n">tableName</span><span class="o">=</span><span class="n">tableName</span><span class="p">,</span>
+            <span class="n">handleInvalidListTypes</span><span class="o">=</span><span class="n">handleInvalidListTypes</span><span class="p">,</span>
+            <span class="n">filterInvalidListTypes</span><span class="o">=</span><span class="n">filterInvalidListTypes</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">cacheFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCacheFile</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span>
+            <span class="s2">&quot;Creating </span><span class="si">%s</span><span class="s2">manager(</span><span class="si">%s</span><span class="s2">) for </span><span class="si">%s</span><span class="s2"> using cache </span><span class="si">%s</span><span class="s2">&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entityName</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">cacheFile</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SPARQL</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">endpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;no endpoint set for mode sparql&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">endpoint</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span> <span class="o">=</span> <span class="n">SPARQL</span><span class="p">(</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">profile</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">executeMany</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># may be True when issues are fixed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listSeparator</span> <span class="o">=</span> <span class="n">listSeparator</span>
+
+<div class="viewcode-block" id="EntityManager.storeMode">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.storeMode">[docs]</a>
+    <span class="k">def</span> <span class="nf">storeMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return my store mode</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.showProgress">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.showProgress">[docs]</a>
+    <span class="k">def</span> <span class="nf">showProgress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;display a progress message</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          msg(string): the message to display</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">withShowProgress</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.getCacheFile">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.getCacheFile">[docs]</a>
+    <span class="k">def</span> <span class="nf">getCacheFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the cache file for this event manager</span>
+<span class="sd">        Args:</span>
+<span class="sd">            config(StorageConfig): if None get the cache for my mode</span>
+<span class="sd">            mode(StoreMode): the storeMode to use</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">cachedir</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getCachePath</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">cacheFile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">cacheFile</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; get the path to the file for my cached data &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSON</span> <span class="ow">or</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSONPICKLE</span><span class="p">:</span>
+            <span class="n">extension</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">mode</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">cachepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cachedir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listName</span><span class="si">}{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SPARQL</span><span class="p">:</span>
+            <span class="n">cachepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SPAQRL </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">:</span>
+            <span class="n">cachepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cachedir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.db&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cachepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;undefined cachepath for StoreMode </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">cachepath</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.removeCacheFile">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.removeCacheFile">[docs]</a>
+    <span class="k">def</span> <span class="nf">removeCacheFile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;remove my cache file&quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSON</span> <span class="ow">or</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSONPICKLE</span><span class="p">:</span>
+            <span class="n">cacheFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCacheFile</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.getSQLDB">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.getSQLDB">[docs]</a>
+    <span class="k">def</span> <span class="nf">getSQLDB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cacheFile</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the SQL database for the given cacheFile</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cacheFile(string): the file to get the SQL db from</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">sqldb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sqldb</span> <span class="o">=</span> <span class="n">SQLDB</span><span class="p">(</span>
+            <span class="n">cacheFile</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">errorDebug</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">errorDebug</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">sqldb</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.initSQLDB">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.initSQLDB">[docs]</a>
+    <span class="k">def</span> <span class="nf">initSQLDB</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sqldb</span><span class="p">,</span>
+        <span class="n">listOfDicts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">withCreate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">withDrop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sampleRecordCount</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        initialize my sql DB</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            listOfDicts(list): the list of dicts to analyze for type information</span>
+<span class="sd">            withDrop(boolean): true if the existing Table should be dropped</span>
+<span class="sd">            withCreate(boolean): true if the create Table command should be executed - false if only the entityInfo should be returned</span>
+<span class="sd">            sampleRecordCount(int): the number of records to analyze for type information</span>
+<span class="sd">        Return:</span>
+<span class="sd">            EntityInfo: the entity information such as CREATE Table command</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">listOfDicts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">listOfDicts</span> <span class="o">=</span> <span class="n">JSONAble</span><span class="o">.</span><span class="n">getJsonTypeSamplesForClass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clazz</span><span class="p">)</span>
+        <span class="n">entityInfo</span> <span class="o">=</span> <span class="n">sqldb</span><span class="o">.</span><span class="n">createTable</span><span class="p">(</span>
+            <span class="n">listOfDicts</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tableName</span><span class="p">,</span>
+            <span class="n">primaryKey</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">primaryKey</span><span class="p">,</span>
+            <span class="n">withCreate</span><span class="o">=</span><span class="n">withCreate</span><span class="p">,</span>
+            <span class="n">withDrop</span><span class="o">=</span><span class="n">withDrop</span><span class="p">,</span>
+            <span class="n">sampleRecordCount</span><span class="o">=</span><span class="n">sampleRecordCount</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">entityInfo</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.setNone">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.setNone">[docs]</a>
+    <span class="k">def</span> <span class="nf">setNone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        make sure the given fields in the given record are set to none</span>
+<span class="sd">        Args:</span>
+<span class="sd">            record(dict): the record to work on</span>
+<span class="sd">            fields(list): the list of fields to set to None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">LOD</span><span class="o">.</span><span class="n">setNone</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.isCached">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.isCached">[docs]</a>
+    <span class="k">def</span> <span class="nf">isCached</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;check whether there is a file containing cached</span>
+<span class="sd">        data for me&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSON</span> <span class="ow">or</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSONPICKLE</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getCacheFile</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SPARQL</span><span class="p">:</span>
+            <span class="c1"># @FIXME - make abstract</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">prefix</span>
+                <span class="o">+</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT  ?source (COUNT(?source) AS ?sourcecount)</span>
+<span class="s2">WHERE { </span>
+<span class="s2">   ?event cr:Event_source ?source.</span>
+<span class="s2">}</span>
+<span class="s2">GROUP by ?source</span>
+<span class="s2">&quot;&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="n">sourceCountList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">sourceCount</span> <span class="ow">in</span> <span class="n">sourceCountList</span><span class="p">:</span>
+                <span class="n">source</span> <span class="o">=</span> <span class="n">sourceCount</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
+                <span class="n">recordCount</span> <span class="o">=</span> <span class="n">sourceCount</span><span class="p">[</span><span class="s2">&quot;sourcecount&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">and</span> <span class="n">recordCount</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">:</span>
+            <span class="n">cacheFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCacheFile</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">):</span>
+                <span class="n">sqlQuery</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT COUNT(*) AS count FROM </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tableName</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">sqlDB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSQLDB</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
+                    <span class="n">countResults</span> <span class="o">=</span> <span class="n">sqlDB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sqlQuery</span><span class="p">)</span>
+                    <span class="n">countResult</span> <span class="o">=</span> <span class="n">countResults</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="n">countResult</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                    <span class="c1"># e.g. sqlite3.OperationalError: no such table: Event_crossref</span>
+                    <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;unsupported mode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.fromCache">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.fromCache">[docs]</a>
+    <span class="k">def</span> <span class="nf">fromCache</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">getListOfDicts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sampleRecordCount</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get my entries from the cache or from the callback provided</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            force(bool): force ignoring the cache</span>
+<span class="sd">            getListOfDicts(callable): a function to call for getting the data</span>
+<span class="sd">            append(bool): True if records should be appended</span>
+<span class="sd">            sampleRecordCount(int): the number of records to analyze for type information</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the list of Dicts and as a side effect setting self.cacheFile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isCached</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
+            <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;getting </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">entityPluralName</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> ...&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">getListOfDicts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;getListOfDicts&quot;</span><span class="p">):</span>
+                    <span class="n">getListOfDicts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getListOfDicts</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                        <span class="s2">&quot;from Cache failed and no secondary cache via getListOfDicts specified&quot;</span>
+                    <span class="p">)</span>
+            <span class="n">listOfDicts</span> <span class="o">=</span> <span class="n">getListOfDicts</span><span class="p">()</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">entityPluralName</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">5.1f</span><span class="si">}</span><span class="s2"> s&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cacheFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storeLoD</span><span class="p">(</span>
+                <span class="n">listOfDicts</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="n">append</span><span class="p">,</span> <span class="n">sampleRecordCount</span><span class="o">=</span><span class="n">sampleRecordCount</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setListFromLoD</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># fromStore also sets self.cacheFile</span>
+            <span class="n">listOfDicts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fromStore</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">listOfDicts</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.fromStore">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.fromStore">[docs]</a>
+    <span class="k">def</span> <span class="nf">fromStore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cacheFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">setList</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        restore me from the store</span>
+<span class="sd">        Args:</span>
+<span class="sd">            cacheFile(String): the cacheFile to use if None use the pre configured cachefile</span>
+<span class="sd">            setList(bool): if True set my list with the data from the cache file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of dicts or JSON entitymanager</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">cacheFile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cacheFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCacheFile</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cacheFile</span> <span class="o">=</span> <span class="n">cacheFile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span>
+            <span class="s2">&quot;reading </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2"> from cache </span><span class="si">%s</span><span class="s2">&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entityPluralName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">cacheFile</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSONPICKLE</span><span class="p">:</span>
+            <span class="n">JSONem</span> <span class="o">=</span> <span class="n">JsonPickleMixin</span><span class="o">.</span><span class="n">readJsonPickle</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clazz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">listOfDicts</span> <span class="o">=</span> <span class="n">JSONem</span><span class="o">.</span><span class="n">getLoD</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">listOfDicts</span> <span class="o">=</span> <span class="n">JSONem</span><span class="o">.</span><span class="n">getList</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSON</span><span class="p">:</span>
+            <span class="n">listOfDicts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readLodFromJsonFile</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SPARQL</span><span class="p">:</span>
+            <span class="c1"># @FIXME make abstract</span>
+            <span class="n">eventQuery</span> <span class="o">=</span> <span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">PREFIX cr: &lt;http://cr.bitplan.com/&gt;</span>
+<span class="sd">SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate ?url ?source WHERE { </span>
+<span class="sd">   OPTIONAL { ?event cr:Event_eventId ?eventId. }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_acronym ?acronym. }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_series ?series. }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_title ?title. }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_year ?year.  }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_country ?country. }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_city ?city. }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_startDate ?startDate. }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_endDate ?endDate. }</span>
+<span class="sd">   OPTIONAL { ?event cr:Event_url ?url. }</span>
+<span class="sd">   ?event cr:Event_source ?source FILTER(?source=&#39;%s&#39;).</span>
+<span class="sd">}</span>
+<span class="sd">&quot;&quot;&quot;</span>
+                <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+            <span class="n">listOfDicts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">eventQuery</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">:</span>
+            <span class="n">sqlQuery</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">tableName</span>
+            <span class="n">sqlDB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSQLDB</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
+            <span class="n">listOfDicts</span> <span class="o">=</span> <span class="n">sqlDB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sqlQuery</span><span class="p">)</span>
+            <span class="n">sqlDB</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;unsupported store mode </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span>
+            <span class="s2">&quot;read </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%5.1f</span><span class="s2"> s&quot;</span>
+            <span class="o">%</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entityPluralName</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">setList</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setListFromLoD</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">listOfDicts</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.getLoD">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.getLoD">[docs]</a>
+    <span class="k">def</span> <span class="nf">getLoD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the LoD of the entities in the list</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            list: a list of Dicts</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lod</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getList</span><span class="p">():</span>
+            <span class="c1"># TODO - optionally filter by samples</span>
+            <span class="n">lod</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lod</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.store">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.store">[docs]</a>
+    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">limit</span><span class="o">=</span><span class="mi">10000000</span><span class="p">,</span>
+        <span class="n">batchSize</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+        <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sampleRecordCount</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        store my list of dicts</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            limit(int): maximum number of records to store per batch</span>
+<span class="sd">            batchSize(int): size of batch for storing</span>
+<span class="sd">            append(bool): True if records should be appended</span>
+<span class="sd">            fixNone(bool): if True make sure the dicts are filled with None references for each record</span>
+<span class="sd">            sampleRecordCount(int): the number of records to analyze for type information</span>
+<span class="sd">            replace(bool): if True allow replace for insert</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            str: The cachefile being used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLoD</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storeLoD</span><span class="p">(</span>
+            <span class="n">lod</span><span class="p">,</span>
+            <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+            <span class="n">batchSize</span><span class="o">=</span><span class="n">batchSize</span><span class="p">,</span>
+            <span class="n">append</span><span class="o">=</span><span class="n">append</span><span class="p">,</span>
+            <span class="n">fixNone</span><span class="o">=</span><span class="n">fixNone</span><span class="p">,</span>
+            <span class="n">sampleRecordCount</span><span class="o">=</span><span class="n">sampleRecordCount</span><span class="p">,</span>
+            <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EntityManager.storeLoD">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.entity.EntityManager.storeLoD">[docs]</a>
+    <span class="k">def</span> <span class="nf">storeLoD</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">listOfDicts</span><span class="p">,</span>
+        <span class="n">limit</span><span class="o">=</span><span class="mi">10000000</span><span class="p">,</span>
+        <span class="n">batchSize</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+        <span class="n">cacheFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fixNone</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sampleRecordCount</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        store my entities</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            listOfDicts(list): the list of dicts to store</span>
+<span class="sd">            limit(int): maximum number of records to store</span>
+<span class="sd">            batchSize(int): size of batch for storing</span>
+<span class="sd">            cacheFile(string): the name of the storage e.g path to JSON or sqlite3 file</span>
+<span class="sd">            append(bool): True if records should be appended</span>
+<span class="sd">            fixNone(bool): if True make sure the dicts are filled with None references for each record</span>
+<span class="sd">            sampleRecordCount(int): the number of records to analyze for type information</span>
+<span class="sd">            replace(bool): if True allow replace for insert</span>
+<span class="sd">        Return:</span>
+<span class="sd">            str: The cachefile being used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">mode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">handleInvalidListTypes</span><span class="p">:</span>
+            <span class="n">LOD</span><span class="o">.</span><span class="n">handleListTypes</span><span class="p">(</span>
+                <span class="n">lod</span><span class="o">=</span><span class="n">listOfDicts</span><span class="p">,</span>
+                <span class="n">doFilter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filterInvalidListTypes</span><span class="p">,</span>
+                <span class="n">separator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listSeparator</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSON</span> <span class="ow">or</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSONPICKLE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cacheFile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cacheFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCacheFile</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;storing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">entityPluralName</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to cache </span><span class="si">{</span><span class="n">cacheFile</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSONPICKLE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">writeJsonPickle</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">JSON</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">storeToJsonFile</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
+                <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SPARQL</span><span class="p">:</span>
+            <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;storing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">entityPluralName</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="c1"># @ FIXME make abstract /configurable</span>
+            <span class="n">entityType</span> <span class="o">=</span> <span class="s2">&quot;cr:Event&quot;</span>
+            <span class="n">prefixes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">prefix</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">insertListOfDicts</span><span class="p">(</span>
+                <span class="n">listOfDicts</span><span class="p">,</span>
+                <span class="n">entityType</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">primaryKey</span><span class="p">,</span>
+                <span class="n">prefixes</span><span class="p">,</span>
+                <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+                <span class="n">batchSize</span><span class="o">=</span><span class="n">batchSize</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span>
+                <span class="s2">&quot;store for </span><span class="si">%s</span><span class="s2"> done after </span><span class="si">%5.1f</span><span class="s2"> secs&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">is</span> <span class="n">StoreMode</span><span class="o">.</span><span class="n">SQL</span><span class="p">:</span>
+            <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cacheFile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cacheFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCacheFile</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+            <span class="n">sqldb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSQLDB</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span>
+                <span class="s2">&quot;storing </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span>
+                <span class="o">%</span> <span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">listOfDicts</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">entityPluralName</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+                    <span class="n">cacheFile</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+                <span class="n">withDrop</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">withCreate</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">withDrop</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">withCreate</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">entityInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initSQLDB</span><span class="p">(</span>
+                <span class="n">sqldb</span><span class="p">,</span>
+                <span class="n">listOfDicts</span><span class="p">,</span>
+                <span class="n">withCreate</span><span class="o">=</span><span class="n">withCreate</span><span class="p">,</span>
+                <span class="n">withDrop</span><span class="o">=</span><span class="n">withDrop</span><span class="p">,</span>
+                <span class="n">sampleRecordCount</span><span class="o">=</span><span class="n">sampleRecordCount</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sqldb</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
+                <span class="n">listOfDicts</span><span class="p">,</span>
+                <span class="n">entityInfo</span><span class="p">,</span>
+                <span class="n">executeMany</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">executeMany</span><span class="p">,</span>
+                <span class="n">fixNone</span><span class="o">=</span><span class="n">fixNone</span><span class="p">,</span>
+                <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showProgress</span><span class="p">(</span>
+                <span class="s2">&quot;store for </span><span class="si">%s</span><span class="s2"> done after </span><span class="si">%5.1f</span><span class="s2"> secs&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unsupported store mode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cacheFile</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.sample &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.sample</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2020-08-24</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
+
+<span class="kn">from</span> <span class="nn">lodstorage.jsonable</span> <span class="kn">import</span> <span class="n">JSONAble</span><span class="p">,</span> <span class="n">JSONAbleList</span>
+
+
+<div class="viewcode-block" id="Sample">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample">[docs]</a>
+<span class="k">class</span> <span class="nc">Sample</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sample dataset generator</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cityList</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Sample.getSample">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.getSample">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getSample</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">listOfDicts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">listOfDicts</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;pkey&quot;</span><span class="p">:</span> <span class="s2">&quot;index</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">index</span><span class="p">,</span> <span class="s2">&quot;cindex&quot;</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">listOfDicts</span></div>
+
+
+<div class="viewcode-block" id="Sample.getCountries">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.getCountries">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getCountries</span><span class="p">():</span>
+        <span class="n">countryJsonUrl</span> <span class="o">=</span> <span class="s2">&quot;https://gist.githubusercontent.com/erdem/8c7d26765831d0f9a8c62f02782ae00d/raw/248037cd701af0a4957cce340dabb0fd04e38f4c/countries.json&quot;</span>
+        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">countryJsonUrl</span><span class="p">)</span> <span class="k">as</span> <span class="n">url</span><span class="p">:</span>
+            <span class="n">countryList</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">countryList</span></div>
+
+
+<div class="viewcode-block" id="Sample.getCities">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.getCities">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getCities</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get a list of cities</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Sample</span><span class="o">.</span><span class="n">cityList</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cityJsonUrl</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json&quot;</span>
+            <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">cityJsonUrl</span><span class="p">)</span> <span class="k">as</span> <span class="n">url</span><span class="p">:</span>
+                <span class="n">Sample</span><span class="o">.</span><span class="n">cityList</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">Sample</span><span class="o">.</span><span class="n">cityList</span><span class="p">:</span>
+                <span class="n">city</span><span class="p">[</span><span class="s2">&quot;cityId&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">city</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">],</span> <span class="n">city</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Sample</span><span class="o">.</span><span class="n">cityList</span></div>
+
+
+<div class="viewcode-block" id="Sample.dob">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.dob">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">dob</span><span class="p">(</span><span class="n">isoDateString</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;get the date of birth from the given iso date state&quot;&quot;&quot;</span>
+        <span class="c1"># if sys.version_info &gt;= (3, 7):</span>
+        <span class="c1">#    dt=datetime.fromisoformat(isoDateString)</span>
+        <span class="c1"># else:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">isoDateString</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Sample.getRoyals">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.getRoyals">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getRoyals</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Royal</span><span class="o">.</span><span class="n">getSamples</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Sample.getRoyalsInstances">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Sample.getRoyalsInstances">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getRoyalsInstances</span><span class="p">():</span>
+        <span class="n">lod</span> <span class="o">=</span> <span class="n">Royal</span><span class="o">.</span><span class="n">getSamples</span><span class="p">()</span>
+        <span class="n">royals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">lod</span><span class="p">:</span>
+            <span class="n">royal</span> <span class="o">=</span> <span class="n">Royal</span><span class="p">()</span>
+            <span class="n">royal</span><span class="o">.</span><span class="n">fromDict</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+            <span class="n">royals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">royal</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">royals</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Royals">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Royals">[docs]</a>
+<span class="k">class</span> <span class="nc">Royals</span><span class="p">(</span><span class="n">JSONAbleList</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a non ORM Royals list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Royals</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;royals&quot;</span><span class="p">,</span> <span class="n">clazz</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span> <span class="o">=</span> <span class="n">Royal</span><span class="o">.</span><span class="n">getSamples</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="RoyalsORMList">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.RoyalsORMList">[docs]</a>
+<span class="k">class</span> <span class="nc">RoyalsORMList</span><span class="p">(</span><span class="n">JSONAbleList</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RoyalsORMList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;royals&quot;</span><span class="p">,</span> <span class="n">Royal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">royals</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">getRoyalsInstances</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Royal">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Royal">[docs]</a>
+<span class="k">class</span> <span class="nc">Royal</span><span class="p">(</span><span class="n">JSONAble</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    i am a single Royal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Royal.getSamples">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Royal.getSamples">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getSamples</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">listOfDicts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Elizabeth Alexandra Mary Windsor&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;born&quot;</span><span class="p">:</span> <span class="n">Sample</span><span class="o">.</span><span class="n">dob</span><span class="p">(</span><span class="s2">&quot;1926-04-21&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;numberInLine&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;wikidataurl&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.wikidata.org/wiki/Q9682&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Charles, Prince of Wales&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;born&quot;</span><span class="p">:</span> <span class="n">Sample</span><span class="o">.</span><span class="n">dob</span><span class="p">(</span><span class="s2">&quot;1948-11-14&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;numberInLine&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">&quot;wikidataurl&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.wikidata.org/wiki/Q43274&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;George of Cambridge&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;born&quot;</span><span class="p">:</span> <span class="n">Sample</span><span class="o">.</span><span class="n">dob</span><span class="p">(</span><span class="s2">&quot;2013-07-22&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;numberInLine&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s2">&quot;wikidataurl&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.wikidata.org/wiki/Q1359041&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Harry Duke of Sussex&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;born&quot;</span><span class="p">:</span> <span class="n">Sample</span><span class="o">.</span><span class="n">dob</span><span class="p">(</span><span class="s2">&quot;1984-09-15&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;numberInLine&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+                <span class="s2">&quot;wikidataurl&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.wikidata.org/wiki/Q152316&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
+        <span class="n">today</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">listOfDicts</span><span class="p">:</span>
+            <span class="n">born</span> <span class="o">=</span> <span class="n">person</span><span class="p">[</span><span class="s2">&quot;born&quot;</span><span class="p">]</span>
+            <span class="n">age</span> <span class="o">=</span> <span class="p">(</span><span class="n">today</span> <span class="o">-</span> <span class="n">born</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">/</span> <span class="mf">365.2425</span>
+            <span class="n">person</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">age</span>
+            <span class="n">person</span><span class="p">[</span><span class="s2">&quot;ofAge&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">18</span>
+            <span class="n">person</span><span class="p">[</span><span class="s2">&quot;lastmodified&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">listOfDicts</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;born&quot;</span><span class="p">]</span>
+        <span class="n">delim</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">delim</span><span class="si">}{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">delim</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+
+
+
+<div class="viewcode-block" id="Cities">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.sample.Cities">[docs]</a>
+<span class="k">class</span> <span class="nc">Cities</span><span class="p">(</span><span class="n">JSONAbleList</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Cities</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;cities&quot;</span><span class="p">,</span> <span class="n">clazz</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">getCities</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

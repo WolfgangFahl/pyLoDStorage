@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lodstorage.trulytabular &#8212; pyLoDStorage  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lodstorage.trulytabular</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 2022-04-14</span>
+
+<span class="sd">@author: wf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">lodstorage.query</span> <span class="kn">import</span> <span class="n">Endpoint</span><span class="p">,</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryManager</span><span class="p">,</span> <span class="n">YamlPath</span>
+<span class="kn">from</span> <span class="nn">lodstorage.sparql</span> <span class="kn">import</span> <span class="n">SPARQL</span>
+<span class="kn">from</span> <span class="nn">lodstorage.version</span> <span class="kn">import</span> <span class="n">Version</span>
+
+
+<div class="viewcode-block" id="Variable">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.Variable">[docs]</a>
+<span class="k">class</span> <span class="nc">Variable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Variable e.g. name handling</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Variable.validVarName">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.Variable.validVarName">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validVarName</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">varStr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        convert the given potential variable name string to a valid</span>
+<span class="sd">        variable name</span>
+
+<span class="sd">        see https://stackoverflow.com/a/3305731/1497139</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            varStr(str): the string to convert</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: a valid variable name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;\W|^(?=\d)&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">varStr</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="WikidataProperty">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataProperty">[docs]</a>
+<span class="k">class</span> <span class="nc">WikidataProperty</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a WikidataProperty</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        construct me with the given property id</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pid(str): the property Id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">pid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="WikidataProperty.getPredicate">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataProperty.getPredicate">[docs]</a>
+    <span class="k">def</span> <span class="nf">getPredicate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get me as a Predicate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reverseToken</span> <span class="o">=</span> <span class="s2">&quot;^&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">plabel</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reverseToken</span><span class="si">}</span><span class="s2">wdt:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">plabel</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;plabel&quot;</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plabel</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="n">text</span>
+
+<div class="viewcode-block" id="WikidataProperty.getPropertiesByLabels">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataProperty.getPropertiesByLabels">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getPropertiesByLabels</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sparql</span><span class="p">,</span> <span class="n">propertyLabels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get a list of Wikidata properties by the given label list</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sparql(SPARQL): the SPARQL endpoint to use</span>
+<span class="sd">            propertyLabels(list): a list of labels of the properties</span>
+<span class="sd">            lang(str): the language of the label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># the result dict</span>
+        <span class="n">wdProperties</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">propertyLabels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">valuesClause</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">propertyLabel</span> <span class="ow">in</span> <span class="n">propertyLabels</span><span class="p">:</span>
+                <span class="n">valuesClause</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;   &quot;</span><span class="si">{</span><span class="n">propertyLabel</span><span class="si">}</span><span class="s1">&quot;@</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;# get the properties for the given labels</span>
+<span class="si">{</span><span class="n">WikidataItem</span><span class="o">.</span><span class="n">getPrefixes</span><span class="p">([</span><span class="s2">&quot;rdf&quot;</span><span class="p">,</span><span class="s2">&quot;rdfs&quot;</span><span class="p">,</span><span class="s2">&quot;wikibase&quot;</span><span class="p">])</span><span class="si">}</span>
+<span class="s2">SELECT ?property ?propertyLabel ?wbType WHERE </span><span class="se">{{</span>
+<span class="s2">  VALUES ?propertyLabel </span><span class="se">{{</span>
+<span class="si">{</span><span class="n">valuesClause</span><span class="si">}</span>
+<span class="s2">  </span><span class="se">}}</span>
+<span class="s2">  ?property rdf:type wikibase:Property;rdfs:label ?propertyLabel.</span>
+<span class="s2">  ?property wikibase:propertyType  ?wbType.</span>
+<span class="s2">  FILTER(LANG(?propertyLabel) = &quot;</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;)</span>
+<span class="se">}}</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">addPropertiesForQuery</span><span class="p">(</span><span class="n">wdProperties</span><span class="p">,</span> <span class="n">sparql</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wdProperties</span></div>
+
+
+<div class="viewcode-block" id="WikidataProperty.from_id">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataProperty.from_id">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">property_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sparql</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;WikidataProperty&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        construct a WikidataProperty from the given property_id</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            property_id(str): a property ID e.g. &quot;P6375&quot;</span>
+<span class="sd">            sparql(SPARQL): the SPARQL endpoint to use</span>
+<span class="sd">            lang(str): the language for the label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">getPropertiesByIds</span><span class="p">(</span><span class="n">sparql</span><span class="p">,</span> <span class="p">[</span><span class="n">property_id</span><span class="p">],</span> <span class="n">lang</span><span class="p">)</span>
+        <span class="n">prop_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prop_count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">properties</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">prop_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">property_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">properties</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;unexpected from_id result for property id </span><span class="si">{</span><span class="n">property_id</span><span class="si">}</span><span class="s2">. Expected 0 or 1 results bot got:</span><span class="si">{</span><span class="n">property_labels</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="WikidataProperty.getPropertiesByIds">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataProperty.getPropertiesByIds">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getPropertiesByIds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sparql</span><span class="p">,</span> <span class="n">propertyIds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get a list of Wikidata properties by the given id list</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sparql(SPARQL): the SPARQL endpoint to use</span>
+<span class="sd">            propertyIds(list): a list of ids of the properties</span>
+<span class="sd">            lang(str): the language of the label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># the result dict</span>
+        <span class="n">wdProperties</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">propertyIds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">valuesClause</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">propertyId</span> <span class="ow">in</span> <span class="n">propertyIds</span><span class="p">:</span>
+                <span class="n">valuesClause</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;   wd:</span><span class="si">{</span><span class="n">propertyId</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"># get the property for the given property Ids</span>
+<span class="si">{</span><span class="n">WikidataItem</span><span class="o">.</span><span class="n">getPrefixes</span><span class="p">([</span><span class="s2">&quot;rdf&quot;</span><span class="p">,</span><span class="s2">&quot;rdfs&quot;</span><span class="p">,</span><span class="s2">&quot;wd&quot;</span><span class="p">,</span><span class="s2">&quot;wikibase&quot;</span><span class="p">])</span><span class="si">}</span>
+<span class="s2">SELECT ?property ?propertyLabel ?wbType WHERE </span><span class="se">{{</span>
+<span class="s2">  VALUES ?property </span><span class="se">{{</span>
+<span class="si">{</span><span class="n">valuesClause</span><span class="si">}</span>
+<span class="s2">  </span><span class="se">}}</span>
+<span class="s2">  ?property rdf:type wikibase:Property;rdfs:label ?propertyLabel.</span>
+<span class="s2">  ?property wikibase:propertyType  ?wbType.</span>
+<span class="s2">  FILTER(LANG(?propertyLabel) = &quot;</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;)</span>
+<span class="se">}}</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">addPropertiesForQuery</span><span class="p">(</span><span class="n">wdProperties</span><span class="p">,</span> <span class="n">sparql</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wdProperties</span></div>
+
+
+<div class="viewcode-block" id="WikidataProperty.addPropertiesForQuery">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataProperty.addPropertiesForQuery">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">addPropertiesForQuery</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">wdProperties</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">sparql</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">          add properties from the given query&#39;s result to the given</span>
+<span class="sd">          wdProperties list using the given sparql endpoint</span>
+<span class="sd">        Args:</span>
+<span class="sd">          wdProperties(list): the list of wikidata properties</span>
+<span class="sd">          sparql(SPARQL): the SPARQL endpoint to use</span>
+<span class="sd">          query(str): the SPARQL query to perform</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">qLod</span> <span class="o">=</span> <span class="n">sparql</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">qLod</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;property&quot;</span><span class="p">]</span>
+            <span class="n">pid</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;http://www.wikidata.org/entity/(.*)&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">WikidataProperty</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">plabel</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;propertyLabel&quot;</span><span class="p">]</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">wbtype</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;wbType&quot;</span><span class="p">]</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+            <span class="n">wdProperties</span><span class="p">[</span><span class="n">prop</span><span class="o">.</span><span class="n">plabel</span><span class="p">]</span> <span class="o">=</span> <span class="n">prop</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">varname</span> <span class="o">=</span> <span class="n">Variable</span><span class="o">.</span><span class="n">validVarName</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">plabel</span><span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">valueVarname</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prop</span><span class="o">.</span><span class="n">varname</span><span class="si">}</span><span class="s2">Item&quot;</span>
+                <span class="k">if</span> <span class="s2">&quot;WikibaseItem&quot;</span> <span class="ow">in</span> <span class="n">prop</span><span class="o">.</span><span class="n">wbtype</span>
+                <span class="k">else</span> <span class="s2">&quot;&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prop</span><span class="o">.</span><span class="n">varname</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">labelVarname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prop</span><span class="o">.</span><span class="n">varname</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">wdProperties</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="WikidataItem">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataItem">[docs]</a>
+<span class="k">class</span> <span class="nc">WikidataItem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a wikidata Item</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">qid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">sparql</span><span class="p">:</span> <span class="n">SPARQL</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        construct me with the given item id, language and optional SPARQL access</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            qid(str): the item Id</span>
+<span class="sd">            lang(str): the language to use</span>
+<span class="sd">            sparql(SPARQL): the sparql access to use</span>
+<span class="sd">            debug(bool): if True switch on debugging</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">qid</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qid</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qid</span> <span class="o">=</span> <span class="n">qid</span>
+        <span class="c1"># numeric qid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qnumber</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">qid</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.wikidata.org/wiki/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">qid</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span> <span class="o">=</span> <span class="n">sparql</span>
+        <span class="k">if</span> <span class="n">sparql</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qlabel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">WikidataItem</span><span class="o">.</span><span class="n">getLabelAndDescription</span><span class="p">(</span>
+                <span class="n">sparql</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">varname</span> <span class="o">=</span> <span class="n">Variable</span><span class="o">.</span><span class="n">validVarName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qlabel</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">itemVarname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">varname</span><span class="si">}</span><span class="s2">Item&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labelVarname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">varname</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asText</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WikidataItem.asText">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataItem.asText">[docs]</a>
+    <span class="k">def</span> <span class="nf">asText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">long</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">wrapAt</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns my content as a text representation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            long(bool): True if a long format including url is wished</span>
+<span class="sd">            wrapAt(int): wrap long lines at the given width (if &gt;0)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: a text representation of my content</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qid</span> <span class="ow">or</span> <span class="s2">&quot;❓&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;qlabel&quot;</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">qlabel</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">qid</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">):</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span>
+            <span class="k">if</span> <span class="n">wrapAt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">desc</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">wrapAt</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;☞</span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">long</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;→ </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+
+
+<div class="viewcode-block" id="WikidataItem.getPrefixes">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataItem.getPrefixes">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getPrefixes</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">prefixes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rdf&quot;</span><span class="p">,</span> <span class="s2">&quot;rdfs&quot;</span><span class="p">,</span> <span class="s2">&quot;schema&quot;</span><span class="p">,</span> <span class="s2">&quot;wd&quot;</span><span class="p">,</span> <span class="s2">&quot;wdt&quot;</span><span class="p">,</span> <span class="s2">&quot;wikibase&quot;</span><span class="p">,</span> <span class="s2">&quot;xsd&quot;</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="n">prefixMap</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;bd&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.bigdata.com/rdf#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cc&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://creativecommons.org/ns#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dct&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://purl.org/dc/terms/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;geo&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.opengis.net/ont/geosparql#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ontolex&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.w3.org/ns/lemon/ontolex#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;owl&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.w3.org/2002/07/owl#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pq&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/qualifier/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pqn&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/qualifier/value-normalized/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pqv&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/qualifier/value/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pr&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/reference/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;prn&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/reference/value-normalized/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;prov&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.w3.org/ns/prov#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;prv&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/reference/value/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ps&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/statement/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;psn&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/statement/value-normalized/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;psv&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/statement/value/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;rdf&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;rdfs&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.w3.org/2000/01/rdf-schema#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://schema.org/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;skos&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.w3.org/2004/02/skos/core#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wd&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/entity/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wdata&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/wiki/Special:EntityData/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wdno&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/novalue/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wdref&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/reference/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wds&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/entity/statement/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wdt&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/direct/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wdtn&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/prop/direct-normalized/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wdv&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.wikidata.org/value/&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wikibase&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://wikiba.se/ontology#&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;xsd&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;http://www.w3.org/2001/XMLSchema#&gt;&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># see also https://www.wikidata.org/wiki/EntitySchema:E49</span>
+        <span class="n">sparql</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">prefixes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">prefixMap</span><span class="p">:</span>
+                <span class="n">sparql</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;PREFIX </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">prefixMap</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">sparql</span></div>
+
+
+<div class="viewcode-block" id="WikidataItem.getLabelAndDescription">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataItem.getLabelAndDescription">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getLabelAndDescription</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">sparql</span><span class="p">:</span> <span class="n">SPARQL</span><span class="p">,</span> <span class="n">itemId</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get  the label for the given item and language</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            itemId(str): the wikidata Q/P id</span>
+<span class="sd">            lang(str): the language of the label</span>
+<span class="sd">            debug(bool): if True output debug information</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str,str): the label and description as a tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;# get the label for the given item</span>
+<span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">getPrefixes</span><span class="p">([</span><span class="s2">&quot;rdfs&quot;</span><span class="p">,</span><span class="s2">&quot;wd&quot;</span><span class="p">,</span><span class="s2">&quot;schema&quot;</span><span class="p">])</span><span class="si">}</span><span class="s2">        </span>
+<span class="s2">SELECT ?itemLabel ?itemDescription</span>
+<span class="s2">WHERE</span>
+<span class="se">{{</span>
+<span class="s2">  VALUES ?item </span><span class="se">{{</span>
+<span class="s2">    wd:</span><span class="si">{</span><span class="n">itemId</span><span class="si">}</span>
+<span class="s2">  </span><span class="se">}}</span>
+<span class="s2">  ?item rdfs:label ?itemLabel.</span>
+<span class="s2">  FILTER (LANG(?itemLabel) = &quot;</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;).</span>
+<span class="s2">  ?item schema:description ?itemDescription.</span>
+<span class="s2">  FILTER(LANG(?itemDescription) = &quot;</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;)</span>
+<span class="se">}}</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;getLabelAndDescription for wikidata Item </span><span class="si">{</span><span class="n">itemId</span><span class="si">}</span><span class="s2"> with query:</span><span class="se">\n</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">labelAndDescription</span> <span class="o">=</span> <span class="n">sparql</span><span class="o">.</span><span class="n">getValues</span><span class="p">(</span>
+                <span class="n">query</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;itemLabel&quot;</span><span class="p">,</span> <span class="s2">&quot;itemDescription&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;getLabelAndDescription failed for wikidata Item </span><span class="si">{</span><span class="n">itemId</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">labelAndDescription</span></div>
+
+
+<div class="viewcode-block" id="WikidataItem.getItemsByLabel">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.WikidataItem.getItemsByLabel">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getItemsByLabel</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">sparql</span><span class="p">:</span> <span class="n">SPARQL</span><span class="p">,</span> <span class="n">itemLabel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get a Wikidata items by the given label</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sparql(SPARQL): the SPARQL endpoint to use</span>
+<span class="sd">            itemLabel(str): the label of the items</span>
+<span class="sd">            lang(str): the language of the label</span>
+<span class="sd">            debug(bool): if True show debugging information</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a list of potential items</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valuesClause</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;   &quot;</span><span class="si">{</span><span class="n">itemLabel</span><span class="si">}</span><span class="s1">&quot;@</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;# get the items that have the given label in the given language</span>
+<span class="s2"># e.g. we&#39;ll find human=Q5 as the oldest type for the label &quot;human&quot; first</span>
+<span class="s2"># and then the newer ones such as &quot;race in Warcraft&quot;</span>
+<span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">getPrefixes</span><span class="p">([</span><span class="s2">&quot;rdfs&quot;</span><span class="p">,</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span><span class="s2">&quot;xsd&quot;</span><span class="p">])</span><span class="si">}</span>
+<span class="s2">SELECT </span>
+<span class="s2">  #?itemId </span>
+<span class="s2">  ?item </span>
+<span class="s2">  ?itemLabel </span>
+<span class="s2">  ?itemDescription</span>
+<span class="s2">WHERE </span><span class="se">{{</span><span class="s2"> </span>
+<span class="s2">  VALUES ?itemLabel </span><span class="se">{{</span>
+<span class="s2">    </span><span class="si">{</span><span class="n">valuesClause</span><span class="si">}</span>
+<span class="s2">  </span><span class="se">}}</span>
+<span class="s2">  #BIND (xsd:integer(SUBSTR(STR(?item),33)) AS ?itemId)</span>
+<span class="s2">  ?item rdfs:label ?itemLabel. </span>
+<span class="s2">  ?item schema:description ?itemDescription.</span>
+<span class="s2">  FILTER(LANG(?itemDescription)=&quot;</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;)</span>
+<span class="se">}}</span><span class="s2"> </span>
+<span class="s2">#ORDER BY ?itemId&quot;&quot;&quot;</span>
+        <span class="n">qLod</span> <span class="o">=</span> <span class="n">sparql</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">qLod</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;item&quot;</span><span class="p">]</span>
+            <span class="n">qid</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;http://www.wikidata.org/entity/(.*)&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">WikidataItem</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">qlabel</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;itemLabel&quot;</span><span class="p">]</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">varname</span> <span class="o">=</span> <span class="n">Variable</span><span class="o">.</span><span class="n">validVarName</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">qlabel</span><span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;itemDescription&quot;</span><span class="p">]</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="n">sortedItems</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">qnumber</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sortedItems</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TrulyTabular">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular">[docs]</a>
+<span class="k">class</span> <span class="nc">TrulyTabular</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    truly tabular SPARQL/RDF analysis</span>
+
+<span class="sd">    checks &quot;how tabular&quot; a query based on a list of properties of an itemclass is</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">itemQid</span><span class="p">,</span>
+        <span class="n">propertyLabels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">propertyIds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">subclassPredicate</span><span class="o">=</span><span class="s2">&quot;wdt:P31&quot;</span><span class="p">,</span>
+        <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">endpointConf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            itemQid(str): wikidata id of the type to analyze</span>
+<span class="sd">            propertyLabels(list): a list of labels of properties to be considered</span>
+<span class="sd">            propertyIds(list): a list of ids of properties to be considered</span>
+<span class="sd">            subclassPredicate(str): the subclass Predicate to use</span>
+<span class="sd">            where(str): extra where clause for instance selection (if any)</span>
+<span class="sd">            endpoint(str): the url of the SPARQL endpoint to be used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">itemQid</span> <span class="o">=</span> <span class="n">itemQid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="k">if</span> <span class="n">endpointConf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">endpointConf</span> <span class="o">=</span> <span class="n">Endpoint</span><span class="o">.</span><span class="n">getDefault</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpointConf</span> <span class="o">=</span> <span class="n">endpointConf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span> <span class="o">=</span> <span class="n">SPARQL</span><span class="p">(</span><span class="n">endpointConf</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">endpointConf</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subclassPredicate</span> <span class="o">=</span> <span class="n">subclassPredicate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">where</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">where</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">WikidataItem</span><span class="p">(</span>
+            <span class="n">itemQid</span><span class="p">,</span> <span class="n">sparql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queryManager</span> <span class="o">=</span> <span class="n">TrulyTabular</span><span class="o">.</span><span class="n">getQueryManager</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">WikidataProperty</span><span class="o">.</span><span class="n">getPropertiesByIds</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="p">,</span> <span class="n">propertyIds</span><span class="p">,</span> <span class="n">lang</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">WikidataProperty</span><span class="o">.</span><span class="n">getPropertiesByLabels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="p">,</span> <span class="n">propertyLabels</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isodate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: my text representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asText</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TrulyTabular.count">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.count">[docs]</a>
+    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get my count</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">itemText</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getItemText</span><span class="p">()</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;# Count all items with the given type</span>
+<span class="s2"># </span><span class="si">{</span><span class="n">itemText</span><span class="si">}</span>
+<span class="si">{</span><span class="n">WikidataItem</span><span class="o">.</span><span class="n">getPrefixes</span><span class="p">()</span><span class="si">}</span>
+<span class="s2">SELECT (COUNT (DISTINCT ?item) AS ?count)</span>
+<span class="s2">WHERE</span>
+<span class="se">{{</span>
+<span class="s2">  # instance of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">qlabel</span><span class="si">}</span>
+<span class="s2">  ?item </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subclassPredicate</span><span class="si">}</span><span class="s2"> wd:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">qid</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">where</span><span class="si">}</span>
+<span class="se">}}</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">)</span>
+            <span class="c1"># workaround https://github.com/ad-freiburg/qlever/issues/717</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">ex</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">count</span><span class="p">,</span> <span class="n">query</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.asText">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.asText">[docs]</a>
+    <span class="k">def</span> <span class="nf">asText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">long</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns my content as a text representation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            long(bool): True if a long format including url is wished</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: a text representation of my content</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">asText</span><span class="p">(</span><span class="n">long</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.getItemText">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.getItemText">[docs]</a>
+    <span class="k">def</span> <span class="nf">getItemText</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># leads to 405 Method not allowed in SPARQLWrapper under certain circumstances</span>
+        <span class="c1"># itemText=self.asText(long=True)</span>
+        <span class="n">itemText</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">itemQid</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">qlabel</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">itemText</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.getQueryManager">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.getQueryManager">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getQueryManager</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;sparql&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;trulytabular&quot;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the query manager for the given language and fileName</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lang(str): the language of the queries to extract</span>
+<span class="sd">            name(str): the name of the manager containing the query specifications</span>
+<span class="sd">            debug(bool): if True set debugging on</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">qYamlFileName</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.yaml&quot;</span>
+        <span class="k">for</span> <span class="n">qYamlFile</span> <span class="ow">in</span> <span class="n">YamlPath</span><span class="o">.</span><span class="n">getPaths</span><span class="p">(</span><span class="n">qYamlFileName</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">qYamlFile</span><span class="p">):</span>
+                <span class="n">qm</span> <span class="o">=</span> <span class="n">QueryManager</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span> <span class="n">queriesPath</span><span class="o">=</span><span class="n">qYamlFile</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">qm</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.generateSparqlQuery">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.generateSparqlQuery">[docs]</a>
+    <span class="k">def</span> <span class="nf">generateSparqlQuery</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">genMap</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">listSeparator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;⇹&quot;</span><span class="p">,</span>
+        <span class="n">naive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        generate a SPARQL Query</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            genMap(dict): a dictionary of generation items aggregates/ignores/labels</span>
+<span class="sd">            listSeparator(str): the symbole to use as a list separator for GROUP_CONCAT</span>
+<span class="sd">            naive(bool): if True - generate a naive straight forward SPARQL query</span>
+<span class="sd">                if False generate a proper truly tabular aggregate query</span>
+<span class="sd">            lang(str): the language to generate for</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the generated SPARQL Query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The Wikidata item to generate the query for</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span>
+        <span class="c1"># the name of this script</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="c1"># the mode of generation</span>
+        <span class="n">naiveText</span> <span class="o">=</span> <span class="s2">&quot;naive&quot;</span> <span class="k">if</span> <span class="n">naive</span> <span class="k">else</span> <span class="s2">&quot;aggregate&quot;</span>
+        <span class="c1"># start with th preamble and PREFIX section</span>
+        <span class="c1"># select the item and it&#39;s label</span>
+        <span class="n">sparqlQuery</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;# truly tabular </span><span class="si">{</span><span class="n">naiveText</span><span class="si">}</span><span class="s2"> query for </span>
+<span class="s2"># </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">qid</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">qlabel</span><span class="si">}</span>
+<span class="s2"># generated by </span><span class="si">{</span><span class="n">script</span><span class="si">}</span><span class="s2"> version </span><span class="si">{</span><span class="n">Version</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">isodate</span><span class="si">}</span>
+<span class="si">{</span><span class="n">WikidataItem</span><span class="o">.</span><span class="n">getPrefixes</span><span class="p">()</span><span class="si">}</span>
+<span class="s2">SELECT ?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">itemVarname</span><span class="si">}</span><span class="s2"> ?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">labelVarname</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="c1"># loop over all properties</span>
+        <span class="k">for</span> <span class="n">wdProp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">naive</span><span class="p">:</span>
+                <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">valueVarname</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span> <span class="ow">in</span> <span class="n">genMap</span><span class="p">:</span>
+                    <span class="n">genList</span> <span class="o">=</span> <span class="n">genMap</span><span class="p">[</span><span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">aggregate</span> <span class="ow">in</span> <span class="n">genList</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">aggregate</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">]:</span>
+                            <span class="n">distinct</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                            <span class="k">if</span> <span class="n">aggregate</span> <span class="o">==</span> <span class="s2">&quot;list&quot;</span><span class="p">:</span>
+                                <span class="n">aggregateFunc</span> <span class="o">=</span> <span class="s2">&quot;GROUP_CONCAT&quot;</span>
+                                <span class="n">aggregateParam</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;;SEPARATOR=&quot;</span><span class="si">{</span><span class="n">listSeparator</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+                                <span class="n">distinct</span> <span class="o">=</span> <span class="s2">&quot;DISTINCT &quot;</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">aggregate</span> <span class="o">==</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span>
+                                    <span class="n">distinct</span> <span class="o">=</span> <span class="s2">&quot;DISTINCT &quot;</span>
+                                <span class="n">aggregateFunc</span> <span class="o">=</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                                <span class="n">aggregateParam</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  (</span><span class="si">{</span><span class="n">aggregateFunc</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">distinct</span><span class="si">}</span><span class="s2">?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">valueVarname</span><span class="si">}{</span><span class="n">aggregateParam</span><span class="si">}</span><span class="s2">) AS ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">valueVarname</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">aggregate</span><span class="si">}</span><span class="s2">)&quot;</span>
+                        <span class="k">elif</span> <span class="n">aggregate</span> <span class="o">==</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span>
+                            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">labelVarname</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">elif</span> <span class="n">aggregate</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s2">&quot;label&quot;</span> <span class="ow">in</span> <span class="n">genList</span><span class="p">:</span>
+                            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">valueVarname</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">WHERE </span><span class="se">{{</span>
+<span class="s2">  # instanceof </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">qid</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">qlabel</span><span class="si">}</span>
+<span class="s2">  ?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">itemVarname</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subclassPredicate</span><span class="si">}</span><span class="s2"> wd:</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">qid</span><span class="si">}</span><span class="s2">.</span>
+<span class="s2">  # label</span>
+<span class="s2">  ?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">itemVarname</span><span class="si">}</span><span class="s2"> rdfs:label ?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">labelVarname</span><span class="si">}</span><span class="s2">.  </span>
+<span class="s2">  FILTER (LANG(?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">labelVarname</span><span class="si">}</span><span class="s2">) = &quot;</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;).</span>
+<span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">wdProp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;  # </span><span class="si">{</span><span class="n">wdProp</span><span class="si">}</span>
+<span class="s2">  OPTIONAL </span><span class="se">{{</span><span class="s2"> </span>
+<span class="s2">    ?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">itemVarname</span><span class="si">}</span><span class="s2"> wdt:</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s2"> ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">valueVarname</span><span class="si">}</span><span class="s2">. &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span> <span class="ow">in</span> <span class="n">genMap</span><span class="p">:</span>
+                <span class="n">genList</span> <span class="o">=</span> <span class="n">genMap</span><span class="p">[</span><span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;label&quot;</span> <span class="ow">in</span> <span class="n">genList</span><span class="p">:</span>
+                    <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\n</span><span class="s2">    ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">valueVarname</span><span class="si">}</span><span class="s2"> rdfs:label ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">labelVarname</span><span class="si">}</span><span class="s2">.&quot;&quot;&quot;</span>
+                    <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\n</span><span class="s2">    FILTER (LANG(?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">labelVarname</span><span class="si">}</span><span class="s2">) = &quot;</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;).&quot;&quot;&quot;</span>
+                    <span class="p">)</span>
+            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="c1"># close where Clause</span>
+        <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;}</span><span class="se">\n</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="c1"># optionally add Aggregate</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">naive</span><span class="p">:</span>
+            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;GROUP BY</span>
+<span class="s2">  ?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">itemVarname</span><span class="si">}</span><span class="s2"> </span>
+<span class="s2">  ?</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">labelVarname</span><span class="si">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">wdProp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span> <span class="ow">in</span> <span class="n">genMap</span><span class="p">:</span>
+                    <span class="n">genList</span> <span class="o">=</span> <span class="n">genMap</span><span class="p">[</span><span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s2">&quot;label&quot;</span> <span class="ow">in</span> <span class="n">genList</span><span class="p">:</span>
+                        <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">labelVarname</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">if</span> <span class="s2">&quot;ignore&quot;</span> <span class="ow">in</span> <span class="n">genList</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s2">&quot;label&quot;</span> <span class="ow">in</span> <span class="n">genList</span><span class="p">:</span>
+                        <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  ?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">valueVarname</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">havingCount</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">havingDelim</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span>
+            <span class="k">for</span> <span class="n">wdProp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span> <span class="ow">in</span> <span class="n">genMap</span><span class="p">:</span>
+                    <span class="n">genList</span> <span class="o">=</span> <span class="n">genMap</span><span class="p">[</span><span class="n">wdProp</span><span class="o">.</span><span class="n">pid</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s2">&quot;ignore&quot;</span> <span class="ow">in</span> <span class="n">genList</span><span class="p">:</span>
+                        <span class="n">havingCount</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">havingCount</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">HAVING (&quot;</span>
+
+                        <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="n">havingDelim</span><span class="si">}</span><span class="s2">COUNT(?</span><span class="si">{</span><span class="n">wdProp</span><span class="o">.</span><span class="n">valueVarname</span><span class="si">}</span><span class="s2">)&lt;=1&quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">havingDelim</span> <span class="o">=</span> <span class="s2">&quot;&amp;&amp; &quot;</span>
+            <span class="k">if</span> <span class="n">havingCount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="n">sparqlQuery</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.mostFrequentPropertiesQuery">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.mostFrequentPropertiesQuery">[docs]</a>
+    <span class="k">def</span> <span class="nf">mostFrequentPropertiesQuery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">whereClause</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">minCount</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the most frequently used properties</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            whereClause(str): an extra WhereClause to use</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">whereClause</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">whereClause</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;?item </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subclassPredicate</span><span class="si">}</span><span class="s2"> wd:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">itemQid</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpointConf</span><span class="o">.</span><span class="n">database</span> <span class="o">!=</span> <span class="s2">&quot;qlever&quot;</span><span class="p">:</span>
+                <span class="n">whereClause</span> <span class="o">+=</span> <span class="s2">&quot;;?p ?id&quot;</span>
+        <span class="n">whereClause</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span>
+        <span class="n">minCountFilter</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">minCount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">minCountFilter</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  FILTER(?count &gt;</span><span class="si">{</span><span class="n">minCount</span><span class="si">}</span><span class="s2">).&quot;</span>
+        <span class="n">itemText</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getItemText</span><span class="p">()</span>
+        <span class="n">sparqlQuery</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;# get the most frequently used properties for</span>
+<span class="s2"># </span><span class="si">{</span><span class="n">itemText</span><span class="si">}</span>
+<span class="si">{</span><span class="n">WikidataItem</span><span class="o">.</span><span class="n">getPrefixes</span><span class="p">()</span><span class="si">}</span>
+<span class="s2">SELECT ?prop ?propLabel ?wbType ?count WHERE </span><span class="se">{{</span>
+<span class="s2">  </span><span class="se">{{</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpointConf</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;qlever&quot;</span><span class="p">:</span>
+            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    SELECT ?p (COUNT(DISTINCT ?item) AS ?count) WHERE </span><span class="se">{{</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    SELECT ?prop (COUNT(DISTINCT ?item) AS ?count) WHERE </span><span class="se">{{</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpointConf</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;blazegraph&quot;</span><span class="p">:</span>
+            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">      hint:Query hint:optimizer &quot;None&quot;.&quot;&quot;&quot;</span>
+        <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">      </span><span class="si">{</span><span class="n">whereClause</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpointConf</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;qlever&quot;</span><span class="p">:</span>
+            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;  </span>
+<span class="s2">      ?item ql:has-predicate ?p </span>
+<span class="s2">    </span><span class="se">}}</span><span class="s2"> GROUP BY ?p</span>
+<span class="s2">  </span><span class="se">}}</span>
+<span class="s2">  ?prop wikibase:directClaim ?p.&quot;&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">      ?prop wikibase:directClaim ?p.</span>
+<span class="s2">    </span><span class="se">}}</span>
+<span class="s2">    GROUP BY ?prop ?propLabel</span>
+<span class="s2">  </span><span class="se">}}</span><span class="s2">&quot;&quot;&quot;</span>
+        <span class="n">sparqlQuery</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">  ?prop rdfs:label ?propLabel.</span>
+<span class="s2">  ?prop wikibase:propertyType ?wbType.</span>
+<span class="s2">  FILTER(LANG(?propLabel) = &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;).</span><span class="si">{</span><span class="n">minCountFilter</span><span class="si">}</span><span class="s2">  </span>
+<span class="se">}}</span>
+<span class="s2">ORDER BY DESC (?count)</span>
+<span class="s2">&quot;&quot;&quot;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;most frequently used properties for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">asText</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;mostFrequentProperties for </span><span class="si">{</span><span class="n">itemText</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">sparqlQuery</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.noneTabularQuery">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.noneTabularQuery">[docs]</a>
+    <span class="k">def</span> <span class="nf">noneTabularQuery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wdProperty</span><span class="p">:</span> <span class="n">WikidataProperty</span><span class="p">,</span> <span class="n">asFrequency</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the none tabular entries for the given property</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            wdProperty(WikidataProperty): the property to analyze</span>
+<span class="sd">            asFrequency(bool): if true do a frequency analysis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">propertyLabel</span> <span class="o">=</span> <span class="n">wdProperty</span><span class="o">.</span><span class="n">plabel</span>
+        <span class="n">propertyId</span> <span class="o">=</span> <span class="n">wdProperty</span><span class="o">.</span><span class="n">pid</span>
+        <span class="c1"># work around https://github.com/RDFLib/sparqlwrapper/issues/211</span>
+        <span class="k">if</span> <span class="s2">&quot;described at&quot;</span> <span class="ow">in</span> <span class="n">propertyLabel</span><span class="p">:</span>
+            <span class="n">propertyLabel</span> <span class="o">=</span> <span class="n">propertyLabel</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;described at&quot;</span><span class="p">,</span> <span class="s2">&quot;describ&#39;d at&quot;</span><span class="p">)</span>
+        <span class="n">sparql</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;SELECT ?item ?itemLabel (COUNT (?value) AS ?count)</span>
+<span class="s2">WHERE</span>
+<span class="se">{{</span>
+<span class="s2">  # instance of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">qlabel</span><span class="si">}</span>
+<span class="s2">  ?item </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subclassPredicate</span><span class="si">}</span><span class="s2"> wd:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">itemQid</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">where</span><span class="si">}</span>
+<span class="s2">  ?item rdfs:label ?itemLabel.</span>
+<span class="s2">  FILTER (LANG(?itemLabel) = &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="si">}</span><span class="s2">&quot;).</span>
+<span class="s2">  # </span><span class="si">{</span><span class="n">propertyLabel</span><span class="si">}</span>
+<span class="s2">  ?item </span><span class="si">{</span><span class="n">wdProperty</span><span class="o">.</span><span class="n">getPredicate</span><span class="p">()</span><span class="si">}</span><span class="s2"> ?value.</span>
+<span class="se">}}</span><span class="s2"> GROUP BY ?item ?itemLabel</span>
+<span class="s2">&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">asFrequency</span><span class="p">:</span>
+            <span class="n">freqDesc</span> <span class="o">=</span> <span class="s2">&quot;frequencies&quot;</span>
+            <span class="n">sparql</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;SELECT ?count (COUNT(?count) AS ?frequency) WHERE </span><span class="se">{{{{</span>
+<span class="si">{</span><span class="n">sparql</span><span class="si">}</span>
+<span class="se">}}}}</span>
+<span class="s2">GROUP BY ?count</span>
+<span class="s2">ORDER BY DESC (?frequency)&quot;&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">freqDesc</span> <span class="o">=</span> <span class="s2">&quot;records&quot;</span>
+            <span class="n">sparql</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="n">sparql</span><span class="si">}</span>
+<span class="s2">HAVING (COUNT (?value) &gt; 1)</span>
+<span class="s2">ORDER BY DESC(?count)&quot;&quot;&quot;</span>
+        <span class="n">itemText</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getItemText</span><span class="p">()</span>
+        <span class="n">sparql</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;# Count all </span><span class="si">{</span><span class="n">itemText</span><span class="si">}</span><span class="s2"> items</span>
+<span class="s2"># with the given </span><span class="si">{</span><span class="n">propertyLabel</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">propertyId</span><span class="si">}</span><span class="s2">) https://www.wikidata.org/wiki/Property:</span><span class="si">{</span><span class="n">propertyId</span><span class="si">}</span><span class="s2"> </span>
+<span class="si">{</span><span class="n">WikidataItem</span><span class="o">.</span><span class="n">getPrefixes</span><span class="p">()</span><span class="si">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+            <span class="o">+</span> <span class="n">sparql</span>
+        <span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;non tabular entries for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">qlabel</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">propertyLabel</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">freqDesc</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;NonTabular </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">qlabel</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">propertyLabel</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">freqDesc</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">sparql</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.noneTabular">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.noneTabular">[docs]</a>
+    <span class="k">def</span> <span class="nf">noneTabular</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wdProperty</span><span class="p">:</span> <span class="n">WikidataProperty</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the none tabular result for the given Wikidata property</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            wdProperty(WikidataProperty): the Wikidata property</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noneTabularQuery</span><span class="p">(</span><span class="n">wdProperty</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">qlod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparql</span><span class="o">.</span><span class="n">queryAsListOfDicts</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">qlod</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.addStatsColWithPercent">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.addStatsColWithPercent">[docs]</a>
+    <span class="k">def</span> <span class="nf">addStatsColWithPercent</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">total</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        add a statistics Column</span>
+<span class="sd">        Args:</span>
+<span class="sd">            m(dict):</span>
+<span class="sd">            col(str): name of the column</span>
+<span class="sd">            value: value</span>
+<span class="sd">            total: total value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">total</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">m</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="o">/</span><span class="n">total</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.genWdPropertyStatistic">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.genWdPropertyStatistic">[docs]</a>
+    <span class="k">def</span> <span class="nf">genWdPropertyStatistic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">wdProperty</span><span class="p">:</span> <span class="n">WikidataProperty</span><span class="p">,</span> <span class="n">itemCount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">withQuery</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        generate a property Statistics Row for the given wikidata Property</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            wdProperty(WikidataProperty): the property to get the statistics for</span>
+<span class="sd">            itemCount(int): the total number of items to check</span>
+<span class="sd">            withQuery(bool): if true include the sparql query</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: a statistics row</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ntlod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noneTabular</span><span class="p">(</span><span class="n">wdProperty</span><span class="p">)</span>
+        <span class="n">statsRow</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;property&quot;</span><span class="p">:</span> <span class="n">wdProperty</span><span class="o">.</span><span class="n">plabel</span><span class="p">}</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nttotal</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">maxCount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">ntlod</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;frequency&quot;</span><span class="p">])</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">])</span>
+            <span class="c1"># statsRow[f&quot;f{count}&quot;]=f</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">nttotal</span> <span class="o">+=</span> <span class="n">f</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">statsRow</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="n">maxCount</span><span class="p">:</span>
+                <span class="n">maxCount</span> <span class="o">=</span> <span class="n">count</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">f</span>
+        <span class="n">statsRow</span><span class="p">[</span><span class="s2">&quot;maxf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxCount</span>
+        <span class="k">if</span> <span class="n">withQuery</span><span class="p">:</span>
+            <span class="n">statsRow</span><span class="p">[</span><span class="s2">&quot;queryf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noneTabularQuery</span><span class="p">(</span><span class="n">wdProperty</span><span class="p">)</span><span class="o">.</span><span class="n">query</span>
+            <span class="n">statsRow</span><span class="p">[</span><span class="s2">&quot;queryex&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noneTabularQuery</span><span class="p">(</span>
+                <span class="n">wdProperty</span><span class="p">,</span> <span class="n">asFrequency</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">query</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addStatsColWithPercent</span><span class="p">(</span><span class="n">statsRow</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">itemCount</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addStatsColWithPercent</span><span class="p">(</span><span class="n">statsRow</span><span class="p">,</span> <span class="s2">&quot;non tabular&quot;</span><span class="p">,</span> <span class="n">nttotal</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">statsRow</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.genPropertyStatistics">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.genPropertyStatistics">[docs]</a>
+    <span class="k">def</span> <span class="nf">genPropertyStatistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        generate the property Statistics</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            generator: a generator of statistic dict rows</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">itemCount</span><span class="p">,</span> <span class="n">_itemCountQuery</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">wdProperty</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">statsRow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genWdPropertyStatistic</span><span class="p">(</span><span class="n">wdProperty</span><span class="p">,</span> <span class="n">itemCount</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">statsRow</span></div>
+
+
+<div class="viewcode-block" id="TrulyTabular.getPropertyStatistics">
+<a class="viewcode-back" href="../../lodstorage.html#lodstorage.trulytabular.TrulyTabular.getPropertyStatistics">[docs]</a>
+    <span class="k">def</span> <span class="nf">getPropertyStatistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the property Statistics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">itemCount</span><span class="p">,</span> <span class="n">_itemCountQuery</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">lod</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;property&quot;</span><span class="p">:</span> <span class="s2">&quot;∑&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">itemCount</span><span class="p">,</span> <span class="s2">&quot;total%&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">}]</span>
+        <span class="k">for</span> <span class="n">wdProperty</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">statsRow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genWdPropertyStatistic</span><span class="p">(</span><span class="n">wdProperty</span><span class="p">,</span> <span class="n">itemCount</span><span class="p">)</span>
+            <span class="n">lod</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">statsRow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lod</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyLoDStorage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../lodstorage.html">lodstorage package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sampledata.html">sampledata package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">tests package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
