@@ -1,4 +1,4 @@
-# lodstorage API Documentation
+# pyLodStorage API Documentation
 
 ::: lodstorage
     options:

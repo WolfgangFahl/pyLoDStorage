@@ -2,14 +2,17 @@
 # create docs for a configurable project
 # WF 2024-07-30 - updated
 
-# Configuration
-PROJECT_NAME="pylodstorage"  # Default project name, can be overridden
+# Extract project name from pyproject.toml
+PROJECT_NAME=$(grep "\[project\]" pyproject.toml -A1 | grep name | cut -d '=' -f2 | tr -d ' "')
+PACKAGE_NAME=$(grep "\[tool.hatch.build.targets.wheel.sources\]" pyproject.toml -A1 | tail -1 | cut -d '=' -f2 | tr -d ' "')
+
 
 # Function to print usage information
 print_usage() {
     echo "Usage: $0 [OPTIONS]"
     echo "Options:"
-    echo "  -p, --project NAME    Set the project name (default: $PROJECT_NAME)"
+    echo "  -pr, --project NAME    Set the project name (default: $PROJECT_NAME)"
+    echo "  -pa, --package NAME    Set the package name (default: $PACKAGE_NAME)"
     echo "  -d, --deploy          Deploy the documentation after building"
     echo "  -h, --help            Display this help message"
 }
@@ -18,7 +21,8 @@ print_usage() {
 DEPLOY=false
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -p|--project) PROJECT_NAME="$2"; shift ;;
+        -pr|--project) PROJECT_NAME="$2"; shift ;;
+        -pa|--package) PACKAGE_NAME="$2"; shift ;;
         -d|--deploy) DEPLOY=true ;;
         -h|--help) print_usage; exit 0 ;;
         *) echo "Unknown parameter: $1"; print_usage; exit 1 ;;
@@ -27,8 +31,8 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Ensure we're in the correct directory
-if [[ ! -d "$PROJECT_NAME" ]]; then
-    echo "Error: $PROJECT_NAME directory not found. Are you in the correct directory?"
+if [[ ! -d "$PACKAGE_NAME" ]]; then
+    echo "Error: $PACKAGE_NAME package directory not found. Are you in the correct directory?"
     exit 1
 fi
 
@@ -65,7 +69,7 @@ mkdir -p docs
 cat << EOF > $index_md
 # $PROJECT_NAME API Documentation
 
-::: $PROJECT_NAME
+::: $PACKAGE_NAME
     options:
       show_submodules: true
 EOF

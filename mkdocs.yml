@@ -1,4 +1,4 @@
-site_name: lodstorage API Documentation
+site_name: pyLodStorage API Documentation
 theme:
   name: material
 plugins:
