@@ -1,4 +1,4 @@
-site_name: py-sidif API Documentation
+site_name: lodstorage API Documentation
 theme:
   name: material
 plugins:

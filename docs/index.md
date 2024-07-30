@@ -1,5 +1,5 @@
-# API Documentation
+# lodstorage API Documentation
 
-::: sidif
+::: lodstorage
     options:
       show_submodules: true
