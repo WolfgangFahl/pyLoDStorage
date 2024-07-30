@@ -8,11 +8,12 @@ python List of Dict (Table) Storage library
 [![Downloads](https://pepy.tech/badge/pyLoDStorage)](https://pepy.tech/project/pyLoDStorage)
 [![GitHub issues](https://img.shields.io/github/issues/WolfgangFahl/pyLoDStorage.svg)](https://github.com/WolfgangFahl/pyLoDStorage/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/WolfgangFahl/pyLoDStorage.svg)](https://github.com/WolfgangFahl/pyLoDStorage/issues/?q=is%3Aissue+is%3Aclosed)
+[![API Docs](https://img.shields.io/badge/API-Documentation-blue)](https://WolfgangFahl.github.io/pyLoDStorage/)
 [![License](https://img.shields.io/github/license/WolfgangFahl/pyLoDStorage.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 What it is
 ==========
-pyLoDStorage allows to store table like data (List of Dicts) via  
+pyLoDStorage allows to store table like data (List of Dicts) via
 
 - Sqlite3
 - JSON
