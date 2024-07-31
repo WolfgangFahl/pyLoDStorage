@@ -3,7 +3,7 @@ python List of Dict (Table) Storage library
 
 [![pypi](https://img.shields.io/pypi/pyversions/pyLodStorage)](https://pypi.org/project/pyLodStorage/)
 [![Github Actions Build](https://github.com/WolfgangFahl/pyLoDStorage/actions/workflows/build.yml/badge.svg)](https://github.com/WolfgangFahl/pyLoDStorage/actions/workflows/build.yml)
-[![PyPI Status](https://img.shields.io/pypi/v/pyLoDStorage.svg)](https://pypi.python.org/pypi/pyLoDStorage/)
+[![PyPI Status](https://img.shields.io/pypi/v/pyLodStorage.svg)](https://pypi.python.org/pypi/pyLodStorage/)
 [![GitHub issues](https://img.shields.io/github/issues/WolfgangFahl/pyLoDStorage.svg)](https://github.com/WolfgangFahl/pyLoDStorage/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/WolfgangFahl/pyLoDStorage.svg)](https://github.com/WolfgangFahl/pyLoDStorage/issues/?q=is%3Aissue+is%3Aclosed)
 [![API Docs](https://img.shields.io/badge/API-Documentation-blue)](https://WolfgangFahl.github.io/pyLoDStorage/)
