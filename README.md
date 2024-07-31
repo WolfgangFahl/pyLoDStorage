@@ -1,7 +1,7 @@
 # pyLoDStorage
 python List of Dict (Table) Storage library
 
-[![pypi](https://img.shields.io/pypi/pyversions/pyLoDStorage)](https://pypi.org/project/pyLoDStorage/)
+[![pypi](https://img.shields.io/pypi/pyversions/pyLodStorage)](https://pypi.org/project/pyLodStorage/)
 [![Github Actions Build](https://github.com/WolfgangFahl/pyLoDStorage/actions/workflows/build.yml/badge.svg)](https://github.com/WolfgangFahl/pyLoDStorage/actions/workflows/build.yml)
 [![PyPI Status](https://img.shields.io/pypi/v/pyLoDStorage.svg)](https://pypi.python.org/pypi/pyLoDStorage/)
 [![GitHub issues](https://img.shields.io/github/issues/WolfgangFahl/pyLoDStorage.svg)](https://github.com/WolfgangFahl/pyLoDStorage/issues)
@@ -47,5 +47,3 @@ see [test cases](https://github.com/WolfgangFahl/pyLoDStorage/tree/master/tests)
 ### Authors
 * [Wolfgang Fahl](http://www.bitplan.com/Wolfgang_Fahl)
 * [Tim Holzheim](https://www.semantic-mediawiki.org/wiki/Tim_Holzheim)
-
-
