@@ -1,7 +1,7 @@
 """
 Created on 2022-06-20
 
-see  
+see
     https://github.com/tyleradams/json-toolkit
     https://stackoverflow.com/questions/36021526/converting-an-array-dict-to-xml-in-python
 
@@ -25,9 +25,9 @@ class Lod2Xml:
         construct me with the given list of dicts
 
         Args:
-            lod(list): the list of dicts to convert to XML
-            root(str): the name of the root nod
-            item_name(func): the function to use to calculate node names
+            lod (list): the list of dicts to convert to XML
+            root (str): the name of the root nod
+            item_name (func): the function to use to calculate node names
         """
         self.lod = lod
         self.root = root
@@ -38,7 +38,7 @@ class Lod2Xml:
         convert result to XML
 
         Args:
-            pretty(bool): if True pretty print the result
+            pretty (bool): if True pretty print the result
 
         """
         xml = dicttoxml(
