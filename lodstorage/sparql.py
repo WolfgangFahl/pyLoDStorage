@@ -68,7 +68,7 @@ class SPARQL(object):
         create a SPARQL endpoint from the given EndpointConfiguration
 
         Args:
-            endpointConf(Endpoint): the endpoint configuration to be used
+            endpointConf (Endpoint): the endpoint configuration to be used
         """
         sparql = SPARQL(url=endpointConf.endpoint, method=endpointConf.method)
         if hasattr(endpointConf, "auth"):
@@ -94,6 +94,28 @@ class SPARQL(object):
         """
         self.sparql.setHTTPAuth(method)
         self.sparql.setCredentials(username, password)
+
+    def test_query(self,
+        query:str="SELECT * WHERE { ?s ?p ?o } LIMIT 1",
+        expected_bindings:int=1)->Exception:
+        """
+        Check if the SPARQL endpoint is available using a standard SPARQL query.
+
+        Args:
+            query (str): the SPARQL query to use for testing
+
+        Returns:
+            Exception if the endpoint fails
+        """
+        result=None
+        try:
+            query_result = self.rawQuery(query, method=self.method)
+            bindings=query_result.bindings
+            if not len(bindings)==expected_bindings:
+                raise Exception(f"SPARQL query {query} returned {len(bindings)} bindings instead of {expected_bindings}")
+        except Exception as ex:
+            result=ex
+        return result
 
     def rawQuery(self, queryString, method=POST):
         """

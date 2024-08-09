@@ -50,7 +50,7 @@ class TestQueries(Basetest):
         test SPARQL queries
         """
         show = self.debug
-        # show=True
+        show=True
         qm = QueryManager(lang="sparql", debug=False)
         for name, query in qm.queriesByName.items():
             if name in ["US President Nicknames"]:
@@ -351,7 +351,7 @@ class TestQueries(Basetest):
                 "description": "https://stackoverflow.com/questions/70206791/sparql-i-have-individual-with-multiple-values-for-single-object-property-how",
                 "title": "Nick names of US Presidents",
                 "query": """SELECT ?item ?itemLabel (GROUP_CONCAT(DISTINCT ?nickName; SEPARATOR=",") as ?nickNames)
-WHERE 
+WHERE
 {
   # president
   ?item wdt:P39 wd:Q11696.
@@ -373,7 +373,7 @@ WHERE
 # see also https://github.com/WolfgangFahl/pyLoDStorage/issues/46
 # WF 2021-08-23
 SELECT ?substance ?substanceLabel ?formula ?structure ?CAS
-WHERE { 
+WHERE {
   ?substance wdt:P31 wd:Q11173.
   ?substance wdt:P231 ?CAS.
   ?substance wdt:P274 ?formula.
@@ -390,11 +390,11 @@ LIMIT 15
                 "name": "CityTop10",
                 "title": "Ten largest cities of the world",
                 "description": "Wikidata SPARQL query showing the 10 most populated cities of the world using the million city class Q1637706 for selection",
-                "query": """# Ten Largest cities of the world 
+                "query": """# Ten Largest cities of the world
 # WF 2021-08-23
 # see also http://wiki.bitplan.com/index.php/PyLoDStorage#Examples
 # see also https://github.com/WolfgangFahl/pyLoDStorage/issues/46
-SELECT DISTINCT ?city ?cityLabel ?population ?country ?countryLabel 
+SELECT DISTINCT ?city ?cityLabel ?population ?country ?countryLabel
 WHERE {
   VALUES ?cityClass { wd:Q1637706}.
   ?city wdt:P31 ?cityClass .
@@ -416,7 +416,7 @@ LIMIT 10""",
 # see also http://wiki.bitplan.com/index.php/PyLoDStorage#Examples
 # see also https://github.com/WolfgangFahl/pyLoDStorage/issues/46
 SELECT (count(?instance) as ?count) ?placeType ?placeTypeLabel
-WHERE { 
+WHERE {
   VALUES ?placeType {
     "city"
     "town"
@@ -429,7 +429,7 @@ GROUP BY ?placeType ?placeTypeLabel
 ORDER BY ?count""",
                 "name": "OSM place types",
                 "title": "count OpenStreetMap place type instances",
-                "description": """This SPARQL query 
+                "description": """This SPARQL query
 determines the number of instances available in the OpenStreetMap for the placeTypes city,town and village
 """,
             },
@@ -515,3 +515,33 @@ class TestEndpoints(Basetest):
             )
             if debug:
                 print(jsonStr)
+
+    def test_availability_of_endpoints(self):
+        """
+        Test the availability of all SPARQL endpoints using the test_query method.
+        """
+        debug = self.debug
+        debug=True
+        endpoints = EndpointManager.getEndpoints(lang="sparql")
+        success=0
+        total=0
+        for i, item in enumerate(endpoints.items()):
+            name, endpoint = item
+            total+=1
+            if debug:
+                print(f"Testing endpoint {i+1}: {name}")
+
+            sparql = SPARQL(endpoint.endpoint)  # Assuming SPARQL class is available
+            exception = sparql.test_query(timeout=5)
+            msg=f"Endpoint {name}"
+            if exception is None:
+                success+=1
+                msg+="✅"
+            else:
+                msg+=f"❌: {str(exception)}"
+            if debug:
+                print(msg)
+        if debug:
+            marker = "❌ " if success < total else "✅"
+            print(f"{marker}:{success}/{total} available")
+        self.assertTrue(success/total>0.5)
