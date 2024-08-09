@@ -92,7 +92,14 @@ class QueryMain:
             params = Params(query.query)
             if params.has_params:
                 if not args.params:
-                    raise Exception(f"{query.name} needs parameters")
+                    param_names = params.params
+                    if len(param_names) > 3:
+                        displayed_params = ", ".join(param_names[:3]) + ", ..."
+                    else:
+                        displayed_params = ", ".join(param_names)
+                    plural_suffix = "s" if len(param_names) > 1 else ""
+                    msg = f"{query.name} needs {len(params.params)} parameter{plural_suffix}: {displayed_params}"
+                    raise Exception(msg)
                 else:
                     params.set(args.params)
                     query.query = params.apply_parameters()

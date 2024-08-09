@@ -175,14 +175,17 @@ class TestQueries(Basetest):
             # workaround https://github.com/ad-freiburg/qlever/issues/631
             # {"en":"qlever-wikidata-proxy",},
         ]
-        debug = self.debug
         showServerDown = True
+        showResult=self.debug
+        #showResult=True
         for testArg in testArgs:
             endpointName = testArg.get("en")
             args = [
                 "-d",
                 "-qn",
                 "cities",
+                "--params",
+                "country=Q183",
                 "-p",
                 "-l",
                 "sparql",
@@ -195,8 +198,8 @@ class TestQueries(Basetest):
             result = self.captureQueryMain(args)
 
             if not "503 Service Unavailable" in result:
-                # if debug:
-                #    print(result)
+                if showResult:
+                    print(result)
                 self.assertTrue(
                     "Arnis" in result, f"{endpointName}: Arnis not in query result"
                 )
