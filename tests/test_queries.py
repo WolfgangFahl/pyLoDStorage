@@ -535,7 +535,8 @@ class TestEndpoints(Basetest):
                 print(f"Testing endpoint {i+1}: {name}")
 
             sparql = SPARQL(endpoint.endpoint)  # Assuming SPARQL class is available
-            exception = sparql.test_query(timeout=5)
+            sparql.sparql.setTimeout(5.0)
+            exception = sparql.test_query()
             msg=f"Endpoint {name}"
             if exception is None:
                 success+=1
