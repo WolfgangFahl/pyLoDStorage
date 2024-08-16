@@ -6,7 +6,8 @@ Created on 2022-02-13
 from pathlib import Path
 
 from lodstorage.params import Params, StoreDictKeyPair
-from lodstorage.version import Version
+from lodstorage.version import Version # Use sqlq.py module for MySQL endpoints
+from lodstorage.mysql import MySqlQuery
 
 __version__ = Version.version
 __date__ = Version.date
@@ -128,7 +129,7 @@ class QueryMain:
                 if args.prefixes and endpointConf is not None:
                     queryCode = f"{endpointConf.prefixes}\n{queryCode}"
                 if args.raw:
-                    qres = cls.rawQuery(
+                    qres = cls.rawMyQuery(
                         endpointConf,
                         query=query.query,
                         resultFormat=args.format,
@@ -140,8 +141,13 @@ class QueryMain:
                     formats = ["*:wikidata"]
                 qlod = sparql.queryAsListOfDicts(queryCode)
             elif args.language == "sql":
-                sqlDB = SQLDB(endpointConf.endpoint)
-                qlod = sqlDB.query(queryCode)
+                if endpointConf.endpoint.startswith("jdbc:mysql"):
+                    query_tool=MySqlQuery(endpointConf,debug=args.debug)
+                    qlod = query_tool.execute_sql_query(queryCode)
+                else:
+                    # Use existing SQLDB for other SQL endpoints
+                    sqlDB = SQLDB(endpointConf.endpoint)
+                    qlod = sqlDB.query(queryCode)
             else:
                 raise Exception(f"language {args.language} not known/supported")
             if args.format is Format.csv:

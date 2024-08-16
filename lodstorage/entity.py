@@ -199,7 +199,7 @@ class EntityManager(YamlAbleMixin, JsonPickleMixin, JSONAbleList):
                 config.prefix
                 + """
 SELECT  ?source (COUNT(?source) AS ?sourcecount)
-WHERE { 
+WHERE {
    ?event cr:Event_source ?source.
 }
 GROUP by ?source
@@ -308,7 +308,7 @@ GROUP by ?source
             eventQuery = (
                 """
 PREFIX cr: <http://cr.bitplan.com/>
-SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate ?url ?source WHERE { 
+SELECT ?eventId ?acronym ?series ?title ?year ?country ?city ?startDate ?endDate ?url ?source WHERE {
    OPTIONAL { ?event cr:Event_eventId ?eventId. }
    OPTIONAL { ?event cr:Event_acronym ?acronym. }
    OPTIONAL { ?event cr:Event_series ?series. }

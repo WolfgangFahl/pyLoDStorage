@@ -113,13 +113,13 @@ class TestSQLDB(Basetest):
             print(plantUml)
         expected = """package Royals {
   class Person << Entity >> {
-   age : FLOAT 
-   born : DATE 
-   lastmodified : TIMESTAMP 
+   age : FLOAT
+   born : DATE
+   lastmodified : TIMESTAMP
    name : TEXT <<PK>>
-   numberInLine : INTEGER 
-   ofAge : BOOLEAN 
-   wikidataurl : TEXT 
+   numberInLine : INTEGER
+   ofAge : BOOLEAN
+   wikidataurl : TEXT
   }
 }
 """
@@ -139,18 +139,18 @@ class TestSQLDB(Basetest):
         if self.debug:
             print(plantUml)
         expected = """class PersonBase << Entity >> {
- lastmodified : TIMESTAMP 
+ lastmodified : TIMESTAMP
  name : TEXT <<PK>>
 }
 class Person << Entity >> {
- age : FLOAT 
- born : DATE 
- numberInLine : INTEGER 
- ofAge : BOOLEAN 
- wikidataurl : TEXT 
+ age : FLOAT
+ born : DATE
+ numberInLine : INTEGER
+ ofAge : BOOLEAN
+ wikidataurl : TEXT
 }
 class Family << Entity >> {
- country : TEXT 
+ country : TEXT
 }
 PersonBase <|-- Person
 PersonBase <|-- Family
@@ -178,7 +178,7 @@ PersonBase <|-- Family
         viewDDL = Schema.getGeneralViewDDL(tableList, "PersonBase")
         if self.debug:
             print(viewDDL)
-        expected = """CREATE VIEW PersonBase AS 
+        expected = """CREATE VIEW PersonBase AS
   SELECT name,lastmodified FROM Person
 UNION
   SELECT name,lastmodified FROM Family"""
