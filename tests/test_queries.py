@@ -179,7 +179,7 @@ class TestQueries(Basetest):
         ]
         showServerDown = True
         showResult = self.debug
-        # showResult=True
+        showResult=True
         for testArg in testArgs:
             endpointName = testArg.get("en")
             args = [
@@ -199,7 +199,7 @@ class TestQueries(Basetest):
             ]
             result = self.captureQueryMain(args)
 
-            if not "503 Service Unavailable" in result:
+            if not "503 Service Unavailable" in result and not "Error 403" in result:
                 if showResult:
                     print(result)
                 self.assertTrue(
