@@ -91,20 +91,8 @@ class QueryMain:
 
         if queryCode:
             params = Params(query.query)
-            if params.has_params:
-                if not args.params:
-                    param_names = params.params
-                    if len(param_names) > 3:
-                        displayed_params = ", ".join(param_names[:3]) + ", ..."
-                    else:
-                        displayed_params = ", ".join(param_names)
-                    plural_suffix = "s" if len(param_names) > 1 else ""
-                    msg = f"{query.name} needs {len(params.params)} parameter{plural_suffix}: {displayed_params}"
-                    raise Exception(msg)
-                else:
-                    params.set(args.params)
-                    query.query = params.apply_parameters()
-                    queryCode = query.query
+            params.apply_parameters_with_check(args.params)
+            queryCode = query.query
             if debug or args.showQuery:
                 print(f"{args.language}:\n{query.query}")
             endpointConf = Endpoint()
