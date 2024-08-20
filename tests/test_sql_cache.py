@@ -59,6 +59,7 @@ class TestSqlCache(Basetest):
             sparql,
             sql_db=self.sql_db,
             query_name="cities",
+            param_dict={"country":"Q32"},
             max_errors=1,
             debug=self.debug,
         )

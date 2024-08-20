@@ -44,6 +44,7 @@ class Cached:
         sparql: SPARQL,
         sql_db: str,
         query_name: str,
+        param_dict: dict,
         max_errors: int = 0,
         debug: bool = False,
     ):
@@ -56,12 +57,14 @@ class Cached:
             sparql (SPARQL): a SPARQL endpoint.
             sql_db (str): The connection string for the SQL database.
             query_name (str): The name of the query to be executed.
+            param_dict (dict): the dictionary of parameters for the query
             debug (bool, optional): Flag to enable debug mode. Defaults to False.
         """
         self.clazz = clazz
         self.sparql = sparql
         self.sql_db = sql_db
         self.query_name = query_name
+        self.param_dict = param_dict
         self.max_errors = max_errors
         self.debug = debug
         self.entities = []
@@ -131,7 +134,7 @@ class Cached:
             profile=self.debug,
         )
         query = qm.queriesByName[self.query_name]
-        self.lod = self.sparql.queryAsListOfDicts(query.query)
+        self.lod = self.sparql.queryAsListOfDicts(query.query,param_dict=self.param_dict)
         profiler.time()
         if self.debug:
             print(f"Found {len(self.lod)} records for {self.query_name}")

@@ -501,7 +501,10 @@ class SPARQL(object):
         return self.getResults(jsonResult)
 
     def queryAsListOfDicts(
-        self, queryString, fixNone: bool = False, sampleCount: int = None, param_dict: dict = None
+        self, queryString,
+        fixNone: bool = False,
+        sampleCount: int = None,
+        param_dict: dict = None
     ):
         """
         Get a list of dicts for the given query (to allow round-trip results for insertListOfDicts)
