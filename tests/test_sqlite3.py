@@ -491,7 +491,9 @@ record  #3={'name': 'John Doe'}"""
                         result, "Expected None for invalid timestamp input"
                     )
                     # Check if the expected log message is in log_stream
-                    self.assertIn("Failed to convert", log_stream.getvalue())
+                    log_content=log_stream.getvalue()
+
+                    self.assertIn("Failed to convert", log_content)
                     # Clear log stream after checking
                     log_stream.truncate(0)
                     log_stream.seek(0)
@@ -504,6 +506,7 @@ record  #3={'name': 'John Doe'}"""
         # Remove the handler after the test to clean up
         logger.removeHandler(handler)
         log_stream.close()
+        DatetimeAdapter._instance=None
 
     def testMultipleAdapters(self):
         """
