@@ -3,10 +3,12 @@ Created on 2021-01-29
 
 @author: wf
 """
+
 import copy
 import io
 import json
 import os
+from argparse import Namespace
 from contextlib import redirect_stdout
 
 import tests.test_sqlite3
@@ -50,7 +52,7 @@ class TestQueries(Basetest):
         test SPARQL queries
         """
         show = self.debug
-        show=True
+        show = True
         qm = QueryManager(lang="sparql", debug=False)
         for name, query in qm.queriesByName.items():
             if name in ["US President Nicknames"]:
@@ -176,8 +178,8 @@ class TestQueries(Basetest):
             # {"en":"qlever-wikidata-proxy",},
         ]
         showServerDown = True
-        showResult=self.debug
-        #showResult=True
+        showResult = self.debug
+        # showResult=True
         for testArg in testArgs:
             endpointName = testArg.get("en")
             args = [
@@ -201,7 +203,8 @@ class TestQueries(Basetest):
                 if showResult:
                     print(result)
                 self.assertTrue(
-                    "Dudelange" in result, f"{endpointName}: Dudelange not in query result"
+                    "Dudelange" in result,
+                    f"{endpointName}: Dudelange not in query result",
                 )
             elif showServerDown:
                 print(f"{endpointName} returns 503 Service Unavailable")
@@ -325,14 +328,14 @@ class TestQueries(Basetest):
         """
         https://github.com/WolfgangFahl/pyLoDStorage/issues/130
         """
-        debug=self.debug
-        #debug=True
+        debug = self.debug
+        # debug=True
         endpoints = EndpointManager.getEndpoints(lang="sparql")
-        for ep_name,ep in endpoints.items():
+        for ep_name, ep in endpoints.items():
             if ep.calls_per_minute is not None:
                 if debug:
                     print(f"{ep_name}: {ep.calls_per_minute} calls per min")
-                self.assertTrue(ep.calls_per_minute>1 and ep.calls_per_minute<60)
+                self.assertTrue(ep.calls_per_minute > 1 and ep.calls_per_minute < 60)
 
     def testCommandLineUsage(self):
         """
@@ -526,7 +529,14 @@ class TestEndpoints(Basetest):
             if debug:
                 print(f"{i}:{name}")
             resultFormat = "json"
-            jsonStr = QueryMain.rawQuery(
+            args = Namespace(
+                debug=debug,
+                calls_per_minute=endpoint.calls_per_minute
+            )
+
+            query_main = QueryMain(args)
+
+            jsonStr = query_main.rawQuery(
                 endpoint, query.query, resultFormat, mimeType=None
             )
             if debug:
@@ -537,28 +547,28 @@ class TestEndpoints(Basetest):
         Test the availability of all SPARQL endpoints using the test_query method.
         """
         debug = self.debug
-        debug=True
+        debug = True
         endpoints = EndpointManager.getEndpoints(lang="sparql")
-        success=0
-        total=0
+        success = 0
+        total = 0
         for i, item in enumerate(endpoints.items()):
             name, endpoint = item
-            total+=1
+            total += 1
             if debug:
                 print(f"Testing endpoint {i+1}: {name}")
 
             sparql = SPARQL(endpoint.endpoint)  # Assuming SPARQL class is available
             sparql.sparql.setTimeout(5.0)
             exception = sparql.test_query()
-            msg=f"Endpoint {name}"
+            msg = f"Endpoint {name}"
             if exception is None:
-                success+=1
-                msg+="✅"
+                success += 1
+                msg += "✅"
             else:
-                msg+=f"❌: {str(exception)}"
+                msg += f"❌: {str(exception)}"
             if debug:
                 print(msg)
         if debug:
             marker = "❌ " if success < total else "✅"
             print(f"{marker}:{success}/{total} available")
-        self.assertTrue(success/total>0.5)
+        self.assertTrue(success / total > 0.5)

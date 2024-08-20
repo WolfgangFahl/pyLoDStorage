@@ -3,12 +3,12 @@ Created on 2024-01-21
 
 @author: wf
 """
+
 from lodstorage.sample2 import Sample
 from tests.basetest import Basetest
 
 
 class TestTriplify(Basetest):
-
     """
     Tests https://github.com/WolfgangFahl/pyLoDStorage/issues/57
     """

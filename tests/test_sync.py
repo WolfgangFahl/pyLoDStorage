@@ -3,6 +3,7 @@ Created on 2023-12-27
 
 @author: wf
 """
+
 from lodstorage.sync import Sync, SyncPair
 from tests.basetest import Basetest
 

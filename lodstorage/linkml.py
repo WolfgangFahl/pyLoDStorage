@@ -3,6 +3,7 @@ Created on 2024-01-28
 
 @author: wf
 """
+
 from dataclasses import field
 from typing import Dict, List, Optional, Type
 

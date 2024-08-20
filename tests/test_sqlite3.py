@@ -3,6 +3,7 @@ Created on 2020-08-24
 
 @author: wf
 """
+
 import logging
 import os
 import sys
@@ -84,8 +85,8 @@ class TestSQLDB(Basetest):
         """
         test creating entityInfo from the sample record
         """
-        debug=self.debug
-        #debug=True
+        debug = self.debug
+        # debug=True
         listOfRecords = Sample.getRoyals()
         entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=debug)
         self.assertEqual(
@@ -166,8 +167,8 @@ PersonBase <|-- Family
         auto create view ddl in mergeschema
 
         """
-        debug=self.debug
-        #debug=True
+        debug = self.debug
+        # debug=True
         self.sqlDB = SQLDB(debug=self.debug, errorDebug=self.debug)
         listOfRecords = Sample.getRoyals()
         entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=self.debug)

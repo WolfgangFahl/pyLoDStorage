@@ -3,6 +3,7 @@ Created on 2024-01-21
 
 @author: wf
 """
+
 from pyparsing import (
     Group,
     Literal,

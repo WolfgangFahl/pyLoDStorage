@@ -3,6 +3,7 @@ Created on 2024-03-09
 
 @author: wf
 """
+
 from lodstorage.cache import CacheManager
 from lodstorage.sample2 import Royals, Sample
 from tests.basetest import Basetest

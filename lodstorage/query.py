@@ -692,10 +692,13 @@ class EndpointManager(object):
                     if select:
                         endpoint = Endpoint()
                         endpoint.fromDict({"name": name, **record})
-                        default_none_attrs=["website","calls_per_minute"]
+                        default_none_attrs = [
+                            "website",
+                            "calls_per_minute",
+                        ]
                         for attr in default_none_attrs:
-                            if not hasattr(endpoint,attr):
-                                setattr(endpoint,attr,None)
+                            if not hasattr(endpoint, attr):
+                                setattr(endpoint, attr, None)
                         endpoints[name] = endpoint
         return endpoints
 
@@ -738,6 +741,14 @@ class Endpoint(JSONAble):
                 "auth": "BASIC",
                 "user": "secret",
                 "password": "#not public - example not usable for access#",
+            },
+            {
+                "name": "qlever-wikidata",
+                "lang": "sparql",
+                "method": "POST",
+                "database": "qlever",
+                "endpoint": "https://qlever.cs.uni-freiburg.de/api/wikidata",
+                "website": "https://qlever.cs.uni-freiburg.de/wikidata",
             },
         ]
         return samples

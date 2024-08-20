@@ -4,10 +4,14 @@ mysql.py:
 MySQL and MariaDB support
 
 """
+
 import logging
+from typing import Any, Dict, List
+
 import pymysql
+
 from lodstorage.query import Endpoint
-from typing import Dict, Any, List
+
 
 class MySqlQuery:
     """
@@ -18,7 +22,7 @@ class MySqlQuery:
         debug (bool): Flag to enable debugging.
     """
 
-    def __init__(self, endpoint:Endpoint,debug:bool=False):
+    def __init__(self, endpoint: Endpoint, debug: bool = False):
         """
         Initializes the Query class with command-line arguments.
 
@@ -27,16 +31,15 @@ class MySqlQuery:
             debug (bool): Flag to enable debugging.
         """
         self.db_params = {
-            'host': endpoint.host or 'localhost',
-            'port': endpoint.port or 3306,
-            'user': endpoint.user or 'root',
-            'password': endpoint.password,
-            'database': endpoint.database,
-            'charset': endpoint.charset or 'utf8mb4'
+            "host": endpoint.host or "localhost",
+            "port": endpoint.port or 3306,
+            "user": endpoint.user or "root",
+            "password": endpoint.password,
+            "database": endpoint.database,
+            "charset": endpoint.charset or "utf8mb4",
         }
 
         self.debug = debug
-
 
     def execute_sql_query(self, query: str) -> List[Dict[str, Any]]:
         """

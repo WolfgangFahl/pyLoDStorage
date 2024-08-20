@@ -3,11 +3,15 @@ Created on 2022-02-13
 
 @author: wf
 """
+
+import logging
+import urllib.parse
 from pathlib import Path
 
-from lodstorage.params import Params, StoreDictKeyPair
-from lodstorage.version import Version # Use sqlq.py module for MySQL endpoints
 from lodstorage.mysql import MySqlQuery
+from lodstorage.params import Params, StoreDictKeyPair
+from lodstorage.rate_limiter import RateLimiter
+from lodstorage.version import Version  # Use sqlq.py module for MySQL endpoints
 
 __version__ = Version.version
 __date__ = Version.date
@@ -43,14 +47,23 @@ class QueryMain:
     Commandline handler
     """
 
-    @classmethod
-    def main(cls, args):
+    def __init__(self, args):
         """
-        command line activation with parsed args
+        command line args
 
         Args:
             args(list): the command line arguments
         """
+        self.args = args
+        self.rate_limiter = RateLimiter(
+            calls_per_minute=(
+                args.calls_per_minute if hasattr(args, "calls_per_minute") else None
+            )
+        )
+
+
+    def work(self):
+        args = self.args
         debug = args.debug
         endpoints = EndpointManager.getEndpoints(args.endpointPath)
         qm = QueryManager(lang=args.language, debug=debug, queriesPath=args.queriesPath)
@@ -91,7 +104,7 @@ class QueryMain:
 
         if queryCode:
             params = Params(query.query)
-            query.query=params.apply_parameters_with_check(args.params)
+            query.query = params.apply_parameters_with_check(args.params)
             queryCode = query.query
             if debug or args.showQuery:
                 print(f"{args.language}:\n{query.query}")
@@ -117,7 +130,7 @@ class QueryMain:
                 if args.prefixes and endpointConf is not None:
                     queryCode = f"{endpointConf.prefixes}\n{queryCode}"
                 if args.raw:
-                    qres = cls.rawQuery(
+                    qres = self.rawQuery(
                         endpointConf,
                         query=query.query,
                         resultFormat=args.format,
@@ -130,7 +143,7 @@ class QueryMain:
                 qlod = sparql.queryAsListOfDicts(queryCode)
             elif args.language == "sql":
                 if endpointConf.endpoint.startswith("jdbc:mysql"):
-                    query_tool=MySqlQuery(endpointConf,debug=args.debug)
+                    query_tool = MySqlQuery(endpointConf, debug=args.debug)
                     qlod = query_tool.execute_sql_query(queryCode)
                 else:
                     # Use existing SQLDB for other SQL endpoints
@@ -158,15 +171,18 @@ class QueryMain:
             else:
                 raise Exception(f"format {args.format} not supported yet")
 
-    @staticmethod
-    def rawQuery(endpointConf,
-                 query: str,
-                 resultFormat: str,
-                 mimeType: str,
-                 content_type: str = "application/sparql-query",
-                 timeout: float = 10.0):
+    def rawQuery(
+        self,
+        endpointConf,
+        query: str,
+        resultFormat: str,
+        mimeType: str,
+        content_type: str = "application/sparql-query",
+        timeout: float = 10.0,
+        lenient: bool = True,
+    ):
         """
-        returns raw result of the endpoint
+        Returns raw result of the endpoint.
 
         Args:
         endpointConf: EndPoint
@@ -175,37 +191,63 @@ class QueryMain:
         mimeType (str): mimeType
         content_type (str): content type of the request
         timeout (float): timeout in seconds
+        lenient (bool): if True do not raise errors but just log
 
         Returns:
         raw result of the query
         """
-        headers = {}
-        if mimeType:
-            headers["Accept"] = mimeType
 
-        headers["Content-Type"] = content_type
+        @self.rate_limiter.rate_limited
+        def execute_query():
+            headers = {}
+            if mimeType:
+                headers["Accept"] = mimeType
 
-        endpoint = endpointConf.endpoint
-        method = endpointConf.method
+            endpoint = endpointConf.endpoint
+            method = endpointConf.method.upper()
 
-        if method.upper() == 'POST':
-            # For POST, send the query in the body
-            data = query
-            params = {"format": resultFormat}
-        else:
-            # For GET, keep the query in params
-            data = None
-            params = {"query": query, "format": resultFormat}
+            if method == "POST":
+                headers["Content-Type"] = "application/x-www-form-urlencoded"
+                data = urllib.parse.urlencode({"query": query, "format": resultFormat})
+                params = None
+            else:
+                headers["Content-Type"] = content_type
+                params = {"query": query, "format": resultFormat}
+                data = None
 
-        response = requests.request(
-            method,
-            endpoint,
-            headers=headers,
-            data=data,
-            params=params,
-            timeout=timeout,
-        )
-        return response.text
+            try:
+                response = requests.request(
+                    method,
+                    endpoint,
+                    headers=headers,
+                    data=data,
+                    params=params,
+                    timeout=timeout,
+                )
+
+                # Check for HTTP errors
+                response.raise_for_status()
+
+                # Handle different response content types
+                if "application/json" in response.headers.get("Content-Type", ""):
+                    return response.json()  # Return JSON if applicable
+                else:
+                    return response.text  # Fallback to plain text
+
+            except requests.exceptions.RequestException as e:
+                # Log or handle the error as needed
+                err_msg = f"An error occurred while querying the endpoint: {e}"
+                # Attempt to retrieve response content if available
+                if hasattr(e, "response") and e.response is not None:
+                    error_content = e.response.content.decode("utf-8", errors="replace")
+                    err_msg += f"\nResponse content: {error_content}"
+
+                if lenient:
+                    logging.error(err_msg)
+                    return None
+                else:
+                    raise RuntimeError(err_msg)
+        return execute_query()
 
 
 def mainSQL(argv=None):
@@ -345,7 +387,8 @@ USAGE
         args = parser.parse_args(argv)
         if lang is not None:
             args.language = lang
-        QueryMain.main(args)
+        query_main = QueryMain(args)
+        query_main.work()
 
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###

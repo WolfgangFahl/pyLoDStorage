@@ -3,6 +3,7 @@ Created on 2024-01-21
 
 @author: wf
 """
+
 import json
 from dataclasses import field
 from datetime import date, datetime

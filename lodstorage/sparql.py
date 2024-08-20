@@ -3,10 +3,9 @@ Created on 2020-08-14
 
 @author: wf
 """
+
 import datetime
-from functools import wraps
 import time
-from ratelimit import limits, sleep_and_retry
 from sys import stderr
 from typing import Union
 
@@ -15,16 +14,8 @@ from SPARQLWrapper.Wrapper import BASIC, DIGEST, POST, POSTDIRECTLY
 
 from lodstorage.lod import LOD
 from lodstorage.params import Params
+from lodstorage.rate_limiter import RateLimiter
 
-def rate_limited(f):
-    @wraps(f)
-    def wrapper(self, *args, **kwargs):
-        @sleep_and_retry
-        @limits(calls=self.calls_per_minute, period=60)
-        def rate_limited_function():
-            return f(self, *args, **kwargs)
-        return rate_limited_function()
-    return wrapper
 
 class SPARQL(object):
     """
@@ -49,7 +40,7 @@ class SPARQL(object):
         profile=False,
         agent="PyLodStorage",
         method="POST",
-        calls_per_minute:int=None
+        calls_per_minute: int = None,
     ):
         """
         Construct a SPARQL wrapper
@@ -74,9 +65,7 @@ class SPARQL(object):
         self.sparql = SPARQLWrapper2(url)
         self.method = method
         self.sparql.agent = agent
-        if calls_per_minute is None:
-            calls_per_minute=6000000
-        self.calls_per_minute=calls_per_minute
+        self.rate_limiter = RateLimiter(calls_per_minute=calls_per_minute)
 
     @classmethod
     def fromEndpointConf(cls, endpointConf) -> "SPARQL":
@@ -89,7 +78,7 @@ class SPARQL(object):
         sparql = SPARQL(
             url=endpointConf.endpoint,
             method=endpointConf.method,
-            calls_per_minute=endpointConf.calls_per_minute
+            calls_per_minute=endpointConf.calls_per_minute,
         )
         if hasattr(endpointConf, "auth"):
             authMethod = None
@@ -115,9 +104,11 @@ class SPARQL(object):
         self.sparql.setHTTPAuth(method)
         self.sparql.setCredentials(username, password)
 
-    def test_query(self,
-        query:str="SELECT * WHERE { ?s ?p ?o } LIMIT 1",
-        expected_bindings:int=1)->Exception:
+    def test_query(
+        self,
+        query: str = "SELECT * WHERE { ?s ?p ?o } LIMIT 1",
+        expected_bindings: int = 1,
+    ) -> Exception:
         """
         Check if the SPARQL endpoint is available using a standard SPARQL query.
 
@@ -127,17 +118,18 @@ class SPARQL(object):
         Returns:
             Exception if the endpoint fails
         """
-        result=None
+        result = None
         try:
             query_result = self.rawQuery(query, method=self.method)
-            bindings=query_result.bindings
-            if not len(bindings)==expected_bindings:
-                raise Exception(f"SPARQL query {query} returned {len(bindings)} bindings instead of {expected_bindings}")
+            bindings = query_result.bindings
+            if not len(bindings) == expected_bindings:
+                raise Exception(
+                    f"SPARQL query {query} returned {len(bindings)} bindings instead of {expected_bindings}"
+                )
         except Exception as ex:
-            result=ex
+            result = ex
         return result
 
-    @rate_limited
     def rawQuery(self, queryString, method=POST):
         """
         query with the given query string
@@ -148,10 +140,15 @@ class SPARQL(object):
         Returns:
             list: the raw query result as bindings
         """
-        queryString = self.fix_comments(queryString)
-        self.sparql.setQuery(queryString)
-        self.sparql.method = method
-        return self.sparql.query()
+        # Wrap the actual query in a rate-limited function
+        @self.rate_limiter.rate_limited
+        def execute_query():
+            queryString = self.fix_comments(queryString)
+            self.sparql.setQuery(queryString)
+            self.sparql.method = method
+            return self.sparql.query()
+
+        return execute_query()
 
     def fix_comments(self, query_string: str) -> str:
         """
@@ -466,9 +463,11 @@ class SPARQL(object):
         """
         escaped = "".join(
             [
-                c.encode("unicode_escape").decode("ascii")
-                if c in SPARQL.controlChars
-                else c
+                (
+                    c.encode("unicode_escape").decode("ascii")
+                    if c in SPARQL.controlChars
+                    else c
+                )
                 for c in s
             ]
         )
@@ -501,10 +500,11 @@ class SPARQL(object):
         return self.getResults(jsonResult)
 
     def queryAsListOfDicts(
-        self, queryString,
+        self,
+        queryString,
         fixNone: bool = False,
         sampleCount: int = None,
-        param_dict: dict = None
+        param_dict: dict = None,
     ):
         """
         Get a list of dicts for the given query (to allow round-trip results for insertListOfDicts)

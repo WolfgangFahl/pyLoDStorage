@@ -3,6 +3,7 @@ Created on 2024-03-16
 
 @author: wf
 """
+
 from typing import Any, Dict, List, Type
 
 from sqlmodel import Session, create_engine, select
@@ -134,7 +135,9 @@ class Cached:
             profile=self.debug,
         )
         query = qm.queriesByName[self.query_name]
-        self.lod = self.sparql.queryAsListOfDicts(query.query,param_dict=self.param_dict)
+        self.lod = self.sparql.queryAsListOfDicts(
+            query.query, param_dict=self.param_dict
+        )
         profiler.time()
         if self.debug:
             print(f"Found {len(self.lod)} records for {self.query_name}")

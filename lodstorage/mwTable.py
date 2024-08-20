@@ -3,6 +3,7 @@ Created on 2020-08-21
 
 @author: wf
 """
+
 # redudant copy
 # original is at
 # https://github.com/WolfgangFahl/py-3rdparty-mediawiki/blob/master/wikibot/mwTable.py

@@ -3,6 +3,7 @@ Created on 2024-01-27
 
 @author: wf, using ChatGPT-4 prompting
 """
+
 from collections.abc import Iterable, Mapping
 from dataclasses import fields
 from typing import Any

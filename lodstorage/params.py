@@ -3,6 +3,7 @@ Created on 2024-05-06
 
 @author: wf
 """
+
 import argparse
 import re
 from typing import Dict, Optional
@@ -79,7 +80,7 @@ class Params:
         Raises:
             Exception: If parameters are required but not provided.
         """
-        query=self.query
+        query = self.query
         if self.has_params:
             if not param_dict:
                 param_names = self.params
@@ -92,7 +93,7 @@ class Params:
                 raise Exception(msg)
             else:
                 self.set(param_dict)
-                query=self.apply_parameters()
+                query = self.apply_parameters()
         return query
 
 

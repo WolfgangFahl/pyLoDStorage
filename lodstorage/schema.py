@@ -3,6 +3,7 @@ Created on 2021-01-26
 
 @author: wf
 """
+
 from collections import Counter
 
 
@@ -113,13 +114,13 @@ class Schema(object):
         cols = ""
         delim = ""
         for col in general["columns"]:
-            col_name=col['name'].strip()
+            col_name = col["name"].strip()
             cols += f"{delim}{col_name}"
             delim = ","
         ddl = f"CREATE VIEW {name} AS\n"
         delim = ""
         for table in tableList:
-            table_name=table['name'].strip()
+            table_name = table["name"].strip()
             ddl += f"{delim}  SELECT {cols} FROM {table_name}"
             delim = "\nUNION\n"
         return ddl

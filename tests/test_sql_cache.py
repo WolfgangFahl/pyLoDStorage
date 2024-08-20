@@ -3,6 +3,7 @@ Created on 2024-03-21
 
 @author: wf
 """
+
 import os
 
 from sqlmodel import Field, SQLModel
@@ -48,7 +49,7 @@ class TestSqlCache(Basetest):
         query = self.qm.queriesByName["cities"]
         sparql = SPARQL(self.wikidata.endpoint)
         # try with Luxembourg
-        qlod = sparql.queryAsListOfDicts(query.query,param_dict={"country":"Q32"})
+        qlod = sparql.queryAsListOfDicts(query.query, param_dict={"country": "Q32"})
         if self.debug:
             print(f"found {len(qlod)} records")
             limit = 10
@@ -59,7 +60,7 @@ class TestSqlCache(Basetest):
             sparql,
             sql_db=self.sql_db,
             query_name="cities",
-            param_dict={"country":"Q32"},
+            param_dict={"country": "Q32"},
             max_errors=1,
             debug=self.debug,
         )

@@ -3,6 +3,7 @@ Created on 2020-08-29
 
 @author: wf
 """
+
 import os
 from enum import Enum
 from pathlib import Path

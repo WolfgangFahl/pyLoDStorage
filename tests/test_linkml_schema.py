@@ -3,6 +3,7 @@ Created on 2024-01-28
 
 @author: wf
 """
+
 import json
 
 from lodstorage.linkml import Schema

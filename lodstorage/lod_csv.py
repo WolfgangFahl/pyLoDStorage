@@ -37,7 +37,7 @@ class CSV(LOD):
         fields: list = None,
         delimiter=",",
         quoting=csv.QUOTE_NONNUMERIC,
-        **kwargs
+        **kwargs,
     ):
         """
         convert given csv string to list of dicts (LOD)
@@ -81,7 +81,7 @@ class CSV(LOD):
         excludeFields: list = None,
         delimiter=",",
         quoting=csv.QUOTE_NONNUMERIC,
-        **kwargs
+        **kwargs,
     ):
         """
         converts the given lod to CSV string.

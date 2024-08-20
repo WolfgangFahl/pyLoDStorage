@@ -3,6 +3,7 @@ Created on 2020-09-04
 
 @author: wf
 """
+
 from lodstorage.schema import Schema
 
 
@@ -141,7 +142,7 @@ hide Circle
                 if "link" in col:
                     colName = col["link"]
                 colUml = f"{indent} {mandatory}{colName} : {colType}{pk}\n"
-                classUml+=colUml
+                classUml += colUml
             tableName = table["name"]
             if "notes" in table:
                 uml += "Note top of %s\n%s\nEnd note\n" % (tableName, table["notes"])

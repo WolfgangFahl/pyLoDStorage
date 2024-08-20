@@ -3,6 +3,7 @@ Created on 2020-07-05
 
 @author: wf
 """
+
 import unittest
 
 from lodstorage.plot import Plot

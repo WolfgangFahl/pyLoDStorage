@@ -3,6 +3,7 @@ Created on 2024-01-21
 
 @author: wf
 """
+
 from rdflib.namespace import XSD
 
 from lodstorage.linkml_gen import LinkMLGen, Schema
