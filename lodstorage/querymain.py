@@ -91,7 +91,7 @@ class QueryMain:
 
         if queryCode:
             params = Params(query.query)
-            params.apply_parameters_with_check(args.params)
+            query.query=params.apply_parameters_with_check(args.params)
             queryCode = query.query
             if debug or args.showQuery:
                 print(f"{args.language}:\n{query.query}")
@@ -159,33 +159,49 @@ class QueryMain:
                 raise Exception(f"format {args.format} not supported yet")
 
     @staticmethod
-    def rawQuery(endpointConf, query, resultFormat, mimeType, timeout: float = 10.0):
+    def rawQuery(endpointConf,
+                 query: str,
+                 resultFormat: str,
+                 mimeType: str,
+                 content_type: str = "application/sparql-query",
+                 timeout: float = 10.0):
         """
         returns raw result of the endpoint
 
         Args:
-            endpointConf: EndPoint
-            query(str): query
-            resultFormat(str): format of the result
-            mimeType(str): mimeType
-            timoeout(float): timeout in seconds
+        endpointConf: EndPoint
+        query (str): query
+        resultFormat (str): format of the result
+        mimeType (str): mimeType
+        content_type (str): content type of the request
+        timeout (float): timeout in seconds
 
         Returns:
-            raw result of the query
+        raw result of the query
         """
-        params = {"query": query, "format": resultFormat}
-        payload = {}
+        headers = {}
         if mimeType:
-            headers = {"Accept": mimeType}
-        else:
-            headers = {}
+            headers["Accept"] = mimeType
+
+        headers["Content-Type"] = content_type
+
         endpoint = endpointConf.endpoint
         method = endpointConf.method
+
+        if method.upper() == 'POST':
+            # For POST, send the query in the body
+            data = query
+            params = {"format": resultFormat}
+        else:
+            # For GET, keep the query in params
+            data = None
+            params = {"query": query, "format": resultFormat}
+
         response = requests.request(
             method,
             endpoint,
             headers=headers,
-            data=payload,
+            data=data,
             params=params,
             timeout=timeout,
         )

@@ -185,7 +185,7 @@ class TestQueries(Basetest):
                 "-qn",
                 "cities",
                 "--params",
-                "country=Q183",
+                "country=Q32",
                 "-p",
                 "-l",
                 "sparql",
@@ -201,7 +201,7 @@ class TestQueries(Basetest):
                 if showResult:
                     print(result)
                 self.assertTrue(
-                    "Arnis" in result, f"{endpointName}: Arnis not in query result"
+                    "Dudelange" in result, f"{endpointName}: Dudelange not in query result"
                 )
             elif showServerDown:
                 print(f"{endpointName} returns 503 Service Unavailable")
