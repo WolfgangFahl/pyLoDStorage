@@ -197,58 +197,54 @@ class QueryMain:
         raw result of the query
         """
 
-        @self.rate_limiter.rate_limited
-        def execute_query():
-            headers = {}
-            if mimeType:
-                headers["Accept"] = mimeType
+        headers = {}
+        if mimeType:
+            headers["Accept"] = mimeType
 
-            endpoint = endpointConf.endpoint
-            method = endpointConf.method.upper()
+        endpoint = endpointConf.endpoint
+        method = endpointConf.method.upper()
 
-            if method == "POST":
-                headers["Content-Type"] = "application/x-www-form-urlencoded"
-                data = urllib.parse.urlencode({"query": query, "format": resultFormat})
-                params = None
+        if method == "POST":
+            headers["Content-Type"] = "application/x-www-form-urlencoded"
+            data = urllib.parse.urlencode({"query": query, "format": resultFormat})
+            params = None
+        else:
+            headers["Content-Type"] = content_type
+            params = {"query": query, "format": resultFormat}
+            data = None
+
+        try:
+            response = requests.request(
+                method,
+                endpoint,
+                headers=headers,
+                data=data,
+                params=params,
+                timeout=timeout,
+            )
+
+            # Check for HTTP errors
+            response.raise_for_status()
+
+            # Handle different response content types
+            if "application/json" in response.headers.get("Content-Type", ""):
+                return response.json()  # Return JSON if applicable
             else:
-                headers["Content-Type"] = content_type
-                params = {"query": query, "format": resultFormat}
-                data = None
+                return response.text  # Fallback to plain text
 
-            try:
-                response = requests.request(
-                    method,
-                    endpoint,
-                    headers=headers,
-                    data=data,
-                    params=params,
-                    timeout=timeout,
-                )
+        except requests.exceptions.RequestException as e:
+            # Log or handle the error as needed
+            err_msg = f"An error occurred while querying the endpoint: {e}"
+            # Attempt to retrieve response content if available
+            if hasattr(e, "response") and e.response is not None:
+                error_content = e.response.content.decode("utf-8", errors="replace")
+                err_msg += f"\nResponse content: {error_content}"
 
-                # Check for HTTP errors
-                response.raise_for_status()
-
-                # Handle different response content types
-                if "application/json" in response.headers.get("Content-Type", ""):
-                    return response.json()  # Return JSON if applicable
-                else:
-                    return response.text  # Fallback to plain text
-
-            except requests.exceptions.RequestException as e:
-                # Log or handle the error as needed
-                err_msg = f"An error occurred while querying the endpoint: {e}"
-                # Attempt to retrieve response content if available
-                if hasattr(e, "response") and e.response is not None:
-                    error_content = e.response.content.decode("utf-8", errors="replace")
-                    err_msg += f"\nResponse content: {error_content}"
-
-                if lenient:
-                    logging.error(err_msg)
-                    return None
-                else:
-                    raise RuntimeError(err_msg)
-        return execute_query()
-
+            if lenient:
+                logging.error(err_msg)
+                return None
+            else:
+                raise RuntimeError(err_msg)
 
 def mainSQL(argv=None):
     """

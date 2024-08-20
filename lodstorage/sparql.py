@@ -140,15 +140,11 @@ class SPARQL(object):
         Returns:
             list: the raw query result as bindings
         """
-        # Wrap the actual query in a rate-limited function
-        @self.rate_limiter.rate_limited
-        def execute_query():
-            queryString = self.fix_comments(queryString)
-            self.sparql.setQuery(queryString)
-            self.sparql.method = method
-            return self.sparql.query()
+        queryString = self.fix_comments(queryString)
+        self.sparql.setQuery(queryString)
+        self.sparql.method = method
+        return self.sparql.query()
 
-        return execute_query()
 
     def fix_comments(self, query_string: str) -> str:
         """
