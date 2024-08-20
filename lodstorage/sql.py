@@ -6,7 +6,6 @@ Created on 2020-08-24
 
 import datetime
 import io
-import logging
 import re
 
 # python standard library
@@ -15,6 +14,7 @@ import sys
 import time
 
 from lodstorage.lod import LOD
+from lodstorage.sqlite_api import SQLiteApiFixer
 
 
 class SQLDB(object):
@@ -52,6 +52,7 @@ class SQLDB(object):
         self.dbname = dbname
         self.debug = debug
         self.errorDebug = errorDebug
+        SQLiteApiFixer.install(lenient=debug)
         if connection is None:
             self.c = sqlite3.connect(
                 dbname,
@@ -652,183 +653,3 @@ class EntityInfo(object):
                     dt = datetime.datetime.strptime(record[key], "%Y-%m-%d")
                     dateValue = dt.date()
                     record[key] = dateValue
-
-
-# sqlite2 adapters as needed as of python 3.12
-def adapt_date_iso(val: datetime.date):
-    """Adapt datetime.date to ISO 8601 date."""
-    return val.isoformat()
-
-
-def adapt_datetime_iso(val: datetime.datetime):
-    """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
-    return val.isoformat()
-
-
-def adapt_datetime_epoch(val: datetime.datetime):
-    """Adapt datetime.datetime to Unix timestamp."""
-    return float(val.timestamp()) * 10**6
-
-
-def adapt_boolean(val: bool):
-    """Adapt boolean to int"""
-    return 1 if val else 0
-
-
-sqlite3.register_adapter(datetime.date, adapt_date_iso)
-sqlite3.register_adapter(datetime.datetime, adapt_datetime_iso)
-# alternative way of storing datetimes
-# sqlite3.register_adapter(datetime.datetime, adapt_datetime_epoch)
-sqlite3.register_adapter(bool, adapt_boolean)
-
-
-class DatetimeAdapter:
-    """Singleton class for converting date and time formats with optional lenient error handling.
-
-    Attributes:
-        lenient (bool): Whether to handle conversion errors leniently, returning None and logging a warning.
-    """
-
-    _instance = None
-
-    def __new__(cls, lenient: bool = False):
-        """Ensure only one instance of the adapter exists.
-
-        Args:
-            lenient (bool): If True, the adapter will not raise exceptions on conversion failures.
-
-        Returns:
-            DatetimeAdapter: The singleton instance of the adapter.
-        """
-        if cls._instance is None:
-            cls._instance = super(DatetimeAdapter, cls).__new__(cls)
-            cls._instance.lenient = lenient
-        return cls._instance
-
-    def _handle_input(self, val: bytes) -> str:
-        """Validate and decode the input bytes into string.
-
-        Args:
-            val (bytes): The bytes input to validate and decode.
-
-        Returns:
-            str: The decoded string from bytes.
-
-        Raises:
-            TypeError: If the input is not bytes.
-        """
-        if not isinstance(val, bytes):
-            raise TypeError("Input must be a byte string.")
-        return val.decode()
-
-    def _handle_error(self, error: Exception, val: bytes):
-        """Handle errors based on the lenient mode.
-
-        Args:
-            error (Exception): The exception that was raised.
-            val (bytes): The input value that caused the error.
-
-        Returns:
-            None: If lenient mode is True and an error occurs.
-
-        Raises:
-            Exception: If lenient mode is False and an error occurs.
-        """
-        if self.lenient:
-            logging.warning(f"Failed to convert {val}: {error}")
-            return None
-        else:
-            raise error
-
-    def convert_date(self, val: bytes) -> datetime.date:
-        """Convert ISO 8601 date byte string to a datetime.date object.
-
-        Args:
-            val (bytes): The ISO 8601 date string in bytes.
-
-        Returns:
-            datetime.date: The converted date object.
-        """
-        try:
-            decoded_date = self._handle_input(val)
-            return datetime.date.fromisoformat(decoded_date)
-        except Exception as e:
-            return self._handle_error(e, val)
-
-    def convert_datetime(self, val: bytes) -> datetime.datetime:
-        """Convert ISO 8601 datetime byte string to a datetime.datetime object.
-
-        Args:
-            val (bytes): The ISO 8601 datetime string in bytes.
-
-        Returns:
-            datetime.datetime: The converted datetime object.
-        """
-        try:
-            decoded_datetime = self._handle_input(val)
-            return datetime.datetime.fromisoformat(decoded_datetime)
-        except Exception as e:
-            return self._handle_error(e, val)
-
-    def convert_timestamp(self, val: bytes) -> datetime.datetime:
-        """Convert Unix epoch timestamp byte string to a datetime.datetime object.
-
-        Args:
-            val (bytes): The Unix epoch timestamp in bytes.
-
-        Returns:
-            datetime.datetime: The converted datetime object.
-        """
-        try:
-            decoded_string = self._handle_input(val)
-            timestamp_float = float(decoded_string) / 10**6
-            return datetime.datetime.fromtimestamp(timestamp_float)
-        except ValueError as _ve:
-            try:
-                # If not, try to parse it as a datetime string
-                dt = datetime.datetime.fromisoformat(decoded_string)
-                return dt
-            except Exception as e:
-                return self._handle_error(e, val)
-        except Exception as e:
-            return self._handle_error(e, val)
-
-    def set_lenient(self, lenient: bool):
-        """Set the lenient mode of the adapter.
-
-        Args:
-            lenient (bool): True to enable lenient mode, False to disable it.
-        """
-        self.lenient = lenient
-
-
-# Usage Functions
-def convert_date(val: bytes) -> datetime.date:
-    """Convert byte string to date using the DatetimeAdapter."""
-    adapter = DatetimeAdapter()
-    return adapter.convert_date(val)
-
-
-def convert_datetime(val: bytes) -> datetime.datetime:
-    """Convert byte string to datetime using the DatetimeAdapter."""
-    adapter = DatetimeAdapter()
-    return adapter.convert_datetime(val)
-
-
-def convert_timestamp(val: bytes) -> datetime.datetime:
-    """Convert byte string to timestamp using the DatetimeAdapter."""
-    adapter = DatetimeAdapter()
-    return adapter.convert_timestamp(val)
-
-
-def convert_boolean(val: bytes):
-    """
-    Convert 0 or 1 to boolean
-    """
-    return True if int(val) == 1 else False
-
-
-sqlite3.register_converter("date", convert_date)
-sqlite3.register_converter("datetime", convert_datetime)
-sqlite3.register_converter("timestamp", convert_timestamp)
-sqlite3.register_converter("boolean", convert_boolean)

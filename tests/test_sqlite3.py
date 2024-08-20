@@ -13,7 +13,8 @@ from io import StringIO
 
 from lodstorage.sample import Sample
 from lodstorage.schema import Schema
-from lodstorage.sql import SQLDB, DatetimeAdapter, EntityInfo, convert_timestamp
+from lodstorage.sql import SQLDB, EntityInfo
+from lodstorage.sqlite_api import SQLiteApiFixer
 from lodstorage.uml import UML
 from tests.basetest import Basetest
 
@@ -466,33 +467,31 @@ record  #3={'name': 'John Doe'}"""
 
         https://github.com/WolfgangFahl/pyLoDStorage/issues/55
         datetime handling sqlite error should lead to warning and not raise an exception
-
         """
+        # Initialize the SQLiteApiFixer singleton
+        SQLiteApiFixer.install(lenient=True)
+
         log_stream = StringIO()
         handler = logging.StreamHandler(log_stream)
         logger = logging.getLogger()
         logger.addHandler(handler)
         logger.setLevel(logging.WARNING)
-        _dta = DatetimeAdapter(lenient=True)
+
         examples = [
             (b"not-a-timestamp", None),
-            (
-                b"725811479000000",
-                datetime.fromtimestamp(725811479),
-            ),  # Correct microseconds to seconds
+            (b"725811479000000", datetime.fromtimestamp(725811479)),  # Correct microseconds to seconds
             (b"1995-04-07 00:00:00", datetime(1995, 4, 7, 0, 0)),
         ]
 
         for val, expected in examples:
             with self.subTest(val=val):
-                result = convert_timestamp(val)
+                result = SQLiteApiFixer._instance.adapter.convert_timestamp(val)  # Use the correct method from the singleton
                 if expected is None:
                     self.assertIsNone(
                         result, "Expected None for invalid timestamp input"
                     )
                     # Check if the expected log message is in log_stream
-                    log_content=log_stream.getvalue()
-
+                    log_content = log_stream.getvalue()
                     self.assertIn("Failed to convert", log_content)
                     # Clear log stream after checking
                     log_stream.truncate(0)
@@ -503,10 +502,11 @@ record  #3={'name': 'John Doe'}"""
                         expected,
                         f"Expected correct datetime conversion for {val}",
                     )
+
         # Remove the handler after the test to clean up
         logger.removeHandler(handler)
         log_stream.close()
-        DatetimeAdapter._instance=None
+
 
     def testMultipleAdapters(self):
         """
