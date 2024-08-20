@@ -4,7 +4,9 @@ Created on 2020-08-14
 @author: wf
 """
 import datetime
+from functools import wraps
 import time
+from ratelimit import limits, sleep_and_retry
 from sys import stderr
 from typing import Union
 
@@ -13,6 +15,16 @@ from SPARQLWrapper.Wrapper import BASIC, DIGEST, POST, POSTDIRECTLY
 
 from lodstorage.lod import LOD
 from lodstorage.params import Params
+
+def rate_limited(f):
+    @wraps(f)
+    def wrapper(self, *args, **kwargs):
+        @sleep_and_retry
+        @limits(calls=self.calls_per_minute, period=60)
+        def rate_limited_function():
+            return f(self, *args, **kwargs)
+        return rate_limited_function()
+    return wrapper
 
 class SPARQL(object):
     """
@@ -37,18 +49,19 @@ class SPARQL(object):
         profile=False,
         agent="PyLodStorage",
         method="POST",
+        calls_per_minute:int=None
     ):
         """
-        Constructor a SPARQL wrapper
+        Construct a SPARQL wrapper
 
         Args:
-            url(string): the base URL of the endpoint - the mode query/update is going to be appended
-            mode(string): 'query' or 'update'
-            debug(bool): True if debugging is to be activated
-            typedLiterals(bool): True if INSERT should be done with typedLiterals
-            profile(boolean): True if profiling / timing information should be displayed
-            agent(string): the User agent to use
-            method(string): the HTTP method to be used 'POST' or 'GET'
+            url (string): the base URL of the endpoint - the mode query/update is going to be appended
+            mode (string): 'query' or 'update'
+            debug (bool): True if debugging is to be activated
+            typedLiterals (bool): True if INSERT should be done with typedLiterals
+            profile (boolean): True if profiling / timing information should be displayed
+            agent (string): the User agent to use
+            method (string): the HTTP method to be used 'POST' or 'GET'
         """
         if isFuseki:
             self.url = f"{url}/{mode}"
@@ -61,6 +74,9 @@ class SPARQL(object):
         self.sparql = SPARQLWrapper2(url)
         self.method = method
         self.sparql.agent = agent
+        if calls_per_minute is None:
+            calls_per_minute=6000000
+        self.calls_per_minute=calls_per_minute
 
     @classmethod
     def fromEndpointConf(cls, endpointConf) -> "SPARQL":
@@ -70,7 +86,11 @@ class SPARQL(object):
         Args:
             endpointConf (Endpoint): the endpoint configuration to be used
         """
-        sparql = SPARQL(url=endpointConf.endpoint, method=endpointConf.method)
+        sparql = SPARQL(
+            url=endpointConf.endpoint,
+            method=endpointConf.method,
+            calls_per_minute=endpointConf.calls_per_minute
+        )
         if hasattr(endpointConf, "auth"):
             authMethod = None
             if endpointConf.auth == "BASIC":
@@ -117,6 +137,7 @@ class SPARQL(object):
             result=ex
         return result
 
+    @rate_limited
     def rawQuery(self, queryString, method=POST):
         """
         query with the given query string
@@ -130,8 +151,7 @@ class SPARQL(object):
         queryString = self.fix_comments(queryString)
         self.sparql.setQuery(queryString)
         self.sparql.method = method
-        queryResult = self.sparql.query()
-        return queryResult
+        return self.sparql.query()
 
     def fix_comments(self, query_string: str) -> str:
         """

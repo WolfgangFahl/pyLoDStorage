@@ -692,6 +692,10 @@ class EndpointManager(object):
                     if select:
                         endpoint = Endpoint()
                         endpoint.fromDict({"name": name, **record})
+                        default_none_attrs=["website","calls_per_minute"]
+                        for attr in default_none_attrs:
+                            if not hasattr(endpoint,attr):
+                                setattr(endpoint,attr,None)
                         endpoints[name] = endpoint
         return endpoints
 
@@ -723,6 +727,7 @@ class Endpoint(JSONAble):
                 "website": "https://query.wikidata.org/",
                 "database": "blazegraph",
                 "method": "POST",
+                "calls_per_minute": 30,
                 "prefixes": "PREFIX bd: <http://www.bigdata.com/rdf#>\nPREFIX cc: <http://creativecommons.org/ns#>",
             },
             {

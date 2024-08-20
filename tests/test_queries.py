@@ -321,6 +321,19 @@ class TestQueries(Basetest):
                 if debug:
                     print(result)
 
+    def test_issue130_rate_limit_support(self):
+        """
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/130
+        """
+        debug=self.debug
+        #debug=True
+        endpoints = EndpointManager.getEndpoints(lang="sparql")
+        for ep_name,ep in endpoints.items():
+            if ep.calls_per_minute is not None:
+                if debug:
+                    print(f"{ep_name}: {ep.calls_per_minute} calls per min")
+                self.assertTrue(ep.calls_per_minute>1 and ep.calls_per_minute<60)
+
     def testCommandLineUsage(self):
         """
         test the command line usage

@@ -5,6 +5,7 @@
   endpoint: https://query.wikidata.org/sparql
   website: https://query.wikidata.org
   database: blazegraph
+  calls_per_minute: 30
   method: POST
   prefixes: |
     PREFIX bd: <http://www.bigdata.com/rdf#>
