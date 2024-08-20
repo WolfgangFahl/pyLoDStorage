@@ -9,7 +9,7 @@ import json
 import os
 from contextlib import redirect_stdout
 
-import tests.testSqlite3
+import tests.test_sqlite3
 from lodstorage.query import (
     EndpointManager,
     Format,
@@ -36,7 +36,7 @@ class TestQueries(Basetest):
         show = self.debug
         qm = QueryManager(lang="sql", debug=False)
         self.assertTrue(len(qm.queriesByName) >= 2)
-        sqlDB = tests.testSqlite3.TestSQLDB.getSampleTableDB()
+        sqlDB = tests.test_sqlite3.TestSQLDB.getSampleTableDB()
         # print(sqlDB.getTableDict())
         for _name, query in qm.queriesByName.items():
             listOfDicts = sqlDB.query(query.query)

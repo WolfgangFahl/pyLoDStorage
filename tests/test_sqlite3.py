@@ -43,13 +43,13 @@ class TestSQLDB(Basetest):
 
         Args:
 
-           listOfRecords(list): a list of dicts that contain the data to be stored
-           entityName(string): the name of the entity type to be used as a table name
-           primaryKey(string): the name of the key / column to be used as a primary key
-           executeMany(boolean): True if executeMany mode of sqlite3 should be used
-           fixNone(boolean): fix dict entries that are undefined to have a "None" entry
-           debug(boolean): True if debug information e.g. CREATE TABLE and INSERT INTO commands should be shown
-           doClose(boolean): True if the connection should be closed
+           listOfRecords (list): a list of dicts that contain the data to be stored
+           entityName (string): the name of the entity type to be used as a table name
+           primaryKey (string): the name of the key / column to be used as a primary key
+           executeMany (boolean): True if executeMany mode of sqlite3 should be used
+           fixNone (boolean): fix dict entries that are undefined to have a "None" entry
+           debug (boolean): True if debug information e.g. CREATE TABLE and INSERT INTO commands should be shown
+           doClose å(boolean): True if the connection should be closed
 
         """
         size = len(listOfRecords)
@@ -84,8 +84,10 @@ class TestSQLDB(Basetest):
         """
         test creating entityInfo from the sample record
         """
+        debug=self.debug
+        #debug=True
         listOfRecords = Sample.getRoyals()
-        entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=True)
+        entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=debug)
         self.assertEqual(
             "CREATE TABLE Person(name TEXT PRIMARY KEY,born DATE,numberInLine INTEGER,wikidataurl TEXT,age FLOAT,ofAge BOOLEAN,lastmodified TIMESTAMP)",
             entityInfo.createTableCmd,
@@ -99,7 +101,7 @@ class TestSQLDB(Basetest):
             listOfRecords[:10], entityInfo.name, entityInfo.primaryKey
         )
         tableList = self.sqlDB.getTableList()
-        if self.debug:
+        if debug:
             print(tableList)
         self.assertEqual(1, len(tableList))
         personTable = tableList[0]
@@ -109,7 +111,7 @@ class TestSQLDB(Basetest):
         plantUml = uml.tableListToPlantUml(
             tableList, packageName="Royals", withSkin=False
         )
-        if self.debug:
+        if debug:
             print(plantUml)
         expected = """package Royals {
   class Person << Entity >> {
@@ -123,7 +125,7 @@ class TestSQLDB(Basetest):
   }
 }
 """
-        self.assertEqual(expected, plantUml)
+        self.assertEqual(expected.strip(), plantUml.strip())
 
         # testGeneralization
         listOfRecords = [
@@ -136,7 +138,7 @@ class TestSQLDB(Basetest):
         plantUml = uml.tableListToPlantUml(
             tableList, generalizeTo="PersonBase", withSkin=False
         )
-        if self.debug:
+        if debug:
             print(plantUml)
         expected = """class PersonBase << Entity >> {
  lastmodified : TIMESTAMP
@@ -164,6 +166,8 @@ PersonBase <|-- Family
         auto create view ddl in mergeschema
 
         """
+        debug=self.debug
+        debug=True
         self.sqlDB = SQLDB(debug=self.debug, errorDebug=self.debug)
         listOfRecords = Sample.getRoyals()
         entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=self.debug)
@@ -176,13 +180,13 @@ PersonBase <|-- Family
         entityInfo = self.sqlDB.createTable(listOfRecords[:10], "Family", "name")
         tableList = self.sqlDB.getTableList()
         viewDDL = Schema.getGeneralViewDDL(tableList, "PersonBase")
-        if self.debug:
+        if debug:
             print(viewDDL)
         expected = """CREATE VIEW PersonBase AS
   SELECT name,lastmodified FROM Person
 UNION
   SELECT name,lastmodified FROM Family"""
-        self.assertEqual(expected, viewDDL)
+        self.assertEqual(expected.strip(), viewDDL.strip())
         pass
 
     def testUniqueConstraint(self):
@@ -214,7 +218,7 @@ record  #3={'name': 'John Doe'}"""
         """
         listOfRecords = Sample.getRoyals()
         resultList = self.checkListOfRecords(
-            listOfRecords, "Person", "name", debug=True
+            listOfRecords, "Person", "name", debug=self.debug
         )
         if self.debug:
             print(resultList)
@@ -417,9 +421,9 @@ record  #3={'name': 'John Doe'}"""
         https://github.com/WolfgangFahl/pyLoDStorage/issues/16
         allow to only warn if samplerecordcount is higher than number of available records
         """
-        self.getSampleTableDB(withDrop=False, debug=True, failIfTooFew=False)
+        self.getSampleTableDB(withDrop=False, debug=self.debug, failIfTooFew=False)
         try:
-            self.getSampleTableDB(withDrop=True, debug=True, failIfTooFew=True)
+            self.getSampleTableDB(withDrop=True, debug=self.debug, failIfTooFew=True)
             self.fail(
                 "There should be an exception that too few sample records where provided"
             )

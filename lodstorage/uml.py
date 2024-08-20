@@ -131,31 +131,21 @@ hide Circle
                 inherit += "%s%s <|-- %s\n" % (indent, generalizeTo, table["name"])
             tableList.insert(0, generalTable)
         for table in tableList:
-            colUml = ""
+            classUml = ""
             sortedColumns = sorted(table["columns"], key=lambda col: col["name"])
             for col in sortedColumns:
                 mandatory = "*" if col["notnull"] == 1 else ""
-                pk = "<<PK>>" if col["pk"] == 1 else ""
-                colName = col["name"]
-                colType = col["type"]
+                pk = " <<PK>>" if col["pk"] == 1 else ""
+                colName = col["name"].strip()
+                colType = col["type"].strip()
                 if "link" in col:
                     colName = col["link"]
-                colUml += "%s %s%s : %s %s\n" % (
-                    indent,
-                    mandatory,
-                    colName,
-                    colType,
-                    pk,
-                )
+                colUml = f"{indent} {mandatory}{colName} : {colType}{pk}\n"
+                classUml+=colUml
             tableName = table["name"]
             if "notes" in table:
                 uml += "Note top of %s\n%s\nEnd note\n" % (tableName, table["notes"])
-            uml += "%sclass %s << Entity >> {\n%s%s}\n" % (
-                indent,
-                tableName,
-                colUml,
-                indent,
-            )
+            uml += f"{indent}class {tableName} << Entity >> {{\n{classUml}{indent}}}\n"
         uml += inherit
         if packageName is not None:
             uml += "}\n"

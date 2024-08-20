@@ -106,18 +106,20 @@ class Schema(object):
 
         Args:
             tableList: the list of tables
-            name(str): the name of the view
-            debug(bool): True if debug should be set
+            name (str): the name of the view
+            debug (bool): True if debug should be set
         """
         general = Schema.getGeneral(tableList, name, debug)
         cols = ""
         delim = ""
         for col in general["columns"]:
-            cols += "%s%s" % (delim, col["name"])
+            col_name=col['name'].strip()
+            cols += f"{delim}{col_name}"
             delim = ","
-        ddl = "CREATE VIEW %s AS \n" % name
+        ddl = f"CREATE VIEW {name} AS\n"
         delim = ""
         for table in tableList:
-            ddl += "%s  SELECT %s FROM %s" % (delim, cols, table["name"])
+            table_name=table['name'].strip()
+            ddl += f"{delim}  SELECT {cols} FROM {table_name}"
             delim = "\nUNION\n"
         return ddl
