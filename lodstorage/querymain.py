@@ -129,7 +129,7 @@ class QueryMain:
                 if args.prefixes and endpointConf is not None:
                     queryCode = f"{endpointConf.prefixes}\n{queryCode}"
                 if args.raw:
-                    qres = cls.rawMyQuery(
+                    qres = cls.rawQuery(
                         endpointConf,
                         query=query.query,
                         resultFormat=args.format,

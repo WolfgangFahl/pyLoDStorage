@@ -62,6 +62,39 @@ class Params:
             query = re.sub(pattern, value, query)
         return query
 
+    def apply_parameters_with_check(self, param_dict: dict = None) -> str:
+        """
+        Apply parameters to the query string with parameter checking.
+
+        This method checks if the query requires parameters. If parameters are required
+        but not provided, it raises an exception with a descriptive message. If parameters
+        are provided, it applies them to the query.
+
+        Args:
+            param_dict (dict, optional): A dictionary of parameter names and values.
+
+        Returns:
+            str: The query string with parameters applied, if applicable.
+
+        Raises:
+            Exception: If parameters are required but not provided.
+        """
+        query=self.query
+        if self.has_params:
+            if not param_dict:
+                param_names = self.params
+                if len(param_names) > 3:
+                    displayed_params = ", ".join(param_names[:3]) + ", ..."
+                else:
+                    displayed_params = ", ".join(param_names)
+                plural_suffix = "s" if len(param_names) > 1 else ""
+                msg = f"Query needs {len(self.params)} parameter{plural_suffix}: {displayed_params}"
+                raise Exception(msg)
+            else:
+                self.set(param_dict)
+                query=self.apply_parameters()
+        return query
+
 
 class StoreDictKeyPair(argparse.Action):
     """

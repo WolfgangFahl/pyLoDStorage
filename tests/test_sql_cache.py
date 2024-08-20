@@ -47,7 +47,8 @@ class TestSqlCache(Basetest):
         """
         query = self.qm.queriesByName["cities"]
         sparql = SPARQL(self.wikidata.endpoint)
-        qlod = sparql.queryAsListOfDicts(query.query)
+        # try with Luxembourg
+        qlod = sparql.queryAsListOfDicts(query.query,param_dict={"country":"Q32"})
         if self.debug:
             print(f"found {len(qlod)} records")
             limit = 10

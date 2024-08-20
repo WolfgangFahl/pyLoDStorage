@@ -167,7 +167,7 @@ PersonBase <|-- Family
 
         """
         debug=self.debug
-        debug=True
+        #debug=True
         self.sqlDB = SQLDB(debug=self.debug, errorDebug=self.debug)
         listOfRecords = Sample.getRoyals()
         entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=self.debug)

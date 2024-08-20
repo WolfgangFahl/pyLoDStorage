@@ -12,7 +12,7 @@ from SPARQLWrapper import SPARQLWrapper2
 from SPARQLWrapper.Wrapper import BASIC, DIGEST, POST, POSTDIRECTLY
 
 from lodstorage.lod import LOD
-
+from lodstorage.params import Params
 
 class SPARQL(object):
     """
@@ -481,19 +481,26 @@ class SPARQL(object):
         return self.getResults(jsonResult)
 
     def queryAsListOfDicts(
-        self, queryString, fixNone: bool = False, sampleCount: int = None
+        self, queryString, fixNone: bool = False, sampleCount: int = None, param_dict: dict = None
     ):
         """
-        get a list of dicts for the given query (to allow round-trip results for insertListOfDicts)
+        Get a list of dicts for the given query (to allow round-trip results for insertListOfDicts)
 
         Args:
-            queryString(string): the SPARQL query to execute
-            fixNone(bool): if True add None values for empty columns in Dict
-            sampleCount(int): the number of samples to check
+            queryString (str): the SPARQL query to execute
+            fixNone (bool): if True add None values for empty columns in Dict
+            sampleCount (int): the number of samples to check
+            param_dict (dict): dictionary of parameter names and values to be applied to the query
 
         Returns:
-            list: a list ofDicts
+            list: a list of Dicts
+
+        Raises:
+            Exception: If the query requires parameters but they are not provided
         """
+        params = Params(queryString)
+        queryString = params.apply_parameters_with_check(param_dict)
+
         records = self.query(queryString, method=self.method)
         listOfDicts = self.asListOfDicts(
             records, fixNone=fixNone, sampleCount=sampleCount
