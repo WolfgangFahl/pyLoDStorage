@@ -479,13 +479,18 @@ record  #3={'name': 'John Doe'}"""
 
         examples = [
             (b"not-a-timestamp", None),
-            (b"725811479000000", datetime.fromtimestamp(725811479)),  # Correct microseconds to seconds
+            (
+                b"725811479000000",
+                datetime.fromtimestamp(725811479),
+            ),  # Correct microseconds to seconds
             (b"1995-04-07 00:00:00", datetime(1995, 4, 7, 0, 0)),
         ]
 
         for val, expected in examples:
             with self.subTest(val=val):
-                result = SQLiteApiFixer._instance.adapter.convert_timestamp(val)  # Use the correct method from the singleton
+                result = SQLiteApiFixer._instance.adapter.convert_timestamp(
+                    val
+                )  # Use the correct method from the singleton
                 if expected is None:
                     self.assertIsNone(
                         result, "Expected None for invalid timestamp input"
@@ -506,7 +511,6 @@ record  #3={'name': 'John Doe'}"""
         # Remove the handler after the test to clean up
         logger.removeHandler(handler)
         log_stream.close()
-
 
     def testMultipleAdapters(self):
         """

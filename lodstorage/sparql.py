@@ -145,7 +145,6 @@ class SPARQL(object):
         self.sparql.method = method
         return self.sparql.query()
 
-
     def fix_comments(self, query_string: str) -> str:
         """
         make sure broken SPARQLWrapper will find comments

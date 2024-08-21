@@ -6,10 +6,8 @@ Created on 2022-02-13
 
 import logging
 import urllib.parse
-from pathlib import Path
 
 from lodstorage.mysql import MySqlQuery
-from lodstorage.params import Params, StoreDictKeyPair
 from lodstorage.rate_limiter import RateLimiter
 from lodstorage.version import Version  # Use sqlq.py module for MySQL endpoints
 
@@ -19,7 +17,6 @@ __updated__ = Version.updated
 
 DEBUG = 0
 
-import json
 import os
 import re
 import sys
@@ -28,21 +25,18 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 import requests
 
-from lodstorage.lod_csv import CSV
 from lodstorage.query import (
     Endpoint,
     EndpointManager,
     Format,
-    Query,
-    QueryManager,
     ValueFormatter,
 )
+from lodstorage.query_cmd import QueryCmd
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
-from lodstorage.xml import Lod2Xml
 
 
-class QueryMain:
+class QueryMain(QueryCmd):
     """
     Commandline handler
     """
@@ -54,77 +48,35 @@ class QueryMain:
         Args:
             args(list): the command line arguments
         """
-        self.args = args
+        super().__init__(args=args)
         self.rate_limiter = RateLimiter(
             calls_per_minute=(
                 args.calls_per_minute if hasattr(args, "calls_per_minute") else None
             )
         )
 
-
-    def work(self):
+    def handle_args(self) -> bool:
         args = self.args
-        debug = args.debug
-        endpoints = EndpointManager.getEndpoints(args.endpointPath)
-        qm = QueryManager(lang=args.language, debug=debug, queriesPath=args.queriesPath)
-        query = None
-        queryCode = args.query
-        formats = None
-        # preload ValueFormatter
-        ValueFormatter.getFormats(args.formatsPath)
-        if args.list:
-            for name, query in qm.queriesByName.items():
-                print(f"{name}:{query.title}")
-        elif args.listEndpoints:
-            # list endpoints
-            for endpoint in endpoints.values():
-                if hasattr(endpoint, "lang") and endpoint.lang == args.language:
-                    print(endpoint)
+        handled = super().handle_args()
 
-        elif args.queryName is not None:
-            if debug or args.showQuery:
-                print(f"named query {args.queryName}:")
-            if args.queryName not in qm.queriesByName:
-                raise Exception(f"named query {args.queryName} not available")
-            query = qm.queriesByName[args.queryName]
-            if query.limit is None and args.limit is not None:
-                query.limit = args.limit
-            formats = query.formats
-            queryCode = query.query
-            if debug or args.showQuery:
-                if hasattr(query, "description") and query.description is not None:
-                    print(query.description)
-        if query is None:
-            name = "?"
-            if queryCode is None and args.queryFile is not None:
-                queryFilePath = Path(args.queryFile)
-                queryCode = queryFilePath.read_text()
-                name = queryFilePath.stem
-            query = Query(name="?", query=queryCode, lang=args.language)
-
-        if queryCode:
-            params = Params(query.query)
-            query.query = params.apply_parameters_with_check(args.params)
-            queryCode = query.query
-            if debug or args.showQuery:
-                print(f"{args.language}:\n{query.query}")
+        if self.queryCode:
             endpointConf = Endpoint()
             endpointConf.method = "POST"
             if args.endpointName:
-                endpointConf = endpoints.get(args.endpointName)
-                query.tryItUrl = endpointConf.website
-                query.database = endpointConf.database
+                endpointConf = self.endpoints.get(args.endpointName)
+                self.query.tryItUrl = endpointConf.website
+                self.query.database = endpointConf.database
             else:
-                endpointConf.endpoint = query.endpoint
+                endpointConf.endpoint = self.query.endpoint
             if args.method:
                 endpointConf.method = args.method
-            if query.limit:
-                if "limit" in queryCode or "LIMIT" in queryCode:
+            if self.query.limit:
+                if "limit" in self.queryCode or "LIMIT" in self.queryCode:
                     queryCode = re.sub(
-                        r"(limit|LIMIT)\s+(\d+)", f"LIMIT {query.limit}", queryCode
+                        r"(limit|LIMIT)\s+(\d+)", f"LIMIT {self.query.limit}", self.queryCode
                     )
                 else:
-                    queryCode += f"\nLIMIT {query.limit}"
+                    queryCode += f"\nLIMIT {self.query.limit}"
             if args.language == "sparql":
                 sparql = SPARQL.fromEndpointConf(endpointConf)
                 if args.prefixes and endpointConf is not None:
@@ -132,14 +84,14 @@ class QueryMain:
                 if args.raw:
                     qres = self.rawQuery(
                         endpointConf,
-                        query=query.query,
+                        query=self.query.query,
                         resultFormat=args.format,
                         mimeType=args.mimeType,
                     )
                     print(qres)
                     return
-                if "wikidata" in args.endpointName and formats is None:
-                    formats = ["*:wikidata"]
+                if "wikidata" in args.endpointName and self.formats is None:
+                    self.formats = ["*:wikidata"]
                 qlod = sparql.queryAsListOfDicts(queryCode)
             elif args.language == "sql":
                 if endpointConf.endpoint.startswith("jdbc:mysql"):
@@ -151,25 +103,9 @@ class QueryMain:
                     qlod = sqlDB.query(queryCode)
             else:
                 raise Exception(f"language {args.language} not known/supported")
-            if args.format is Format.csv:
-                csv = CSV.toCSV(qlod)
-                print(csv)
-            elif args.format in [Format.latex, Format.github, Format.mediawiki]:
-                doc = query.documentQueryResult(
-                    qlod, tablefmt=str(args.format), floatfmt=".0f"
-                )
-                docstr = doc.asText()
-                print(docstr)
-            elif args.format in [Format.json] or args.format is None:  # set as default
-                # https://stackoverflow.com/a/36142844/1497139
-                print(json.dumps(qlod, indent=2, sort_keys=True, default=str))
-            elif args.format in [Format.xml]:
-                lod2xml = Lod2Xml(qlod)
-                xml = lod2xml.asXml()
-                print(xml)
-
-            else:
-                raise Exception(f"format {args.format} not supported yet")
+            self.format_output(qlod)
+            handled=True
+        return handled
 
     def rawQuery(
         self,
@@ -246,6 +182,7 @@ class QueryMain:
             else:
                 raise RuntimeError(err_msg)
 
+
 def mainSQL(argv=None):
     """
     commandline for SQL queries
@@ -310,12 +247,8 @@ USAGE
             action="store_true",
             help="set debug [default: %(default)s]",
         )
-        parser.add_argument(
-            "-ep",
-            "--endpointPath",
-            default=None,
-            help="path to yaml file to configure endpoints to use for queries",
-        )
+        QueryCmd.add_args(parser)
+
         parser.add_argument(
             "-fp",
             "--formatsPath",
@@ -331,26 +264,6 @@ USAGE
         parser.add_argument("--method", help="method to be used for SPARQL queries")
         parser.add_argument("-f", "--format", type=Format, choices=list(Format))
         parser.add_argument(
-            "-li",
-            "--list",
-            action="store_true",
-            help="show the list of available queries",
-        )
-        parser.add_argument(
-            "--limit", type=int, default=None, help="set limit parameter of query"
-        )
-        parser.add_argument(
-            "--params",
-            action=StoreDictKeyPair,
-            help="query parameters as Key-value pairs in the format key1=value1,key2=value2",
-        )
-        parser.add_argument(
-            "-le",
-            "--listEndpoints",
-            action="store_true",
-            help="show the list of available endpoints",
-        )
-        parser.add_argument(
             "-m", "--mimeType", help="MIME-type to use for the raw query"
         )
         parser.add_argument(
@@ -359,15 +272,6 @@ USAGE
             action="store_true",
             help="add predefined prefixes for endpoint",
         )
-        parser.add_argument(
-            "-sq", "--showQuery", action="store_true", help="show the query"
-        )
-        parser.add_argument(
-            "-qp", "--queriesPath", help="path to YAML file with query definitions"
-        )
-        parser.add_argument("-q", "--query", help="the query to run")
-        parser.add_argument("-qf", "--queryFile", help="the query file to run")
-        parser.add_argument("-qn", "--queryName", help="run a named query")
         parser.add_argument(
             "-raw",
             action="store_true",
@@ -384,7 +288,7 @@ USAGE
         if lang is not None:
             args.language = lang
         query_main = QueryMain(args)
-        query_main.work()
+        query_main.handle_args()
 
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###

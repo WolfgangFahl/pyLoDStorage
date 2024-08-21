@@ -1,11 +1,13 @@
-'''
+"""
 Created on 2024-08-24
 
 @author: wf
-'''
-import sqlite3
+"""
+
 import datetime
 import logging
+import sqlite3
+
 
 class DatetimeAdapter:
     """Class for converting date and time formats with optional lenient error handling."""
@@ -65,6 +67,7 @@ class SQLiteApiFixer:
     Class to register SQLite adapters
     and converters using a DatetimeAdapter instance.
     """
+
     _instance = None  # Singleton instance
 
     def __init__(self, lenient: bool = True):
@@ -112,4 +115,3 @@ class SQLiteApiFixer:
     def convert_boolean(val: bytes):
         """Convert 0 or 1 to boolean."""
         return bool(int(val))
-

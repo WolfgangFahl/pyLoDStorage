@@ -179,7 +179,7 @@ class TestQueries(Basetest):
         ]
         showServerDown = True
         showResult = self.debug
-        showResult=True
+        showResult = True
         for testArg in testArgs:
             endpointName = testArg.get("en")
             args = [
@@ -529,10 +529,7 @@ class TestEndpoints(Basetest):
             if debug:
                 print(f"{i}:{name}")
             resultFormat = "json"
-            args = Namespace(
-                debug=debug,
-                calls_per_minute=endpoint.calls_per_minute
-            )
+            args = Namespace(debug=debug, calls_per_minute=endpoint.calls_per_minute)
 
             query_main = QueryMain(args)
 
