@@ -72,15 +72,15 @@ class QueryMain(QueryCmd):
                 endpointConf.method = args.method
             if self.query.limit:
                 if "limit" in self.queryCode or "LIMIT" in self.queryCode:
-                    queryCode = re.sub(
+                    self.queryCode = re.sub(
                         r"(limit|LIMIT)\s+(\d+)", f"LIMIT {self.query.limit}", self.queryCode
                     )
                 else:
-                    queryCode += f"\nLIMIT {self.query.limit}"
+                    self.queryCode += f"\nLIMIT {self.query.limit}"
             if args.language == "sparql":
                 sparql = SPARQL.fromEndpointConf(endpointConf)
                 if args.prefixes and endpointConf is not None:
-                    queryCode = f"{endpointConf.prefixes}\n{queryCode}"
+                    self.queryCode = f"{endpointConf.prefixes}\n{self.queryCode}"
                 if args.raw:
                     qres = self.rawQuery(
                         endpointConf,
