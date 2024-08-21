@@ -92,15 +92,15 @@ class QueryMain(QueryCmd):
                     return
                 if "wikidata" in args.endpointName and self.formats is None:
                     self.formats = ["*:wikidata"]
-                qlod = sparql.queryAsListOfDicts(queryCode)
+                qlod = sparql.queryAsListOfDicts(self.queryCode)
             elif args.language == "sql":
                 if endpointConf.endpoint.startswith("jdbc:mysql"):
                     query_tool = MySqlQuery(endpointConf, debug=args.debug)
-                    qlod = query_tool.execute_sql_query(queryCode)
+                    qlod = query_tool.execute_sql_query(self.queryCode)
                 else:
                     # Use existing SQLDB for other SQL endpoints
                     sqlDB = SQLDB(endpointConf.endpoint)
-                    qlod = sqlDB.query(queryCode)
+                    qlod = sqlDB.query(self.queryCode)
             else:
                 raise Exception(f"language {args.language} not known/supported")
             self.format_output(qlod)

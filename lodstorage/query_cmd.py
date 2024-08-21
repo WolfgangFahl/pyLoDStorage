@@ -70,8 +70,8 @@ class QueryCmd:
             self.query = self.qm.queriesByName[args.queryName]
             if self.query.limit is None and args.limit is not None:
                 self.query.limit = args.limit
-            self.formats = query.formats
-            self.queryCode = query.query
+            self.formats = self.query.formats
+            self.queryCode = self.query.query
             if debug or args.showQuery:
                 if (
                     hasattr(self.query, "description")
@@ -82,16 +82,16 @@ class QueryCmd:
             name = "?"
             if self.queryCode is None and args.queryFile is not None:
                 queryFilePath = Path(args.queryFile)
-                queryCode = queryFilePath.read_text()
+                self.queryCode = queryFilePath.read_text()
                 name = queryFilePath.stem
-            query = Query(name="?", query=queryCode, lang=args.language)
+            query = Query(name="?", query=self.queryCode, lang=args.language)
 
-        if queryCode:
-            params = Params(query.query)
-            query.query = params.apply_parameters_with_check(args.params)
-            queryCode = query.query
+        if self.queryCode:
+            params = Params(self.query.query)
+            self.query.query = params.apply_parameters_with_check(args.params)
+            self.queryCode = self.query.query
             if debug or args.showQuery:
-                print(f"{args.language}:\n{query.query}")
+                print(f"{args.language}:\n{self.query.query}")
         return handled
 
     def format_output(self, qlod: List[Dict[str, Any]]):
