@@ -250,12 +250,6 @@ USAGE
         QueryCmd.add_args(parser)
 
         parser.add_argument(
-            "-fp",
-            "--formatsPath",
-            default=ValueFormatter.formatsPath,
-            help="path to yaml file to configure formats to use for query result documentation",
-        )
-        parser.add_argument(
             "-en",
             "--endpointName",
             default="wikidata",
