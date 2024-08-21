@@ -26,7 +26,7 @@ class QueryCmd:
     command line support queries
     """
 
-    def __init__(self, args: Namespace):
+    def __init__(self, args: Namespace,with_default_queries:bool=True):
         """
         command line args
 
@@ -35,6 +35,16 @@ class QueryCmd:
         """
         self.args = args
         self.debug = args.debug
+        self.with_default_queries=with_default_queries
+
+    def init_managers(self):
+        self.endpoints = EndpointManager.getEndpoints(self.args.endpointPath)
+        self.qm = QueryManager(
+            lang=self.args.language,
+            debug=self.debug,
+            queriesPath=self.args.queriesPath,
+            with_default=self.with_default_queries
+        )
 
     def handle_args(self) -> bool:
         """
@@ -43,10 +53,7 @@ class QueryCmd:
         handled = False
         debug = self.debug
         args = self.args
-        self.endpoints = EndpointManager.getEndpoints(self.args.endpointPath)
-        self.qm = QueryManager(
-            lang=args.language, debug=debug, queriesPath=args.queriesPath
-        )
+        self.init_managers()
         self.query = None
         self.queryCode = args.query
         self.formats = None
@@ -84,7 +91,7 @@ class QueryCmd:
                 queryFilePath = Path(args.queryFile)
                 self.queryCode = queryFilePath.read_text()
                 name = queryFilePath.stem
-            query = Query(name="?", query=self.queryCode, lang=args.language)
+            self.query = Query(name="?", query=self.queryCode, lang=args.language)
 
         if self.queryCode:
             params = Params(self.query.query)
