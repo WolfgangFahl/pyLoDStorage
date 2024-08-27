@@ -83,7 +83,7 @@ class Schema(object):
             debug(bool): True if column names should be shown
 
         Returns:
-            at table dict for the generalized table
+            a table dict for the generalized table
         """
         general = {"name": name, "columns": []}
         colCount = Counter()
