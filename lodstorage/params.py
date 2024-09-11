@@ -83,13 +83,13 @@ class Params:
         query = self.query
         if self.has_params:
             if not param_dict:
-                param_names = self.params
+                param_names = list(dict.fromkeys(self.params)) # remove duplicates while preserving order
                 if len(param_names) > 3:
                     displayed_params = ", ".join(param_names[:3]) + ", ..."
                 else:
                     displayed_params = ", ".join(param_names)
                 plural_suffix = "s" if len(param_names) > 1 else ""
-                msg = f"Query needs {len(self.params)} parameter{plural_suffix}: {displayed_params}"
+                msg = f"Query needs {len(param_names)} parameter{plural_suffix}: {displayed_params}"
                 raise Exception(msg)
             else:
                 self.set(param_dict)
