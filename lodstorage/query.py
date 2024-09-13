@@ -26,7 +26,7 @@ from tabulate import tabulate
 from lodstorage.jsonable import JSONAble
 from lodstorage.mwTable import MediaWikiTable
 from lodstorage.yamlable import lod_storable
-from typing import Dict,List,Optional
+from typing import Any,Dict,List,Optional
 from lodstorage.params import Params, Param
 
 class Format(Enum):
@@ -342,13 +342,19 @@ class Query:
         )
         return f"{queryStr}"
 
+    def set_default_params(self,params_dict:Dict[str,Any]):
+        """
+        set the default parameters for the given params_dict
+        """
+        for param in self.param_list:
+            value = param.default_value
+            params_dict[param.name] = value
+
     def apply_default_params(self):
         """
         apply my default parameters
         """
-        for param in self.param_list:
-            value = param.default_value
-            self.params.params_dict[param.name] = value
+        self.set_default_params(self.params.params_dict)
         self.params.apply_parameters()
 
     def addFormatCallBack(self, callback):
