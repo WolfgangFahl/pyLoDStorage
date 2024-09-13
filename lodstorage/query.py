@@ -11,7 +11,7 @@ import sys
 import urllib
 from enum import Enum
 from pathlib import Path
-
+from dataclasses import field
 import yaml
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
@@ -25,7 +25,9 @@ from tabulate import tabulate
 # original is at
 from lodstorage.jsonable import JSONAble
 from lodstorage.mwTable import MediaWikiTable
-
+from lodstorage.yamlable import lod_storable
+from typing import Dict,List,Optional
+from lodstorage.params import Params, Param
 
 class Format(Enum):
     """
@@ -282,55 +284,53 @@ class QueryResultDocumentation:
         )
         return fixedStr
 
+@lod_storable
+class Query:
+    """
+    A Query e.g. for SPARQL
 
-class Query(object):
-    """a Query e.g. for SPAQRL"""
+    Attributes:
+        name (str): the name/label of the query
+        query (str): the native Query text e.g. in SPARQL
+        lang (str): the language of the query e.g. SPARQL
 
-    def __init__(
-        self,
-        name: str,
-        query: str,
-        lang="sparql",
-        endpoint: str = None,
-        database: str = "blazegraph",
-        title: str = None,
-        description: str = None,
-        limit: int = None,
-        prefixes=None,
-        tryItUrl: str = None,
-        formats: list = None,
-        debug=False,
-    ):
-        """
-        constructor
-        Args:
-            name(string): the name/label of the query
-            query(string): the native Query text e.g. in SPARQL
-            lang(string): the language of the query e.g. SPARQL
-            endpoint(string): the endpoint url to use
-            database(string): the type of database e.g. "blazegraph"
-            title(string): the header/title of the query
-            description(string): the description of the query
-            limit(int): the limit of the query default: None
-            prefixes(list): list of prefixes to be resolved
-            tryItUrl(str): the url of a "tryit" webpage
-            formats(list): key,value pairs of ValueFormatters to be applied
-            debug(boolean): true if debug mode should be switched on
-        """
-        self.name = name
-        self.query = query
-        self.lang = lang
-        self.endpoint = endpoint
-        self.database = database
-        self.tryItUrl = tryItUrl
+        sparql(str): SPARQL querycode
+        sql(str): SQL query code
+        ask(atr): SMW ASK query code
 
-        self.title = title = name if title is None else title
-        self.description = "" if description is None else description
-        self.limit = limit
-        self.prefixes = prefixes
-        self.debug = debug
-        self.formats = formats
-        self.formatCallBacks = []
+        endpoint (str): the endpoint url to use
+        database (str): the type of database e.g. "blazegraph"
+        title (str): the header/title of the query
+        description (str): the description of the query
+        limit (int): the limit of the query
+        prefixes (list): list of prefixes to be resolved
+        tryItUrl (str): the url of a "tryit" webpage
+        formats (list): key,value pairs of ValueFormatters to be applied
+        debug (bool): true if debug mode should be switched on
+    """
+    name: str
+    query: str
+    lang: str = "sparql"
+    sparql: Optional[str] = None
+    sql: Optional[str]=None
+    ask: Optional[str]=None
+    endpoint: Optional[str] = None
+    database: str = "blazegraph"
+    title: Optional[str] = None
+    description: str = ""
+    limit: Optional[int] = None
+    prefixes: Optional[List[str]] = None
+    tryItUrl: Optional[str] = None
+    formats: Optional[List] = None
+    debug: bool = False
+    formatCallBacks: List = field(default_factory=list)
+    param_list: List[Param] = field(default_factory=list)
+
+
+    def __post_init__(self):
+        if self.title is None:
+            self.title = self.name
+        self.params = Params(self.query)
 
     def __str__(self):
         queryStr = "\n".join(
@@ -341,6 +341,15 @@ class Query(object):
             ]
         )
         return f"{queryStr}"
+
+    def apply_default_params(self):
+        """
+        apply my default parameters
+        """
+        for param in self.param_list:
+            value = param.default_value
+            self.params.params_dict[param.name] = value
+        self.params.apply_parameters()
 
     def addFormatCallBack(self, callback):
         self.formatCallBacks.append(callback)
@@ -598,7 +607,6 @@ class Query(object):
         )
         return queryResultDocumentation
 
-
 class QueryManager(object):
     """
     manages pre packaged Queries
@@ -620,26 +628,20 @@ class QueryManager(object):
         self.queriesByName = {}
         self.lang = lang
         self.debug = debug
-        queries = QueryManager.getQueries(
+        queries = self.getQueries(
             queriesPath=queriesPath, with_default=with_default
         )
         for name, queryDict in queries.items():
             if self.lang in queryDict:
-                queryText = queryDict.pop(self.lang)
-                for qformat in ["sparql", "sql", "ask"]:  # drop not needed query variants
-                    if qformat in queryDict:
-                        queryDict.pop(qformat)
-                query = Query(
-                    name=name,
-                    query=queryText,
-                    lang=self.lang,
-                    **queryDict,
-                    debug=self.debug,
-                )
+                queryDict["name"]=name
+                queryDict["lang"]=self.lang
+                if not "query" in queryDict:
+                    queryDict["query"]=queryDict[self.lang]
+                query=Query.from_dict(queryDict)
+                query.debug=self.debug
                 self.queriesByName[name] = query
 
-    @staticmethod
-    def getQueries(queriesPath=None, with_default: bool = True):
+    def getQueries(self,queriesPath=None, with_default: bool = True):
         """
         get the queries for the given queries Path
 

@@ -10,6 +10,7 @@ import json
 import os
 from argparse import Namespace
 from contextlib import redirect_stdout
+import traceback
 
 import tests.test_sqlite3
 from lodstorage.query import (
@@ -31,6 +32,10 @@ class TestQueries(Basetest):
     Test query handling
     """
 
+    def setUp(self, debug=False, profile=True):
+        Basetest.setUp(self, debug=debug, profile=profile)
+        self.wikidata_queries_path=f"{os.path.dirname(__file__)}/../sampledata/wikidata.yaml"
+
     def testSQLQueries(self):
         """
         see https://github.com/WolfgangFahl/pyLoDStorage/issues/19
@@ -47,30 +52,51 @@ class TestQueries(Basetest):
                 print(resultDoc)
         pass
 
+    def runQuery(self,query,show:bool=False):
+        if show:
+            print(f"{query.name}:{query}")
+        endpoint = SPARQL(query.endpoint)
+        try:
+            if query.params.has_params:
+                query.apply_default_params()
+                pass
+            qlod = endpoint.queryAsListOfDicts(query.query,param_dict=query.params.params_dict)
+            for tablefmt in ["mediawiki", "github", "latex"]:
+                doc = query.documentQueryResult(
+                    qlod, tablefmt=tablefmt, floatfmt=".0f"
+                )
+                docstr = doc.asText()
+                if show:
+                    print(docstr)
+
+        except Exception as ex:
+            print(f"{query.title} at {query.endpoint} failed: {ex}")
+            print(traceback.format_exc())
+
+
+    def testQueryWithParams(self):
+        """
+        test SPARQL Query with parameters
+        """
+        show = self.debug
+        show = True
+        qm = QueryManager( queriesPath=self.wikidata_queries_path,with_default=False,lang="sparql", debug=False)
+        query=qm.queriesByName["WikidataItemsNearItem"]
+        query.endpoint="https://query.wikidata.org/sparql"
+        self.assertIsInstance(query, Query)
+        self.runQuery(query,show=show)
+        pass
+
     def testSparqlQueries(self):
         """
         test SPARQL queries
         """
         show = self.debug
-        show = True
+        #show = True
         qm = QueryManager(lang="sparql", debug=False)
         for name, query in qm.queriesByName.items():
             if name in ["US President Nicknames"]:
-                if show:
-                    print(f"{name}:{query}")
-                endpoint = SPARQL(query.endpoint)
-                try:
-                    qlod = endpoint.queryAsListOfDicts(query.query)
-                    for tablefmt in ["mediawiki", "github", "latex"]:
-                        doc = query.documentQueryResult(
-                            qlod, tablefmt=tablefmt, floatfmt=".0f"
-                        )
-                        docstr = doc.asText()
-                        if show:
-                            print(docstr)
-
-                except Exception as ex:
-                    print(f"{query.title} at {query.endpoint} failed: {ex}")
+                self.runQuery(query,show=show)
 
     def testUnicode2LatexWorkaround(self):
         """
@@ -478,7 +504,7 @@ determines the number of instances available in the OpenStreetMap for the placeT
         """
         test fix TypeError('Object of type datetime is not JSON serializable') #89
         """
-        queriesPath = f"{os.path.dirname(__file__)}/../sampledata/wikidata.yaml"
+        queriesPath = self.wikidata_queries_path
         args = [
             "-qp",
             f"{queriesPath}",

@@ -237,3 +237,38 @@
     }
     GROUP BY ?event ?eventLabel
     ORDER BY DESC(?date)
+'WikidataItemsNearItem':
+  # This query finds Wikidata items near a specified Wikidata item.
+  # It uses the Wikidata Query Service to find places within a given radius
+  # of the specified item and returns them ordered by distance.
+  param_list:
+    - name: item
+      type: WikidataItem
+      default_value: Q878253  # Schloss Weimar
+    - name: radius
+      type: float
+      default_value: 0.5 # 0.5 km
+    - name: limit
+      type: int
+      default_value: 50
+  sparql: |
+    #defaultView:Map
+    SELECT ?place ?placeLabel ?location ?dist
+    WHERE {
+      # coordinates of the item
+      wd:{{ item }} wdt:P625 ?itemLoc .
+      SERVICE wikibase:around {
+        ?place wdt:P625 ?location .
+        bd:serviceParam wikibase:center ?itemLoc .
+        bd:serviceParam wikibase:radius "{{ radius }}" .
+        bd:serviceParam wikibase:distance ?dist.
+      }
+      # Optional: Filter for specific types of places
+      # FILTER EXISTS {
+      #   ?place wdt:P31/wdt:P279* wd:Q41176 . # Instance of building or subclass of building
+      # }
+      FILTER(?place != wd:{{item}}) # Exclude item itself
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ASC(?dist)
+    LIMIT {{ limit }}

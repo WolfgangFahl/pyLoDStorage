@@ -6,7 +6,18 @@ Created on 2024-05-06
 
 import argparse
 import re
-from typing import Dict, Optional
+from typing import Dict,Optional
+from lodstorage.yamlable import lod_storable
+
+
+@lod_storable
+class Param:
+    """
+    a parameter
+    """
+    name:str
+    type:str
+    default_value: str
 
 
 class Params:
@@ -14,16 +25,18 @@ class Params:
     parameter handling
     """
 
-    def __init__(self, query: str, illegal_chars: str = """"[;<>&|]"'"""):
+    def __init__(self, query: str, illegal_chars: str = """"[;<>&|]"'""",with_audit:bool=True):
         """
         constructor
 
         Args:
-            query(str): the query to analyze for parameters
-            illegal_chars: chars that may not be in the values
+            query (str): the query to analyze for parameters
+            illegal_chars (str): chars that may not be in the values
+            with_audit (bool): if True audit parameters
         """
         self.illegal_chars = illegal_chars
         self.query = query
+        self.with_audit=with_audit
         self.pattern = re.compile(r"{{\s*(\w+)\s*}}")
         self.params = self.pattern.findall(query)
         self.params_dict = {param: "" for param in self.params}
@@ -56,7 +69,8 @@ class Params:
         Returns:
             str: The query with Jinja templates replaced by parameter values.
         """
-        self.audit()
+        if self.with_audit:
+            self.audit()
         query = self.query
         for param, value in self.params_dict.items():
             pattern = re.compile(r"{{\s*" + re.escape(param) + r"\s*\}\}")
