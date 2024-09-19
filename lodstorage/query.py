@@ -330,7 +330,8 @@ class Query:
     def __post_init__(self):
         if self.title is None:
             self.title = self.name
-        self.params = Params(self.query)
+        if self.query:
+            self.params = Params(self.query)
 
     def __str__(self):
         queryStr = "\n".join(
