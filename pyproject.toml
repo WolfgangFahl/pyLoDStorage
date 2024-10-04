@@ -38,8 +38,6 @@ dependencies = [
   "python-slugify>=8.0.1",
   # https://pypi.org/project/orjson/
   'orjson>=3.9.15',
-  # https://pypi.org/project/sqlmodel/
-  'sqlmodel>=0.0.16',
   # https://pypi.org/project/PyMySQL/
   'PyMySQL>=1.1.1',
   # https://pypi.org/project/requests/
