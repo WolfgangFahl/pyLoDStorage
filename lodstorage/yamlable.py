@@ -19,20 +19,20 @@ Prompts for the development and extension of the 'YamlAble' class within the 'ya
    to/from YAML and JSON files in 'YamlAble'.
 7. Implement loading of dataclass instances from URLs
    for both YAML and JSON in 'YamlAble'.
-8. Write tests for 'YamlAble' within the pyLodStorage context. 
-   Use 'samples 2' example from pyLoDStorage 
+8. Write tests for 'YamlAble' within the pyLodStorage context.
+   Use 'samples 2' example from pyLoDStorage
    https://github.com/WolfgangFahl/pyLoDStorage/blob/master/lodstorage/sample2.py
-   as a reference. 
-9. Ensure tests cover YAML/JSON serialization, deserialization, 
+   as a reference.
+9. Ensure tests cover YAML/JSON serialization, deserialization,
    and file I/O operations, using the sample-based approach..
 10. Use Google-style docstrings, comments, and type hints
    in 'YamlAble' class and tests.
 11. Adhere to instructions and seek clarification for
     any uncertainties.
 12. Add @lod_storable annotation support that will automatically
-    YamlAble support and add @dataclass and @dataclass_json 
-    prerequisite behavior to a class    
-    
+    YamlAble support and add @dataclass and @dataclass_json
+    prerequisite behavior to a class
+
 """
 
 import urllib.request
@@ -40,7 +40,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Generic, Type, TypeVar, Union
+from typing import Any, Generic, TextIO, Type, TypeVar, Union
 
 import yaml
 from dacite import from_dict
@@ -167,6 +167,21 @@ class YamlAble(Generic[T]):
         return instance
 
     @classmethod
+    def load_from_yaml_stream(cls: Type[T], stream: TextIO) -> T:
+        """
+        Loads a dataclass instance from a YAML stream.
+
+        Args:
+            stream (TextIO): The input stream containing YAML data.
+
+        Returns:
+            T: An instance of the dataclass.
+        """
+        yaml_str: str = stream.read()
+        instance: T = cls.from_yaml(yaml_str)
+        return instance
+
+    @classmethod
     def load_from_yaml_file(cls: Type[T], filename: str) -> T:
         """
         Loads a dataclass instance from a YAML file.
@@ -178,9 +193,7 @@ class YamlAble(Generic[T]):
             T: An instance of the dataclass.
         """
         with open(filename, "r") as file:
-            yaml_str: str = file.read()
-        instance: T = cls.from_yaml(yaml_str)
-        return instance
+            return cls.load_from_yaml_stream(file)
 
     @classmethod
     def load_from_yaml_url(cls: Type[T], url: str) -> T:
@@ -197,6 +210,16 @@ class YamlAble(Generic[T]):
         instance: T = cls.from_yaml(yaml_str)
         return instance
 
+    def save_to_yaml_stream(self,file:TextIO):
+        """
+        Saves the current dataclass instance to the given YAML stream.
+
+        Args:
+            file (TextIO): The stream to which YAML content will be saved.
+        """
+        yaml_content: str = self.to_yaml()
+        file.write(yaml_content)
+
     def save_to_yaml_file(self, filename: str):
         """
         Saves the current dataclass instance to a YAML file.
@@ -204,9 +227,9 @@ class YamlAble(Generic[T]):
         Args:
             filename (str): The path where the YAML file will be saved.
         """
-        yaml_content: str = self.to_yaml()
+
         with open(filename, "w", encoding="utf-8") as file:
-            file.write(yaml_content)
+            self.save_to_yaml_stream(file)
 
     @classmethod
     def load_from_json_file(cls: Type[T], filename: Union[str, Path]) -> T:
