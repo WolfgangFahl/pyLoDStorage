@@ -5,6 +5,8 @@ Created on 2024-01-21
 """
 
 from rdflib.namespace import XSD
+from rdflib import Graph
+from rdflib.plugins.sparql import prepareQuery
 
 from lodstorage.linkml_gen import LinkMLGen, Schema
 from lodstorage.rdf import RDFDumper
@@ -17,7 +19,7 @@ class TestLinkMLConversion(Basetest):
     Test class for generating LinkML YAML schema from Python data models.
     """
 
-    def setUp(self, debug=False, profile=True):
+    def setUp(self, debug=True, profile=True):
         super().setUp(debug=debug, profile=profile)
         # Retrieve the data model instances
         royals_samples = Sample.get("royals")
@@ -102,3 +104,28 @@ class TestLinkMLConversion(Basetest):
         # Optionally, save the RDF graph to a file
         with open("/tmp/royals_rdf_output.ttl", "w") as rdf_file:
             rdf_file.write(rdf_output)
+
+        # Load the serialized RDF output into an RDFLib graph
+        rdf_graph = Graph()
+        rdf_graph.parse(data=rdf_output, format="turtle")
+
+        # Perform SPARQL queries to verify the RDF content
+        query = prepareQuery("""
+            SELECT ?subject ?predicate ?object
+            WHERE {
+                ?subject ?predicate ?object .
+            }
+            LIMIT 10
+        """)
+
+        results = rdf_graph.query(query)
+
+        # Example assertions for the query results
+        assert len(results) > 0, "No triples found in the RDF graph"
+
+        for row in results:
+            if self.debug:
+                print(row)
+            assert row.subject is not None
+            assert row.predicate is not None
+            assert row.object is not None

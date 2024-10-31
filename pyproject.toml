@@ -13,6 +13,9 @@ maintainers = [
 readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
+  # https://pypi.org/project/rdflib/
+  "rdflib>=7.1.0",
+  # https://pypi.org/project/SPARQLWrapper/
   "SPARQLWrapper>=2.0.0",
   #"SPARQLWrapper==1.8.5",
   # https://pypi.org/project/ratelimit/
