@@ -140,6 +140,13 @@ class QueryCmd:
     @classmethod
     def add_args(cls, parser: ArgumentParser):
         parser.add_argument(
+            "-d",
+            "--debug",
+            dest="debug",
+            action="store_true",
+            help="set debug [default: %(default)s]",
+        )
+        parser.add_argument(
             "-ep",
             "--endpointPath",
             default=None,

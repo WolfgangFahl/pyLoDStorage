@@ -240,13 +240,6 @@ USAGE
         parser = ArgumentParser(
             description=program_license, formatter_class=RawDescriptionHelpFormatter
         )
-        parser.add_argument(
-            "-d",
-            "--debug",
-            dest="debug",
-            action="store_true",
-            help="set debug [default: %(default)s]",
-        )
         QueryCmd.add_args(parser)
 
         parser.add_argument(
