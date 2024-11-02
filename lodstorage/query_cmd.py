@@ -26,12 +26,15 @@ class QueryCmd:
     command line support queries
     """
 
-    def __init__(self, args: Namespace,with_default_queries:bool=True):
+    def __init__(self,
+        args: Namespace,
+        with_default_queries:bool=True):
         """
         command line args
 
         Args:
             args (Namespace): the command line arguments
+            with_default_queries (bool): should default queries be made available/listed?
         """
         self.args = args
         self.debug = args.debug
