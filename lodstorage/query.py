@@ -17,7 +17,6 @@ from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.formatters.latex import LatexFormatter
 from pygments.lexers import get_lexer_by_name
-from pylatexenc.latexencode import unicode_to_latex
 from tabulate import tabulate
 
 # from wikibot.mwTable import MediaWikiTable
@@ -259,6 +258,8 @@ class QueryResultDocumentation:
         for code in range(8320, 8330):
             text = text.replace(chr(code), f"$_{code-8320}$")
         if withConvert:
+            # workaround - hidden dependency!
+            from pylatexenc.latexencode import unicode_to_latex
             latex = unicode_to_latex(text)
             # workaround {\textbackslash} being returned
             # latex=latex.replace("{\\textbackslash}",'\\')

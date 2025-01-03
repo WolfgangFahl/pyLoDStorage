@@ -27,7 +27,7 @@ dependencies = [
   "tabulate",
   "numpy",
   "jsonpickle==1.5.2",
-  "pylatexenc~=2.10",
+  # "pylatexenc~=2.10",
   "pygments",
   "dicttoxml2",
   # https://pypi.org/project/dataclasses-json/
