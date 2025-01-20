@@ -56,11 +56,12 @@ class Params:
             ValueError: If potentially malicious values are detected in the parameter dictionary.
         """
         for param, value in self.params_dict.items():
-            for char in self.illegal_chars:
-                if char in value:
-                    raise ValueError(
-                        f"Potentially malicious value detected for parameter '{param}'"
-                    )
+            if isinstance(value, str):
+                for char in self.illegal_chars:
+                    if char in value:
+                        raise ValueError(
+                            f"Potentially malicious value detected for parameter '{param}'"
+                        )
 
     def apply_parameters(self) -> str:
         """
