@@ -75,7 +75,8 @@ class Params:
         query = self.query
         for param, value in self.params_dict.items():
             pattern = re.compile(r"{{\s*" + re.escape(param) + r"\s*\}\}")
-            query = re.sub(pattern, value, query)
+            value_str=str(value)
+            query = re.sub(pattern, value_str, query)
         return query
 
     def apply_parameters_with_check(self, param_dict: dict = None) -> str:
