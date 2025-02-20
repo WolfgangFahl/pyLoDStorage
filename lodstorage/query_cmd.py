@@ -138,14 +138,20 @@ class QueryCmd:
             raise Exception(f"format {args.format} not supported yet")
 
     @classmethod
+    def argument_exists(cls, parser, arg_name):
+        return any(arg_name in action.option_strings for action in parser._actions)
+
+
+    @classmethod
     def add_args(cls, parser: ArgumentParser):
-        parser.add_argument(
-            "-d",
-            "--debug",
-            dest="debug",
-            action="store_true",
-            help="set debug [default: %(default)s]",
-        )
+        if not cls.argument_exists(parser, "--debug"):
+            parser.add_argument(
+                "-d",
+                "--debug",
+                dest="debug",
+                action="store_true",
+                help="set debug [default: %(default)s]",
+            )
         parser.add_argument(
             "-ep",
             "--endpointPath",
