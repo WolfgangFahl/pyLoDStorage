@@ -26,7 +26,7 @@ dependencies = [
   "matplotlib>=3.8.2",
   "tabulate",
   "numpy",
-  "jsonpickle=>4.0.2",
+  "jsonpickle>=4.0.2",
   # "pylatexenc~=2.10",
   "pygments",
   "dicttoxml2",
