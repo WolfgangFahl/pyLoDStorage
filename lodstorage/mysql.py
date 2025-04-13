@@ -6,7 +6,7 @@ MySQL and MariaDB support
 """
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict,Generator, List
 
 import pymysql
 
@@ -41,6 +41,15 @@ class MySqlQuery:
 
         self.debug = debug
 
+    def get_cursor(self,query:str):
+        if self.debug:
+            logging.debug(f"Executing query: {query}")
+            logging.debug(f"With connection parameters: {self.db_params}")
+
+        connection = pymysql.connect(**self.db_params)
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        return connection, cursor
+
     def execute_sql_query(self, query: str) -> List[Dict[str, Any]]:
         """
         Executes an SQL query using the provided connection parameters.
@@ -52,13 +61,25 @@ class MySqlQuery:
         Returns:
             list: A list of dictionaries representing the query results.
         """
-        if self.debug:
-            logging.debug(f"Executing query: {query}")
-            logging.debug(f"With connection parameters: {self.db_params}")
-
-        connection = pymysql.connect(**self.db_params)
-        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        connection,cursor=self.get_cursor(query)
         cursor.execute(query)
         result = cursor.fetchall()
         connection.close()
         return result
+
+    def query_generator(self, query: str) -> Generator[Dict[str, Any], None, None]:
+        """
+        Generator for fetching records one by one from a SQL query.
+        """
+        connection,cursor=self.get_cursor(query)
+        try:
+            cursor.execute(query)
+            while True:
+                record = cursor.fetchone()
+                if not record:
+                    break
+                yield record
+
+        finally:
+            cursor.close()
+            connection.close()
