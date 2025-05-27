@@ -22,30 +22,7 @@ class Prefixes:
     Methods:
         getPrefixes(prefixes): Generates SPARQL PREFIX lines for a given list of prefix keys.
     """
-
-    @classmethod
-    def getPrefixes(
-        cls, prefixes=["rdf", "rdfs", "schema", "wd", "wdt", "wikibase", "xsd"]
-    ) -> str:
-        """Generates SPARQL PREFIX lines for a given list of prefix keys.
-
-        This method looks up URIs for the specified prefixes from a predefined map and constructs
-        PREFIX lines suitable for inclusion at the beginning of a SPARQL query. It allows for easy
-        and flexible specification of the prefixes needed for a particular query.
-
-        Args:
-            prefixes (list of str): A list of prefix keys for which PREFIX lines should be generated.
-                Defaults to a common set of prefixes used in Wikidata queries.
-
-        Returns:
-            str: A string containing the SPARQL PREFIX lines for the specified prefixes, each ending
-                with a newline character. If a prefix key is not recognized, it is ignored.
-
-        Example:
-            >>> Prefixes.getPrefixes(["wd", "wdt"])
-            'PREFIX wd: <http://www.wikidata.org/entity/>\nPREFIX wdt: <http://www.wikidata.org/prop/direct/>\n'
-        """
-        prefixMap = {
+    prefixMap = {
             "bd": "<http://www.bigdata.com/rdf#>",
             "cc": "<http://creativecommons.org/ns#>",
             "dct": "<http://purl.org/dc/terms/>",
@@ -77,10 +54,99 @@ class Prefixes:
             "wdv": "<http://www.wikidata.org/value/>",
             "wikibase": "<http://wikiba.se/ontology#>",
             "xsd": "<http://www.w3.org/2001/XMLSchema#>",
-        }
+    }
+
+    @classmethod
+    def getPrefixes(
+        cls, prefixes=["rdf", "rdfs", "schema", "wd", "wdt", "wikibase", "xsd"]
+    ) -> str:
+        """Generates SPARQL PREFIX lines for a given list of prefix keys.
+
+        This method looks up URIs for the specified prefixes from a predefined map and constructs
+        PREFIX lines suitable for inclusion at the beginning of a SPARQL query. It allows for easy
+        and flexible specification of the prefixes needed for a particular query.
+
+        Args:
+            prefixes (list of str): A list of prefix keys for which PREFIX lines should be generated.
+                Defaults to a common set of prefixes used in Wikidata queries.
+
+        Returns:
+            str: A string containing the SPARQL PREFIX lines for the specified prefixes, each ending
+                with a newline character. If a prefix key is not recognized, it is ignored.
+
+        Example:
+            >>> Prefixes.getPrefixes(["wd", "wdt"])
+            'PREFIX wd: <http://www.wikidata.org/entity/>\nPREFIX wdt: <http://www.wikidata.org/prop/direct/>\n'
+        """
+
         # see also https://www.wikidata.org/wiki/EntitySchema:E49
         sparql = ""
         for prefix in prefixes:
-            if prefix in prefixMap:
-                sparql += f"PREFIX {prefix}: {prefixMap[prefix]}\n"
+            if prefix in cls.prefixMap:
+                sparql += f"PREFIX {prefix}: {cls.prefixMap[prefix]}\n"
         return sparql
+
+    @classmethod
+    def extract_prefixes(cls, sparql_query: str) -> dict:
+        """
+        Extract only the explicitly declared prefixes from a SPARQL query string.
+        Simple regex-based extraction that finds PREFIX declarations in the query text.
+
+        Args:
+            sparql_query (str): The SPARQL query containing PREFIX declarations
+
+        Returns:
+            dict: Dictionary mapping prefix names to their URI strings
+        """
+        import re
+
+        declared_prefixes = {}
+
+        # Simple pattern to match PREFIX declarations: PREFIX name: <uri>
+        prefix_pattern = r'PREFIX\s+(\w+):\s*<([^>]+)>'
+
+        # Find all PREFIX declarations (case insensitive)
+        matches = re.findall(prefix_pattern, sparql_query, re.IGNORECASE)
+
+        # Convert matches to dictionary
+        for prefix_name, uri in matches:
+            declared_prefixes[prefix_name] = f"<{uri}>"
+
+        return declared_prefixes
+
+    @classmethod
+    def merge_prefix_dict(cls, query: str, prefix_dict: dict) -> str:
+        """
+        Merge prefixes from dict into SPARQL query by prepending missing prefix declarations.
+
+        Args:
+            query (str): The SPARQL query
+            prefix_dict (dict): Dictionary of prefixes to merge
+
+        Returns:
+            str: SPARQL query with missing prefixes prepended
+        """
+        existing_prefixes = cls.extract_prefixes(query)
+        missing = set(prefix_dict.keys()) - set(existing_prefixes.keys())
+        prepend=""
+        for prefix in missing:
+            prepend+=f"PREFIX {prefix}: {prefix_dict[prefix]}\n"
+        query=prepend+query
+
+        return query
+
+    @classmethod
+    def merge_prefixes(cls, query: str, prefixes: str) -> str:
+        """
+        Merge prefixes from string into SPARQL query by prepending missing prefix declarations.
+
+        Args:
+            query (str): The SPARQL query
+            prefixes (str): String containing PREFIX declarations
+
+        Returns:
+            str: SPARQL query with missing prefixes prepended
+        """
+        prefix_dict = cls.extract_prefixes(prefixes)
+        merged_query=cls.merge_prefix_dict(query, prefix_dict)
+        return merged_query
