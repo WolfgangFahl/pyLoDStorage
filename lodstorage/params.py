@@ -6,7 +6,8 @@ Created on 2024-05-06
 
 import argparse
 import re
-from typing import Dict,Optional
+from typing import Dict, Optional
+
 from lodstorage.yamlable import lod_storable
 
 
@@ -15,8 +16,9 @@ class Param:
     """
     a parameter
     """
-    name:str
-    type:str
+
+    name: str
+    type: str
     default_value: str
 
 
@@ -25,7 +27,9 @@ class Params:
     parameter handling
     """
 
-    def __init__(self, query: str, illegal_chars: str = """"[;<>&|]"'""",with_audit:bool=True):
+    def __init__(
+        self, query: str, illegal_chars: str = """"[;<>&|]"'""", with_audit: bool = True
+    ):
         """
         constructor
 
@@ -36,7 +40,7 @@ class Params:
         """
         self.illegal_chars = illegal_chars
         self.query = query
-        self.with_audit=with_audit
+        self.with_audit = with_audit
         self.pattern = re.compile(r"{{\s*(\w+)\s*}}")
         self.params = self.pattern.findall(query)
         self.params_dict = {param: "" for param in self.params}
@@ -75,7 +79,7 @@ class Params:
         query = self.query
         for param, value in self.params_dict.items():
             pattern = re.compile(r"{{\s*" + re.escape(param) + r"\s*\}\}")
-            value_str=str(value)
+            value_str = str(value)
             query = re.sub(pattern, value_str, query)
         return query
 
@@ -99,7 +103,9 @@ class Params:
         query = self.query
         if self.has_params:
             if not param_dict:
-                param_names = list(dict.fromkeys(self.params)) # remove duplicates while preserving order
+                param_names = list(
+                    dict.fromkeys(self.params)
+                )  # remove duplicates while preserving order
                 if len(param_names) > 3:
                     displayed_params = ", ".join(param_names[:3]) + ", ..."
                 else:

@@ -210,7 +210,7 @@ class YamlAble(Generic[T]):
         instance: T = cls.from_yaml(yaml_str)
         return instance
 
-    def save_to_yaml_stream(self,file:TextIO):
+    def save_to_yaml_stream(self, file: TextIO):
         """
         Saves the current dataclass instance to the given YAML stream.
 

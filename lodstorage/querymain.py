@@ -25,12 +25,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 import requests
 
-from lodstorage.query import (
-    Endpoint,
-    EndpointManager,
-    Format,
-    ValueFormatter,
-)
+from lodstorage.query import Endpoint, EndpointManager, Format, ValueFormatter
 from lodstorage.query_cmd import QueryCmd
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
@@ -73,13 +68,17 @@ class QueryMain(QueryCmd):
             if self.query.limit:
                 if "limit" in self.queryCode or "LIMIT" in self.queryCode:
                     self.queryCode = re.sub(
-                        r"(limit|LIMIT)\s+(\d+)", f"LIMIT {self.query.limit}", self.queryCode
+                        r"(limit|LIMIT)\s+(\d+)",
+                        f"LIMIT {self.query.limit}",
+                        self.queryCode,
                     )
                 else:
                     self.queryCode += f"\nLIMIT {self.query.limit}"
             if args.language == "sparql":
                 sparql = SPARQL.fromEndpointConf(endpointConf)
                 if args.prefixes and endpointConf is not None:
+                    prefixes_list = endpointConf.prefixes.split('\n')
+                    self.query.prefixes=prefixes_list
                     self.queryCode = f"{endpointConf.prefixes}\n{self.queryCode}"
                 if args.raw:
                     qres = self.rawQuery(
@@ -104,7 +103,7 @@ class QueryMain(QueryCmd):
             else:
                 raise Exception(f"language {args.language} not known/supported")
             self.format_output(qlod)
-            handled=True
+            handled = True
         return handled
 
     def rawQuery(

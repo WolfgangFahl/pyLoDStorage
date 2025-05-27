@@ -3,7 +3,7 @@ Created on 2024-03-02
 
 @author: wf
 """
-
+import re
 
 class Prefixes:
     """
@@ -22,38 +22,39 @@ class Prefixes:
     Methods:
         getPrefixes(prefixes): Generates SPARQL PREFIX lines for a given list of prefix keys.
     """
+
     prefixMap = {
-            "bd": "<http://www.bigdata.com/rdf#>",
-            "cc": "<http://creativecommons.org/ns#>",
-            "dct": "<http://purl.org/dc/terms/>",
-            "geo": "<http://www.opengis.net/ont/geosparql#>",
-            "ontolex": "<http://www.w3.org/ns/lemon/ontolex#>",
-            "owl": "<http://www.w3.org/2002/07/owl#>",
-            "p": "<http://www.wikidata.org/prop/>",
-            "pq": "<http://www.wikidata.org/prop/qualifier/>",
-            "pqn": "<http://www.wikidata.org/prop/qualifier/value-normalized/>",
-            "pqv": "<http://www.wikidata.org/prop/qualifier/value/>",
-            "pr": "<http://www.wikidata.org/prop/reference/>",
-            "prn": "<http://www.wikidata.org/prop/reference/value-normalized/>",
-            "prov": "<http://www.w3.org/ns/prov#>",
-            "prv": "<http://www.wikidata.org/prop/reference/value/>",
-            "ps": "<http://www.wikidata.org/prop/statement/>",
-            "psn": "<http://www.wikidata.org/prop/statement/value-normalized/>",
-            "psv": "<http://www.wikidata.org/prop/statement/value/>",
-            "rdf": "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>",
-            "rdfs": "<http://www.w3.org/2000/01/rdf-schema#>",
-            "schema": "<http://schema.org/>",
-            "skos": "<http://www.w3.org/2004/02/skos/core#>",
-            "wd": "<http://www.wikidata.org/entity/>",
-            "wdata": "<http://www.wikidata.org/wiki/Special:EntityData/>",
-            "wdno": "<http://www.wikidata.org/prop/novalue/>",
-            "wdref": "<http://www.wikidata.org/reference/>",
-            "wds": "<http://www.wikidata.org/entity/statement/>",
-            "wdt": "<http://www.wikidata.org/prop/direct/>",
-            "wdtn": "<http://www.wikidata.org/prop/direct-normalized/>",
-            "wdv": "<http://www.wikidata.org/value/>",
-            "wikibase": "<http://wikiba.se/ontology#>",
-            "xsd": "<http://www.w3.org/2001/XMLSchema#>",
+        "bd": "<http://www.bigdata.com/rdf#>",
+        "cc": "<http://creativecommons.org/ns#>",
+        "dct": "<http://purl.org/dc/terms/>",
+        "geo": "<http://www.opengis.net/ont/geosparql#>",
+        "ontolex": "<http://www.w3.org/ns/lemon/ontolex#>",
+        "owl": "<http://www.w3.org/2002/07/owl#>",
+        "p": "<http://www.wikidata.org/prop/>",
+        "pq": "<http://www.wikidata.org/prop/qualifier/>",
+        "pqn": "<http://www.wikidata.org/prop/qualifier/value-normalized/>",
+        "pqv": "<http://www.wikidata.org/prop/qualifier/value/>",
+        "pr": "<http://www.wikidata.org/prop/reference/>",
+        "prn": "<http://www.wikidata.org/prop/reference/value-normalized/>",
+        "prov": "<http://www.w3.org/ns/prov#>",
+        "prv": "<http://www.wikidata.org/prop/reference/value/>",
+        "ps": "<http://www.wikidata.org/prop/statement/>",
+        "psn": "<http://www.wikidata.org/prop/statement/value-normalized/>",
+        "psv": "<http://www.wikidata.org/prop/statement/value/>",
+        "rdf": "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>",
+        "rdfs": "<http://www.w3.org/2000/01/rdf-schema#>",
+        "schema": "<http://schema.org/>",
+        "skos": "<http://www.w3.org/2004/02/skos/core#>",
+        "wd": "<http://www.wikidata.org/entity/>",
+        "wdata": "<http://www.wikidata.org/wiki/Special:EntityData/>",
+        "wdno": "<http://www.wikidata.org/prop/novalue/>",
+        "wdref": "<http://www.wikidata.org/reference/>",
+        "wds": "<http://www.wikidata.org/entity/statement/>",
+        "wdt": "<http://www.wikidata.org/prop/direct/>",
+        "wdtn": "<http://www.wikidata.org/prop/direct-normalized/>",
+        "wdv": "<http://www.wikidata.org/value/>",
+        "wikibase": "<http://wikiba.se/ontology#>",
+        "xsd": "<http://www.w3.org/2001/XMLSchema#>",
     }
 
     @classmethod
@@ -80,11 +81,23 @@ class Prefixes:
         """
 
         # see also https://www.wikidata.org/wiki/EntitySchema:E49
-        sparql = ""
-        for prefix in prefixes:
-            if prefix in cls.prefixMap:
-                sparql += f"PREFIX {prefix}: {cls.prefixMap[prefix]}\n"
-        return sparql
+        prefixes=cls.prefix_string(cls.prefixMap,prefixes)
+        return prefixes
+
+    @classmethod
+    def prefix_string(cls,prefix_dict:dict,prefix_keys:list[str]):
+        prefixes = ""
+        for prefix in prefix_keys:
+            if prefix in prefix_dict:
+                prefixes += cls.prefix_line(prefix_dict, prefix)
+        return prefixes
+
+
+    @classmethod
+    def prefix_line(cls,prefix_dict:dict,prefix:str)->str:
+        line=f"PREFIX {prefix}: {prefix_dict[prefix]}\n"
+        return line
+
 
     @classmethod
     def extract_prefixes(cls, sparql_query: str) -> dict:
@@ -98,12 +111,10 @@ class Prefixes:
         Returns:
             dict: Dictionary mapping prefix names to their URI strings
         """
-        import re
-
         declared_prefixes = {}
 
         # Simple pattern to match PREFIX declarations: PREFIX name: <uri>
-        prefix_pattern = r'PREFIX\s+(\w+):\s*<([^>]+)>'
+        prefix_pattern = r"PREFIX\s+(\w+):\s*<([^>]+)>"
 
         # Find all PREFIX declarations (case insensitive)
         matches = re.findall(prefix_pattern, sparql_query, re.IGNORECASE)
@@ -128,10 +139,8 @@ class Prefixes:
         """
         existing_prefixes = cls.extract_prefixes(query)
         missing = set(prefix_dict.keys()) - set(existing_prefixes.keys())
-        prepend=""
-        for prefix in missing:
-            prepend+=f"PREFIX {prefix}: {prefix_dict[prefix]}\n"
-        query=prepend+query
+        prepend = cls.prefix_string(prefix_dict, list(missing))
+        query = prepend + query
 
         return query
 
@@ -148,5 +157,5 @@ class Prefixes:
             str: SPARQL query with missing prefixes prepended
         """
         prefix_dict = cls.extract_prefixes(prefixes)
-        merged_query=cls.merge_prefix_dict(query, prefix_dict)
+        merged_query = cls.merge_prefix_dict(query, prefix_dict)
         return merged_query

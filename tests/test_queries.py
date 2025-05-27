@@ -4,15 +4,14 @@ Created on 2021-01-29
 @author: wf
 """
 
+from argparse import Namespace
+from contextlib import redirect_stdout
 import copy
 import io
 import json
 import os
-from argparse import Namespace
-from contextlib import redirect_stdout
 import traceback
 
-import tests.test_sqlite3
 from lodstorage.query import (
     EndpointManager,
     Format,
@@ -24,7 +23,10 @@ from lodstorage.query import (
 from lodstorage.querymain import QueryMain
 from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
+from lodstorage.prefixes import Prefixes
+
 from tests.basetest import Basetest
+import tests.test_sqlite3
 
 
 class TestQueries(Basetest):
@@ -34,7 +36,9 @@ class TestQueries(Basetest):
 
     def setUp(self, debug=False, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.wikidata_queries_path=f"{os.path.dirname(__file__)}/../sampledata/wikidata.yaml"
+        self.wikidata_queries_path = (
+            f"{os.path.dirname(__file__)}/../sampledata/wikidata.yaml"
+        )
 
     def testSQLQueries(self):
         """
@@ -52,7 +56,7 @@ class TestQueries(Basetest):
                 print(resultDoc)
         pass
 
-    def runQuery(self,query,show:bool=False):
+    def runQuery(self, query, show: bool = False):
         if show:
             print(f"{query.name}:{query}")
         endpoint = SPARQL(query.endpoint)
@@ -60,11 +64,11 @@ class TestQueries(Basetest):
             if query.params.has_params:
                 query.apply_default_params()
                 pass
-            qlod = endpoint.queryAsListOfDicts(query.query,param_dict=query.params.params_dict)
+            qlod = endpoint.queryAsListOfDicts(
+                query.query, param_dict=query.params.params_dict
+            )
             for tablefmt in ["mediawiki", "github", "latex"]:
-                doc = query.documentQueryResult(
-                    qlod, tablefmt=tablefmt, floatfmt=".0f"
-                )
+                doc = query.documentQueryResult(qlod, tablefmt=tablefmt, floatfmt=".0f")
                 docstr = doc.asText()
                 if show:
                     print(docstr)
@@ -73,18 +77,22 @@ class TestQueries(Basetest):
             print(f"{query.title} at {query.endpoint} failed: {ex}")
             print(traceback.format_exc())
 
-
     def testQueryWithParams(self):
         """
         test SPARQL Query with parameters
         """
         show = self.debug
         show = True
-        qm = QueryManager( queriesPath=self.wikidata_queries_path,with_default=False,lang="sparql", debug=False)
-        query=qm.queriesByName["WikidataItemsNearItem"]
-        query.endpoint="https://query.wikidata.org/sparql"
+        qm = QueryManager(
+            queriesPath=self.wikidata_queries_path,
+            with_default=False,
+            lang="sparql",
+            debug=False,
+        )
+        query = qm.queriesByName["WikidataItemsNearItem"]
+        query.endpoint = "https://query.wikidata.org/sparql"
         self.assertIsInstance(query, Query)
-        self.runQuery(query,show=show)
+        self.runQuery(query, show=show)
         pass
 
     def testSparqlQueries(self):
@@ -92,11 +100,11 @@ class TestQueries(Basetest):
         test SPARQL queries
         """
         show = self.debug
-        #show = True
+        # show = True
         qm = QueryManager(lang="sparql", debug=False)
         for name, query in qm.queriesByName.items():
             if name in ["US President Nicknames"]:
-                self.runQuery(query,show=show)
+                self.runQuery(query, show=show)
 
     def testUnicode2LatexWorkaround(self):
         """
@@ -130,31 +138,6 @@ class TestQueries(Basetest):
             queryMain(args)
             result = stdout.getvalue()
         return result
-
-    def testIssue115Limit(self):
-        """
-        test the limit argument
-        """
-        limit = 5
-        args_list = [
-            [
-                "-qn",
-                "10 Largest Cities Of The World",
-                "-l",
-                "sparql",
-                "--limit",
-                f"{limit}",
-            ],
-            ["-qn", "US President Nicknames", "-l", "sparql", "--limit", f"{limit}"],
-        ]
-        debug = self.debug
-        debug = True
-        for args in args_list:
-            json_str = self.captureQueryMain(args)
-            json_data = json.loads(json_str)
-            if debug:
-                print(len(json_data))
-            self.assertEqual(limit, len(json_data))
 
     def testQueryCommandLine(self):
         """
@@ -308,6 +291,20 @@ class TestQueries(Basetest):
                     lod[2]["wikidata"],
                 )
 
+    def testIssue61(self):
+        """
+        tests different query path
+
+        see https://github.com/WolfgangFahl/pyLoDStorage/issues/61
+        """
+        queriesPath = f"{os.path.dirname(__file__)}/../sampledata/scholia.yaml"
+        args = ["-qp", f"{queriesPath}", "-l", "sparql", "--list"]
+        result = self.captureQueryMain(args)
+        debug = self.debug
+        if debug:
+            print(result)
+        self.assertTrue("WorksAndAuthor" in result)
+
     def testIssue73ReadFormats(self):
         """
         test reading the valueFormatters
@@ -315,13 +312,33 @@ class TestQueries(Basetest):
         vfs = ValueFormatter.getFormats(ValueFormatter.formatsPath)
         self.assertTrue("wikidata" in vfs)
 
+    def testIssue89(self):
+        """
+        test fix TypeError('Object of type datetime is not JSON serializable') #89
+        """
+        queriesPath = self.wikidata_queries_path
+        args = [
+            "-qp",
+            f"{queriesPath}",
+            "-l" "sparql",
+            "-qn",
+            "MachadoDeAssis",
+            "-f",
+            "json",
+        ]
+        result = self.captureQueryMain(args)
+        debug = self.debug
+        if debug:
+            print(result)
+        self.assertTrue("1839-06-21" in result)
+
     def testIssue111(self):
         """
         https://github.com/WolfgangFahl/pyLoDStorage/issues/111
         add basicauth support for endpoints
         """
         debug = self.debug
-        debug = True
+        #debug = True
         if not self.inPublicCI():
             endpoints = EndpointManager.getEndpoints(lang="sparql")
             # for endpoint in endpoints:
@@ -350,6 +367,31 @@ class TestQueries(Basetest):
                 if debug:
                     print(result)
 
+    def testIssue115Limit(self):
+        """
+        test the limit argument
+        """
+        limit = 5
+        args_list = [
+            [
+                "-qn",
+                "10 Largest Cities Of The World",
+                "-l",
+                "sparql",
+                "--limit",
+                f"{limit}",
+            ],
+            ["-qn", "US President Nicknames", "-l", "sparql", "--limit", f"{limit}"],
+        ]
+        debug = self.debug
+        #debug = True
+        for args in args_list:
+            json_str = self.captureQueryMain(args)
+            json_data = json.loads(json_str)
+            if debug:
+                print(len(json_data))
+            self.assertEqual(limit, len(json_data))
+
     def test_issue130_rate_limit_support(self):
         """
         https://github.com/WolfgangFahl/pyLoDStorage/issues/130
@@ -362,6 +404,27 @@ class TestQueries(Basetest):
                 if debug:
                     print(f"{ep_name}: {ep.calls_per_minute} calls per min")
                 self.assertTrue(ep.calls_per_minute > 1 and ep.calls_per_minute < 60)
+
+    def test_issue140_prefixes_for_tryit(self):
+        """
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/140
+        fix PREFIXES for tryit button
+        """
+        qm = QueryManager(lang="sparql", debug=False)
+        query = qm.queriesByName["US President Nicknames"]
+        baseurl="https://query.wikidata.org/"
+        prefixes=Prefixes.getPrefixes(["wdt","wd","rdfs"])
+        prefixes_list = prefixes.split('\n')
+        query.prefixes=prefixes_list
+        tryit=query.getTryItUrl(baseurl=baseurl)
+        debug=self.debug
+        debug=True
+        if debug:
+            print(prefixes)
+            print(tryit)
+        pass
+
+
 
     def testCommandLineUsage(self):
         """
@@ -499,40 +562,6 @@ determines the number of instances available in the OpenStreetMap for the placeT
 
             except Exception as ex:
                 print(f"{query.title} at {endpointUrl} failed: {ex}")
-
-    def testIssue89(self):
-        """
-        test fix TypeError('Object of type datetime is not JSON serializable') #89
-        """
-        queriesPath = self.wikidata_queries_path
-        args = [
-            "-qp",
-            f"{queriesPath}",
-            "-l" "sparql",
-            "-qn",
-            "MachadoDeAssis",
-            "-f",
-            "json",
-        ]
-        result = self.captureQueryMain(args)
-        debug = self.debug
-        if debug:
-            print(result)
-        self.assertTrue("1839-06-21" in result)
-
-    def testIssue61(self):
-        """
-        tests different query path
-
-        see https://github.com/WolfgangFahl/pyLoDStorage/issues/61
-        """
-        queriesPath = f"{os.path.dirname(__file__)}/../sampledata/scholia.yaml"
-        args = ["-qp", f"{queriesPath}", "-l", "sparql", "--list"]
-        result = self.captureQueryMain(args)
-        debug = self.debug
-        if debug:
-            print(result)
-        self.assertTrue("WorksAndAuthor" in result)
 
 
 class TestEndpoints(Basetest):

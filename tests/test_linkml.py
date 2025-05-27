@@ -4,8 +4,8 @@ Created on 2024-01-21
 @author: wf
 """
 
-from rdflib.namespace import XSD
 from rdflib import Graph
+from rdflib.namespace import XSD
 from rdflib.plugins.sparql import prepareQuery
 
 from lodstorage.linkml_gen import LinkMLGen, Schema
@@ -110,13 +110,15 @@ class TestLinkMLConversion(Basetest):
         rdf_graph.parse(data=rdf_output, format="turtle")
 
         # Perform SPARQL queries to verify the RDF content
-        query = prepareQuery("""
+        query = prepareQuery(
+            """
             SELECT ?subject ?predicate ?object
             WHERE {
                 ?subject ?predicate ?object .
             }
             LIMIT 10
-        """)
+        """
+        )
 
         results = rdf_graph.query(query)
 

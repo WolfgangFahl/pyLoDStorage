@@ -9,9 +9,11 @@ import os
 import re
 import sys
 import urllib
+from dataclasses import field
 from enum import Enum
 from pathlib import Path
-from dataclasses import field
+from typing import Any, Dict, List, Optional
+
 import yaml
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
@@ -24,9 +26,9 @@ from tabulate import tabulate
 # original is at
 from lodstorage.jsonable import JSONAble
 from lodstorage.mwTable import MediaWikiTable
+from lodstorage.params import Param, Params
 from lodstorage.yamlable import lod_storable
-from typing import Any,Dict,List,Optional
-from lodstorage.params import Params, Param
+
 
 class Format(Enum):
     """
@@ -260,6 +262,7 @@ class QueryResultDocumentation:
         if withConvert:
             # workaround - hidden dependency!
             from pylatexenc.latexencode import unicode_to_latex
+
             latex = unicode_to_latex(text)
             # workaround {\textbackslash} being returned
             # latex=latex.replace("{\\textbackslash}",'\\')
@@ -285,6 +288,7 @@ class QueryResultDocumentation:
         )
         return fixedStr
 
+
 @lod_storable
 class Query:
     """
@@ -309,12 +313,13 @@ class Query:
         formats (list): key,value pairs of ValueFormatters to be applied
         debug (bool): true if debug mode should be switched on
     """
+
     name: str
     query: str
     lang: str = "sparql"
     sparql: Optional[str] = None
-    sql: Optional[str]=None
-    ask: Optional[str]=None
+    sql: Optional[str] = None
+    ask: Optional[str] = None
     endpoint: Optional[str] = None
     database: str = "blazegraph"
     title: Optional[str] = None
@@ -326,7 +331,6 @@ class Query:
     debug: bool = False
     formatCallBacks: List = field(default_factory=list)
     param_list: List[Param] = field(default_factory=list)
-
 
     def __post_init__(self):
         if self.title is None:
@@ -344,7 +348,7 @@ class Query:
         )
         return f"{queryStr}"
 
-    def set_default_params(self,params_dict:Dict[str,Any]):
+    def set_default_params(self, params_dict: Dict[str, Any]):
         """
         set the default parameters for the given params_dict
         """
@@ -419,7 +423,11 @@ class Query:
             str: the "try it!" url for the given query
         """
         # https://stackoverflow.com/a/9345102/1497139
-        quoted = urllib.parse.quote(str(self.query))
+        prefixed_query=str(self.query)
+        if self.prefixes:
+            prepend = "\n".join(self.prefixes)
+            prefixed_query=prepend+prefixed_query
+        quoted = urllib.parse.quote(prefixed_query)
         if database == "blazegraph":
             delim = "/#"
         else:
@@ -615,6 +623,7 @@ class Query:
         )
         return queryResultDocumentation
 
+
 class QueryManager(object):
     """
     manages pre packaged Queries
@@ -636,20 +645,18 @@ class QueryManager(object):
         self.queriesByName = {}
         self.lang = lang
         self.debug = debug
-        queries = self.getQueries(
-            queriesPath=queriesPath, with_default=with_default
-        )
+        queries = self.getQueries(queriesPath=queriesPath, with_default=with_default)
         for name, queryDict in queries.items():
             if self.lang in queryDict:
-                queryDict["name"]=name
-                queryDict["lang"]=self.lang
+                queryDict["name"] = name
+                queryDict["lang"] = self.lang
                 if not "query" in queryDict:
-                    queryDict["query"]=queryDict[self.lang]
-                query=Query.from_dict(queryDict)
-                query.debug=self.debug
+                    queryDict["query"] = queryDict[self.lang]
+                query = Query.from_dict(queryDict)
+                query.debug = self.debug
                 self.queriesByName[name] = query
 
-    def getQueries(self,queriesPath=None, with_default: bool = True):
+    def getQueries(self, queriesPath=None, with_default: bool = True):
         """
         get the queries for the given queries Path
 

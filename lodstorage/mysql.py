@@ -6,7 +6,7 @@ MySQL and MariaDB support
 """
 
 import logging
-from typing import Any, Dict,Generator, List
+from typing import Any, Dict, Generator, List
 
 import pymysql
 
@@ -41,7 +41,7 @@ class MySqlQuery:
 
         self.debug = debug
 
-    def get_cursor(self,query:str):
+    def get_cursor(self, query: str):
         if self.debug:
             logging.debug(f"Executing query: {query}")
             logging.debug(f"With connection parameters: {self.db_params}")
@@ -61,7 +61,7 @@ class MySqlQuery:
         Returns:
             list: A list of dictionaries representing the query results.
         """
-        connection,cursor=self.get_cursor(query)
+        connection, cursor = self.get_cursor(query)
         cursor.execute(query)
         result = cursor.fetchall()
         connection.close()
@@ -71,7 +71,7 @@ class MySqlQuery:
         """
         Generator for fetching records one by one from a SQL query.
         """
-        connection,cursor=self.get_cursor(query)
+        connection, cursor = self.get_cursor(query)
         try:
             cursor.execute(query)
             while True:

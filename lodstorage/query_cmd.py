@@ -7,6 +7,7 @@ Created on 2024-08-21
 import json
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
+from typing import Any, Dict, List
 
 from lodstorage.lod_csv import CSV
 from lodstorage.params import Params, StoreDictKeyPair
@@ -18,7 +19,6 @@ from lodstorage.query import (
     ValueFormatter,
 )
 from lodstorage.xml import Lod2Xml
-from typing import Dict, List, Any
 
 
 class QueryCmd:
@@ -26,9 +26,7 @@ class QueryCmd:
     command line support queries
     """
 
-    def __init__(self,
-        args: Namespace,
-        with_default_queries:bool=True):
+    def __init__(self, args: Namespace, with_default_queries: bool = True):
         """
         command line args
 
@@ -38,7 +36,7 @@ class QueryCmd:
         """
         self.args = args
         self.debug = args.debug
-        self.with_default_queries=with_default_queries
+        self.with_default_queries = with_default_queries
 
     def init_managers(self):
         self.endpoints = EndpointManager.getEndpoints(self.args.endpointPath)
@@ -46,7 +44,7 @@ class QueryCmd:
             lang=self.args.language,
             debug=self.debug,
             queriesPath=self.args.queriesPath,
-            with_default=self.with_default_queries
+            with_default=self.with_default_queries,
         )
 
     def handle_args(self) -> bool:
@@ -140,7 +138,6 @@ class QueryCmd:
     @classmethod
     def argument_exists(cls, parser, arg_name):
         return any(arg_name in action.option_strings for action in parser._actions)
-
 
     @classmethod
     def add_args(cls, parser: ArgumentParser):

@@ -3,9 +3,13 @@ Created on 2025-05-27
 
 @author: wf
 """
-from tests.basetest import Basetest
-from owlready2 import get_ontology, default_world
+
 import json
+
+from owlready2 import default_world, get_ontology
+
+from tests.basetest import Basetest
+
 
 class TestOwl2Ready(Basetest):
     """
@@ -19,13 +23,13 @@ class TestOwl2Ready(Basetest):
         """
         https://dblp.org/rdf/docu/
         """
-        onto_url="https://dblp.org/rdf/schema.rdf#"
+        onto_url = "https://dblp.org/rdf/schema.rdf#"
         onto = get_ontology(onto_url)
         onto.load()
-        classes=list(onto.classes())
-        classes_by_name={}
+        classes = list(onto.classes())
+        classes_by_name = {}
         for oc in classes:
-            classes_by_name[oc.name]=oc
+            classes_by_name[oc.name] = oc
         if self.debug:
             print(f"Ontology loaded: {onto}")
             print(f"Base IRI: {onto.base_iri}")
@@ -33,5 +37,3 @@ class TestOwl2Ready(Basetest):
             for c in classes:
                 print(c)
         self.assertTrue("Inproceedings" in classes_by_name)
-
-

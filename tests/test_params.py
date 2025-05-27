@@ -53,20 +53,18 @@ class TestParams(Basetest):
         query = params.apply_parameters()
 
         self.assertEqual(
-            "Hello Alice, welcome to Wonderland! Nice to meet you, Alice.",
-            query
+            "Hello Alice, welcome to Wonderland! Nice to meet you, Alice.", query
         )
 
         # Test apply_parameters_with_check
         result = params.apply_parameters_with_check(params_dict)
         self.assertEqual(
-            "Hello Alice, welcome to Wonderland! Nice to meet you, Alice.",
-            result
+            "Hello Alice, welcome to Wonderland! Nice to meet you, Alice.", result
         )
 
         # Test error message for missing parameters
         with self.assertRaises(Exception) as context:
             params.apply_parameters_with_check()
 
-        msg=str(context.exception)
-        self.assertTrue("Query needs 2 parameters: name, place" in msg,msg)
+        msg = str(context.exception)
+        self.assertTrue("Query needs 2 parameters: name, place" in msg, msg)
