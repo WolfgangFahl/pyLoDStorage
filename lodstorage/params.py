@@ -5,8 +5,8 @@ Created on 2024-05-06
 """
 
 import argparse
-from dataclasses import field
 import re
+from dataclasses import field
 from typing import Dict, Optional
 
 from lodstorage.yamlable import lod_storable
@@ -19,8 +19,8 @@ class Param:
     """
 
     name: str
-    type: str # python type
-    default_value: Optional[str] = None # for input parameters only
+    type: str  # python type
+    default_value: Optional[str] = None  # for input parameters only
     range: Optional[list] = field(default=None)  # for output only
     description: Optional[str] = None  # optional for doc/UI
 

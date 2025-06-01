@@ -3,7 +3,7 @@ Created on 2020-08-14
 
 @author: wf
 """
-
+import json
 import datetime
 import time
 import unittest
@@ -144,9 +144,9 @@ class TestSPARQL(Basetest):
             deleteString = """
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>
-            DELETE WHERE {  
+            DELETE WHERE {
               ?person a 'foafo:Person'.
-              ?person ?p ?o. 
+              ?person ?p ?o.
             }
             """
             jena.query(deleteString)
@@ -158,7 +158,7 @@ class TestSPARQL(Basetest):
             jena = self.getJena(mode="query", debug=self.debug)
             queryString = """
             PREFIX foafo: <http://foafo.bitplan.com/foafo/0.1/>
-            SELECT ?name ?born ?numberInLine ?wikidataurl ?age ?ofAge ?lastmodified WHERE { 
+            SELECT ?name ?born ?numberInLine ?wikidataurl ?age ?ofAge ?lastmodified WHERE {
                 ?person a 'foafo:Person'.
                 ?person foafo:Person_name ?name.
                 ?person foafo:Person_born ?born.
@@ -166,7 +166,7 @@ class TestSPARQL(Basetest):
                 ?person foafo:Person_wikidataurl ?wikidataurl.
                 ?person foafo:Person_age ?age.
                 ?person foafo:Person_ofAge ?ofAge.
-                ?person foafo:Person_lastmodified ?lastmodified. 
+                ?person foafo:Person_lastmodified ?lastmodified.
             }"""
             personResults = jena.query(queryString)
             self.assertEqual(len(listofDicts), len(personResults))
@@ -214,14 +214,14 @@ class TestSPARQL(Basetest):
         helpListOfDicts = [
             {
                 "topic": "edit",
-                "description": """Use 
-the "edit" 
-button to start editing - you can use 
-- tab \t 
-- carriage return \r 
+                "description": """Use
+the "edit"
+button to start editing - you can use
+- tab \t
+- carriage return \r
 - newline \n
 
-as escape characters 
+as escape characters
 """,
             }
         ]
@@ -279,6 +279,30 @@ WHERE {
                     % (limit, elapsed, limit / elapsed)
                 )
 
+    def testPostQueryDirect(self):
+        """
+        test post_query_direct with different RDF formats
+        """
+        wd = self.get_wikidata_endpoint()
+        # Tim Berners Lee
+        pattern="<http://www.wikidata.org/entity/Q80> ?p ?o ."
+        queryString = f"CONSTRUCT {{ {pattern} }} WHERE {{ {pattern} }} LIMIT 5"
+        format_cases= [
+            ("turtle","@prefix"),
+            ("rdf-xml","<rdf:RDF"),
+            ("json-ld","[ {")
+        ]
+        # note hat n3 does not work for wikidata
+        debug=self.debug
+        #debug=True
+        for rdf_format,expected in format_cases:
+            with self.subTest(rdf_format=rdf_format,expected=expected):
+                text = wd.post_query_direct(queryString, rdf_format=rdf_format)
+                if debug:
+                    print(text)
+                self.assertIn(expected,text)
+
+
     def testWikdata(self):
         """
         check wikidata
@@ -289,10 +313,10 @@ WHERE {
         #    endpoint="http://jena.zeus.bitplan.com/wikidata/"
         wd = self.get_wikidata_endpoint()
         queryString = """# get a list of whisky distilleries
-PREFIX wd: <http://www.wikidata.org/entity/>            
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-SELECT ?item ?coord 
-WHERE 
+SELECT ?item ?coord
+WHERE
 {
   # instance of whisky distillery
   ?item wdt:P31 wd:Q10373548.
@@ -319,17 +343,17 @@ WHERE
 # see https://confident.dbis.rwth-aachen.de/dblpconf/wikidata
 # WF 2021-01-30
 SELECT ?confSeries ?short_name ?official_website
-WHERE 
+WHERE
 {
-  #  scientific conference series (Q47258130) 
+  #  scientific conference series (Q47258130)
   ?confSeries wdt:P31 wd:Q47258130.
-  OPTIONAL { 
-    ?confSeries wdt:P1813 ?short_name . 
+  OPTIONAL {
+    ?confSeries wdt:P1813 ?short_name .
   }
-  #  official website (P856) 
+  #  official website (P856)
   OPTIONAL {
     ?confSeries wdt:P856 ?official_website
-  } 
+  }
 }
 LIMIT 200
 """
@@ -361,13 +385,13 @@ LIMIT 200
         ?num wikibase:apiOrdinal true.
     }
     ?s wdt:P279|wdt:P31 ?item .
-    OPTIONAL { 
+    OPTIONAL {
       ?s wdt:P1324 ?sourceCode.
     }
-    OPTIONAL {    
+    OPTIONAL {
       ?s wdt:P856 ?webSite.
     }
-    OPTIONAL {    
+    OPTIONAL {
       ?s wdt:P1482 ?stackexchangeTag.
     }
     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
@@ -430,7 +454,7 @@ WHERE
         """
         wd = self.get_wikidata_endpoint()
         sparql_query = """# Count all Q44613:monastery items
-# with the given street address(P6375) https://www.wikidata.org/wiki/Property:P6375 
+# with the given street address(P6375) https://www.wikidata.org/wiki/Property:P6375
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX schema: <http://schema.org/>

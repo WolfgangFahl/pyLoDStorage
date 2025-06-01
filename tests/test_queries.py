@@ -4,14 +4,16 @@ Created on 2021-01-29
 @author: wf
 """
 
-from argparse import Namespace
-from contextlib import redirect_stdout
 import copy
 import io
 import json
 import os
 import traceback
+from argparse import Namespace
+from contextlib import redirect_stdout
 
+import tests.test_sqlite3
+from lodstorage.prefixes import Prefixes
 from lodstorage.query import (
     EndpointManager,
     Format,
@@ -23,10 +25,7 @@ from lodstorage.query import (
 from lodstorage.querymain import QueryMain
 from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
-from lodstorage.prefixes import Prefixes
-
 from tests.basetest import Basetest
-import tests.test_sqlite3
 
 
 class TestQueries(Basetest):
@@ -338,7 +337,7 @@ class TestQueries(Basetest):
         add basicauth support for endpoints
         """
         debug = self.debug
-        #debug = True
+        # debug = True
         if not self.inPublicCI():
             endpoints = EndpointManager.getEndpoints(lang="sparql")
             # for endpoint in endpoints:
@@ -384,7 +383,7 @@ class TestQueries(Basetest):
             ["-qn", "US President Nicknames", "-l", "sparql", "--limit", f"{limit}"],
         ]
         debug = self.debug
-        #debug = True
+        # debug = True
         for args in args_list:
             json_str = self.captureQueryMain(args)
             json_data = json.loads(json_str)
@@ -412,19 +411,17 @@ class TestQueries(Basetest):
         """
         qm = QueryManager(lang="sparql", debug=False)
         query = qm.queriesByName["US President Nicknames"]
-        baseurl="https://query.wikidata.org/"
-        prefixes=Prefixes.getPrefixes(["wdt","wd","rdfs"])
-        prefixes_list = prefixes.split('\n')
-        query.prefixes=prefixes_list
-        tryit=query.getTryItUrl(baseurl=baseurl)
-        debug=self.debug
-        debug=True
+        baseurl = "https://query.wikidata.org/"
+        prefixes = Prefixes.getPrefixes(["wdt", "wd", "rdfs"])
+        prefixes_list = prefixes.split("\n")
+        query.prefixes = prefixes_list
+        tryit = query.getTryItUrl(baseurl=baseurl)
+        debug = self.debug
+        debug = True
         if debug:
             print(prefixes)
             print(tryit)
         pass
-
-
 
     def testCommandLineUsage(self):
         """

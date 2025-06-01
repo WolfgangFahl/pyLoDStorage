@@ -3,7 +3,9 @@ Created on 2024-03-02
 
 @author: wf
 """
+
 import re
+
 
 class Prefixes:
     """
@@ -81,23 +83,21 @@ class Prefixes:
         """
 
         # see also https://www.wikidata.org/wiki/EntitySchema:E49
-        prefixes=cls.prefix_string(cls.prefixMap,prefixes)
+        prefixes = cls.prefix_string(cls.prefixMap, prefixes)
         return prefixes
 
     @classmethod
-    def prefix_string(cls,prefix_dict:dict,prefix_keys:list[str]):
+    def prefix_string(cls, prefix_dict: dict, prefix_keys: list[str]):
         prefixes = ""
         for prefix in prefix_keys:
             if prefix in prefix_dict:
                 prefixes += cls.prefix_line(prefix_dict, prefix)
         return prefixes
 
-
     @classmethod
-    def prefix_line(cls,prefix_dict:dict,prefix:str)->str:
-        line=f"PREFIX {prefix}: {prefix_dict[prefix]}\n"
+    def prefix_line(cls, prefix_dict: dict, prefix: str) -> str:
+        line = f"PREFIX {prefix}: {prefix_dict[prefix]}\n"
         return line
-
 
     @classmethod
     def extract_prefixes(cls, sparql_query: str) -> dict:

@@ -331,7 +331,7 @@ class Query:
     debug: bool = False
     formatCallBacks: List = field(default_factory=list)
     param_list: List[Param] = field(default_factory=list)  # input
-    output: List[Param] = field(default_factory=list)       # output
+    output: List[Param] = field(default_factory=list)  # output
 
     def __post_init__(self):
         if self.title is None:
@@ -424,10 +424,10 @@ class Query:
             str: the "try it!" url for the given query
         """
         # https://stackoverflow.com/a/9345102/1497139
-        prefixed_query=str(self.query)
+        prefixed_query = str(self.query)
         if self.prefixes:
             prepend = "\n".join(self.prefixes)
-            prefixed_query=prepend+prefixed_query
+            prefixed_query = prepend + prefixed_query
         quoted = urllib.parse.quote(prefixed_query)
         if database == "blazegraph":
             delim = "/#"

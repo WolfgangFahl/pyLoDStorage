@@ -77,8 +77,8 @@ class QueryMain(QueryCmd):
             if args.language == "sparql":
                 sparql = SPARQL.fromEndpointConf(endpointConf)
                 if args.prefixes and endpointConf is not None:
-                    prefixes_list = endpointConf.prefixes.split('\n')
-                    self.query.prefixes=prefixes_list
+                    prefixes_list = endpointConf.prefixes.split("\n")
+                    self.query.prefixes = prefixes_list
                     self.queryCode = f"{endpointConf.prefixes}\n{self.queryCode}"
                 if args.raw:
                     qres = self.rawQuery(
