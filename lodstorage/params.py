@@ -5,6 +5,7 @@ Created on 2024-05-06
 """
 
 import argparse
+from dataclasses import field
 import re
 from typing import Dict, Optional
 
@@ -14,12 +15,14 @@ from lodstorage.yamlable import lod_storable
 @lod_storable
 class Param:
     """
-    a parameter
+    a parameter  (input or output) for a query
     """
 
     name: str
-    type: str
-    default_value: str
+    type: str # python type
+    default_value: Optional[str] = None # for input parameters only
+    range: Optional[list] = field(default=None)  # for output only
+    description: Optional[str] = None  # optional for doc/UI
 
 
 class Params:

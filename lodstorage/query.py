@@ -330,7 +330,8 @@ class Query:
     formats: Optional[List] = None
     debug: bool = False
     formatCallBacks: List = field(default_factory=list)
-    param_list: List[Param] = field(default_factory=list)
+    param_list: List[Param] = field(default_factory=list)  # input
+    output: List[Param] = field(default_factory=list)       # output
 
     def __post_init__(self):
         if self.title is None:
