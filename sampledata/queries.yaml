@@ -2,6 +2,28 @@
 # Sample Queries for pyLodStorage library
 #
 # WF 2020-08-22
+'WikidataUpdateState':
+  title: Wikidata state
+  description: Returns total triple count and dateModified of the Wikidata root node
+  sparql: |
+    # show the number of triples and the timestamp of the last modification
+    # see https://github.com/WolfgangFahl/pyLoDStorage/issues/143
+    PREFIX schema: <http://schema.org/>
+
+    SELECT
+      (?count as ?tripleCount)
+      ?dateModified
+      (STR(?dateModified) as ?timestamp)
+    WHERE {
+      {
+        SELECT (COUNT(*) AS ?count) {
+          ?s ?p ?o
+        }
+      }
+      OPTIONAL {
+        <http://www.wikidata.org> schema:dateModified ?dateModified
+      }
+    }
 'classHistogramm':
   sparql: |
     SELECT ?c (COUNT(?c) AS ?count)

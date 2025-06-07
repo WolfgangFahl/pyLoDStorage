@@ -285,8 +285,7 @@ USAGE
         indent = len(program_name) * " "
         sys.stderr.write(program_name + ": " + repr(e) + "\n")
         sys.stderr.write(indent + "  for help use --help")
-        if args.debug:
-            print(traceback.format_exc())
+        print(traceback.format_exc())
         return 2
 
 

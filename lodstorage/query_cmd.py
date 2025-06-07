@@ -18,7 +18,7 @@ from lodstorage.query import (
     QueryManager,
     ValueFormatter,
 )
-from lodstorage.xml import Lod2Xml
+from lodstorage.lod2xml import Lod2Xml
 
 
 class QueryCmd:
