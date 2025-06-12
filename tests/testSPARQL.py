@@ -3,8 +3,9 @@ Created on 2020-08-14
 
 @author: wf
 """
-import json
+
 import datetime
+import json
 import time
 import unittest
 import warnings
@@ -285,23 +286,22 @@ WHERE {
         """
         wd = self.get_wikidata_endpoint()
         # Tim Berners Lee
-        pattern="<http://www.wikidata.org/entity/Q80> ?p ?o ."
+        pattern = "<http://www.wikidata.org/entity/Q80> ?p ?o ."
         queryString = f"CONSTRUCT {{ {pattern} }} WHERE {{ {pattern} }} LIMIT 5"
-        format_cases= [
-            ("turtle","@prefix"),
-            ("rdf-xml","<rdf:RDF"),
-            ("json-ld","[ {")
+        format_cases = [
+            ("turtle", "@prefix"),
+            ("rdf-xml", "<rdf:RDF"),
+            ("json-ld", "[ {"),
         ]
         # note hat n3 does not work for wikidata
-        debug=self.debug
-        #debug=True
-        for rdf_format,expected in format_cases:
-            with self.subTest(rdf_format=rdf_format,expected=expected):
+        debug = self.debug
+        # debug=True
+        for rdf_format, expected in format_cases:
+            with self.subTest(rdf_format=rdf_format, expected=expected):
                 text = wd.post_query_direct(queryString, rdf_format=rdf_format)
                 if debug:
                     print(text)
-                self.assertIn(expected,text)
-
+                self.assertIn(expected, text)
 
     def testWikdata(self):
         """

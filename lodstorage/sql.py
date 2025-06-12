@@ -530,7 +530,7 @@ class EntityInfo(object):
         self.sampleRecords = sampleRecords
         self.name = name
         self.primaryKey = primaryKey
-        self.quiet=quiet
+        self.quiet = quiet
         self.debug = debug
         self.typeMap = {}
         self.sqlTypeMap = {}
@@ -563,7 +563,7 @@ class EntityInfo(object):
                 valueType = None
                 if value is None:
                     if len(sampleRecords) == 1:
-                        msg=f"Warning sampleRecord column {key} is None - using TEXT as type"
+                        msg = f"Warning sampleRecord column {key} is None - using TEXT as type"
                         if not self.quiet:
                             print(msg)
                         valueType = str

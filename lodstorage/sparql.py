@@ -3,12 +3,13 @@ Created on 2020-08-14
 
 @author: wf
 """
-import requests
+
 import datetime
 import time
 from sys import stderr
 from typing import Union
 
+import requests
 from SPARQLWrapper import SPARQLWrapper2
 from SPARQLWrapper.Wrapper import BASIC, DIGEST, POST, POSTDIRECTLY
 
@@ -131,11 +132,9 @@ class SPARQL(object):
             result = ex
         return result
 
-
-    def post_query_direct(self,
-        query: str,
-        rdf_format: str = "n3",
-        timeout: int = 60) -> str:
+    def post_query_direct(
+        self, query: str, rdf_format: str = "n3", timeout: int = 60
+    ) -> str:
         """
         Fetch raw RDF response via direct HTTP POST.
 
@@ -150,8 +149,8 @@ class SPARQL(object):
         Raises:
             Exception if HTTP request fails
         """
-        rdf_format=RdfFormat.by_label(rdf_format)
-        mime_type=rdf_format.mime_type
+        rdf_format = RdfFormat.by_label(rdf_format)
+        mime_type = rdf_format.mime_type
         headers = {"Accept": mime_type}
         response = requests.post(
             self.url,
@@ -160,13 +159,12 @@ class SPARQL(object):
             timeout=timeout,
         )
         if response.status_code != 200:
-            msg=f"HTTP {response.status_code}: {response.text}"
+            msg = f"HTTP {response.status_code}: {response.text}"
             raise Exception(msg)
-        text=response.text.strip()
+        text = response.text.strip()
         return text
 
-
-    def rawQuery(self, queryString:str, method=POST):
+    def rawQuery(self, queryString: str, method=POST):
         """
         query with the given query string
 
@@ -179,7 +177,7 @@ class SPARQL(object):
         queryString = self.fix_comments(queryString)
         self.sparql.setQuery(queryString)
         self.sparql.method = method
-        bindings=self.sparql.query()
+        bindings = self.sparql.query()
         return bindings
 
     def fix_comments(self, query_string: str) -> str:

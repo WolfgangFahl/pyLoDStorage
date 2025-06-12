@@ -9,6 +9,7 @@ from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Any, Dict, List
 
+from lodstorage.lod2xml import Lod2Xml
 from lodstorage.lod_csv import CSV
 from lodstorage.params import Params, StoreDictKeyPair
 from lodstorage.query import (
@@ -18,7 +19,6 @@ from lodstorage.query import (
     QueryManager,
     ValueFormatter,
 )
-from lodstorage.lod2xml import Lod2Xml
 
 
 class QueryCmd:
