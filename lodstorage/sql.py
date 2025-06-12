@@ -516,18 +516,21 @@ class EntityInfo(object):
 
     """
 
-    def __init__(self, sampleRecords, name, primaryKey=None, debug=False):
+    def __init__(self, sampleRecords, name, primaryKey=None, quiet=False, debug=False):
         """
         construct me from the given name and primary key
 
         Args:
+           sampleRecords:a list of sample record dicts
            name(string): the name of the entity
            primaryKey(string): the name of the primary key column
+           quite(boolean): if True suppress all print messages
            debug(boolean): True if debug information should be shown
         """
         self.sampleRecords = sampleRecords
         self.name = name
         self.primaryKey = primaryKey
+        self.quiet=quiet
         self.debug = debug
         self.typeMap = {}
         self.sqlTypeMap = {}
@@ -560,10 +563,9 @@ class EntityInfo(object):
                 valueType = None
                 if value is None:
                     if len(sampleRecords) == 1:
-                        print(
-                            "Warning sampleRecord column %s is None - using TEXT as type"
-                            % key
-                        )
+                        msg=f"Warning sampleRecord column {key} is None - using TEXT as type"
+                        if not self.quiet:
+                            print(msg)
                         valueType = str
                 else:
                     valueType = type(value)
@@ -580,11 +582,8 @@ class EntityInfo(object):
                 elif valueType == datetime.datetime:
                     sqlType = "TIMESTAMP"
                 else:
-                    if valueType is not None:
-                        msg = "warning: unsupported type %s for column %s " % (
-                            str(valueType),
-                            key,
-                        )
+                    msg = f"warning: unsupported type {valueType} for column {key}"
+                    if not self.quiet:
                         print(msg)
                 if sqlType is not None and valueType is not None:
                     self.addType(key, valueType, sqlType)
@@ -597,7 +596,7 @@ class EntityInfo(object):
             )
             delim = ","
         ddlCmd += ")"
-        if self.debug:
+        if self.debug and not self.quiet:
             print(ddlCmd)
         return ddlCmd
 
@@ -622,7 +621,7 @@ class EntityInfo(object):
         placeholders = ":" + ",:".join(self.typeMap.keys())
         replaceClause = " OR REPLACE" if replace else ""
         insertCmd = f"INSERT{replaceClause} INTO {self.name} ({columns}) values ({placeholders})"
-        if self.debug:
+        if self.debug and not self.quiet:
             print(insertCmd)
         return insertCmd
 
