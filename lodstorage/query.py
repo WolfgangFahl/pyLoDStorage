@@ -27,7 +27,7 @@ from tabulate import tabulate
 from lodstorage.jsonable import JSONAble
 from lodstorage.mwTable import MediaWikiTable
 from lodstorage.params import Param, Params
-from lodstorage.yamlable import lod_storable
+from basemkit.yamlable import lod_storable
 
 
 class Format(Enum):

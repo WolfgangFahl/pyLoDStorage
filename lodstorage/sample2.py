@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from slugify import slugify
 
-from lodstorage.yamlable import DateConvert, lod_storable
+from basemkit.yamlable import DateConvert, lod_storable
 
 
 @lod_storable

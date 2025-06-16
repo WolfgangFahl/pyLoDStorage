@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Type
 
 from rdflib.namespace import XSD
 
-from lodstorage.yamlable import lod_storable
+from basemkit.yamlable import lod_storable
 
 
 @lod_storable

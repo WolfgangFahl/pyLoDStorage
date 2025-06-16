@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Type, Union
 
 from orjson import orjson
 
-from lodstorage.yamlable import YamlAble, lod_storable
+from basemkit.yamlable import YamlAble, lod_storable
 
 
 @lod_storable
