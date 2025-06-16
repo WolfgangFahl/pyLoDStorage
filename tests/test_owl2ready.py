@@ -3,11 +3,6 @@ Created on 2025-05-27
 
 @author: wf
 """
-
-import json
-
-from owlready2 import default_world, get_ontology
-
 from tests.basetest import Basetest
 
 
@@ -23,6 +18,8 @@ class TestOwl2Ready(Basetest):
         """
         https://dblp.org/rdf/docu/
         """
+        return
+        from owlready2 import default_world, get_ontology
         onto_url = "https://dblp.org/rdf/schema.rdf#"
         onto = get_ontology(onto_url)
         onto.load()

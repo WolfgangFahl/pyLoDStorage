@@ -19,7 +19,7 @@ dependencies = [
   "SPARQLWrapper>=2.0.0",
   #"SPARQLWrapper==1.8.5",
   # https://pypi.org/project/owlready2/
-  "owlready2>=0.47",
+  #"owlready2>=0.47",
   # https://pypi.org/project/ratelimit/
   "ratelimit>=2.2.1",
   "PyYAML",
@@ -32,10 +32,10 @@ dependencies = [
   # "pylatexenc~=2.10",
   "pygments",
   "dicttoxml2",
-  # https://pypi.org/project/dataclasses-json/
-  "dataclasses-json>=0.6.3",
-  # https://pypi.org/project/dacite/
-  "dacite>=1.8.1",
+  # https://pypi.org/project/pybasemkit/
+  # https://github.com/WolfgangFahl/pybasemkit
+  # Python base module kit: YAML/JSON I/O, structured logging, CLI tooling, shell execution, and remote pydevd debug support.
+  "pybasemkit>=0.0.2",
   # https://pypi.org/project/pyparsing/
   "pyparsing>=3.1.1",
   # https://github.com/un33k/python-slugify
@@ -51,11 +51,11 @@ dependencies = [
 requires-python = ">=3.9"
 classifiers=[
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13"
 ]
 dynamic = ["version", "description"]
 
