@@ -24,7 +24,6 @@ from tabulate import tabulate
 # from wikibot.mwTable import MediaWikiTable
 # redundant copy in this library to avoid dependency issues
 # original is at
-from lodstorage.jsonable import JSONAble
 from lodstorage.mwTable import MediaWikiTable
 from lodstorage.params import Param, Params
 from basemkit.yamlable import lod_storable
@@ -71,44 +70,15 @@ class YamlPath:
         return yamlPaths
 
 
+@lod_storable
 class ValueFormatter:
     """
     a value Formatter
     """
+    name: str
+    formatString: str
+    regexps: List[str] = field(default_factory=list)
 
-    home = str(Path.home())
-    # additional endpoints from users endpoint configuration
-    formatsPath = f"{os.path.dirname(__file__)}/../sampledata/formats.yaml"
-    valueFormats = None
-
-    def __init__(
-        self,
-        name: str,
-        formatString: str,
-        regexps: list = None,
-    ):
-        """
-        constructor
-
-        Args:
-            fstring(str): the format String to use
-            regexps(list): the regular expressions to apply
-        """
-        self.name = name
-        self.regexps = regexps
-        self.formatString = formatString
-
-    @classmethod
-    def fromDict(cls, name: str, record: dict):
-        """
-        create a ValueFormatter from the given dict
-        """
-        if "regexps" in record:
-            regexps = record["regexps"]
-        else:
-            regexps = []
-        vf = ValueFormatter(name=name, formatString=record["format"], regexps=regexps)
-        return vf
 
     @classmethod
     def getFormats(cls, formatsPath: str = None) -> dict:
@@ -120,6 +90,10 @@ class ValueFormatter:
         Returns:
             dict: a map for ValueFormatters by formatter Name
         """
+        if formatsPath is None:
+            # additional endpoints from users endpoint configuration
+            formatsPath = f"{os.path.dirname(__file__)}/../sampledata/formats.yaml"
+
         if cls.valueFormats is None:
             valueFormats = {}
             formatPaths = YamlPath.getPaths("formats.yaml", formatsPath)
@@ -170,6 +144,18 @@ class ValueFormatter:
                         newValue = f"\href{{{link}}}{{{value}}}"
                     if newValue is not None:
                         record[key] = newValue
+@lod_storable
+class ValueFormatters:
+    """
+    manages a set of ValueFormatters
+    """
+    formatters: Dict[str, ValueFormatter] = field(default_factory=dict)
+
+    @classmethod
+    def ofYaml(cls, yaml_path: str) -> "ValueFormatters":
+        """Load ValueFormatters from YAML file."""
+        vf = cls.load_from_yaml_file(yaml_path)
+        return vf
 
 
 class QuerySyntaxHighlight:
@@ -484,10 +470,6 @@ class Query:
                         link = self.getLink(value, uqitem, tablefmt)
                     record[key] = link
 
-    def asYaml(self):
-        yamlMarkup = yaml.dump(self)
-        return yamlMarkup
-
     def asWikiSourceMarkup(self):
         """
         convert me to Mediawiki markup for syntax highlighting using the "source" tag
@@ -679,64 +661,23 @@ class QueryManager(object):
         return queries
 
 
-class EndpointManager(object):
-    """
-    manages a set of SPARQL endpoints
-    """
 
-    @staticmethod
-    def getEndpoints(
-        endpointPath: str = None, lang: str = None, with_default: bool = True
-    ):
-        """
-        get the endpoints for the given endpointPath
-
-        Args:
-            endpointPath(str): the path to the yaml file with the endpoint configurations
-            lang(str): if lang is given filter by the given language
-            with_default(bool): if True include the default endpoints
-        """
-        endpointPaths = YamlPath.getPaths(
-            "endpoints.yaml", endpointPath, with_default=with_default
-        )
-        endpoints = {}
-        for lEndpointPath in endpointPaths:
-            with open(lEndpointPath, "r") as stream:
-                endpointRecords = yaml.safe_load(stream)
-                for name, record in endpointRecords.items():
-                    select = True
-                    if lang is not None:
-                        select = record["lang"] == lang
-                    if select:
-                        endpoint = Endpoint()
-                        endpoint.fromDict({"name": name, **record})
-                        default_none_attrs = [
-                            "website",
-                            "calls_per_minute",
-                        ]
-                        for attr in default_none_attrs:
-                            if not hasattr(endpoint, attr):
-                                setattr(endpoint, attr, None)
-                        endpoints[name] = endpoint
-        return endpoints
-
-    @staticmethod
-    def getEndpointNames(endpointPath=None, lang: str = None) -> list:
-        """
-        Returns a list of all available endpoint names
-        Args:
-            endpointPath(str): the path to the yaml file with the endpoint configurations
-            lang(str): if lang is given filter by the given language
-
-        """
-        endpoints = EndpointManager.getEndpoints(endpointPath, lang=lang)
-        return list(endpoints.keys())
-
-
-class Endpoint(JSONAble):
+@lod_storable
+class Endpoint:
     """
     a query endpoint
     """
+    name: str = ""
+    lang: str = "SPARQL"
+    endpoint: str = ""
+    website: Optional[str] = None
+    database: str = "blazegraph"
+    method: str = "POST"
+    calls_per_minute: Optional[int] = None
+    auth: Optional[str] = None
+    user: Optional[str] = None
+    password: Optional[str] = None
+    prefixes: Optional[str] = None
 
     @staticmethod
     def getSamples():
@@ -773,16 +714,12 @@ class Endpoint(JSONAble):
 
     @classmethod
     def getDefault(cls):
-        endpointConf = Endpoint()
-        endpointConf.fromDict(Endpoint.getSamples()[0])
-        return endpointConf
-
-    def __init__(self):
         """
-        constructor for setting defaults
+        get the default endpoint cofiguration
         """
-        self.method = "POST"
-        self.lang = "SPARQL"
+        sample_data = cls.getSamples()[0]
+        endpoint_conf=cls.from_dict(sample_data)
+        return endpoint_conf
 
     def __str__(self):
         """
@@ -791,3 +728,53 @@ class Endpoint(JSONAble):
         """
         text = f"{self.name}:{self.website}:{self.endpoint}({self.method})"
         return text
+
+@lod_storable
+class EndpointManager(object):
+    """
+    manages a set of SPARQL endpoints
+    """
+    endpoints: Dict[str, Endpoint] = field(default_factory=dict)
+
+    @classmethod
+    def ofYaml(cls, yaml_path: str) -> "EndpointManager":
+        """Load prefix configurations from YAML file."""
+        em = cls.load_from_yaml_file(yaml_path)
+        return em
+
+    @classmethod
+    def getEndpoints(
+        cls,
+        endpointPath: str = None, lang: str = None, with_default: bool = True
+    ):
+        """
+        get the endpoints for the given endpointPath
+
+        Args:
+            endpointPath(str): the path to the yaml file with the endpoint configurations
+            lang(str): if lang is given filter by the given language
+            with_default(bool): if True include the default endpoints
+        """
+        endpointPaths = YamlPath.getPaths(
+            "endpoints.yaml", endpointPath, with_default=with_default
+        )
+        endpoints = {}
+        for lEndpointPath in endpointPaths:
+            em=cls.ofYaml(lEndpointPath)
+            for name, endpoint in em.endpoints.items():
+                if lang is not None and endpoint.lang == lang:
+                    endpoints[name] = endpoint
+        return endpoints
+
+    @staticmethod
+    def getEndpointNames(endpointPath=None, lang: str = None) -> list:
+        """
+        Returns a list of all available endpoint names
+        Args:
+            endpointPath(str): the path to the yaml file with the endpoint configurations
+            lang(str): if lang is given filter by the given language
+
+        """
+        endpoints = EndpointManager.getEndpoints(endpointPath, lang=lang)
+        endpoint_names= list(endpoints.keys())
+        return endpoint_names
