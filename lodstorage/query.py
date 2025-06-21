@@ -129,6 +129,7 @@ class ValueFormatters:
     formatters: Dict[str, ValueFormatter] = field(default_factory=dict)
 
     _instance: Optional['ValueFormatters'] = None
+    _formats_path: str = None
 
     @classmethod
     def get_instance(cls) -> 'ValueFormatters':
@@ -144,7 +145,7 @@ class ValueFormatters:
         return cls._instance
 
     @classmethod
-    def ofYaml(cls, yaml_path: str=None) -> "ValueFormatters":
+    def of_yaml(cls, yaml_path: str=None) -> "ValueFormatters":
         """Load ValueFormatters from YAML file."""
         vf=None
         if yaml_path is None:
@@ -153,6 +154,7 @@ class ValueFormatters:
                 yaml_path=paths[0]
         if yaml_path:
             vf = cls.load_from_yaml_file(yaml_path)
+            cls._formats_path=yaml_path
         return vf
 
 

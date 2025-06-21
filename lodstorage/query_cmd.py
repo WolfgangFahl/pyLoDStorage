@@ -155,10 +155,11 @@ class QueryCmd:
             default=None,
             help="path to yaml file to configure endpoints to use for queries",
         )
+        ValueFormatters.get_instance()
         parser.add_argument(
             "-fp",
             "--formatsPath",
-            default=ValueFormatter.formatsPath,
+            default=ValueFormatters._formats_path,
             help="path to yaml file to configure formats to use for query result documentation",
         )
         parser.add_argument(
