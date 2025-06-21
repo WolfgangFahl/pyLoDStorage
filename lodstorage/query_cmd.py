@@ -4,8 +4,8 @@ Created on 2024-08-21
 @author: wf
 """
 
-import json
 from argparse import ArgumentParser, Namespace
+import json
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -17,7 +17,7 @@ from lodstorage.query import (
     Format,
     Query,
     QueryManager,
-    ValueFormatter,
+    ValueFormatter, ValueFormatters,
 )
 
 
@@ -58,8 +58,8 @@ class QueryCmd:
         self.query = None
         self.queryCode = args.query
         self.formats = None
-        # preload ValueFormatter
-        ValueFormatter.getFormats(args.formatsPath)
+        # preload ValueFormatters
+        ValueFormatters.preload(args.formatsPath)
         if args.list:
             for name, query in self.qm.queriesByName.items():
                 print(f"{name}:{query.title}")

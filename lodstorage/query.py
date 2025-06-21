@@ -128,6 +128,21 @@ class ValueFormatters:
     """
     formatters: Dict[str, ValueFormatter] = field(default_factory=dict)
 
+    _instance: Optional['ValueFormatters'] = None
+
+    @classmethod
+    def get_instance(cls) -> 'ValueFormatters':
+        """Get the singleton instance."""
+        if cls._instance is None:
+            cls._instance = cls.of_yaml()
+        return cls._instance
+
+    @classmethod
+    def preload(cls, formats_path: str) -> 'ValueFormatters':
+        """Preload singleton with specific formats path."""
+        cls._instance = cls.of_yaml(formats_path)
+        return cls._instance
+
     @classmethod
     def ofYaml(cls, yaml_path: str=None) -> "ValueFormatters":
         """Load ValueFormatters from YAML file."""
@@ -361,26 +376,25 @@ class Query:
             # no
             return
         # get the value Formatters that might apply here
-        valueFormatters = ValueFormatter.getFormats()
+        valueFormatters = ValueFormatters.get_instance()
         formatsToApply = {}
         for valueFormatSpec in self.formats:
             parts = valueFormatSpec.split(":")
             # e.g. president:wikidata
             keytoformat = parts[0]
             formatName = parts[1]
-            if formatName in valueFormatters:
-                formatsToApply[keytoformat] = valueFormatters[formatName]
+            if formatName in valueFormatters.formatters:
+                formatsToApply[keytoformat] = valueFormatters.formatters[formatName]
         for record in lod:
             for keytoformat in formatsToApply:
                 valueFormatter = formatsToApply[keytoformat]
                 # format all key values
                 if keytoformat == "*":
                     for key in record:
-                        valueFormatter.applyFormat(record, key, tablefmt)
+                        valueFormatter.apply_format(record, key, tablefmt)
                 # or just a selected one
                 elif keytoformat in record:
-                    valueFormatter.applyFormat(record, keytoformat, tablefmt)
-            pass
+                    valueFormatter.apply_format(record, keytoformat, tablefmt)
 
     def getTryItUrl(self, baseurl: str, database: str = "blazegraph"):
         """
