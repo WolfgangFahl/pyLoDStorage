@@ -1,0 +1,105 @@
+# pre-fix sets for omnigraph
+# see https://github.com/WolfgangFahl/pyomnigraph
+#
+prefix_sets:
+  rdf:
+    name: "rdf"
+    description: "Standard RDF/OWL prefixes"
+    prefixes:
+      rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      rdfs: "http://www.w3.org/2000/01/rdf-schema#"
+      owl: "http://www.w3.org/2002/07/owl#"
+      xsd: "http://www.w3.org/2001/XMLSchema#"
+      skos: "http://www.w3.org/2004/02/skos/core#"
+      schema: "http://schema.org/"
+
+  wikidata:
+    name: "wikidata"
+    description: "Wikidata-specific prefixes"
+    prefixes:
+      wd: "http://www.wikidata.org/entity/"
+      wdt: "http://www.wikidata.org/prop/direct/"
+      wikibase: "http://wikiba.se/ontology#"
+      p: "http://www.wikidata.org/prop/"
+      ps: "http://www.wikidata.org/prop/statement/"
+      pq: "http://www.wikidata.org/prop/qualifier/"
+      pqn: "http://www.wikidata.org/prop/qualifier/value-normalized/"
+      pqv: "http://www.wikidata.org/prop/qualifier/value/"
+      pr: "http://www.wikidata.org/prop/reference/"
+      prn: "http://www.wikidata.org/prop/reference/value-normalized/"
+      prv: "http://www.wikidata.org/prop/reference/value/"
+      psn: "http://www.wikidata.org/prop/statement/value-normalized/"
+      psv: "http://www.wikidata.org/prop/statement/value/"
+      wdata: "http://www.wikidata.org/wiki/Special:EntityData/"
+      wdno: "http://www.wikidata.org/prop/novalue/"
+      wdref: "http://www.wikidata.org/reference/"
+      wds: "http://www.wikidata.org/entity/statement/"
+      wdtn: "http://www.wikidata.org/prop/direct-normalized/"
+      wdv: "http://www.wikidata.org/value/"
+
+  factgrid:
+    name: "factgrid"
+    description: "FactGrid-specific prefixes"
+    prefixes:
+      wd: "http://factgrid.de/entity/"
+      wdt: "http://factgrid.de/prop/direct/"
+      p: "http://factgrid.de/prop/"
+      ps: "http://factgrid.de/prop/statement/"
+      pq: "http://factgrid.de/prop/qualifier/"
+      pqn: "http://factgrid.de/prop/qualifier/value-normalized/"
+      pqv: "http://factgrid.de/prop/qualifier/value/"
+      pr: "http://factgrid.de/prop/reference/"
+      prn: "http://factgrid.de/prop/reference/value-normalized/"
+      prv: "http://factgrid.de/prop/reference/value/"
+      psn: "http://factgrid.de/prop/statement/value-normalized/"
+      psv: "http://factgrid.de/prop/statement/value/"
+      wdata: "http://factgrid.de/wiki/Special:EntityData/"
+      wdno: "http://factgrid.de/prop/novalue/"
+      wdref: "http://factgrid.de/reference/"
+      wds: "http://factgrid.de/entity/statement/"
+      wdtn: "http://factgrid.de/prop/direct-normalized/"
+      wdv: "http://factgrid.de/value/"
+
+  commons:
+    name: "commons"
+    description: "Common vocabulary prefixes"
+    prefixes:
+      cc: "http://creativecommons.org/ns#"
+      dct: "http://purl.org/dc/terms/"
+      dc: "http://purl.org/dc/terms/"
+      dc11: "http://purl.org/dc/elements/1.1/"
+      ontolex: "http://www.w3.org/ns/lemon/ontolex#"
+      prov: "http://www.w3.org/ns/prov#"
+      foaf: "http://xmlns.com/foaf/0.1/"
+      time: "http://www.w3.org/2006/time#"
+
+  blazegraph:
+    name: "blazegraph"
+    description: "Blazegraph-specific prefixes"
+    prefixes:
+      bd: "http://www.bigdata.com/rdf#"
+
+  dblp:
+    name: "dblp"
+    description: "DBLP-specific prefixes"
+    prefixes:
+      dblp: "https://dblp.org/rdf/schema#"
+
+  gov:
+    name: "gov"
+    description: "Genealogy.net GOV-specific prefixes"
+    prefixes:
+      gov: "http://gov.genealogy.net/"
+      gp: "http://gov.genealogy.net/ontology.owl#"
+      gt: "http://gov.genealogy.net/types.owl#"
+
+  osm:
+    name: "osm"
+    description: "OpenStreetMap prefixes"
+    prefixes:
+      geo: "http://www.opengis.net/ont/geosparql#"
+      osmm: "https://www.openstreetmap.org/meta/"
+      osmrel: "https://www.openstreetmap.org/relation/"
+      osmt: "https://wiki.openstreetmap.org/wiki/Key:"
+      osm2rdfmember: "https://osm2rdf.cs.uni-freiburg.de/rdf/member#"
+      osmway: "https://www.openstreetmap.org/way/"

@@ -10,10 +10,9 @@ from typing import Dict
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import EndpointManager
 
-from omnigraph.ominigraph_paths import OmnigraphPaths
-from omnigraph.prefix_config import PrefixConfigs
+from lodstorage.prefix_config import PrefixConfigs
 from tests.basetest import Basetest
-
+from pathlib import Path
 
 class TestPrefixConfig(Basetest):
     """
@@ -25,8 +24,7 @@ class TestPrefixConfig(Basetest):
         setUp the test environment
         """
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.ogp = OmnigraphPaths()
-        self.prefixes_yaml_path = self.ogp.examples_dir / "prefixes.yaml"
+        self.prefixes_yaml_path = (Path(__file__).parent / ".." / "sampledata" / "prefixes.yaml").resolve()
         self.pfix_configs = PrefixConfigs.ofYaml(self.prefixes_yaml_path)
 
     def get_all_prefixes(self) -> Dict[str, str]:

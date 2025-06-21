@@ -21,6 +21,7 @@ from lodstorage.query import (
     QueryManager,
     QueryResultDocumentation,
     ValueFormatter,
+    ValueFormatters,
 )
 from lodstorage.querymain import QueryMain
 from lodstorage.querymain import main as queryMain
@@ -308,8 +309,8 @@ class TestQueries(Basetest):
         """
         test reading the valueFormatters
         """
-        vfs = ValueFormatter.getFormats(ValueFormatter.formatsPath)
-        self.assertTrue("wikidata" in vfs)
+        vfs = ValueFormatters.ofYaml()
+        self.assertTrue("wikidata" in vfs.formatters)
 
     def testIssue89(self):
         """

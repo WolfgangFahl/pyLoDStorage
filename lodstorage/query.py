@@ -49,9 +49,15 @@ class Format(Enum):
 
 
 class YamlPath:
+    """
+    provide path to loading configuration or data files by checking:
+    - a provided path or an optional user-specific location (~/.pylodstorage).
+    """
     @staticmethod
     def getPaths(yamlFileName: str, yamlPath: str = None, with_default: bool = True):
         """
+        Get a list of YAML file paths to be used for loading configuration/data.
+
         Args:
             yamlFileName (str): The name of the YAML file to read from if (any) - legacy way to specify name
             yamlPath (str, optional): The full path to read from. Defaults to None.
@@ -59,7 +65,7 @@ class YamlPath:
 
         """
         if yamlPath is None:
-            yamlPath = f"{os.path.dirname(__file__)}/../sampledata/{yamlFileName}"
+            yamlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "sampledata", yamlFileName))
         yamlPaths = [yamlPath]
         if with_default:
             home = str(Path.home())
@@ -75,37 +81,8 @@ class ValueFormatter:
     """
     a value Formatter
     """
-    name: str
-    formatString: str
+    format: str
     regexps: List[str] = field(default_factory=list)
-
-
-    @classmethod
-    def getFormats(cls, formatsPath: str = None) -> dict:
-        """
-        get the available ValueFormatters
-
-        Args:
-            formatsPath(str): the path to the yaml file to read the format specs from
-        Returns:
-            dict: a map for ValueFormatters by formatter Name
-        """
-        if formatsPath is None:
-            # additional endpoints from users endpoint configuration
-            formatsPath = f"{os.path.dirname(__file__)}/../sampledata/formats.yaml"
-
-        if cls.valueFormats is None:
-            valueFormats = {}
-            formatPaths = YamlPath.getPaths("formats.yaml", formatsPath)
-            for formatPath in formatPaths:
-                with open(formatPath, "r", encoding="utf-8") as stream:
-                    valueFormatRecords = yaml.safe_load(stream)
-                    for valueFormatKey, valueFormatRecord in valueFormatRecords.items():
-                        valueFormats[valueFormatKey] = ValueFormatter.fromDict(
-                            name=valueFormatKey, record=valueFormatRecord
-                        )
-            cls.valueFormats = valueFormats
-        return cls.valueFormats
 
     def applyFormat(self, record, key, resultFormat: Format):
         """
@@ -134,14 +111,14 @@ class ValueFormatter:
                             file=sys.stderr,
                         )
                 if value is not None and doformat:
-                    link = self.formatString.format(value=value)
+                    link = self.format.format(value=value)
                     newValue = None
                     if resultFormat == "github":
                         newValue = f"[{value}]({link})"
                     elif resultFormat == "mediawiki":
                         newValue = f"[{link} {value}]"
                     elif resultFormat == "latex":
-                        newValue = f"\href{{{link}}}{{{value}}}"
+                        newValue = fr"\href{{{link}}}{{{value}}}"
                     if newValue is not None:
                         record[key] = newValue
 @lod_storable
@@ -152,9 +129,15 @@ class ValueFormatters:
     formatters: Dict[str, ValueFormatter] = field(default_factory=dict)
 
     @classmethod
-    def ofYaml(cls, yaml_path: str) -> "ValueFormatters":
+    def ofYaml(cls, yaml_path: str=None) -> "ValueFormatters":
         """Load ValueFormatters from YAML file."""
-        vf = cls.load_from_yaml_file(yaml_path)
+        vf=None
+        if yaml_path is None:
+            paths=YamlPath.getPaths("formats.yaml")
+            if len(paths)>0:
+                yaml_path=paths[0]
+        if yaml_path:
+            vf = cls.load_from_yaml_file(yaml_path)
         return vf
 
 
