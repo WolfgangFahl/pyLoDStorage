@@ -23,7 +23,6 @@ dependencies = [
   # https://pypi.org/project/ratelimit/
   "ratelimit>=2.2.1",
   "PyYAML",
-  "pandas",
   # beware of https://github.com/matplotlib/matplotlib/issues/26827
   "matplotlib>=3.8.2",
   "tabulate",
