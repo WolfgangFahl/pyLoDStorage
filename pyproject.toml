@@ -18,8 +18,6 @@ dependencies = [
   # https://pypi.org/project/SPARQLWrapper/
   "SPARQLWrapper>=2.0.0",
   #"SPARQLWrapper==1.8.5",
-  # https://pypi.org/project/owlready2/
-  #"owlready2>=0.47",
   # https://pypi.org/project/ratelimit/
   "ratelimit>=2.2.1",
   "PyYAML",
