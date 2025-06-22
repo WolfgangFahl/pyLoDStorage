@@ -11,7 +11,7 @@ import time
 from datetime import datetime, timezone
 from io import StringIO
 
-from lodstorage.sample import Sample
+from lodstorage.sample2 import Sample
 from lodstorage.schema import Schema
 from lodstorage.sql import SQLDB, EntityInfo
 from lodstorage.sqlite_api import SQLiteApiFixer
@@ -87,15 +87,15 @@ class TestSQLDB(Basetest):
         test creating entityInfo from the sample record
         """
         debug = self.debug
-        # debug=True
+        #debug=True
         listOfRecords = Sample.getRoyals()
-        entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=debug)
+        entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=debug, quiet=not debug)
         self.assertEqual(
-            "CREATE TABLE Person(name TEXT PRIMARY KEY,born DATE,numberInLine INTEGER,wikidataurl TEXT,age FLOAT,ofAge BOOLEAN,lastmodified TIMESTAMP)",
+            "CREATE TABLE Person(name TEXT PRIMARY KEY,wikidata_id TEXT,number_in_line INTEGER,born_iso_date TEXT,died_iso_date TEXT,lastmodified_iso TEXT,age INTEGER,of_age BOOLEAN,wikidata_url TEXT)",
             entityInfo.createTableCmd,
         )
         self.assertEqual(
-            "INSERT INTO Person (name,born,numberInLine,wikidataurl,age,ofAge,lastmodified) values (:name,:born,:numberInLine,:wikidataurl,:age,:ofAge,:lastmodified)",
+            "INSERT INTO Person (name,wikidata_id,number_in_line,born_iso_date,died_iso_date,lastmodified_iso,age,of_age,wikidata_url) values (:name,:wikidata_id,:number_in_line,:born_iso_date,:died_iso_date,:lastmodified_iso,:age,:of_age,:wikidata_url)",
             entityInfo.insertCmd,
         )
         self.sqlDB = SQLDB(debug=self.debug, errorDebug=True)
@@ -108,7 +108,7 @@ class TestSQLDB(Basetest):
         self.assertEqual(1, len(tableList))
         personTable = tableList[0]
         self.assertEqual("Person", personTable["name"])
-        self.assertEqual(7, len(personTable["columns"]))
+        self.assertEqual(9, len(personTable["columns"]))
         uml = UML()
         plantUml = uml.tableListToPlantUml(
             tableList, packageName="Royals", withSkin=False
@@ -117,13 +117,15 @@ class TestSQLDB(Basetest):
             print(plantUml)
         expected = """package Royals {
   class Person << Entity >> {
-   age : FLOAT
-   born : DATE
-   lastmodified : TIMESTAMP
+   age : INTEGER
+   born_iso_date : TEXT
+   died_iso_date : TEXT
+   lastmodified_iso : TEXT
    name : TEXT <<PK>>
-   numberInLine : INTEGER
-   ofAge : BOOLEAN
-   wikidataurl : TEXT
+   number_in_line : INTEGER
+   of_age : BOOLEAN
+   wikidata_id : TEXT
+   wikidata_url : TEXT
   }
 }
 """
@@ -143,22 +145,26 @@ class TestSQLDB(Basetest):
         if debug:
             print(plantUml)
         expected = """class PersonBase << Entity >> {
- lastmodified : TIMESTAMP
  name : TEXT <<PK>>
 }
 class Person << Entity >> {
- age : FLOAT
- born : DATE
- numberInLine : INTEGER
- ofAge : BOOLEAN
- wikidataurl : TEXT
+ age : INTEGER
+ born_iso_date : TEXT
+ died_iso_date : TEXT
+ lastmodified_iso : TEXT
+ number_in_line : INTEGER
+ of_age : BOOLEAN
+ wikidata_id : TEXT
+ wikidata_url : TEXT
 }
 class Family << Entity >> {
  country : TEXT
+ lastmodified : TIMESTAMP
 }
 PersonBase <|-- Person
 PersonBase <|-- Family
 """
+        self.maxDiff=None
         self.assertEqual(expected, plantUml)
 
     def testIssue15(self):
@@ -177,7 +183,7 @@ PersonBase <|-- Family
             listOfRecords[:10], entityInfo.name, entityInfo.primaryKey
         )
         listOfRecords = [
-            {"name": "Royal family", "country": "UK", "lastmodified": datetime.now()}
+            {"name": "Royal family", "country": "UK", "lastmodified_iso": "2022-09-08"}
         ]
         entityInfo = self.sqlDB.createTable(listOfRecords[:10], "Family", "name")
         tableList = self.sqlDB.getTableList()
@@ -185,9 +191,9 @@ PersonBase <|-- Family
         if debug:
             print(viewDDL)
         expected = """CREATE VIEW PersonBase AS
-  SELECT name,lastmodified FROM Person
+  SELECT name,lastmodified_iso FROM Person
 UNION
-  SELECT name,lastmodified FROM Family"""
+  SELECT name,lastmodified_iso FROM Family"""
         self.assertEqual(expected.strip(), viewDDL.strip())
         pass
 
@@ -222,7 +228,10 @@ record  #3={'name': 'John Doe'}"""
         resultList = self.checkListOfRecords(
             listOfRecords, "Person", "name", debug=self.debug
         )
-        if self.debug:
+        debug=self.debug
+        debug=True
+        if debug:
+            print(listOfRecords)
             print(resultList)
         self.assertEqual(listOfRecords, resultList)
 
@@ -468,6 +477,8 @@ record  #3={'name': 'John Doe'}"""
         https://github.com/WolfgangFahl/pyLoDStorage/issues/55
         datetime handling sqlite error should lead to warning and not raise an exception
         """
+        # Reset singleton for test isolation
+        SQLiteApiFixer._instance = None
         # Initialize the SQLiteApiFixer singleton
         SQLiteApiFixer.install(lenient=True)
 

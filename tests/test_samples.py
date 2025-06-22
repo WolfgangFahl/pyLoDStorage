@@ -202,5 +202,5 @@ class TestSamples(Basetest):
         """
         # royals
         royals_url = "https://raw.githubusercontent.com/WolfgangFahl/pyLoDStorage/master/sampledata/royals.yaml"
-        royals = Royals.load_from_yaml_url(royals_url)
+        royals = Royals.load_from_yaml_url(royals_url) # @UndefinedVariable
         self.check_sample(Royals, "royals", "QE2 heirs up to number in line 5", royals)

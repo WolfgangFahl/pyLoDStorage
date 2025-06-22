@@ -588,12 +588,9 @@ class EntityInfo(object):
                 if sqlType is not None and valueType is not None:
                     self.addType(key, valueType, sqlType)
         for key, sqlType in self.sqlTypeMap.items():
-            ddlCmd += "%s%s %s%s" % (
-                delim,
-                key,
-                sqlType,
-                " PRIMARY KEY" if key == self.primaryKey else "",
-            )
+            is_primary = " PRIMARY KEY" if key == self.primaryKey else ""
+            ddl_col=f"{delim}{key} {sqlType}{is_primary}"
+            ddlCmd += ddl_col
             delim = ","
         ddlCmd += ")"
         if self.debug and not self.quiet:
