@@ -104,7 +104,7 @@ checkOrGetJenaParts() {
       ls -l "$tgz"
       file -b "$tgz"
       color_msg $blue "unpacking $tgz"
-      tar xvfz "$tgz"
+      tar xfz "$tgz"
     else
       color_msg $green "$jpart already downloaded and unpacked"
     fi
