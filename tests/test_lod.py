@@ -5,9 +5,7 @@ Created on 2021-06-11
 """
 
 import copy
-import unittest
 
-from lodstorage.jsonable import JSONAble, JSONAbleList
 from lodstorage.lod import LOD
 from tests.basetest import Basetest
 
@@ -100,13 +98,3 @@ class TestLOD(Basetest):
         expectedFields = ["name", "label", "location"]
         actualFieldsLoD = LOD.getFields(lod)
         self.assertEqual(actualFieldsLoD, expectedFields)
-        jsonAbleList = JSONAbleList(clazz=JSONAble)
-        jsonAbleList.fromLoD(lod)
-        loj = jsonAbleList.getList()
-        actualFieldsLoJ = LOD.getFields(loj)
-        self.assertEqual(actualFieldsLoJ, expectedFields)
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

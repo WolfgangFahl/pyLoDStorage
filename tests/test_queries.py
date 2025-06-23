@@ -309,7 +309,7 @@ class TestQueries(Basetest):
         """
         test reading the valueFormatters
         """
-        vfs = ValueFormatters.ofYaml()
+        vfs = ValueFormatters.of_yaml()
         self.assertTrue("wikidata" in vfs.formatters)
 
     def testIssue89(self):
