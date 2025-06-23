@@ -5,14 +5,14 @@ Created on 2025-06-04
 """
 
 import json
+from pathlib import Path
 from typing import Dict
 
+from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import EndpointManager
-
-from lodstorage.prefix_config import PrefixConfigs
 from tests.basetest import Basetest
-from pathlib import Path
+
 
 class TestPrefixConfig(Basetest):
     """
@@ -24,7 +24,9 @@ class TestPrefixConfig(Basetest):
         setUp the test environment
         """
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.prefixes_yaml_path = (Path(__file__).parent / ".." / "sampledata" / "prefixes.yaml").resolve()
+        self.prefixes_yaml_path = (
+            Path(__file__).parent / ".." / "sampledata" / "prefixes.yaml"
+        ).resolve()
         self.pfix_configs = PrefixConfigs.ofYaml(self.prefixes_yaml_path)
 
     def get_all_prefixes(self) -> Dict[str, str]:
@@ -72,7 +74,11 @@ class TestPrefixConfig(Basetest):
                         missing_prefixes.add(f"{prefix_name}: {prefix_uri}")
                         if self.debug:
                             print(f"  Missing prefix: {prefix_name} -> {prefix_uri}")
-        self.assertEqual(len(missing_prefixes), 0, f"Missing {len(missing_prefixes)} prefixes: {missing_prefixes}")
+        self.assertEqual(
+            len(missing_prefixes),
+            0,
+            f"Missing {len(missing_prefixes)} prefixes: {missing_prefixes}",
+        )
 
     def test_get_declarations(self):
         """

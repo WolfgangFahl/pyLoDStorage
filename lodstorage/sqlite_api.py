@@ -34,7 +34,7 @@ class DatetimeAdapter:
         """Convert ISO 8601 date byte string to a datetime.date object."""
         try:
             decoded_date = self._handle_input(val)
-            dt= datetime.date.fromisoformat(decoded_date)
+            dt = datetime.date.fromisoformat(decoded_date)
             return dt
         except Exception as e:
             return self._handle_error(e, val)
@@ -52,7 +52,7 @@ class DatetimeAdapter:
         try:
             decoded_string = self._handle_input(val)
             timestamp_float = float(decoded_string) / 10**6
-            dt=datetime.datetime.fromtimestamp(timestamp_float)
+            dt = datetime.datetime.fromtimestamp(timestamp_float)
             return dt
         except ValueError as _ve:
             try:

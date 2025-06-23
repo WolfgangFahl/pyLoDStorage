@@ -3,11 +3,12 @@ Created on 2024-01-21
 
 @author: wf
 """
+
+import json
 import urllib.request
 from dataclasses import field
-from datetime import date, datetime
-import json
-from typing import List, Optional, Dict, Any
+from datetime import date
+from typing import Any, Dict, List, Optional
 
 from basemkit.yamlable import DateConvert, lod_storable
 from slugify import slugify
@@ -104,49 +105,49 @@ class Royals:
                         died_iso_date="2022-09-08",
                         wikidata_id="Q9682",
                         number_in_line=-1,  # for deceased or unranked
-                        lastmodified_iso="2022-09-08"
+                        lastmodified_iso="2022-09-08",
                     ),
                     Royal(
                         name="Charles III of the United Kingdom",
                         born_iso_date="1948-11-14",
                         number_in_line=0,
                         wikidata_id="Q43274",
-                        lastmodified_iso="2022-09-08"
+                        lastmodified_iso="2022-09-08",
                     ),
                     Royal(
                         name="William, Duke of Cambridge",
                         born_iso_date="1982-06-21",
                         number_in_line=1,
                         wikidata_id="Q36812",
-                        lastmodified_iso="2022-09-08"
+                        lastmodified_iso="2022-09-08",
                     ),
                     Royal(
                         name="Prince George of Wales",
                         born_iso_date="2013-07-22",
                         number_in_line=2,
                         wikidata_id="Q13590412",
-                        lastmodified_iso="2022-09-08"
+                        lastmodified_iso="2022-09-08",
                     ),
                     Royal(
                         name="Princess Charlotte of Wales",
                         born_iso_date="2015-05-02",
                         number_in_line=3,
                         wikidata_id="Q18002970",
-                        lastmodified_iso="2022-09-08"
+                        lastmodified_iso="2022-09-08",
                     ),
                     Royal(
                         name="Prince Louis of Wales",
                         born_iso_date="2018-04-23",
                         number_in_line=4,
                         wikidata_id="Q38668629",
-                        lastmodified_iso="2022-09-08"
+                        lastmodified_iso="2022-09-08",
                     ),
                     Royal(
                         name="Harry Duke of Sussex",
                         born_iso_date="1984-09-15",
                         number_in_line=5,
                         wikidata_id="Q152316",
-                        lastmodified_iso="2022-09-08"
+                        lastmodified_iso="2022-09-08",
                     ),
                 ]
             )
@@ -216,7 +217,8 @@ class Sample:
     """
     Sample dataset provider
     """
-    cityList=None
+
+    cityList = None
 
     @staticmethod
     def get(dataset_name: str):
@@ -233,7 +235,7 @@ class Sample:
         return samples
 
     @staticmethod
-    def getSample(size)->List[Dict[str,Any]]:
+    def getSample(size) -> List[Dict[str, Any]]:
         """
         get a generated sample of the given size
         """
@@ -242,23 +244,22 @@ class Sample:
             listOfDicts.append({"pkey": "index%d" % index, "cindex": index})
         return listOfDicts
 
-
     @staticmethod
-    def getRoyals()->List[Dict[str,Any]]:
+    def getRoyals() -> List[Dict[str, Any]]:
         """
         compatibility for old sample module
         return list of dicts
         """
-        royals_dict=Royals.get_samples()
-        royals=royals_dict.get("QE2 heirs up to number in line 5")
-        royals_lod=[]
+        royals_dict = Royals.get_samples()
+        royals = royals_dict.get("QE2 heirs up to number in line 5")
+        royals_lod = []
         for royal in royals.members:
-            record=royal.to_dict()
+            record = royal.to_dict()
             royals_lod.append(record)
         return royals_lod
 
     @staticmethod
-    def getCities()->List[Dict[str,Any]]:
+    def getCities() -> List[Dict[str, Any]]:
         """
         get a list of city records
         compatibility for old sample module

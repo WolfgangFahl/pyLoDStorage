@@ -19,18 +19,27 @@ class LOD(object):
 
     @staticmethod
     def getFields(listOfDicts, sampleCount: int = None):
-        if sampleCount is None:
-            if listOfDicts is None:
-                return None
-            sampleCount = len(listOfDicts)
-        fields = []
-        from lodstorage.jsonable import JSONAble
+        """
+        Extract field names from a list of dictionaries.
 
-        for row in listOfDicts:
-            if isinstance(row, JSONAble):
-                row = vars(row)
+        Args:
+            listOfDicts: List of dictionaries to extract field names from
+            sampleCount: Number of dictionaries to sample. If None, all are sampled
+
+        Returns:
+            list: Field names found in the dictionaries, or None if listOfDicts is None
+        """
+        if listOfDicts is None:
+            return None
+        if sampleCount is None:
+            sampleCount = len(listOfDicts)
+
+        fields = []
+        for i, row in enumerate(listOfDicts):
+            if i >= sampleCount:
+                break
             for key in row.keys():
-                if not key in fields:
+                if key not in fields:
                     fields.append(key)
         return fields
 

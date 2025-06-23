@@ -4,8 +4,8 @@ Created on 2024-08-21
 @author: wf
 """
 
-from argparse import ArgumentParser, Namespace
 import json
+from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -17,7 +17,7 @@ from lodstorage.query import (
     Format,
     Query,
     QueryManager,
-    ValueFormatter, ValueFormatters,
+    ValueFormatters,
 )
 
 
@@ -116,7 +116,8 @@ class QueryCmd:
         """
         args = self.args
         if args.format is Format.csv:
-            csv = CSV.toCSV(qlod)
+            csv_converter = CSV.get_instance()
+            csv = csv_converter.toCSV(qlod)
             print(csv)
         elif args.format in [Format.latex, Format.github, Format.mediawiki]:
             doc = self.query.documentQueryResult(

@@ -4,12 +4,11 @@ Created on 2021-06-13
 @author: wf
 """
 
-import unittest
 from collections import Counter
 
 from tabulate import tabulate
 
-from lodstorage.sample import Royals, Sample
+from lodstorage.sample2 import Sample
 from lodstorage.tabulateCounter import TabulateCounter
 from tests.basetest import Basetest
 
@@ -19,6 +18,9 @@ class TestTabulate(Basetest):
     test tabulate support/compatibility
     """
 
+    def setUp(self, debug=False, profile=True):
+        Basetest.setUp(self, debug=debug, profile=profile)
+
     def testIssue24_IntegrateTabulate(self):
         """
         https://github.com/WolfgangFahl/pyLoDStorage/issues/24
@@ -26,12 +28,13 @@ class TestTabulate(Basetest):
         test https://pypi.org/project/tabulate/ support
         """
         show = self.debug
-        # show=True
-        royals = Royals(load=True)
+        # show = True
+        royals_lod = Sample.getRoyals()
         for fmt in ["latex", "grid", "mediawiki", "github"]:
-            table = tabulate(royals.royals, headers="keys", tablefmt=fmt)
+            table = tabulate(royals_lod, headers="keys", tablefmt=fmt)
             if show:
                 print(table)
+            self.assertTrue("Charles III" in table)
 
         cities = Sample.getCities()
         counter = Counter()
@@ -43,8 +46,3 @@ class TestTabulate(Basetest):
             if show:
                 print(table)
         pass
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

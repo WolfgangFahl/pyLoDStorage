@@ -87,9 +87,11 @@ class TestSQLDB(Basetest):
         test creating entityInfo from the sample record
         """
         debug = self.debug
-        #debug=True
+        # debug=True
         listOfRecords = Sample.getRoyals()
-        entityInfo = EntityInfo(listOfRecords[:3], "Person", "name", debug=debug, quiet=not debug)
+        entityInfo = EntityInfo(
+            listOfRecords[:3], "Person", "name", debug=debug, quiet=not debug
+        )
         self.assertEqual(
             "CREATE TABLE Person(name TEXT PRIMARY KEY,wikidata_id TEXT,number_in_line INTEGER,born_iso_date TEXT,died_iso_date TEXT,lastmodified_iso TEXT,age INTEGER,of_age BOOLEAN,wikidata_url TEXT)",
             entityInfo.createTableCmd,
@@ -164,7 +166,7 @@ class Family << Entity >> {
 PersonBase <|-- Person
 PersonBase <|-- Family
 """
-        self.maxDiff=None
+        self.maxDiff = None
         self.assertEqual(expected, plantUml)
 
     def testIssue15(self):
@@ -228,8 +230,8 @@ record  #3={'name': 'John Doe'}"""
         resultList = self.checkListOfRecords(
             listOfRecords, "Person", "name", debug=self.debug
         )
-        debug=self.debug
-        debug=True
+        debug = self.debug
+        debug = True
         if debug:
             print(listOfRecords)
             print(resultList)

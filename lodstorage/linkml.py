@@ -7,9 +7,8 @@ Created on 2024-01-28
 from dataclasses import field
 from typing import Dict, List, Optional, Type
 
-from rdflib.namespace import XSD
-
 from basemkit.yamlable import lod_storable
+from rdflib.namespace import XSD
 
 
 @lod_storable

@@ -20,7 +20,7 @@ class TestLinkMLSchema(Basetest):
         test reading official LinkML types
         """
         uri = "https://raw.githubusercontent.com/linkml/linkml-runtime/main/linkml_runtime/linkml_model/model/schema/types.yaml"
-        schema = Schema.load_from_yaml_url(uri)
+        schema = Schema.load_from_yaml_url(uri)  # @UndefinedVariable
         debug = self.debug
         # debug = True
         if debug:

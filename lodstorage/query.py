@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
+from basemkit.yamlable import lod_storable
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.formatters.latex import LatexFormatter
@@ -26,7 +27,6 @@ from tabulate import tabulate
 # original is at
 from lodstorage.mwTable import MediaWikiTable
 from lodstorage.params import Param, Params
-from basemkit.yamlable import lod_storable
 
 
 class Format(Enum):
@@ -53,6 +53,7 @@ class YamlPath:
     provide path to loading configuration or data files by checking:
     - a provided path or an optional user-specific location (~/.pylodstorage).
     """
+
     @staticmethod
     def getPaths(yamlFileName: str, yamlPath: str = None, with_default: bool = True):
         """
@@ -65,7 +66,11 @@ class YamlPath:
 
         """
         if yamlPath is None:
-            yamlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "sampledata", yamlFileName))
+            yamlPath = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__), "..", "sampledata", yamlFileName
+                )
+            )
         yamlPaths = [yamlPath]
         if with_default:
             home = str(Path.home())
@@ -81,6 +86,7 @@ class ValueFormatter:
     """
     a value Formatter
     """
+
     format: str
     regexps: List[str] = field(default_factory=list)
 
@@ -118,43 +124,46 @@ class ValueFormatter:
                     elif resultFormat == "mediawiki":
                         newValue = f"[{link} {value}]"
                     elif resultFormat == "latex":
-                        newValue = fr"\href{{{link}}}{{{value}}}"
+                        newValue = rf"\href{{{link}}}{{{value}}}"
                     if newValue is not None:
                         record[key] = newValue
+
+
 @lod_storable
 class ValueFormatters:
     """
     manages a set of ValueFormatters
     """
+
     formatters: Dict[str, ValueFormatter] = field(default_factory=dict)
 
-    _instance: Optional['ValueFormatters'] = None
+    _instance: Optional["ValueFormatters"] = None
     _formats_path: str = None
 
     @classmethod
-    def get_instance(cls) -> 'ValueFormatters':
+    def get_instance(cls) -> "ValueFormatters":
         """Get the singleton instance."""
         if cls._instance is None:
             cls._instance = cls.of_yaml()
         return cls._instance
 
     @classmethod
-    def preload(cls, formats_path: str) -> 'ValueFormatters':
+    def preload(cls, formats_path: str) -> "ValueFormatters":
         """Preload singleton with specific formats path."""
         cls._instance = cls.of_yaml(formats_path)
         return cls._instance
 
     @classmethod
-    def of_yaml(cls, yaml_path: str=None) -> "ValueFormatters":
+    def of_yaml(cls, yaml_path: str = None) -> "ValueFormatters":
         """Load ValueFormatters from YAML file."""
-        vf=None
+        vf = None
         if yaml_path is None:
-            paths=YamlPath.getPaths("formats.yaml")
-            if len(paths)>0:
-                yaml_path=paths[0]
+            paths = YamlPath.getPaths("formats.yaml")
+            if len(paths) > 0:
+                yaml_path = paths[0]
         if yaml_path:
             vf = cls.load_from_yaml_file(yaml_path)
-            cls._formats_path=yaml_path
+            cls._formats_path = yaml_path
         return vf
 
 
@@ -660,12 +669,12 @@ class QueryManager(object):
         return queries
 
 
-
 @lod_storable
 class Endpoint:
     """
     a query endpoint
     """
+
     name: str = ""
     lang: str = "SPARQL"
     endpoint: str = ""
@@ -717,7 +726,7 @@ class Endpoint:
         get the default endpoint cofiguration
         """
         sample_data = cls.getSamples()[0]
-        endpoint_conf=cls.from_dict(sample_data)
+        endpoint_conf = cls.from_dict(sample_data)
         return endpoint_conf
 
     def __str__(self):
@@ -728,11 +737,13 @@ class Endpoint:
         text = f"{self.name}:{self.website}:{self.endpoint}({self.method})"
         return text
 
+
 @lod_storable
 class EndpointManager(object):
     """
     manages a set of SPARQL endpoints
     """
+
     endpoints: Dict[str, Endpoint] = field(default_factory=dict)
 
     @classmethod
@@ -743,8 +754,7 @@ class EndpointManager(object):
 
     @classmethod
     def getEndpoints(
-        cls,
-        endpointPath: str = None, lang: str = None, with_default: bool = True
+        cls, endpointPath: str = None, lang: str = None, with_default: bool = True
     ):
         """
         get the endpoints for the given endpointPath
@@ -759,7 +769,7 @@ class EndpointManager(object):
         )
         endpoints = {}
         for lEndpointPath in endpointPaths:
-            em=cls.ofYaml(lEndpointPath)
+            em = cls.ofYaml(lEndpointPath)
             for name, endpoint in em.endpoints.items():
                 if lang is not None and endpoint.lang == lang:
                     endpoints[name] = endpoint
@@ -775,5 +785,5 @@ class EndpointManager(object):
 
         """
         endpoints = EndpointManager.getEndpoints(endpointPath, lang=lang)
-        endpoint_names= list(endpoints.keys())
+        endpoint_names = list(endpoints.keys())
         return endpoint_names

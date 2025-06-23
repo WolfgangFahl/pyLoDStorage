@@ -589,7 +589,7 @@ class EntityInfo(object):
                     self.addType(key, valueType, sqlType)
         for key, sqlType in self.sqlTypeMap.items():
             is_primary = " PRIMARY KEY" if key == self.primaryKey else ""
-            ddl_col=f"{delim}{key} {sqlType}{is_primary}"
+            ddl_col = f"{delim}{key} {sqlType}{is_primary}"
             ddlCmd += ddl_col
             delim = ","
         ddlCmd += ")"

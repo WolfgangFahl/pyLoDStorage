@@ -3,11 +3,11 @@ Created on 2025-06-12
 
 @author: wf
 """
+
 import os
 
-from lodstorage.query import QueryManager, Query
 from lodstorage.params import Param
-
+from lodstorage.query import Query, QueryManager
 from tests.basetest import Basetest
 
 
@@ -32,7 +32,7 @@ class TestQueryYaml(Basetest):
             lang="sparql",
             debug=False,
         )
-        self.assertTrue(len(qm.queriesByName)>8)
+        self.assertTrue(len(qm.queriesByName) > 8)
         pass
 
     def testQuerySerialization(self):
@@ -50,7 +50,7 @@ class TestQueryYaml(Basetest):
             name="TestQuery",
             query="SELECT ?entity ?label WHERE { VALUES ?entity { {{qids}} } ?entity rdfs:label ?label }",
             param_list=[input_param],
-            output=[output_param]
+            output=[output_param],
         )
 
         # Test serialization
@@ -64,7 +64,7 @@ class TestQueryYaml(Basetest):
         self.assertNotIn("!!python/object:", yaml_str)
 
         # Test deserialization
-        restored_query = Query.from_yaml(yaml_str) # @UndefinedVariable
+        restored_query = Query.from_yaml(yaml_str)  # @UndefinedVariable
         self.assertEqual(restored_query.name, "TestQuery")
         self.assertEqual(len(restored_query.param_list), 1)
         self.assertEqual(len(restored_query.output), 1)
