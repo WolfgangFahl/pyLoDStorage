@@ -11,7 +11,7 @@ from typing import Union
 
 import requests
 from SPARQLWrapper import SPARQLWrapper2
-from SPARQLWrapper.Wrapper import BASIC, DIGEST, POST, POSTDIRECTLY
+from SPARQLWrapper.Wrapper import POST, POSTDIRECTLY
 
 from lodstorage.lod import LOD
 from lodstorage.params import Params
@@ -77,6 +77,8 @@ class SPARQL(object):
         Args:
             endpointConf (Endpoint): the endpoint configuration to be used
         """
+        if not endpointConf:
+            raise ValueError("endpointConf must be specified")
         sparql = SPARQL(
             url=endpointConf.endpoint,
             method=endpointConf.method,
@@ -85,16 +87,21 @@ class SPARQL(object):
         if hasattr(endpointConf, "auth"):
             authMethod = None
             if endpointConf.auth == "BASIC":
-                authMethod = BASIC
+                authMethod = "BASIC"
             elif endpointConf.auth == "DIGEST":
-                authMethod = DIGEST
+                authMethod = "DIGEST"
             sparql.addAuthentication(
-                endpointConf.user, endpointConf.passwd, method=authMethod
+                endpointConf.user,
+                endpointConf.password,
+                method=authMethod
             )
         return sparql
 
     def addAuthentication(
-        self, username: str, password: str, method: Union[BASIC, DIGEST] = BASIC
+        self,
+        username: str,
+        password: str,
+        method: str = "BASIC"
     ):
         """
         Add Http Authentication credentials to the sparql wrapper
@@ -103,8 +110,11 @@ class SPARQL(object):
             password: password of the user
             method: HTTP Authentication method
         """
-        self.sparql.setHTTPAuth(method)
-        self.sparql.setCredentials(username, password)
+        if method:
+            self.sparql.setHTTPAuth(method)
+
+        if username and password:
+            self.sparql.setCredentials(username, password)
 
     def test_query(
         self,

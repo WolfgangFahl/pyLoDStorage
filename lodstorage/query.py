@@ -776,7 +776,8 @@ class EndpointManager(object):
         for lEndpointPath in endpointPaths:
             em = cls.ofYaml(lEndpointPath)
             for name, endpoint in em.endpoints.items():
-                if lang is not None and endpoint.lang == lang:
+                selected = lang is None or endpoint.lang == lang
+                if selected:
                     endpoints[name] = endpoint
         return endpoints
 
