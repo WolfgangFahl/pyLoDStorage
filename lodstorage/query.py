@@ -90,7 +90,7 @@ class ValueFormatter:
     format: str
     regexps: List[str] = field(default_factory=list)
 
-    def applyFormat(self, record, key, resultFormat: Format):
+    def apply_format(self, record, key, resultFormat: Format):
         """
         apply the given format to the given record
 
@@ -128,6 +128,11 @@ class ValueFormatter:
                     if newValue is not None:
                         record[key] = newValue
 
+    def applyFormat(self, record, key, resultFormat: Format):
+        """
+        legacy delegate
+        """
+        self.apply_format(record, key, resultFormat)
 
 @lod_storable
 class ValueFormatters:
@@ -138,7 +143,7 @@ class ValueFormatters:
     formatters: Dict[str, ValueFormatter] = field(default_factory=dict)
 
     _instance: Optional["ValueFormatters"] = None
-    _formats_path: str = None
+    _formats_path: Optional[str] = None
 
     @classmethod
     def get_instance(cls) -> "ValueFormatters":
@@ -318,7 +323,7 @@ class Query:
     endpoint: Optional[str] = None
     database: str = "blazegraph"
     title: Optional[str] = None
-    description: str = ""
+    description: Optional[str] = ""
     limit: Optional[int] = None
     prefixes: Optional[List[str]] = None
     tryItUrl: Optional[str] = None
@@ -734,7 +739,7 @@ class Endpoint:
         Returns:
             str: a string representation of this Endpoint
         """
-        text = f"{self.name}:{self.website}:{self.endpoint}({self.method})"
+        text = f"{self.name or ''}:{self.website or ''}:{self.endpoint or ''}({self.method or ''})"
         return text
 
 

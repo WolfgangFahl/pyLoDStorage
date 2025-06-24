@@ -188,7 +188,7 @@ class TestQueries(Basetest):
         ]
         showServerDown = True
         showResult = self.debug
-        showResult = True
+        #showResult = True
         for testArg in testArgs:
             endpointName = testArg.get("en")
             args = [

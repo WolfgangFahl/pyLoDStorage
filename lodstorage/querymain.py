@@ -59,12 +59,13 @@ class QueryMain(QueryCmd):
             endpointConf.method = "POST"
             if args.endpointName:
                 endpointConf = self.endpoints.get(args.endpointName)
-                self.query.tryItUrl = endpointConf.website
-                self.query.database = endpointConf.database
             else:
                 endpointConf.endpoint = self.query.endpoint
             if args.method:
                 endpointConf.method = args.method
+            if endpointConf:
+                self.query.tryItUrl = endpointConf.website
+                self.query.database = endpointConf.database
             if self.query.limit:
                 if "limit" in self.queryCode or "LIMIT" in self.queryCode:
                     self.queryCode = re.sub(
@@ -219,7 +220,7 @@ def main(argv=None, lang=None):  # IGNORE:C0111
     program_license = """%s
 
   Created by %s on %s.
-  Copyright 2020-2024 Wolfgang Fahl. All rights reserved.
+  Copyright 2020-2025 Wolfgang Fahl. All rights reserved.
 
   Licensed under the Apache License 2.0
   http://www.apache.org/licenses/LICENSE-2.0

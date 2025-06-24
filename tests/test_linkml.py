@@ -19,7 +19,7 @@ class TestLinkMLConversion(Basetest):
     Test class for generating LinkML YAML schema from Python data models.
     """
 
-    def setUp(self, debug=True, profile=True):
+    def setUp(self, debug=False, profile=True):
         super().setUp(debug=debug, profile=profile)
         # Retrieve the data model instances
         royals_samples = Sample.get("royals")
