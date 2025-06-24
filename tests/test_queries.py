@@ -82,7 +82,7 @@ class TestQueries(Basetest):
         test SPARQL Query with parameters
         """
         show = self.debug
-        show = True
+        #show = True
         qm = QueryManager(
             queriesPath=self.wikidata_queries_path,
             with_default=False,
@@ -264,12 +264,11 @@ class TestQueries(Basetest):
             },
         ]
         vf = ValueFormatter(
-            name="wikidata",
             regexps=[
                 r"(?P<value>(Q|Property:P)[0-9]+)",
                 r"http(s)?://.*/(?P<value>(Q|Property:P)[0-9]+)",
             ],
-            formatString="https://www.wikidata.org/wiki/{value}",
+            format="https://www.wikidata.org/wiki/{value}",
         )
         key = "wikidata"
         for tablefmt in [Format.mediawiki, Format.github, Format.latex]:
@@ -572,7 +571,7 @@ class TestEndpoints(Basetest):
         tests getting and rawQuerying Endpoints
         """
         debug = self.debug
-        debug = True
+        #debug = True
         endpoints = EndpointManager.getEndpoints(lang="sparql")
         qm = QueryManager(lang="sparql", debug=False)
         query = qm.queriesByName["FirstTriple"]

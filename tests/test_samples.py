@@ -208,7 +208,13 @@ class TestSamples(Basetest):
         """
         Test loading a dataclass instance from a YAML string obtained from a URL.
         """
+        debug=self.debug
+        debug=True
         # royals
+        royals_sample=Sample.getRoyalsSample()
+        if debug:
+            print(royals_sample.to_yaml())
         royals_url = "https://raw.githubusercontent.com/WolfgangFahl/pyLoDStorage/master/sampledata/royals.yaml"
         royals = Royals.load_from_yaml_url(royals_url)  # @UndefinedVariable
+
         self.check_sample(Royals, "royals", "QE2 heirs up to number in line 5", royals)
