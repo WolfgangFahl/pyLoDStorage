@@ -209,7 +209,7 @@ class TestSamples(Basetest):
         Test loading a dataclass instance from a YAML string obtained from a URL.
         """
         debug=self.debug
-        debug=True
+        #debug=True
         # royals
         royals_sample=Sample.getRoyalsSample()
         if debug:
