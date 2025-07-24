@@ -779,6 +779,7 @@ class EndpointManager(object):
                 selected = lang is None or endpoint.lang == lang
                 if selected:
                     endpoints[name] = endpoint
+                    endpoint.name=name
         return endpoints
 
     @staticmethod
