@@ -51,6 +51,24 @@ class MySqlQuery:
         cursor = connection.cursor(pymysql.cursors.DictCursor)
         return connection, cursor
 
+    def decode_record(self, record: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Converts binary values to UTF-8 strings.
+
+        Args:
+            data (Dict[str, Any]): Raw database row data
+
+        Returns:
+            Dict[str, Any]: Data with binary values decoded to strings
+        """
+        decoded_record= {}
+        for key, value in record.items():
+            if isinstance(value, bytes):
+                decoded_record[key] = value.decode('utf-8', errors='replace')
+            else:
+                decoded_record[key] = value
+        return decoded_record
+
     def execute_sql_query(self, query: str) -> List[Dict[str, Any]]:
         """
         Executes an SQL query using the provided connection parameters.
@@ -64,9 +82,13 @@ class MySqlQuery:
         """
         connection, cursor = self.get_cursor(query)
         cursor.execute(query)
-        result = cursor.fetchall()
+        raw_lod = cursor.fetchall()
         connection.close()
-        return result
+        lod=[]
+        for raw_row in raw_lod:
+            row=self.decode_record(raw_row)
+            lod.append(row)
+        return lod
 
     def query_generator(self, query: str) -> Generator[Dict[str, Any], None, None]:
         """
@@ -76,9 +98,10 @@ class MySqlQuery:
         try:
             cursor.execute(query)
             while True:
-                record = cursor.fetchone()
-                if not record:
+                raw_record = cursor.fetchone()
+                if not raw_record:
                     break
+                record=self.decode_record(raw_record)
                 yield record
 
         finally:
