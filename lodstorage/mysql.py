@@ -37,6 +37,7 @@ class MySqlQuery:
             "password": endpoint.password,
             "database": endpoint.database,
             "charset": endpoint.charset or "utf8mb4",
+            "use_unicode": True # ensure proper unicode handling
         }
 
         self.debug = debug
