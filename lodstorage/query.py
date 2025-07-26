@@ -679,13 +679,16 @@ class Endpoint:
     """
     a query endpoint
     """
-
     name: str = ""
     lang: str = "SPARQL"
     endpoint: str = ""
     website: Optional[str] = None
     database: str = "blazegraph"
     method: str = "POST"
+    # JDBC endpoints e.g. SQL
+    host: Optional[str]="localhost"
+    port: Optional[int]=3306
+    charset: Optional[str]="utf8mb4"
     calls_per_minute: Optional[int] = None
     auth: Optional[str] = None
     user: Optional[str] = None
