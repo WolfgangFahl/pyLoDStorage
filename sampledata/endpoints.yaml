@@ -14,7 +14,6 @@ endpoints:
       database: blazegraph
       method: POST
       calls_per_minute: 30
-      reliability: high
       auto_update: true
       data_seeded: 2012-10-29
       uptime_days: 4500
@@ -36,7 +35,6 @@ endpoints:
         website: https://query-main.wikidata.org/
         database: blazegraph
         calls_per_minute: 30
-        reliability: high
         method: POST
         data_seeded: 2025-01-01
         uptime_days: 200
@@ -56,12 +54,33 @@ endpoints:
         website: https://query-scholarly.wikidata.org/
         database: blazegraph
         calls_per_minute: 30
-        reliability: high
         data_seeded: 2025-01-01
         uptime_days: 200
         mtriples: 8730
         method: POST
         auto_update: true
+        prefix_sets:
+          - rdf
+          - wikidata
+          - blazegraph
+          - commons
+
+    # WDQS Legacy: Full dataset (unsplit)
+    'wikidata-legacy-full':
+        description: |
+          Wikimedia Foundation official Wikidata Query Service.
+          Legacy endpoint serving the full dataset (both main and scholarly).
+          Warning: This endpoint is subject to high load and query timeouts.
+        lang: sparql
+        endpoint: https://query.wikidata.org/sparql
+        website: https://query.wikidata.org
+        database: blazegraph
+        method: POST
+        calls_per_minute: 20
+        auto_update: true
+        data_seeded: 2012-10-29
+        uptime_days: 4500
+        mtriples: 22000
         prefix_sets:
           - rdf
           - wikidata
@@ -81,7 +100,6 @@ endpoints:
         website: https://wdqs.wikidata.dbis.rwth-aachen.de
         database: blazegraph
         calls_per_minute: 30
-        reliability: medium
         method: POST
         prefix_sets:
           - rdf
@@ -102,7 +120,6 @@ endpoints:
       endpoint: https://qlever.dev/api/wikidata
       website: https://qlever.dev/wikidata
       calls_per_minute: 60
-      reliability: high
       prefix_sets:
         - rdf
         - wikidata

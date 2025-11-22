@@ -310,6 +310,7 @@ class Query:
         limit (int): the limit of the query
         prefixes (list): list of prefixes to be resolved
         tryItUrl (str): the url of a "tryit" webpage
+        short_urls (dict): dictionary of short urls keyed by endpoint name
         formats (list): key,value pairs of ValueFormatters to be applied
         debug (bool): true if debug mode should be switched on
     """
@@ -327,6 +328,7 @@ class Query:
     limit: Optional[int] = None
     prefixes: Optional[List[str]] = None
     tryItUrl: Optional[str] = None
+    short_urls: Dict[str, str] = field(default_factory=dict)
     formats: Optional[List] = None
     debug: bool = False
     formatCallBacks: List = field(default_factory=list)

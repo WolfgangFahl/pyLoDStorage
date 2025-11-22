@@ -5,6 +5,10 @@
 'WikidataUpdateState':
   title: Wikidata state
   description: Returns total triple count and dateModified of the Wikidata root node
+  short_urls:
+    wikidata: https://w.wiki/GEGh
+    wikidata-scholarly: https://w.wiki/GEH3
+    wikidata-legacy-full: https://w.wiki/GEHu
   sparql: |
     # show the number of triples and the timestamp of the last modification
     # see https://github.com/WolfgangFahl/pyLoDStorage/issues/143
