@@ -1,5 +1,8 @@
-# pre-fix sets for omnigraph
-# see https://github.com/WolfgangFahl/pyomnigraph
+# pre-fix sets for omnigraph and lodstorage
+#
+# see
+#   https://github.com/WolfgangFahl/pyLoDStorage
+#   https://github.com/WolfgangFahl/pyomnigraph
 #
 prefix_sets:
   # Standard RDF/OWL prefixes
@@ -97,6 +100,8 @@ prefix_sets:
     description: "DBLP-specific prefixes"
     prefixes:
       dblp: "https://dblp.org/rdf/schema#"
+      dblpc: "https://dblp.org/rdf/contribution#"
+      dblpp: "https://dblp.org/rdf/person#"
 
   # Genealogy.net GOV-specific prefixes
   gov:
@@ -120,3 +125,94 @@ prefix_sets:
       osmt: "https://wiki.openstreetmap.org/wiki/Key:"
       osm2rdfmember: "https://osm2rdf.cs.uni-freiburg.de/rdf/member#"
       osmway: "https://www.openstreetmap.org/way/"
+
+  # OpenHistoricalMap prefixes
+  ohm:
+    name: "ohm"
+    url: "https://www.openhistoricalmap.org/"
+    description: "OpenHistoricalMap prefixes"
+    prefixes:
+      ohm: "https://www.openhistoricalmap.org/"
+      ohmm: "https://www.openhistoricalmap.org/meta/"
+      ohmrel: "https://www.openhistoricalmap.org/relation/"
+      ohmt: "https://wiki.openhistoricalmap.org/wiki/Key:"
+      ohmway: "https://www.openhistoricalmap.org/way/"
+
+  # Freebase prefixes
+  freebase:
+    name: "freebase"
+    url: "https://developers.google.com/freebase"
+    description: "Freebase Knowledge Graph prefixes"
+    prefixes:
+      fb: "http://rdf.freebase.com/ns/"
+      ky: "http://rdf.freebase.com/key/"
+
+  # Freebase Easy (QLever) prefixes
+  freebase_easy:
+    name: "freebase_easy"
+    url: "https://qlever.cs.uni-freiburg.de/freebase"
+    description: "Freebase Easy schema prefixes"
+    prefixes:
+      fbe: "http://orion.cs.uni-freiburg.de/freebase/"
+
+  # UniProt prefixes
+  uniprot:
+    name: "uniprot"
+    url: "https://www.uniprot.org/"
+    description: "UniProt protein database prefixes"
+    prefixes:
+      up: "http://purl.uniprot.org/core/"
+      uniprot: "http://purl.uniprot.org/uniprot/"
+
+  # PubChem prefixes
+  pubchem:
+    name: "pubchem"
+    url: "https://pubchem.ncbi.nlm.nih.gov/"
+    description: "PubChem chemical database prefixes"
+    prefixes:
+      pc: "http://rdf.ncbi.nlm.nih.gov/pubchem/vocabulary#"
+      pcc: "http://rdf.ncbi.nlm.nih.gov/pubchem/compound/"
+      pcd: "http://rdf.ncbi.nlm.nih.gov/pubchem/descriptor/"
+
+  # DNB (Deutsche Nationalbibliothek) prefixes
+  dnb:
+    name: "dnb"
+    url: "https://www.dnb.de/"
+    description: "Deutsche Nationalbibliothek prefixes"
+    prefixes:
+      gndo: "https://d-nb.info/standards/elementset/gnd#"
+      dnb: "https://d-nb.info/"
+
+  # IMDb prefixes
+  imdb:
+    name: "imdb"
+    url: "https://www.imdb.com/"
+    description: "IMDb prefixes"
+    prefixes:
+      imdb: "https://www.imdb.com/"
+
+  # Yago Knowledge Base prefixes
+  yago:
+    name: "yago"
+    url: "https://yago-knowledge.org/"
+    description: "YAGO Knowledge Base prefixes"
+    prefixes:
+      yago: "http://yago-knowledge.org/resource/"
+
+  # DBpedia prefixes
+  dbpedia:
+    name: "dbpedia"
+    url: "https://www.dbpedia.org/"
+    description: "DBpedia prefixes"
+    prefixes:
+      dbo: "http://dbpedia.org/ontology/"
+      dbr: "http://dbpedia.org/resource/"
+      dbp: "http://dbpedia.org/property/"
+
+  # Olympics prefixes
+  olympics:
+    name: "olympics"
+    url: "https://olympics.com/"
+    description: "Olympics dataset prefixes"
+    prefixes:
+      oly: "http://olympics.com/"

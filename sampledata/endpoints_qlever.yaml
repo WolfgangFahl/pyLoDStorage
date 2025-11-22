@@ -1,0 +1,159 @@
+# SPARQL endpoints for sparqlquery and snapquery tools
+# 2025-11-22 Wolfgang Fahl - use prefix sets and new qlever endpoints
+endpoints:
+    'wikidata-qlever':
+      description: "QLever Wikidata endpoint."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/wikidata
+      website: https://qlever.dev/wikidata
+      prefix_sets:
+        - rdf
+        - wikidata
+        - commons
+      auto_update: false
+      mtriples: 22000
+
+    'dblp-qlever':
+      description: "DBLP Computer Science Bibliography hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/dblp
+      website: https://qlever.dev/dblp
+      prefix_sets:
+        - rdf
+        - dblp
+      auto_update: false
+      mtriples: 3000
+
+    'osm-qlever':
+      description: "OpenStreetMap Planet hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/osm-planet
+      website: https://qlever.dev/osm-planet
+      prefix_sets:
+        - rdf
+        - osm
+      auto_update: false
+      mtriples: 50000
+
+    'ohm-qlever':
+      description: "OpenHistoricalMap hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/ohm-planet
+      website: https://qlever.dev/ohm-planet
+      prefix_sets:
+        - rdf
+        - ohm
+      auto_update: false
+      mtriples: 5775
+
+    'freebase-qlever':
+      description: "Freebase Knowledge Graph hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/freebase
+      website: https://qlever.dev/freebase
+      prefix_sets:
+        - rdf
+        - freebase
+      auto_update: false
+      mtriples: 3100
+
+    'uniprot-qlever':
+      description: "UniProt Protein Database hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/uniprot
+      website: https://qlever.dev/uniprot
+      prefix_sets:
+        - rdf
+        - uniprot
+      auto_update: false
+      mtriples: 110000
+
+    'pubchem-qlever':
+      description: "PubChem Chemical Database hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/pubchem
+      website: https://qlever.dev/pubchem
+      prefix_sets:
+        - rdf
+        - pubchem
+      auto_update: false
+      mtriples: 150000
+
+    'imdb-qlever':
+      description: "IMDb (Internet Movie Database) hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/imdb
+      website: https://qlever.dev/imdb
+      prefix_sets:
+        - rdf
+        - imdb
+      auto_update: false
+      mtriples: 1000
+
+    'dnb-qlever':
+      description: "Deutsche Nationalbibliothek (DNB) hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/dnb
+      website: https://qlever.dev/dnb
+      prefix_sets:
+        - rdf
+        - dnb
+      auto_update: false
+      mtriples: 5000
+
+    'yago-qlever':
+      description: "YAGO 4 Knowledge Base hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/yago-4
+      website: https://qlever.dev/yago-4
+      prefix_sets:
+        - rdf
+        - yago
+      auto_update: false
+      mtriples: 2000
+
+    'dbpedia-qlever':
+      description: "DBpedia hosted by QLever."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/dbpedia
+      website: https://qlever.dev/dbpedia
+      prefix_sets:
+        - rdf
+        - dbpedia
+      auto_update: false
+      mtriples: 1000
+
+    'olympics-qlever':
+      description: "120 Years of Olympics, data from https://github.com/wallscope/olympics-rdf"
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/olympics
+      website: https://qlever.dev/olympics
+      prefix_sets:
+        - rdf
+        - olympics
+      auto_update: false
+      mtriples: 1.8

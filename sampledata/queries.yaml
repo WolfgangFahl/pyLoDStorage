@@ -189,3 +189,13 @@
         SELECT ?s ?p ?o WHERE {
           ?s ?p ?o
         } LIMIT 1
+'CountAllTriples':
+    title: Count All Triples
+    description: Get the total number of triples in the triplestore
+    sparql: |
+        # Generic SPARQL test query
+        # Count triples
+        # 2025-11-23
+        SELECT (COUNT(*) as ?count) WHERE {
+          ?s ?p ?o
+        }

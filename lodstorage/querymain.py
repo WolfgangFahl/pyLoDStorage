@@ -121,19 +121,22 @@ class QueryMain(QueryCmd):
         Returns raw result of the endpoint.
 
         Args:
-        endpointConf: EndPoint
-        query (str): query
-        resultFormat (str): format of the result
-        mimeType (str): mimeType
-        content_type (str): content type of the request
-        timeout (float): timeout in seconds
-        lenient (bool): if True do not raise errors but just log
+            endpointConf: EndPoint
+            query (str): query
+            resultFormat (str): format of the result
+            mimeType (str): mimeType
+            content_type (str): content type of the request
+            timeout (float): timeout in seconds
+            lenient (bool): if True do not raise errors but just log
 
         Returns:
-        raw result of the query
+            raw result of the query
         """
 
-        headers = {}
+        headers = {
+           "User-Agent": f"{Version.name}/{Version.version}"
+        }
+
         if mimeType:
             headers["Accept"] = mimeType
 

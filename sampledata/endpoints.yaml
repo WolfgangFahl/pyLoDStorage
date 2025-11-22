@@ -1,132 +1,117 @@
 # Default SPARQL endpoints for sparqlquery tool
 # 2022-02-14 tholzheim
+# 2025-11-22 Wolfgang Fahl - use prefix sets
 endpoints:
     'wikidata':
+      description: |
+        Wikimedia Foundation official Wikidata Query Service.
+        Legacy endpoint serving full dataset before graph split.
+        Note: This endpoint may have stability issues due to the large dataset.
+        Consider using wikidata-scholarly or wikidata-main for better performance.
       lang: sparql
       endpoint: https://query.wikidata.org/sparql
       website: https://query.wikidata.org
       database: blazegraph
+      method: POST
       calls_per_minute: 30
-      method: POST
-      prefixes: |
-        PREFIX bd: <http://www.bigdata.com/rdf#>
-        PREFIX cc: <http://creativecommons.org/ns#>
-        PREFIX dct: <http://purl.org/dc/terms/>
-        PREFIX geo: <http://www.opengis.net/ont/geosparql#>
-        PREFIX ontolex: <http://www.w3.org/ns/lemon/ontolex#>
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
-        PREFIX p: <http://www.wikidata.org/prop/>
-        PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
-        PREFIX pqn: <http://www.wikidata.org/prop/qualifier/value-normalized/>
-        PREFIX pqv: <http://www.wikidata.org/prop/qualifier/value/>
-        PREFIX pr: <http://www.wikidata.org/prop/reference/>
-        PREFIX prn: <http://www.wikidata.org/prop/reference/value-normalized/>
-        PREFIX prov: <http://www.w3.org/ns/prov#>
-        PREFIX prv: <http://www.wikidata.org/prop/reference/value/>
-        PREFIX ps: <http://www.wikidata.org/prop/statement/>
-        PREFIX psn: <http://www.wikidata.org/prop/statement/value-normalized/>
-        PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        PREFIX schema: <http://schema.org/>
-        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        PREFIX wd: <http://www.wikidata.org/entity/>
-        PREFIX wdata: <http://www.wikidata.org/wiki/Special:EntityData/>
-        PREFIX wdno: <http://www.wikidata.org/prop/novalue/>
-        PREFIX wdref: <http://www.wikidata.org/reference/>
-        PREFIX wds: <http://www.wikidata.org/entity/statement/>
-        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-        PREFIX wdtn: <http://www.wikidata.org/prop/direct-normalized/>
-        PREFIX wdv: <http://www.wikidata.org/value/>
-        PREFIX wikibase: <http://wikiba.se/ontology#>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    'qlever-wikidata':
-      lang: sparql
-      method: POST
-      database: qlever
-      endpoint: https://qlever.cs.uni-freiburg.de/api/wikidata
-      website: https://qlever.cs.uni-freiburg.de/wikidata
-      prefixes: |
-        PREFIX bd: <http://www.bigdata.com/rdf#>
-        PREFIX cc: <http://creativecommons.org/ns#>
-        PREFIX dct: <http://purl.org/dc/terms/>
-        PREFIX geo: <http://www.opengis.net/ont/geosparql#>
-        PREFIX ontolex: <http://www.w3.org/ns/lemon/ontolex#>
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
-        PREFIX p: <http://www.wikidata.org/prop/>
-        PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
-        PREFIX pqn: <http://www.wikidata.org/prop/qualifier/value-normalized/>
-        PREFIX pqv: <http://www.wikidata.org/prop/qualifier/value/>
-        PREFIX pr: <http://www.wikidata.org/prop/reference/>
-        PREFIX prn: <http://www.wikidata.org/prop/reference/value-normalized/>
-        PREFIX prov: <http://www.w3.org/ns/prov#>
-        PREFIX prv: <http://www.wikidata.org/prop/reference/value/>
-        PREFIX ps: <http://www.wikidata.org/prop/statement/>
-        PREFIX psn: <http://www.wikidata.org/prop/statement/value-normalized/>
-        PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        PREFIX schema: <http://schema.org/>
-        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        PREFIX wd: <http://www.wikidata.org/entity/>
-        PREFIX wdata: <http://www.wikidata.org/wiki/Special:EntityData/>
-        PREFIX wdno: <http://www.wikidata.org/prop/novalue/>
-        PREFIX wdref: <http://www.wikidata.org/reference/>
-        PREFIX wds: <http://www.wikidata.org/entity/statement/>
-        PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-        PREFIX wdtn: <http://www.wikidata.org/prop/direct-normalized/>
-        PREFIX wdv: <http://www.wikidata.org/value/>
-        PREFIX wikibase: <http://wikiba.se/ontology#>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    'qlever-dblp':
-      lang: sparql
-      method: POST
-      database: qlever
-      endpoint: https://qlever.cs.uni-freiburg.de/api/dblp
-      website: https://qlever.cs.uni-freiburg.de/dblp
-      prefixes: |
-    'qlever-dblp-plus':
-      lang: sparql
-      method: POST
-      database: qlever
-      endpoint: https://qlever.cs.uni-freiburg.de/api/dblp-plus
-      website: https://qlever.cs.uni-freiburg.de/dblp-plus
-      prefixes: |
-    'wikidata-openlinksw':
+      reliability: high
+      auto_update: true
+      data_seeded: 2012-10-29
+      uptime_days: 4500
+      mtriples: 22000
+      prefix_sets:
+        - rdf
+        - wikidata
+        - blazegraph
+        - commons
+
+    # WDQS Graph Split: main subgraph
+    'wikidata-main':
+        description: |
+            WDQS Graph Split — main subgraph
+            (everything except scholarly items);
+            official Wikimedia endpoint.
         lang: sparql
-        endpoint: https://wikidata.demo.openlinksw.com/sparql
-        website: https://wikidata.demo.openlinksw.com/sparql
-        database: virtuoso
-        prefixes: |
-          PREFIX bd: <http://www.bigdata.com/rdf#>
-          PREFIX cc: <http://creativecommons.org/ns#>
-          PREFIX dct: <http://purl.org/dc/terms/>
-          PREFIX geo: <http://www.opengis.net/ont/geosparql#>
-          PREFIX ontolex: <http://www.w3.org/ns/lemon/ontolex#>
-          PREFIX owl: <http://www.w3.org/2002/07/owl#>
-          PREFIX p: <http://www.wikidata.org/prop/>
-          PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
-          PREFIX pqn: <http://www.wikidata.org/prop/qualifier/value-normalized/>
-          PREFIX pqv: <http://www.wikidata.org/prop/qualifier/value/>
-          PREFIX pr: <http://www.wikidata.org/prop/reference/>
-          PREFIX prn: <http://www.wikidata.org/prop/reference/value-normalized/>
-          PREFIX prov: <http://www.w3.org/ns/prov#>
-          PREFIX prv: <http://www.
-          wikidata.org/prop/reference/value/>
-          PREFIX ps: <http://www.wikidata.org/prop/statement/>
-          PREFIX psn: <http://www.wikidata.org/prop/statement/value-normalized/>
-          PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
-          PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-          PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-          PREFIX schema: <http://schema.org/>
-          PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-          PREFIX wd: <http://www.wikidata.org/entity/>
-          PREFIX wdata: <http://www.wikidata.org/wiki/Special:EntityData/>
-          PREFIX wdno: <http://www.wikidata.org/prop/novalue/>
-          PREFIX wdref: <http://www.wikidata.org/reference/>
-          PREFIX wds: <http://www.wikidata.org/entity/statement/>
-          PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-          PREFIX wdtn: <http://www.wikidata.org/prop/direct-normalized/>
-          PREFIX wdv: <http://www.wikidata.org/value/>
-          PREFIX wikibase: <http://wikiba.se/ontology#>
-          PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        endpoint: https://query-main.wikidata.org/sparql
+        website: https://query-main.wikidata.org/
+        database: blazegraph
+        calls_per_minute: 30
+        reliability: high
+        method: POST
+        data_seeded: 2025-01-01
+        uptime_days: 200
+        mtriples: 11000
+        auto_update: true
+        prefix_sets:
+          - rdf
+          - wikidata
+          - blazegraph
+          - commons
+
+    # WDQS Graph Split: scholarly subgraph
+    'wikidata-scholarly':
+        description: "WDQS Graph Split — scholarly subgraph (items for scholarly articles); official Wikimedia endpoint."
+        lang: sparql
+        endpoint: https://query-scholarly.wikidata.org/sparql
+        website: https://query-scholarly.wikidata.org/
+        database: blazegraph
+        calls_per_minute: 30
+        reliability: high
+        data_seeded: 2025-01-01
+        uptime_days: 200
+        mtriples: 11000
+        method: POST
+        auto_update: true
+        prefix_sets:
+          - rdf
+          - wikidata
+          - blazegraph
+          - commons
+
+    # RWTH Aachen chair of Database and Information systems
+    # Full copy of legacy wikidata
+    # seeded 2025-05 - running in auto update mode until 2025-08
+    # auto update mode currently broken
+    'wikidata-dbis':
+        description: |
+            RWTH Aachen chair of Database and Information systems.
+            Full copy of legacy wikidata.
+        lang: sparql
+        endpoint: https://wdqs.wikidata.dbis.rwth-aachen.de/sparql
+        website: https://wdqs.wikidata.dbis.rwth-aachen.de/
+        database: blazegraph
+        calls_per_minute: 30
+        reliability: medium
+        method: POST
+        prefix_sets:
+          - rdf
+          - wikidata
+          - blazegraph
+          - commons
+        uptime_days: 1
+        auto_update: false
+        data_seeded: 2025-06-01
+        mtriples: 22000
+
+    # QLever-hosted Wikidata index (external)
+    'wikidata-qlever':
+      description: "QLever Wikidata endpoint at qlever.dev (external, non-Blazegraph)."
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever.dev/api/wikidata
+      website: https://qlever.dev/wikidata
+      calls_per_minute: 60
+      reliability: high
+      prefix_sets:
+        - rdf
+        - wikidata
+        - commons
+      uptime_days: 700
+      auto_update: true
+      data_seeded: 2025-05-20
+      mtriples: 22000
+
+
+
+

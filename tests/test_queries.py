@@ -36,9 +36,8 @@ class TestQueries(Basetest):
 
     def setUp(self, debug=False, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.wikidata_queries_path = (
-            f"{os.path.dirname(__file__)}/../sampledata/wikidata.yaml"
-        )
+        self.sampledata_dir = f"{os.path.dirname(__file__)}/../sampledata"
+        self.wikidata_queries_path = f"{self.sampledata_dir}/wikidata.yaml"
 
     def testSQLQueries(self):
         """
@@ -565,31 +564,52 @@ class TestEndpoints(Basetest):
     """
     tests Endpoint
     """
+    def setUp(self, debug=False, profile=True):
+        Basetest.setUp(self, debug=debug, profile=profile)
+        self.sampledata_dir = f"{os.path.dirname(__file__)}/../sampledata"
+
+    def yieldSampleEndpoints(self):
+        """
+        yield all sample Endpoints
+        """
+        for filename in ["endpoints.yaml", "endpoints_qlever.yaml"]:
+            full_path = f"{self.sampledata_dir}/{filename}"
+            endpoints = EndpointManager.getEndpoints(endpointPath=full_path, lang="sparql", with_default=False)
+            for key, endpoint in endpoints.items():
+                yield key, endpoint
 
     def testEndpoints(self):
         """
-        tests getting and rawQuerying Endpoints
+        tests getting and rawQuerying Endpoints with multiple queries
         """
         debug = self.debug
-        #debug = True
-        endpoints = EndpointManager.getEndpoints(lang="sparql")
+        debug = True
         qm = QueryManager(lang="sparql", debug=False)
-        query = qm.queriesByName["FirstTriple"]
-        self.assertTrue("wikidata" in endpoints)
-        for i, item in enumerate(endpoints.items()):
-            name, endpoint = item
+        query_names = ["FirstTriple", "CountAllTriples"]
+
+        for i, (name, endpoint) in enumerate(self.yieldSampleEndpoints()):
             if debug:
                 print(f"{i}:{name}")
-            resultFormat = "json"
-            args = Namespace(debug=debug, calls_per_minute=endpoint.calls_per_minute)
 
+            # Set up arguments based on specific endpoint properties
+            cpm = getattr(endpoint, 'calls_per_minute', 60)
+            args = Namespace(debug=debug, calls_per_minute=cpm)
             query_main = QueryMain(args)
 
-            jsonStr = query_main.rawQuery(
-                endpoint, query.query, resultFormat, mimeType=None
-            )
-            if debug:
-                print(jsonStr)
+            for query_name in query_names:
+                query = qm.queriesByName[query_name]
+
+                if debug:
+                    print(f"[{name}] Running {query_name}...")
+
+                resultFormat = "json"
+                jsonStr = query_main.rawQuery(
+                    endpoint, query.query, resultFormat, mimeType=None
+                )
+
+                if debug:
+                    print(jsonStr)
+
 
     def test_availability_of_endpoints(self):
         """
@@ -597,11 +617,9 @@ class TestEndpoints(Basetest):
         """
         debug = self.debug
         debug = True
-        endpoints = EndpointManager.getEndpoints(lang="sparql")
         success = 0
         total = 0
-        for i, item in enumerate(endpoints.items()):
-            name, endpoint = item
+        for i, (name, endpoint) in enumerate(self.yieldSampleEndpoints()):
             total += 1
             if debug:
                 print(f"Testing endpoint {i+1}: {name}")
