@@ -28,6 +28,43 @@ from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
 from tests.basetest import Basetest
 
+class ActionStats:
+    """Helper class to track success rates of actions."""
+    def __init__(self):
+        self.success_count = 0
+        self.total_count = 0
+        self.current=None
+
+    def add(self, is_success: bool):
+        """adds a single result."""
+        self.current=is_success
+        self.total_count += 1
+        if is_success:
+            self.success_count += 1
+
+    @property
+    def ratio(self) -> float:
+        """Returns the success/total ratio."""
+        ratio= self.success_count / self.total_count if self.total_count > 0 else 0.0
+        return ratio
+
+    def state(self,success_msg,fail_msg)->str:
+        """
+        return the current state
+        """
+        if self.current:
+            msg = f"✅{success_msg}"
+        else:
+            msg = f"❌: {fail_msg}"
+        return msg
+
+
+    def __str__(self):
+        """Returns the formatted summary string."""
+        marker = "❌ " if self.success_count < self.total_count else "✅"
+        text= f"{marker}:{self.success_count}/{self.total_count} available"
+        return text
+
 
 class TestQueries(Basetest):
     """
@@ -580,35 +617,84 @@ class TestEndpoints(Basetest):
 
     def testEndpoints(self):
         """
-        tests getting and rawQuerying Endpoints with multiple queries
+        tests getting and rawQuerying
+        Endpoints: checks raw access first, then proper API
         """
         debug = self.debug
         debug = True
+
         qm = QueryManager(lang="sparql", debug=False)
         query_names = ["FirstTriple", "CountAllTriples"]
 
+        # Initialize helper class
+        stats = ActionStats()
+
         for i, (name, endpoint) in enumerate(self.yieldSampleEndpoints()):
             if debug:
-                print(f"{i}:{name}")
+                print(f"--- {i}:{name} ---")
 
-            # Set up arguments based on specific endpoint properties
+            # Setup for Raw Query
             cpm = getattr(endpoint, 'calls_per_minute', 60)
-            args = Namespace(debug=debug, calls_per_minute=cpm)
-            query_main = QueryMain(args)
+            query_main = QueryMain(Namespace(debug=debug, calls_per_minute=cpm))
 
             for query_name in query_names:
                 query = qm.queriesByName[query_name]
 
-                if debug:
-                    print(f"[{name}] Running {query_name}...")
+                # 1. Raw Query (Connectivity Check)
+                if debug: print(f"[{name}] {query_name} (Raw)...")
+                # We don't count rawQuery in stats, it acts as a gatekeeper
+                raw_res = query_main.rawQuery(endpoint, query.query, "json", mimeType=None)
 
-                resultFormat = "json"
-                jsonStr = query_main.rawQuery(
-                    endpoint, query.query, resultFormat, mimeType=None
-                )
+                # Only proceed to "Proper" if Raw succeeded
+                if raw_res:
+                    # 2. Proper API (List of Dicts)
+                    if debug: print(f"[{name}] {query_name} (Proper)...")
+                    try:
+                        sparql = SPARQL(endpoint.endpoint, method=endpoint.method)
+                        qlod = sparql.queryAsListOfDicts(query.query)
 
-                if debug:
-                    print(jsonStr)
+                        # Determine success based on if we got a list back
+                        success = isinstance(qlod, list)
+                        stats.add(success)
+
+                        if debug:
+                            # Use stats.state for consistent logging
+                            msg = f"Rows: {len(qlod)}" if success else "No list returned"
+                            print(f"  {stats.state(msg, 'Failed to retrieve list')}")
+                            if success and qlod:
+                                print(qlod[0])
+
+                        # 3. Compare Counts (Specific Logic)
+                        # We use getattr defaults instead of hasattr
+                        mtriples = getattr(endpoint, "mtriples", 0)
+
+                        if query_name == "CountAllTriples" and success and qlod and mtriples > 0:
+                            count = int(qlod[0].get("count", 0))
+                            # Logic: Verify actual count meets the expected million-triple threshold
+                            # $Count > mtriples \times 10^6$
+                            expected = mtriples * 1000000
+
+                            print(f"  Config mTriples: {mtriples} M ({expected:,.0f})")
+                            print(f"  Actual Count:    {count:,.0f}")
+
+                            if count < expected:
+                                print(f"  ⚠️ Warning: Actual count is lower than expected config!")
+                            else:
+                                print(f"  ✅ Count verification passed.")
+
+                    except Exception as ex:
+                        stats.add(False)
+                        print(f"  {stats.state('', str(ex))}")
+                else:
+                    # If raw failed, the proper attempt implicitly failed availability check
+                    stats.add(False)
+                    print(f"  {stats.state('', 'Raw query failed, skipping proper API')}")
+
+        if debug:
+            print(f"\nSummary: {stats}")
+
+        # Assert acceptable success ratio
+        self.assertTrue(stats.ratio > 0.5)
 
 
     def test_availability_of_endpoints(self):
@@ -617,25 +703,26 @@ class TestEndpoints(Basetest):
         """
         debug = self.debug
         debug = True
-        success = 0
-        total = 0
+
+        stats = ActionStats()
+
         for i, (name, endpoint) in enumerate(self.yieldSampleEndpoints()):
-            total += 1
             if debug:
                 print(f"Testing endpoint {i+1}: {name}")
 
             sparql = SPARQL(endpoint.endpoint)  # Assuming SPARQL class is available
             sparql.sparql.setTimeout(5.0)
+
             exception = sparql.test_query()
-            msg = f"Endpoint {name}"
-            if exception is None:
-                success += 1
-                msg += "✅"
-            else:
-                msg += f"❌: {str(exception)}"
+            stats.add(exception is None)
+
             if debug:
+                msg = f"Endpoint {name}{stats.state('', str(exception))}"
                 print(msg)
+
         if debug:
-            marker = "❌ " if success < total else "✅"
-            print(f"{marker}:{success}/{total} available")
-        self.assertTrue(success / total > 0.5)
+            print(stats)
+
+        # Assert that success rate is strictly greater than 50%
+        # logic: $ratio > 0.5$
+        self.assertTrue(stats.ratio > 0.5)

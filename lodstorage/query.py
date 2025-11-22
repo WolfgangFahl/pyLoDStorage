@@ -679,7 +679,11 @@ class Endpoint:
     """
     a query endpoint
     """
+    # Basic identification
     name: str = ""
+    description: Optional[str] = None
+
+    # Connection details
     lang: str = "SPARQL"
     endpoint: str = ""
     website: Optional[str] = None
@@ -689,11 +693,22 @@ class Endpoint:
     host: Optional[str]="localhost"
     port: Optional[int]=3306
     charset: Optional[str]="utf8mb4"
+
+    # Authentication and rate limiting
     calls_per_minute: Optional[int] = None
     auth: Optional[str] = None
     user: Optional[str] = None
     password: Optional[str] = None
-    prefixes: Optional[str] = None
+
+    # Prefix handling
+    prefix_sets: Optional[List[str]] = None  # References to prefix set names
+    prefixes: Optional[str] = None  # Legacy: inline prefixes for backward compatibility
+
+    # Dataset characteristics
+    data_seeded: Optional[str] = None   # ISO date when data was initially seeded/imported: "2012-10-29"
+    auto_update: Optional[bool] = None  # if false data_seeded is the most recent state of data
+    mtriples: Optional[int] = None  # Dataset size in millions of triples
+
 
     @staticmethod
     def getSamples():

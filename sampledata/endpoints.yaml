@@ -40,7 +40,7 @@ endpoints:
         method: POST
         data_seeded: 2025-01-01
         uptime_days: 200
-        mtriples: 11000
+        mtriples: 8580
         auto_update: true
         prefix_sets:
           - rdf
@@ -59,7 +59,7 @@ endpoints:
         reliability: high
         data_seeded: 2025-01-01
         uptime_days: 200
-        mtriples: 11000
+        mtriples: 8730
         method: POST
         auto_update: true
         prefix_sets:
@@ -78,7 +78,7 @@ endpoints:
             Full copy of legacy wikidata.
         lang: sparql
         endpoint: https://wdqs.wikidata.dbis.rwth-aachen.de/sparql
-        website: https://wdqs.wikidata.dbis.rwth-aachen.de/
+        website: https://wdqs.wikidata.dbis.rwth-aachen.de
         database: blazegraph
         calls_per_minute: 30
         reliability: medium
@@ -91,7 +91,7 @@ endpoints:
         uptime_days: 1
         auto_update: false
         data_seeded: 2025-06-01
-        mtriples: 22000
+        mtriples: 17029
 
     # QLever-hosted Wikidata index (external)
     'wikidata-qlever':

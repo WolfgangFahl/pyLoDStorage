@@ -26,7 +26,7 @@ endpoints:
         - rdf
         - dblp
       auto_update: false
-      mtriples: 3000
+      mtriples: 520
 
     'osm-qlever':
       description: "OpenStreetMap Planet hosted by QLever."
@@ -91,7 +91,7 @@ endpoints:
         - rdf
         - pubchem
       auto_update: false
-      mtriples: 150000
+      mtriples: 25900
 
     'imdb-qlever':
       description: "IMDb (Internet Movie Database) hosted by QLever."
@@ -104,7 +104,7 @@ endpoints:
         - rdf
         - imdb
       auto_update: false
-      mtriples: 1000
+      mtriples: 382
 
     'dnb-qlever':
       description: "Deutsche Nationalbibliothek (DNB) hosted by QLever."
@@ -117,7 +117,7 @@ endpoints:
         - rdf
         - dnb
       auto_update: false
-      mtriples: 5000
+      mtriples: 1500
 
     'yago-qlever':
       description: "YAGO 4 Knowledge Base hosted by QLever."
@@ -143,7 +143,7 @@ endpoints:
         - rdf
         - dbpedia
       auto_update: false
-      mtriples: 1000
+      mtriples: 845
 
     'olympics-qlever':
       description: "120 Years of Olympics, data from https://github.com/wallscope/olympics-rdf"
