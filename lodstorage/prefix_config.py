@@ -17,8 +17,19 @@ class PrefixConfig:
     """
 
     name: str
+    url: Optional[str] = None
+    prefix_prefix: Optional[str] = None
+
     description: Optional[str] = None
     prefixes: Dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self):
+        """
+        Set default values after initialization
+        """
+        if self.prefix_prefix is None:
+            self.prefix_prefix = self.name
+
 
     def as_text(self) -> str:
         """

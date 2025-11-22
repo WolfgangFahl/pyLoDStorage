@@ -12,6 +12,7 @@ from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import EndpointManager
 from tests.basetest import Basetest
+import urllib.request
 
 
 class TestPrefixConfig(Basetest):
@@ -93,3 +94,35 @@ class TestPrefixConfig(Basetest):
         expected_prefixes = ["rdf", "bd", "gov"]
         for prefix in expected_prefixes:
             self.assertIn(prefix, declarations)
+
+    def test_issue_150_url_and_prefix_prefix(self):
+        """
+        test for issue #150: support for url and prefix_prefix
+        """
+        pfix_configs = self.pfix_configs
+
+        # Check defaults
+        rdf = pfix_configs.prefix_sets["rdf"]
+        self.assertEqual("rdf", rdf.name)
+        self.assertEqual("rdf", rdf.prefix_prefix)
+        self.assertEqual("https://www.w3.org/rdf/", rdf.url)
+
+        # Check override
+        wikidata = pfix_configs.prefix_sets["wikidata"]
+        self.assertEqual("wikidata", wikidata.name)
+        self.assertEqual("wiki", wikidata.prefix_prefix)
+        debug=self.debug
+        debug=True
+        if debug:
+            for name, config in pfix_configs.prefix_sets.items():
+                print(f"Checking {name} -> url: {config.url}")
+                if config.url:
+                    try:
+                        req = urllib.request.Request(
+                            config.url,
+                            headers={'User-Agent': 'Mozilla/5.0'}
+                        )
+                        code = urllib.request.urlopen(req, timeout=2).getcode()
+                        print(f"  Status: {code}")
+                    except Exception as ex:
+                        print(f"  Failed: {ex}")

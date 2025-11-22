@@ -2,8 +2,10 @@
 # see https://github.com/WolfgangFahl/pyomnigraph
 #
 prefix_sets:
+  # Standard RDF/OWL prefixes
   rdf:
     name: "rdf"
+    url: "https://www.w3.org/rdf/"
     description: "Standard RDF/OWL prefixes"
     prefixes:
       rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -13,8 +15,11 @@ prefix_sets:
       skos: "http://www.w3.org/2004/02/skos/core#"
       schema: "http://schema.org/"
 
+  # Wikidata-specific prefixes
   wikidata:
     name: "wikidata"
+    url: "https://www.wikidata.org/"
+    prefix_prefix: "wiki"
     description: "Wikidata-specific prefixes"
     prefixes:
       wd: "http://www.wikidata.org/entity/"
@@ -37,8 +42,10 @@ prefix_sets:
       wdtn: "http://www.wikidata.org/prop/direct-normalized/"
       wdv: "http://www.wikidata.org/value/"
 
+  # FactGrid-specific prefixes
   factgrid:
     name: "factgrid"
+    url: "https://database.factgrid.de/"
     description: "FactGrid-specific prefixes"
     prefixes:
       wd: "http://factgrid.de/entity/"
@@ -60,8 +67,10 @@ prefix_sets:
       wdtn: "http://factgrid.de/prop/direct-normalized/"
       wdv: "http://factgrid.de/value/"
 
+  # Common vocabulary prefixes
   commons:
     name: "commons"
+    url: "https://commons.wikimedia.org/"
     description: "Common vocabulary prefixes"
     prefixes:
       cc: "http://creativecommons.org/ns#"
@@ -73,28 +82,36 @@ prefix_sets:
       foaf: "http://xmlns.com/foaf/0.1/"
       time: "http://www.w3.org/2006/time#"
 
+  # Blazegraph-specific prefixes
   blazegraph:
     name: "blazegraph"
+    url: "https://blazegraph.com/"
     description: "Blazegraph-specific prefixes"
     prefixes:
       bd: "http://www.bigdata.com/rdf#"
 
+  # DBLP-specific prefixes
   dblp:
     name: "dblp"
+    url: "https://dblp.org/"
     description: "DBLP-specific prefixes"
     prefixes:
       dblp: "https://dblp.org/rdf/schema#"
 
+  # Genealogy.net GOV-specific prefixes
   gov:
     name: "gov"
+    url: "http://gov.genealogy.net/"
     description: "Genealogy.net GOV-specific prefixes"
     prefixes:
       gov: "http://gov.genealogy.net/"
       gp: "http://gov.genealogy.net/ontology.owl#"
       gt: "http://gov.genealogy.net/types.owl#"
 
+  # OpenStreetMap prefixes
   osm:
     name: "osm"
+    url: "https://www.openstreetmap.org/"
     description: "OpenStreetMap prefixes"
     prefixes:
       geo: "http://www.opengis.net/ont/geosparql#"

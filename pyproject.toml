@@ -4,6 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyLodStorage"
+description = "python List of Dict (Table) Storage library"
 authors = [
   {name = "Wolfgang Fahl", email = "wf@bitplan.com"}
 ]
@@ -32,7 +33,7 @@ dependencies = [
   # https://pypi.org/project/pybasemkit/
   # https://github.com/WolfgangFahl/pybasemkit
   # Python base module kit: YAML/JSON I/O, structured logging, CLI tooling, shell execution, and remote pydevd debug support.
-  "pybasemkit>=0.0.2",
+  "pybasemkit>=0.1.3",
   # https://pypi.org/project/pyparsing/
   "pyparsing>=3.1.1",
   # https://github.com/un33k/python-slugify
@@ -49,7 +50,6 @@ requires-python = ">=3.10"
 classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13"
