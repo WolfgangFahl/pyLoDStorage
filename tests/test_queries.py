@@ -436,11 +436,12 @@ class TestQueries(EndpointTest):
             ["-qn", "US President Nicknames", "-l", "sparql", "--limit", f"{limit}"],
         ]
         debug = self.debug
-        # debug = True
+        debug = True
         for args in args_list:
             json_str = self.captureQueryMain(args)
             json_data = json.loads(json_str)
             if debug:
+                print(json.dumps(json_data,indent=2))
                 print(len(json_data))
             self.assertEqual(limit, len(json_data))
 

@@ -5,30 +5,30 @@ Created on 2020-08-22
 """
 
 import copy
+from dataclasses import field
+from enum import Enum
 import os
 import re
 import sys
-import urllib
-from dataclasses import field
-from enum import Enum
-from pathlib import Path
 from typing import Any, Dict, List, Optional
+import urllib
 
-import yaml
 from basemkit.yamlable import lod_storable
+from lodstorage.mwTable import MediaWikiTable
+from lodstorage.params import Param, Params
+from lodstorage.prefix_config import PrefixConfigs
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.formatters.latex import LatexFormatter
 from pygments.lexers import get_lexer_by_name
 from tabulate import tabulate
+import yaml
+from lodstorage.yaml_path import YamlPath
+
 
 # from wikibot.mwTable import MediaWikiTable
 # redundant copy in this library to avoid dependency issues
 # original is at
-from lodstorage.mwTable import MediaWikiTable
-from lodstorage.params import Param, Params
-
-
 class Format(Enum):
     """
     the supported formats for the results to be delivered
@@ -46,40 +46,6 @@ class Format(Enum):
 
     def __str__(self):
         return self.value
-
-
-class YamlPath:
-    """
-    provide path to loading configuration or data files by checking:
-    - a provided path or an optional user-specific location (~/.pylodstorage).
-    """
-
-    @staticmethod
-    def getPaths(yamlFileName: str, yamlPath: str = None, with_default: bool = True):
-        """
-        Get a list of YAML file paths to be used for loading configuration/data.
-
-        Args:
-            yamlFileName (str): The name of the YAML file to read from if (any) - legacy way to specify name
-            yamlPath (str, optional): The full path to read from. Defaults to None.
-            with_default (bool, optional): Whether to include paths from the default location .pylodstorage in the Home directory. Defaults to True.
-
-        """
-        if yamlPath is None:
-            yamlPath = os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), "..", "sampledata", yamlFileName
-                )
-            )
-        yamlPaths = [yamlPath]
-        if with_default:
-            home = str(Path.home())
-            # additional yamls from users yaml configuration
-            homepath = f"{home}/.pylodstorage/{yamlFileName}"
-            if os.path.isfile(homepath):
-                yamlPaths.append(homepath)
-        return yamlPaths
-
 
 @lod_storable
 class ValueFormatter:
@@ -754,6 +720,28 @@ class Endpoint:
         endpoint_conf = cls.from_dict(sample_data)
         return endpoint_conf
 
+    def get_prefixes(self, prefix_configs: Optional[PrefixConfigs] = None) -> str:
+        """
+        Get prefix declarations for this endpoint.
+
+        Args:
+            prefix_configs: PrefixConfigs instance to resolve prefix_sets
+
+        Returns:
+            str: PREFIX declarations
+        """
+        # default: empty
+        prefixes=""
+        # Use inline prefixes if defined (legacy support)
+        if self.prefixes:
+            prefixes=self.prefixes
+
+        # Resolve from prefix_sets if available
+        if self.prefix_sets and prefix_configs:
+            prefixes= prefix_configs.get_selected_declarations(self.prefix_sets)
+
+        return prefixes
+
     def __str__(self):
         """
         Returns:
@@ -779,7 +767,10 @@ class EndpointManager(object):
 
     @classmethod
     def getEndpoints(
-        cls, endpointPath: str = None, lang: str = None, with_default: bool = True
+        cls,
+        endpointPath: str = None,
+        lang: str = None,
+        with_default: bool = True
     ):
         """
         get the endpoints for the given endpointPath

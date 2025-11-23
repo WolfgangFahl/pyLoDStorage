@@ -58,7 +58,7 @@ class TestPrefixConfig(Basetest):
         """
         test we have references all PREFIX definitions of all default endpoints
         """
-        endpoints = EndpointManager.getEndpoints(lang="sparql")
+        endpoints = EndpointManager.getEndpoints(lang="sparql",with_default=False)
         all_config_prefixes = self.get_all_prefixes()
         missing_prefixes = set()
 
