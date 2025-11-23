@@ -17,6 +17,7 @@ class PrefixConfig:
     """
 
     name: str
+    wikidata_id: Optional[str] = None
     url: Optional[str] = None
     prefix_prefix: Optional[str] = None
 

@@ -1,0 +1,40 @@
+# Olympics Queries (queries_olympics.yaml)
+# https://qlever.dev/olympics
+# WF 2025-11-23
+
+Athletes_by_gold_medals:
+  title: Athletes ranked by number of gold medals
+  description: Select athletes with their gold medal counts from the Olympics dataset.
+  prefix_sets:
+    - rdf
+    - olympics
+  sparql: |
+    SELECT ?athlete ?athlete_label (COUNT(?medal) as ?count) WHERE {
+      ?medal olympics:medal medal:Gold .
+      ?medal olympics:athlete ?athlete .
+      ?athlete rdfs:label ?athlete_label .
+    }
+    GROUP BY ?athlete ?athlete_label
+    ORDER BY DESC(?count)
+  short_urls:
+    https://qlever.dev/olympics/61xCAB
+
+Athles_name_contain_keywords:
+  title: All athletes whose name contains the given keywords
+  description: Query athletes by name keywords.
+  prefix_sets:
+    - rdf
+    - commons  # for foaf
+    - olympics
+  param_list:
+    - name: keywords
+      type: str
+      default_value: "Patr"
+  sparql: |
+    SELECT ?athlete ?athlete_label WHERE {
+      ?athlete rdf:type foaf:Person .
+      ?athlete rdfs:label ?athlete_label .
+      FILTER (regex(?athlete_label, "{{ keywords }}", "i"))  # Adjusted for param substitution and case-insensitive search
+    }
+  short_urls:
+    # Add if available

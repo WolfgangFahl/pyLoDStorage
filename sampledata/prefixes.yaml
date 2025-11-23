@@ -7,9 +7,10 @@
 prefix_sets:
   # Standard RDF/OWL prefixes
   rdf:
-    name: "rdf"
+    name: "RDF"
+    wikidata_id: "Q54872"
     url: "https://www.w3.org/rdf/"
-    description: "Standard RDF/OWL prefixes"
+    description: "Resource Description Framework"
     prefixes:
       rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
       rdfs: "http://www.w3.org/2000/01/rdf-schema#"
@@ -20,10 +21,11 @@ prefix_sets:
 
   # Wikidata-specific prefixes
   wikidata:
-    name: "wikidata"
+    name: "Wikidata"
+    wikidata_id: "Q2013"
     url: "https://www.wikidata.org/"
     prefix_prefix: "wiki"
-    description: "Wikidata-specific prefixes"
+    description: "Free multilingual online knowledge graph"
     prefixes:
       wd: "http://www.wikidata.org/entity/"
       wdt: "http://www.wikidata.org/prop/direct/"
@@ -45,11 +47,70 @@ prefix_sets:
       wdtn: "http://www.wikidata.org/prop/direct-normalized/"
       wdv: "http://www.wikidata.org/value/"
 
+  # Dublin Core
+  dc:
+    name: "Dublin Core"
+    wikidata_id: "Q624610"
+    url: "https://www.dublincore.org/"
+    description: "Metadata standard for describing resources"
+    prefixes:
+      dct: "http://purl.org/dc/terms/"
+      dc: "http://purl.org/dc/terms/"
+      dc11: "http://purl.org/dc/elements/1.1/"
+
+  # OntoLex (Lemon)
+  ontolex:
+    name: "OntoLex-Lemon"
+    wikidata_id: "Q96397500"
+    url: "https://www.w3.org/2016/05/ontolex/"
+    description: "Lexicon model for ontologies providing rich linguistic grounding"
+    prefixes:
+      ontolex: "http://www.w3.org/ns/lemon/ontolex#"
+
+  # PROV Ontology
+  prov:
+    name: "PROV"
+    wikidata_id: "Q60747003"
+    url: "https://www.w3.org/TR/prov-o/"
+    description: "W3C Provenance Ontology for representing provenance information"
+    prefixes:
+      prov: "http://www.w3.org/ns/prov#"
+
+  # W3C Time Ontology
+  time:
+    name: "OWL-Time"
+    wikidata_id: "Q62210191"
+    url: "https://www.w3.org/TR/owl-time/"
+    description: "W3C Time Ontology for describing temporal properties"
+    prefixes:
+      time: "http://www.w3.org/2006/time#"
+
+  # foaf
+  # https://prefix.cc/foaf
+  foaf:
+    name: "foaf"
+    wikidata_id: "Q1389366"
+    url: "http://xmlns.com/foaf/0.1/"
+    description: "Fried of a Friend"
+    prefixes:
+      foaf: "http://xmlns.com/foaf/0.1/"
+
+  # Blazegraph-specific prefixes
+  blazegraph:
+    name: "blazegraph"
+    url: "https://blazegraph.com/"
+    wikidata_id: "Q20127748"
+    description: "High Performance Graph Database"
+    prefixes:
+      bd: "http://www.bigdata.com/rdf#"
+
+
   # FactGrid-specific prefixes
   factgrid:
-    name: "factgrid"
+    name: "FactGrid"
+    wikidata_id: "Q90405608"
     url: "https://database.factgrid.de/"
-    description: "FactGrid-specific prefixes"
+    description: "Database for historians using Wikibase"
     prefixes:
       wd: "http://factgrid.de/entity/"
       wdt: "http://factgrid.de/prop/direct/"
@@ -70,34 +131,22 @@ prefix_sets:
       wdtn: "http://factgrid.de/prop/direct-normalized/"
       wdv: "http://factgrid.de/value/"
 
-  # Common vocabulary prefixes
+  # Creative Commons
   commons:
-    name: "commons"
-    url: "https://commons.wikimedia.org/"
-    description: "Common vocabulary prefixes"
+    name: "Creative Commons"
+    wikidata_id: "Q43449"
+    url: "https://creativecommons.org/"
+    description: "Copyright licenses for the public release of creative works"
     prefixes:
       cc: "http://creativecommons.org/ns#"
-      dct: "http://purl.org/dc/terms/"
-      dc: "http://purl.org/dc/terms/"
-      dc11: "http://purl.org/dc/elements/1.1/"
-      ontolex: "http://www.w3.org/ns/lemon/ontolex#"
-      prov: "http://www.w3.org/ns/prov#"
-      foaf: "http://xmlns.com/foaf/0.1/"
-      time: "http://www.w3.org/2006/time#"
 
-  # Blazegraph-specific prefixes
-  blazegraph:
-    name: "blazegraph"
-    url: "https://blazegraph.com/"
-    description: "Blazegraph-specific prefixes"
-    prefixes:
-      bd: "http://www.bigdata.com/rdf#"
 
   # DBLP-specific prefixes
   dblp:
-    name: "dblp"
+    name: "DBLP"
     url: "https://dblp.org/"
-    description: "DBLP-specific prefixes"
+    wikidata_id: "Q1224715"
+    description: "computer science bibliography website hosted in Germany"
     prefixes:
       dblp: "https://dblp.org/rdf/schema#"
       dblpc: "https://dblp.org/rdf/contribution#"
@@ -105,9 +154,10 @@ prefix_sets:
 
   # Genealogy.net GOV-specific prefixes
   gov:
-    name: "gov"
+    name: "GOV"
+    wikidata_id: "Q38814612"
     url: "http://gov.genealogy.net/"
-    description: "Genealogy.net GOV-specific prefixes"
+    description: "Historical Gazetteer"
     prefixes:
       gov: "http://gov.genealogy.net/"
       gp: "http://gov.genealogy.net/ontology.owl#"
@@ -115,9 +165,10 @@ prefix_sets:
 
   # OpenStreetMap prefixes
   osm:
-    name: "osm"
+    name: "OpenStreetMap"
     url: "https://www.openstreetmap.org/"
-    description: "OpenStreetMap prefixes"
+    wikidata_id: "Q936"
+    description: "OpenStreetMap:online collaborative project creating a world geographic database"
     prefixes:
       geo: "http://www.opengis.net/ont/geosparql#"
       osmm: "https://www.openstreetmap.org/meta/"
@@ -128,9 +179,10 @@ prefix_sets:
 
   # OpenHistoricalMap prefixes
   ohm:
-    name: "ohm"
+    name: "OpenHistoricalMap"
+    wikidata_id: "Q25384440"
     url: "https://www.openhistoricalmap.org/"
-    description: "OpenHistoricalMap prefixes"
+    description: "Collaborative project to create a freely licensed online database of historical world geography based on OpenStreetMap technology"
     prefixes:
       ohm: "https://www.openhistoricalmap.org/"
       ohmm: "https://www.openhistoricalmap.org/meta/"
@@ -140,26 +192,21 @@ prefix_sets:
 
   # Freebase prefixes
   freebase:
-    name: "freebase"
-    url: "https://developers.google.com/freebase"
-    description: "Freebase Knowledge Graph prefixes"
+    name: "Freebase"
+    wikidata_id: "Q1453477"
+    url: "http://www.freebase.com/"
+    description: "Freebase online knowledge base (2007–2016)"
     prefixes:
       fb: "http://rdf.freebase.com/ns/"
       ky: "http://rdf.freebase.com/key/"
 
-  # Freebase Easy (QLever) prefixes
-  freebase_easy:
-    name: "freebase_easy"
-    url: "https://qlever.cs.uni-freiburg.de/freebase"
-    description: "Freebase Easy schema prefixes"
-    prefixes:
-      fbe: "http://orion.cs.uni-freiburg.de/freebase/"
 
   # UniProt prefixes
   uniprot:
-    name: "uniprot"
+    name: "UniProt"
     url: "https://www.uniprot.org/"
-    description: "UniProt protein database prefixes"
+    wikidata_id: "Q905695"
+    description: "Database of protein sequence and functional information"
     prefixes:
       up: "http://purl.uniprot.org/core/"
       uniprot: "http://purl.uniprot.org/uniprot/"
@@ -168,7 +215,8 @@ prefix_sets:
   pubchem:
     name: "pubchem"
     url: "https://pubchem.ncbi.nlm.nih.gov/"
-    description: "PubChem chemical database prefixes"
+    description: "chemical information database"
+    wikidata_id: "Q278487"
     prefixes:
       pc: "http://rdf.ncbi.nlm.nih.gov/pubchem/vocabulary#"
       pcc: "http://rdf.ncbi.nlm.nih.gov/pubchem/compound/"
@@ -176,34 +224,38 @@ prefix_sets:
 
   # DNB (Deutsche Nationalbibliothek) prefixes
   dnb:
-    name: "dnb"
+    name: "DNB: German National Library"
     url: "https://www.dnb.de/"
-    description: "Deutsche Nationalbibliothek prefixes"
+    wikidata_id: "Q27302"
+    description: "Central archival library and national bibliographic centre for the Federal Republic of Germany"
     prefixes:
       gndo: "https://d-nb.info/standards/elementset/gnd#"
       dnb: "https://d-nb.info/"
 
   # IMDb prefixes
   imdb:
-    name: "imdb"
+    name: "IMDb: Internet Movie Database"
     url: "https://www.imdb.com/"
-    description: "IMDb prefixes"
+    wikidata_id: "Q37312"
+    description: "Online database of information related to films, television series, and video games"
     prefixes:
       imdb: "https://www.imdb.com/"
 
   # Yago Knowledge Base prefixes
   yago:
-    name: "yago"
+    name: "YAGO"
+    wikidata_id: "Q8045810"
     url: "https://yago-knowledge.org/"
-    description: "YAGO Knowledge Base prefixes"
+    description: "Yet Another Great Ontology"
     prefixes:
       yago: "http://yago-knowledge.org/resource/"
 
   # DBpedia prefixes
   dbpedia:
-    name: "dbpedia"
+    name: "DBpedia"
     url: "https://www.dbpedia.org/"
-    description: "DBpedia prefixes"
+    wikidata_id: "Q465"
+    description: "Online database project of structured data extracted from Wikipedia"
     prefixes:
       dbo: "http://dbpedia.org/ontology/"
       dbr: "http://dbpedia.org/resource/"
@@ -211,8 +263,10 @@ prefix_sets:
 
   # Olympics prefixes
   olympics:
-    name: "olympics"
+    name: "Olympic Games"
+    wikidata_id: "Q5389"
     url: "https://olympics.com/"
-    description: "Olympics dataset prefixes"
+    description: "Major international multi-sport event organised by International Olympic Committee"
     prefixes:
-      oly: "http://olympics.com/"
+      olympics: "http://wallscope.co.uk/ontology/olympics/"
+      medal: "http://wallscope.co.uk/resource/olympics/medal/"

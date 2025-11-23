@@ -5,13 +5,13 @@ Created on 2025-06-04
 """
 
 import json
-from pathlib import Path
 from typing import Dict
 
 from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import EndpointManager
 from tests.basetest import Basetest
+from lodstorage.yaml_path import YamlPath
 import urllib.request
 
 
@@ -25,9 +25,7 @@ class TestPrefixConfig(Basetest):
         setUp the test environment
         """
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.prefixes_yaml_path = (
-            Path(__file__).parent / ".." / "sampledata" / "prefixes.yaml"
-        ).resolve()
+        self.prefixes_yaml_path = YamlPath.getSamplePath("prefixes.yaml")
         self.pfix_configs = PrefixConfigs.ofYaml(self.prefixes_yaml_path)
 
     def get_all_prefixes(self) -> Dict[str, str]:
