@@ -194,7 +194,7 @@ prefix_sets:
   freebase:
     name: "Freebase"
     wikidata_id: "Q1453477"
-    url: "http://www.freebase.com/"
+    url: "https://en.wikipedia.org/wiki/Freebase_(database)"
     description: "Freebase online knowledge base (2007–2016)"
     prefixes:
       fb: "http://rdf.freebase.com/ns/"

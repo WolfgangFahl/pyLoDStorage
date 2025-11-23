@@ -28,9 +28,8 @@ class PrefixConfig:
         """
         Set default values after initialization
         """
-        if self.prefix_prefix is None:
-            self.prefix_prefix = self.name
-
+        # nothing to do yet
+        pass
 
     def as_text(self) -> str:
         """
@@ -56,10 +55,14 @@ class PrefixConfigs:
         return prefix_configs
 
     def __post_init__(self):
-        """ """
+        """
+        initialize all prefixes and test prefix prefix for all prefix configs
+        """
         self.all_prefixes = {}
-        for prefix_config in self.prefix_sets.values():
-            self.all_prefixes.update(prefix_config.prefixes)
+        for key, prefix_config in self.prefix_sets.items():
+            if prefix_config.prefix_prefix is None:
+                prefix_config.prefix_prefix = key
+        self.all_prefixes.update(prefix_config.prefixes)
         pass
 
     def get_selected_declarations(self, prefix_set: List[str]) -> str:

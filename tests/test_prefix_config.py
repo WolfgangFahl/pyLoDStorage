@@ -101,13 +101,13 @@ class TestPrefixConfig(Basetest):
 
         # Check defaults
         rdf = pfix_configs.prefix_sets["rdf"]
-        self.assertEqual("rdf", rdf.name)
+        self.assertEqual("RDF", rdf.name)
         self.assertEqual("rdf", rdf.prefix_prefix)
         self.assertEqual("https://www.w3.org/rdf/", rdf.url)
 
         # Check override
         wikidata = pfix_configs.prefix_sets["wikidata"]
-        self.assertEqual("wikidata", wikidata.name)
+        self.assertEqual("Wikidata", wikidata.name)
         self.assertEqual("wiki", wikidata.prefix_prefix)
         debug=self.debug
         debug=True
