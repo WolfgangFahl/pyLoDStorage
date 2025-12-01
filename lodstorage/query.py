@@ -718,8 +718,8 @@ class Endpoint:
     )
     mtriples: Optional[int] = None  # Dataset size in millions of triples
 
-    @staticmethod
-    def getSamples():
+    @classmethod
+    def get_samples(cls):
         samples = [
             {
                 "name": "wikidata",
@@ -749,6 +749,11 @@ class Endpoint:
                 "website": "https://qlever.cs.uni-freiburg.de/wikidata",
             },
         ]
+        return samples
+
+    @classmethod
+    def getSamples(cls):
+        samples=cls.get_samples()
         return samples
 
     @classmethod
