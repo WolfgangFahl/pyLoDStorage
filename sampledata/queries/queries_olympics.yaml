@@ -17,7 +17,7 @@ Athletes_by_gold_medals:
     GROUP BY ?athlete ?athlete_label
     ORDER BY DESC(?count)
   short_urls:
-    https://qlever.dev/olympics/61xCAB
+    qlever-olympics: https://qlever.dev/olympics/61xCAB
 
 Athles_name_contain_keywords:
   title: All athletes whose name contains the given keywords

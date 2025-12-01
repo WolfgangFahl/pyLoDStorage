@@ -6,9 +6,11 @@ Created on 2024-03-02
 
 import json
 
+from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import EndpointManager, QueryManager
 from lodstorage.sparql import SPARQL
+
 from lodstorage.yaml_path import YamlPath
 from tests.basetest import Basetest
 from tests.endpoint_test import EndpointTest
@@ -70,119 +72,42 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         """
         Test Issue #151: Simplify endpoints.yaml by referencing prefix sets.
 
-        Verifies:
-        1. Endpoints use prefix_sets (List[str]) instead of inline prefixes
-        2. Prefix resolution works correctly via Prefixes.getPrefixes()
-        3. Queries using resolved prefixes execute successfully
-
-        Uses queries_olympics.yaml as test data.
+        Verifies new add_endpoint_prefixes() merges prefix_sets → query.query.
         """
-        debug = self.debug
-        debug = True
-        # Get QLever Olympics endpoint
+        debug = False
+
         endpoint_path = YamlPath.getSamplePath("endpoints_qlever.yaml")
-        endpoints = EndpointManager.getEndpoints(
-            endpointPath=endpoint_path, lang="sparql", with_default=False
-        )
-        ep_name = "olympics-qlever"
-        self.assertIn(ep_name, endpoints, f"{ep_name} endpoint not found")
-        endpoint = endpoints[ep_name]
+        endpoints = EndpointManager.getEndpoints(endpointPath=endpoint_path, lang="sparql", with_default=False)
+        endpoint_name = "olympics-qlever"
+        endpoint = endpoints[endpoint_name]
 
-        # Load Olympics queries which use prefix_sets
+        # Verify prefix_sets
+        if debug:
+            print(f"prefix_sets for {endpoint_name}: {endpoint.prefix_sets}")
+        self.assertTrue(hasattr(endpoint, "prefix_sets"))
+        self.assertEqual(endpoint.prefix_sets, ["rdf", "olympics"])
+
         olympics_queries_path = f"{self.sampledata_dir}/queries/queries_olympics.yaml"
-        qm = QueryManager(
-            queriesPath=olympics_queries_path,
-            with_default=False,
-            lang="sparql",
-            debug=False,
-        )
-
-        if debug:
-            print(f"\n=== Testing Issue #151: Prefix Sets Refactoring ===")
-            print(f"Endpoint: {endpoint.name}")
-            print(f"URL: {endpoint.endpoint}")
-
-        # 1. Verify endpoint has prefix_sets field
-        if debug:
-            print(f"\n1. Checking endpoint structure...")
-            print(f"   Has prefix_sets: {hasattr(endpoint, 'prefix_sets')}")
-            if hasattr(endpoint, "prefix_sets"):
-                print(f"   Prefix sets: {endpoint.prefix_sets}")
-
-        self.assertTrue(
-            hasattr(endpoint, "prefix_sets"),
-            f"Endpoint {endpoint.name} lacks 'prefix_sets' field",
-        )
-        self.assertIsInstance(
-            endpoint.prefix_sets, list, f"prefix_sets for {endpoint.name} is not a list"
-        )
-
-        # 2. Verify prefix resolution
-        if debug:
-            print(f"\n2. Testing prefix resolution...")
-
-        combined_prefixes = Prefixes.getPrefixes(endpoint.prefix_sets)
-
-        if debug:
-            print(f"   Combined prefixes from {endpoint.prefix_sets}:")
-            for line in combined_prefixes.split("\n")[:5]:  # Show first 5
-                print(f"     {line}")
-            print(f"   ... (total {len(combined_prefixes.split(chr(10)))} lines)")
-
-        # Verify expected prefixes are present
-        expected_prefixes = [
-            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>",
-            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>",
-            "PREFIX olympics: <https://olympics.qlever.cs.uni-freiburg.de/>",
-        ]
-
-        for expected in expected_prefixes:
-            if debug:
-                print(f"   Checking for: {expected[:50]}...")
-            self.assertIn(
-                expected, combined_prefixes, f"Expected prefix missing: {expected}"
-            )
-
-        # 3. Test query execution with resolved prefixes
-        if debug:
-            print(f"\n3. Testing query execution...")
-
+        qm = QueryManager(queriesPath=olympics_queries_path, with_default=False, lang="sparql", debug=False)
         query = qm.queriesByName["Athletes_by_gold_medals"]
 
         if debug:
-            print(f"   Query: {query.name}")
-            print(f"   Query prefix_sets: {query.prefix_sets}")
+            print(f"Query before add_endpoint_prefixes:\n{query.query[:200]}...")
 
-        # Resolve query-specific prefixes
-        query_prefixes = Prefixes.getPrefixes(query.prefix_sets)
-        query.prefixes = query_prefixes.split("\n")
+        query.add_endpoint_prefixes(endpoint, PrefixConfigs.get_instance())
 
         if debug:
-            print(f"   Resolved {len(query.prefixes)} prefix lines for query")
+            print(f"Query after (has rdf?: {'PREFIX rdf:' in query.query}, olympics?: {'PREFIX olympics:' in query.query})")
+            print(f"Full query:\n{query.query}")
 
-        # Execute query
+        self.assertIn("PREFIX rdf:", query.query)
+        self.assertIn("PREFIX olympics:", query.query)
+
         sparql = SPARQL(endpoint.endpoint, method=endpoint.method)
-
-        try:
-            if debug:
-                print(f"   Executing query at {endpoint.endpoint}...")
-
-            qlod = sparql.queryAsListOfDicts(query.query)
-
-            if debug:
-                print(f"   ✅ Query succeeded: {len(qlod)} results")
-                if qlod:
-                    print(f"   Sample result: {qlod[0]}")
-
-            self.assertIsInstance(qlod, list, "Query result is not a list")
-            self.assertGreater(
-                len(qlod), 0, "Query with assembled prefixes returned no results"
-            )
-
-        except Exception as ex:
-            if debug:
-                print(f"   ❌ Query failed: {ex}")
-            self.fail(f"Query failed with refactored prefixes: {ex}")
+        qlod = sparql.queryAsListOfDicts(query.query)
 
         if debug:
-            print(f"\n=== Issue #151 Test Complete ===\n")
+            print(f"Query results: {len(qlod)} rows")
+
+        self.assertIsInstance(qlod, list)
+        self.assertGreater(len(qlod), 0)
