@@ -451,7 +451,7 @@ class TestQueries(EndpointTest):
             json_str = self.captureQueryMain(args)
             json_data = json.loads(json_str)
             if debug:
-                print(json.dumps(json_data, indent=2))
+                print(json.dumps(json_data, indent=2,default=str))
                 print(len(json_data))
             self.assertEqual(limit, len(json_data))
 
