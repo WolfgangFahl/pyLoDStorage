@@ -719,7 +719,7 @@ class Endpoint:
     mtriples: Optional[int] = None  # Dataset size in millions of triples
 
     @classmethod
-    def get_samples(cls):
+    def getSamples(cls):
         samples = [
             {
                 "name": "wikidata",
@@ -752,8 +752,16 @@ class Endpoint:
         return samples
 
     @classmethod
-    def getSamples(cls):
-        samples=cls.get_samples()
+    def get_samples(cls) -> dict[str, List["Endpoint"]]:
+        """
+        Get samples for Endpoint
+        """
+        sample_dicts = cls.getSamples()
+        endpoint_list=[]
+        for sample_dict in sample_dicts:
+            endpoint=cls(**sample_dict)
+            endpoint_list.append(endpoint)
+        samples= {"sample-endpoints": endpoint_list}
         return samples
 
     @classmethod
