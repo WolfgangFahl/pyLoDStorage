@@ -36,5 +36,3 @@ Athles_name_contain_keywords:
       ?athlete rdfs:label ?athlete_label .
       FILTER (regex(?athlete_label, "{{ keywords }}", "i"))  # Adjusted for param substitution and case-insensitive search
     }
-  short_urls:
-    # Add if available

@@ -27,26 +27,7 @@ from lodstorage.query import (
 from lodstorage.querymain import QueryMain
 from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
-from tests.basetest import Basetest
-
-
-class EndpointTest(Basetest):
-    """
-    base class for endpoint tests
-    """
-    def setUp(self, debug=False, profile=True):
-        Basetest.setUp(self, debug=debug, profile=profile)
-        self.sampledata_dir = f"{os.path.dirname(__file__)}/../sampledata"
-
-    def yieldSampleEndpoints(self):
-        """
-        yield all sample Endpoints
-        """
-        for filename in ["endpoints.yaml", "endpoints_qlever.yaml"]:
-            full_path = f"{self.sampledata_dir}/{filename}"
-            endpoints = EndpointManager.getEndpoints(endpointPath=full_path, lang="sparql", with_default=False)
-            for key, endpoint in endpoints.items():
-                yield key, endpoint
+from tests.endpoint_test import EndpointTest
 
 class TestQueries(EndpointTest):
     """
@@ -54,9 +35,7 @@ class TestQueries(EndpointTest):
     """
 
     def setUp(self, debug=False, profile=True):
-        Basetest.setUp(self, debug=debug, profile=profile)
-        self.sampledata_dir = f"{os.path.dirname(__file__)}/../sampledata"
-        self.wikidata_queries_path = f"{self.sampledata_dir}/wikidata.yaml"
+        EndpointTest.setUp(self, debug=debug, profile=profile)
 
     def testSQLQueries(self):
         """
@@ -442,116 +421,6 @@ class TestQueries(EndpointTest):
             print(tryit)
         pass
 
-    def test_issue151_prefix_sets_refactoring_gcf(self):
-        """
-        Test the new prefix_sets feature introduced to eliminate redundancy in endpoints.yaml.
-
-        This test verifies:
-        - Endpoints now use prefix_sets (List[str]) instead of inline prefixes string.
-        - Prefix strings are correctly assembled from referenced prefix_sets in prefixes.yaml.
-        - Existing query functionality (e.g., SPARQL with prefixes) continues to work.
-
-        See acceptance criteria tasks 4 & 5.
-        """
-        debug = self.debug
-        debug = True
-        endpoints = {}
-        for ep_name, endpoint in self.yieldSampleEndpoints():
-            endpoints[ep_name] = endpoint
-        for ep_name, endpoint in endpoints.items():
-            # Verify removal of old 'prefixes' field and addition of 'prefix_sets'
-            #self.assertFalse(hasattr(endpoint, 'prefixes'), f"Endpoint {ep_name} still has old 'prefixes' field")
-            self.assertTrue(hasattr(endpoint, 'prefix_sets'), f"Endpoint {ep_name} lacks 'prefix_sets' field")
-            self.assertIsInstance(endpoint.prefix_sets, list, f"prefix_sets for {ep_name} is not a list")
-            if "wikidata" in endpoint.prefix_sets:
-                self.assertIn("wikidata", endpoint.prefix_sets)  # Already ensured by the if, but keeping assertion
-            # Assuming EndpointManager or Endpoint has logic to assemble prefixes
-            from lodstorage.prefixes import Prefixes  # Import as per existing code
-            combined_prefixes = Prefixes.getPrefixes(endpoint.prefix_sets)
-            self.assertIn("PREFIX wd: <http://www.wikidata.org/entity/>", combined_prefixes, f"wd prefix missing in combined for {ep_name}")
-            self.assertIn("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>", combined_prefixes, f"rdfs prefix missing in combined for {ep_name}")
-
-        # Verify existing functionality: Run a query to ensure prefixes work
-        qm = QueryManager(lang="sparql", debug=False)
-        query = qm.queriesByName["US President Nicknames"]
-        query.endpoint = endpoints["wikidata"].endpoint  # Use the actual endpoint URL from sample
-        # Assuming sparql.queryAsListOfDicts now uses endpoint's assembled prefixes
-        sparql = SPARQL(endpoints["wikidata"].endpoint, method=endpoints["wikidata"].method)
-        # Simulate setting prefixes from endpoint
-        query.prefixes = Prefixes.getPrefixes(endpoints["wikidata"].prefix_sets).split('\n')
-        qlod = sparql.queryAsListOfDicts(query.query, param_dict=query.params.params_dict)
-        self.assertIsInstance(qlod, list)
-        self.assertTrue(len(qlod) > 0, "Query with assembled prefixes failed")
-        if debug:
-            print(f"Query succeeded with {len(qlod)} results using prefixes assembled from prefix_sets")
-
-    def test_issue151_prefix_sets_refactoring(self):
-        """
-        Test the new prefix_sets feature introduced to eliminate redundancy in endpoints.yaml.
-
-        This test verifies:
-        - Endpoints now use prefix_sets (List[str]) instead of inline prefixes string.
-        - Prefix strings are correctly assembled from referenced prefix_sets in prefixes.yaml.
-        - Existing query functionality (e.g., SPARQL with prefixes) continues to work.
-
-        See acceptance criteria tasks 4 & 5.
-        """
-        debug = self.debug
-        debug = True
-
-        # Track if we found the specific endpoint to verify
-        wikidata_verified = False
-
-        # Use yieldSampleEndpoints to iterate over the constrained sample data
-        for ep_name, endpoint in self.yieldSampleEndpoints():
-
-            # We are verifying the refactoring, so we expect 'prefix_sets' to define the configuration
-            if hasattr(endpoint, 'prefix_sets'):
-                self.assertIsInstance(endpoint.prefix_sets, list, f"prefix_sets for {ep_name} is not a list")
-
-                # Perform deep verification on the 'wikidata' endpoint as the primary test case
-                if ep_name == "wikidata":
-                    wikidata_verified = True
-
-                    # 1. Structural Verification
-                    # Ensure the transition from 'prefixes' (raw string) to 'prefix_sets' (list)
-                    # Note: We check specifically that proper list configuration exists.
-                    self.assertIn("wikidata", endpoint.prefix_sets, f"'wikidata' set not in {ep_name} prefix_sets")
-
-                    # 2. Logic Verification (Resolution)
-                    # Simulate the assembly logic (EndpointManager would handle this in production)
-                    combined_prefixes = Prefixes.getPrefixes(endpoint.prefix_sets)
-
-                    if debug:
-                        print(f"[{ep_name}] Prefix sets: {endpoint.prefix_sets}")
-
-                    # Verify key prefixes are physically present in the resolved string
-                    self.assertIn("PREFIX wd: <http://www.wikidata.org/entity/>", combined_prefixes,
-                                  f"wd prefix missing in combined prefixes for {ep_name}")
-                    self.assertIn("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>", combined_prefixes,
-                                  f"rdfs prefix missing in combined prefixes for {ep_name}")
-
-                    # 3. Functional Verification (Query)
-                    # Verify that the resolved prefixes actually work in a real query context
-                    qm = QueryManager(lang="sparql", debug=False)
-                    query = qm.queriesByName["US President Nicknames"]
-                    query.endpoint = ep_name
-
-                    # Inject the resolved prefixes into the query to simulate fully migrated logic
-                    query.prefixes = combined_prefixes.split('\n')
-
-                    sparql = SPARQL(endpoint.endpoint, method=endpoint.method)
-
-                    try:
-                        qlod = sparql.queryAsListOfDicts(query.query, param_dict=query.params.params_dict)
-                        self.assertIsInstance(qlod, list)
-                        self.assertTrue(len(qlod) > 0, "Query with assembled prefixes returned no results")
-                        if debug:
-                            print(f"Query succeeded with {len(qlod)} results using prefixes assembled from prefix_sets")
-                    except Exception as ex:
-                        self.fail(f"Query failed with refactored prefixes: {ex}")
-
-        self.assertTrue(wikidata_verified, "Could not find 'wikidata' endpoint in sample data to verify refactoring")
 
 
     def testCommandLineUsage(self):

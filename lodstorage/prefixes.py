@@ -24,12 +24,13 @@ class Prefixes:
     Methods:
         getPrefixes(prefixes): Generates SPARQL PREFIX lines for a given list of prefix keys.
     """
-
+    # see https://www.wikidata.org/wiki/EntitySchema:E49
     prefixMap = {
         "bd": "<http://www.bigdata.com/rdf#>",
         "cc": "<http://creativecommons.org/ns#>",
         "dct": "<http://purl.org/dc/terms/>",
         "geo": "<http://www.opengis.net/ont/geosparql#>",
+        "mwapi": "<https://www.mediawiki.org/ontology#API/>",
         "ontolex": "<http://www.w3.org/ns/lemon/ontolex#>",
         "owl": "<http://www.w3.org/2002/07/owl#>",
         "p": "<http://www.wikidata.org/prop/>",
@@ -48,6 +49,7 @@ class Prefixes:
         "schema": "<http://schema.org/>",
         "skos": "<http://www.w3.org/2004/02/skos/core#>",
         "wd": "<http://www.wikidata.org/entity/>",
+        "wdsubgraph": "<https://query.wikidata.org/subgraph/>",
         "wdata": "<http://www.wikidata.org/wiki/Special:EntityData/>",
         "wdno": "<http://www.wikidata.org/prop/novalue/>",
         "wdref": "<http://www.wikidata.org/reference/>",
