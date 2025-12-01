@@ -17,12 +17,14 @@ from basemkit.yamlable import lod_storable
 from lodstorage.mwTable import MediaWikiTable
 from lodstorage.params import Param, Params
 from lodstorage.prefix_config import PrefixConfigs
+from lodstorage.prefixes import Prefixes
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.formatters.latex import LatexFormatter
 from pygments.lexers import get_lexer_by_name
 from tabulate import tabulate
 import yaml
+
 from lodstorage.yaml_path import YamlPath
 
 
@@ -424,11 +426,29 @@ class Query:
             markup = r"\href{%s}{%s}" % (url, title)
         return markup
 
-    def add_endpoint_prefixes(self, endpoint: "Endpoint", prefix_configs: PrefixConfigs):
+
+    def add_endpoint_prefixes(self, endpoint: "Endpoint", prefix_configs: PrefixConfigs) -> None:
+        """
+        Add endpoint-specific PREFIX declarations to this query (via prefix_sets or legacy prefixes).
+
+        Merges (deduplicates by prefix name) endpoint prefixes into self.query using Prefixes.merge_prefixes().
+        Updates self.prefixes to full unique PREFIX lines list. Safe/idempotent (no-op if prefixes_str empty).
+
+        Args:
+            endpoint (Endpoint): Endpoint config with prefix_sets or legacy prefixes.
+            prefix_configs (PrefixConfigs): Loaded prefix configurations resolver.
+        """
         prefixes_str = endpoint.get_prefixes(prefix_configs)
-        if prefixes_str:
-            self.prefixes = prefixes_str.splitlines()
-            self.query = f"{prefixes_str}\n{self.query}"
+        if not prefixes_str.strip():
+            return
+
+        # Merge: Prepend ONLY missing prefixes (no dups like 'rdfs')
+        self.query = Prefixes.merge_prefixes(self.query, prefixes_str)
+
+        # Update self.prefixes: Full unique lines from merged query
+        prefix_dict = Prefixes.extract_prefixes(self.query)
+        self.prefixes = [Prefixes.prefix_line(prefix_dict, prefix) for prefix in sorted(prefix_dict)]
+
 
     def prefixToLink(self, lod: list, prefix: str, tablefmt: str):
         """

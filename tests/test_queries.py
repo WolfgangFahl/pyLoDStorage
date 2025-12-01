@@ -4,16 +4,15 @@ Created on 2021-01-29
 @author: wf
 """
 
+from argparse import Namespace
+from contextlib import redirect_stdout
 import copy
 import io
 import json
 import os
 import traceback
-from argparse import Namespace
-from contextlib import redirect_stdout
 
-import tests.test_sqlite3
-from tests.action_stats import ActionStats
+from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import (
     EndpointManager,
@@ -27,7 +26,11 @@ from lodstorage.query import (
 from lodstorage.querymain import QueryMain
 from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
+
+from tests.action_stats import ActionStats
 from tests.endpoint_test import EndpointTest
+import tests.test_sqlite3
+
 
 class TestQueries(EndpointTest):
     """
@@ -170,6 +173,64 @@ class TestQueries(EndpointTest):
             if debug:
                 print(f"{resultFormat}:{result}")
             self.assertTrue(expected in result, f"{expected}({resultFormat})")
+
+    def test_add_endpoint_prefixes(self):
+        """
+        Test Query.add_endpoint_prefixes() merges endpoint prefixes without duplicates.
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/140 (related prefix handling)
+        """
+        debug = self.debug
+        #debug=True
+        endpoints = EndpointManager.getEndpoints(lang="sparql")
+        wikidata_ep = endpoints["wikidata"]
+        prefix_configs = PrefixConfigs.get_instance()
+
+        qm = QueryManager(lang="sparql", debug=False)
+        cities_query = qm.queriesByName["cities"]  # Has rdfs, wd, wdt
+
+        original_query = cities_query.query
+        original_prefixes = Prefixes.extract_prefixes(original_query)
+        self.assertEqual(3, len(original_prefixes))  # rdfs, wd, wdt
+
+        # Add endpoint prefixes (Wikidata full set → overlaps)
+        cities_query.add_endpoint_prefixes(wikidata_ep, prefix_configs)
+
+        # Debug: Always show merged state (before asserts → visible on fail)
+        merged_query = cities_query.query
+        prefix_dict = Prefixes.extract_prefixes(merged_query)
+        prefix_lines = [line for line in merged_query.splitlines() if line.strip().startswith('PREFIX')]
+        if debug:
+            print("Merged query prefixes:")
+            print('\n'.join(prefix_lines))
+            print(f"Unique prefixes: {len(prefix_dict)}")
+            print(f"self.prefixes len: {len(cities_query.prefixes)}")
+            print("self.prefixes sample:", cities_query.prefixes[:3])
+
+        # Verify: Unique prefixes (no dups like 'rdfs')
+        self.assertEqual(len(prefix_dict), len(prefix_lines))  # 1:1 → no dup lines
+
+        # Specific: 'rdfs', 'wd', 'wdt' appear exactly once
+        for prefix in ['rdfs', 'wd', 'wdt']:
+            count = sum(1 for line in prefix_lines if f'{prefix}: ' in line)
+            self.assertEqual(1, count)
+
+        # Full Wikidata set merged (many more)
+        self.assertGreater(len(prefix_dict), 10)
+
+        # Query body preserved
+        self.assertIn('SELECT ?city_id ?name', merged_query)
+
+        # self.prefixes: Unique PREFIX lines list (len + sorted names match)
+        self.assertEqual(len(prefix_lines), len(cities_query.prefixes))  # same count
+        def get_prefix_names(lines):
+            return sorted([line.split(':')[0].strip('PREFIX ').strip() for line in lines])
+        self.assertEqual(
+            get_prefix_names(prefix_lines),
+            get_prefix_names(cities_query.prefixes)
+        )  # same set (order-insensitive)
+        used_prefixes = {line.split(':')[0].strip() for line in cities_query.prefixes}
+        self.assertEqual(len(used_prefixes), len(cities_query.prefixes))  # no dups
+
 
     def testQueryEndpoints(self):
         """
