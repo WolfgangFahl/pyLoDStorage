@@ -13,7 +13,7 @@ endpoints:
         - wikidata
         - commons
       auto_update: false
-      mtriples: 22000
+      mtriples: 20947
 
     'dblp-qlever':
       description: "DBLP Computer Science Bibliography hosted by QLever."
@@ -26,7 +26,7 @@ endpoints:
         - rdf
         - dblp
       auto_update: false
-      mtriples: 520
+      mtriples: 1464
 
     'osm-qlever':
       description: "OpenStreetMap Planet hosted by QLever."
@@ -39,7 +39,7 @@ endpoints:
         - rdf
         - osm
       auto_update: false
-      mtriples: 50000
+      mtriples: 202395
 
     'ohm-qlever':
       description: "OpenHistoricalMap hosted by QLever."
@@ -52,7 +52,7 @@ endpoints:
         - rdf
         - ohm
       auto_update: false
-      mtriples: 5775
+      mtriples: 5781
 
     'freebase-qlever':
       description: "Freebase Knowledge Graph hosted by QLever."
@@ -65,7 +65,7 @@ endpoints:
         - rdf
         - freebase
       auto_update: false
-      mtriples: 3100
+      mtriples: 3124
 
     'uniprot-qlever':
       description: "UniProt Protein Database hosted by QLever."
@@ -78,7 +78,7 @@ endpoints:
         - rdf
         - uniprot
       auto_update: false
-      mtriples: 110000
+      mtriples: 238930
 
     'pubchem-qlever':
       description: "PubChem Chemical Database hosted by QLever."
@@ -91,7 +91,7 @@ endpoints:
         - rdf
         - pubchem
       auto_update: false
-      mtriples: 25900
+      mtriples: 25934
 
     'imdb-qlever':
       description: "IMDb (Internet Movie Database) hosted by QLever."
@@ -117,7 +117,7 @@ endpoints:
         - rdf
         - dnb
       auto_update: false
-      mtriples: 1500
+      mtriples: 1502
 
     'yago-qlever':
       description: "YAGO 4 Knowledge Base hosted by QLever."
@@ -130,7 +130,7 @@ endpoints:
         - rdf
         - yago
       auto_update: false
-      mtriples: 2000
+      mtriples: 2489
 
     'dbpedia-qlever':
       description: "DBpedia hosted by QLever."
@@ -156,4 +156,4 @@ endpoints:
         - rdf
         - olympics
       auto_update: false
-      mtriples: 1.8
+      mtriples: 1
