@@ -1,5 +1,6 @@
 """
 Created on 2020-08-22
+2025-12-01 version for prefix sets
 
 @author: wf
 """
@@ -799,10 +800,26 @@ class EndpointManager(object):
     endpoints: Dict[str, Endpoint] = field(default_factory=dict)
 
     @classmethod
-    def ofYaml(cls, yaml_path: str) -> "EndpointManager":
+    def of_yaml(cls, yaml_path: str) -> "EndpointManager":
         """Load prefix configurations from YAML file."""
         em = cls.load_from_yaml_file(yaml_path)
         return em
+
+    @classmethod
+    def ofYaml(cls, yaml_path: str) -> "EndpointManager":
+        em = cls.of_yaml(yaml_path)
+        return em
+
+    def get_endpoint(self, name: str) -> Optional[Endpoint]:
+        """Get endpoint by name."""
+        return self.endpoints.get(name)
+
+    def __len__(self) -> int:
+        return len(self.endpoints)
+
+    def __iter__(self):
+        return iter(self.endpoints.values())
+
 
     @classmethod
     def getEndpoints(
