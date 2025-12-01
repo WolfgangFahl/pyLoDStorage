@@ -24,6 +24,7 @@ class Prefixes:
     Methods:
         getPrefixes(prefixes): Generates SPARQL PREFIX lines for a given list of prefix keys.
     """
+
     # see https://www.wikidata.org/wiki/EntitySchema:E49
     prefixMap = {
         "bd": "<http://www.bigdata.com/rdf#>",

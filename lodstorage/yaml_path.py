@@ -3,8 +3,11 @@ Created on 2025-11-23
 
 @author: wf
 """
+
 import os
 from pathlib import Path
+
+
 class YamlPath:
     """
     provide path to loading configuration or data files by checking:
@@ -44,7 +47,9 @@ class YamlPath:
         return default_path
 
     @classmethod
-    def getPaths(cls, yamlFileName: str, yamlPath: str = None, with_default: bool = True):
+    def getPaths(
+        cls, yamlFileName: str, yamlPath: str = None, with_default: bool = True
+    ):
         """
         Get a list of YAML file paths to be used for loading configuration/data.
 

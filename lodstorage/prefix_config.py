@@ -4,10 +4,9 @@ Created on 2025-06-04
 @author: wf
 """
 
-from dataclasses import dataclass, field
 import os
-from typing import ClassVar, Optional
-from typing import Dict, List, Optional, ClassVar
+from dataclasses import dataclass, field
+from typing import ClassVar, Dict, List, Optional
 
 from basemkit.yamlable import lod_storable
 
@@ -78,9 +77,9 @@ class PrefixConfigs:
             paths = YamlPath.getPaths("prefixes.yaml")
             yaml_path = paths[0] if paths else None
         if yaml_path and os.path.exists(yaml_path):
-            prefix_configs= cls.load_from_yaml_file(yaml_path)
+            prefix_configs = cls.load_from_yaml_file(yaml_path)
         else:
-            prefix_configs=cls() # Empty if no file
+            prefix_configs = cls()  # Empty if no file
         return prefix_configs
 
     def __post_init__(self):

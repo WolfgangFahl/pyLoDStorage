@@ -91,18 +91,11 @@ class SPARQL(object):
             elif endpointConf.auth == "DIGEST":
                 authMethod = "DIGEST"
             sparql.addAuthentication(
-                endpointConf.user,
-                endpointConf.password,
-                method=authMethod
+                endpointConf.user, endpointConf.password, method=authMethod
             )
         return sparql
 
-    def addAuthentication(
-        self,
-        username: str,
-        password: str,
-        method: str = "BASIC"
-    ):
+    def addAuthentication(self, username: str, password: str, method: str = "BASIC"):
         """
         Add Http Authentication credentials to the sparql wrapper
         Args:

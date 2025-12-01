@@ -235,12 +235,12 @@ class Sample:
         return samples
 
     @staticmethod
-    def getRoyalsSample()->Royals:
+    def getRoyalsSample() -> Royals:
         samples = Royals.get_samples()
         all_members = []
         for royals in samples.values():
             all_members.extend(royals.members)
-        royals=Royals(members=all_members)
+        royals = Royals(members=all_members)
         return royals
 
     @staticmethod

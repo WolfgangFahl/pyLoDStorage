@@ -5,14 +5,14 @@ Created on 2025-06-04
 """
 
 import json
+import urllib.request
 from typing import Dict
 
 from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import EndpointManager
-from tests.basetest import Basetest
 from lodstorage.yaml_path import YamlPath
-import urllib.request
+from tests.basetest import Basetest
 
 
 class TestPrefixConfig(Basetest):
@@ -56,7 +56,7 @@ class TestPrefixConfig(Basetest):
         """
         test we have references all PREFIX definitions of all default endpoints
         """
-        endpoints = EndpointManager.getEndpoints(lang="sparql",with_default=False)
+        endpoints = EndpointManager.getEndpoints(lang="sparql", with_default=False)
         all_config_prefixes = self.get_all_prefixes()
         missing_prefixes = set()
 
@@ -109,16 +109,15 @@ class TestPrefixConfig(Basetest):
         wikidata = pfix_configs.prefix_sets["wikidata"]
         self.assertEqual("Wikidata", wikidata.name)
         self.assertEqual("wiki", wikidata.prefix_prefix)
-        debug=self.debug
-        debug=True
+        debug = self.debug
+        debug = True
         if debug:
             for name, config in pfix_configs.prefix_sets.items():
                 print(f"Checking {name} -> url: {config.url}")
                 if config.url:
                     try:
                         req = urllib.request.Request(
-                            config.url,
-                            headers={'User-Agent': 'Mozilla/5.0'}
+                            config.url, headers={"User-Agent": "Mozilla/5.0"}
                         )
                         code = urllib.request.urlopen(req, timeout=2).getcode()
                         print(f"  Status: {code}")

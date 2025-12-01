@@ -4,14 +4,15 @@ Created on 2021-01-29
 @author: wf
 """
 
-from argparse import Namespace
-from contextlib import redirect_stdout
 import copy
 import io
 import json
 import os
 import traceback
+from argparse import Namespace
+from contextlib import redirect_stdout
 
+import tests.test_sqlite3
 from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import (
@@ -26,10 +27,8 @@ from lodstorage.query import (
 from lodstorage.querymain import QueryMain
 from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
-
 from tests.action_stats import ActionStats
 from tests.endpoint_test import EndpointTest
-import tests.test_sqlite3
 
 
 class TestQueries(EndpointTest):
@@ -82,7 +81,7 @@ class TestQueries(EndpointTest):
         test SPARQL Query with parameters
         """
         show = self.debug
-        #show = True
+        # show = True
         qm = QueryManager(
             queriesPath=self.wikidata_queries_path,
             with_default=False,
@@ -180,7 +179,7 @@ class TestQueries(EndpointTest):
         https://github.com/WolfgangFahl/pyLoDStorage/issues/140 (related prefix handling)
         """
         debug = self.debug
-        #debug=True
+        # debug=True
         endpoints = EndpointManager.getEndpoints(lang="sparql")
         wikidata_ep = endpoints["wikidata"]
         prefix_configs = PrefixConfigs.get_instance()
@@ -198,10 +197,14 @@ class TestQueries(EndpointTest):
         # Debug: Always show merged state (before asserts → visible on fail)
         merged_query = cities_query.query
         prefix_dict = Prefixes.extract_prefixes(merged_query)
-        prefix_lines = [line for line in merged_query.splitlines() if line.strip().startswith('PREFIX')]
+        prefix_lines = [
+            line
+            for line in merged_query.splitlines()
+            if line.strip().startswith("PREFIX")
+        ]
         if debug:
             print("Merged query prefixes:")
-            print('\n'.join(prefix_lines))
+            print("\n".join(prefix_lines))
             print(f"Unique prefixes: {len(prefix_dict)}")
             print(f"self.prefixes len: {len(cities_query.prefixes)}")
             print("self.prefixes sample:", cities_query.prefixes[:3])
@@ -210,27 +213,29 @@ class TestQueries(EndpointTest):
         self.assertEqual(len(prefix_dict), len(prefix_lines))  # 1:1 → no dup lines
 
         # Specific: 'rdfs', 'wd', 'wdt' appear exactly once
-        for prefix in ['rdfs', 'wd', 'wdt']:
-            count = sum(1 for line in prefix_lines if f'{prefix}: ' in line)
+        for prefix in ["rdfs", "wd", "wdt"]:
+            count = sum(1 for line in prefix_lines if f"{prefix}: " in line)
             self.assertEqual(1, count)
 
         # Full Wikidata set merged (many more)
         self.assertGreater(len(prefix_dict), 10)
 
         # Query body preserved
-        self.assertIn('SELECT ?city_id ?name', merged_query)
+        self.assertIn("SELECT ?city_id ?name", merged_query)
 
         # self.prefixes: Unique PREFIX lines list (len + sorted names match)
         self.assertEqual(len(prefix_lines), len(cities_query.prefixes))  # same count
-        def get_prefix_names(lines):
-            return sorted([line.split(':')[0].strip('PREFIX ').strip() for line in lines])
-        self.assertEqual(
-            get_prefix_names(prefix_lines),
-            get_prefix_names(cities_query.prefixes)
-        )  # same set (order-insensitive)
-        used_prefixes = {line.split(':')[0].strip() for line in cities_query.prefixes}
-        self.assertEqual(len(used_prefixes), len(cities_query.prefixes))  # no dups
 
+        def get_prefix_names(lines):
+            return sorted(
+                [line.split(":")[0].strip("PREFIX ").strip() for line in lines]
+            )
+
+        self.assertEqual(
+            get_prefix_names(prefix_lines), get_prefix_names(cities_query.prefixes)
+        )  # same set (order-insensitive)
+        used_prefixes = {line.split(":")[0].strip() for line in cities_query.prefixes}
+        self.assertEqual(len(used_prefixes), len(cities_query.prefixes))  # no dups
 
     def testQueryEndpoints(self):
         """
@@ -446,7 +451,7 @@ class TestQueries(EndpointTest):
             json_str = self.captureQueryMain(args)
             json_data = json.loads(json_str)
             if debug:
-                print(json.dumps(json_data,indent=2))
+                print(json.dumps(json_data, indent=2))
                 print(len(json_data))
             self.assertEqual(limit, len(json_data))
 
@@ -455,7 +460,7 @@ class TestQueries(EndpointTest):
         https://github.com/WolfgangFahl/pyLoDStorage/issues/130
         """
         debug = self.debug
-        debug=True
+        debug = True
         endpoints = EndpointManager.getEndpoints(lang="sparql")
         for ep_name, ep in endpoints.items():
             if ep.calls_per_minute is not None:
@@ -481,8 +486,6 @@ class TestQueries(EndpointTest):
             print(prefixes)
             print(tryit)
         pass
-
-
 
     def testCommandLineUsage(self):
         """
@@ -627,7 +630,6 @@ class TestEndpoints(EndpointTest):
     tests Endpoint
     """
 
-
     def testEndpoints(self):
         """
         tests getting and rawQuerying
@@ -647,21 +649,25 @@ class TestEndpoints(EndpointTest):
                 print(f"--- {i}:{name} ---")
 
             # Setup for Raw Query
-            cpm = getattr(endpoint, 'calls_per_minute', 60)
+            cpm = getattr(endpoint, "calls_per_minute", 60)
             query_main = QueryMain(Namespace(debug=debug, calls_per_minute=cpm))
 
             for query_name in query_names:
                 query = qm.queriesByName[query_name]
 
                 # 1. Raw Query (Connectivity Check)
-                if debug: print(f"[{name}] {query_name} (Raw)...")
+                if debug:
+                    print(f"[{name}] {query_name} (Raw)...")
                 # We don't count rawQuery in stats, it acts as a gatekeeper
-                raw_res = query_main.rawQuery(endpoint, query.query, "json", mimeType=None)
+                raw_res = query_main.rawQuery(
+                    endpoint, query.query, "json", mimeType=None
+                )
 
                 # Only proceed to "Proper" if Raw succeeded
                 if raw_res:
                     # 2. Proper API (List of Dicts)
-                    if debug: print(f"[{name}] {query_name} (Proper)...")
+                    if debug:
+                        print(f"[{name}] {query_name} (Proper)...")
                     try:
                         sparql = SPARQL(endpoint.endpoint, method=endpoint.method)
                         qlod = sparql.queryAsListOfDicts(query.query)
@@ -672,7 +678,9 @@ class TestEndpoints(EndpointTest):
 
                         if debug:
                             # Use stats.state for consistent logging
-                            msg = f"Rows: {len(qlod)}" if success else "No list returned"
+                            msg = (
+                                f"Rows: {len(qlod)}" if success else "No list returned"
+                            )
                             print(f"  {stats.state(msg, 'Failed to retrieve list')}")
                             if success and qlod:
                                 print(qlod[0])
@@ -681,7 +689,12 @@ class TestEndpoints(EndpointTest):
                         # We use getattr defaults instead of hasattr
                         mtriples = getattr(endpoint, "mtriples", 0)
 
-                        if query_name == "CountAllTriples" and success and qlod and mtriples > 0:
+                        if (
+                            query_name == "CountAllTriples"
+                            and success
+                            and qlod
+                            and mtriples > 0
+                        ):
                             count = int(qlod[0].get("count", 0))
                             # Logic: Verify actual count meets the expected million-triple threshold
                             # $Count > mtriples \times 10^6$
@@ -691,7 +704,9 @@ class TestEndpoints(EndpointTest):
                             print(f"  Actual Count:    {count:,.0f}")
 
                             if count < expected:
-                                print(f"  ⚠️ Warning: Actual count is lower than expected config!")
+                                print(
+                                    f"  ⚠️ Warning: Actual count is lower than expected config!"
+                                )
                             else:
                                 print(f"  ✅ Count verification passed.")
 
@@ -701,14 +716,15 @@ class TestEndpoints(EndpointTest):
                 else:
                     # If raw failed, the proper attempt implicitly failed availability check
                     stats.add(False)
-                    print(f"  {stats.state('', 'Raw query failed, skipping proper API')}")
+                    print(
+                        f"  {stats.state('', 'Raw query failed, skipping proper API')}"
+                    )
 
         if debug:
             print(f"\nSummary: {stats}")
 
         # Assert acceptable success ratio
         self.assertTrue(stats.ratio > 0.5)
-
 
     def test_availability_of_endpoints(self):
         """

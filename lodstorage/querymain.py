@@ -4,13 +4,15 @@ Created on 2022-02-13
 @author: wf
 """
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import logging
 import os
 import re
 import sys
 import traceback
 import urllib.parse
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+
+import requests
 
 from lodstorage.mysql import MySqlQuery
 from lodstorage.prefix_config import PrefixConfigs
@@ -20,17 +22,12 @@ from lodstorage.rate_limiter import RateLimiter
 from lodstorage.sparql import SPARQL
 from lodstorage.sql import SQLDB
 from lodstorage.version import Version  # Use sqlq.py module for MySQL endpoints
-import requests
-
 
 __version__ = Version.version
 __date__ = Version.date
 __updated__ = Version.updated
 
 DEBUG = 0
-
-
-
 
 
 class QueryMain(QueryCmd):
@@ -80,7 +77,9 @@ class QueryMain(QueryCmd):
             if args.language == "sparql":
                 sparql = SPARQL.fromEndpointConf(endpointConf)
                 if args.prefixes and endpointConf is not None:
-                    self.query.add_endpoint_prefixes(endpointConf, PrefixConfigs.get_instance())
+                    self.query.add_endpoint_prefixes(
+                        endpointConf, PrefixConfigs.get_instance()
+                    )
                 if args.raw:
                     qres = self.rawQuery(
                         endpointConf,
@@ -133,9 +132,7 @@ class QueryMain(QueryCmd):
             raw result of the query
         """
 
-        headers = {
-           "User-Agent": f"{Version.name}/{Version.version}"
-        }
+        headers = {"User-Agent": f"{Version.name}/{Version.version}"}
 
         if mimeType:
             headers["Accept"] = mimeType

@@ -37,7 +37,7 @@ class MySqlQuery:
             "password": endpoint.password,
             "database": endpoint.database,
             "charset": endpoint.charset or "utf8mb4",
-            "use_unicode": True # ensure proper unicode handling
+            "use_unicode": True,  # ensure proper unicode handling
         }
 
         self.debug = debug
@@ -61,10 +61,10 @@ class MySqlQuery:
         Returns:
             Dict[str, Any]: Data with binary values decoded to strings
         """
-        decoded_record= {}
+        decoded_record = {}
         for key, value in record.items():
             if isinstance(value, bytes):
-                decoded_record[key] = value.decode('utf-8', errors='replace')
+                decoded_record[key] = value.decode("utf-8", errors="replace")
             else:
                 decoded_record[key] = value
         return decoded_record
@@ -84,9 +84,9 @@ class MySqlQuery:
         cursor.execute(query)
         raw_lod = cursor.fetchall()
         connection.close()
-        lod=[]
+        lod = []
         for raw_row in raw_lod:
-            row=self.decode_record(raw_row)
+            row = self.decode_record(raw_row)
             lod.append(row)
         return lod
 
@@ -101,7 +101,7 @@ class MySqlQuery:
                 raw_record = cursor.fetchone()
                 if not raw_record:
                     break
-                record=self.decode_record(raw_record)
+                record = self.decode_record(raw_record)
                 yield record
 
         finally:

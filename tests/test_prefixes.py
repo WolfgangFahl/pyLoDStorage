@@ -7,9 +7,8 @@ Created on 2024-03-02
 import json
 
 from lodstorage.prefixes import Prefixes
-from lodstorage.query import QueryManager, EndpointManager
+from lodstorage.query import EndpointManager, QueryManager
 from lodstorage.sparql import SPARQL
-
 from lodstorage.yaml_path import YamlPath
 from tests.basetest import Basetest
 from tests.endpoint_test import EndpointTest
@@ -67,7 +66,6 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         expected = Prefixes.getPrefixes(["xsd"])
         self.assertTrue(merged_query.startswith(expected))
 
-
     def test_issue151_prefix_sets_refactoring(self):
         """
         Test Issue #151: Simplify endpoints.yaml by referencing prefix sets.
@@ -82,9 +80,11 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         debug = self.debug
         debug = True
         # Get QLever Olympics endpoint
-        endpoint_path=YamlPath.getSamplePath("endpoints_qlever.yaml")
-        endpoints = EndpointManager.getEndpoints(endpointPath=endpoint_path,lang="sparql", with_default=False)
-        ep_name="olympics-qlever"
+        endpoint_path = YamlPath.getSamplePath("endpoints_qlever.yaml")
+        endpoints = EndpointManager.getEndpoints(
+            endpointPath=endpoint_path, lang="sparql", with_default=False
+        )
+        ep_name = "olympics-qlever"
         self.assertIn(ep_name, endpoints, f"{ep_name} endpoint not found")
         endpoint = endpoints[ep_name]
 
@@ -94,9 +94,8 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
             queriesPath=olympics_queries_path,
             with_default=False,
             lang="sparql",
-            debug=False
+            debug=False,
         )
-
 
         if debug:
             print(f"\n=== Testing Issue #151: Prefix Sets Refactoring ===")
@@ -107,17 +106,15 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         if debug:
             print(f"\n1. Checking endpoint structure...")
             print(f"   Has prefix_sets: {hasattr(endpoint, 'prefix_sets')}")
-            if hasattr(endpoint, 'prefix_sets'):
+            if hasattr(endpoint, "prefix_sets"):
                 print(f"   Prefix sets: {endpoint.prefix_sets}")
 
         self.assertTrue(
-            hasattr(endpoint, 'prefix_sets'),
-            f"Endpoint {endpoint.name} lacks 'prefix_sets' field"
+            hasattr(endpoint, "prefix_sets"),
+            f"Endpoint {endpoint.name} lacks 'prefix_sets' field",
         )
         self.assertIsInstance(
-            endpoint.prefix_sets,
-            list,
-            f"prefix_sets for {endpoint.name} is not a list"
+            endpoint.prefix_sets, list, f"prefix_sets for {endpoint.name} is not a list"
         )
 
         # 2. Verify prefix resolution
@@ -128,7 +125,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
         if debug:
             print(f"   Combined prefixes from {endpoint.prefix_sets}:")
-            for line in combined_prefixes.split('\n')[:5]:  # Show first 5
+            for line in combined_prefixes.split("\n")[:5]:  # Show first 5
                 print(f"     {line}")
             print(f"   ... (total {len(combined_prefixes.split(chr(10)))} lines)")
 
@@ -136,16 +133,14 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         expected_prefixes = [
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>",
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>",
-            "PREFIX olympics: <https://olympics.qlever.cs.uni-freiburg.de/>"
+            "PREFIX olympics: <https://olympics.qlever.cs.uni-freiburg.de/>",
         ]
 
         for expected in expected_prefixes:
             if debug:
                 print(f"   Checking for: {expected[:50]}...")
             self.assertIn(
-                expected,
-                combined_prefixes,
-                f"Expected prefix missing: {expected}"
+                expected, combined_prefixes, f"Expected prefix missing: {expected}"
             )
 
         # 3. Test query execution with resolved prefixes
@@ -160,7 +155,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
         # Resolve query-specific prefixes
         query_prefixes = Prefixes.getPrefixes(query.prefix_sets)
-        query.prefixes = query_prefixes.split('\n')
+        query.prefixes = query_prefixes.split("\n")
 
         if debug:
             print(f"   Resolved {len(query.prefixes)} prefix lines for query")
@@ -181,9 +176,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
             self.assertIsInstance(qlod, list, "Query result is not a list")
             self.assertGreater(
-                len(qlod),
-                0,
-                "Query with assembled prefixes returned no results"
+                len(qlod), 0, "Query with assembled prefixes returned no results"
             )
 
         except Exception as ex:

@@ -23,11 +23,7 @@ class TestSamples(Basetest):
         os.makedirs(self.tmp, exist_ok=True)
 
     def check_fields(
-        self,
-        check_instance,
-        expected_instance,
-        hint: str,
-        level: int = 0
+        self, check_instance, expected_instance, hint: str, level: int = 0
     ):
         """
         Recursively check fields for both lists and dictionaries in a dataclass.
@@ -99,11 +95,7 @@ class TestSamples(Basetest):
                     print(msg)
 
     def check_sample(
-        self,
-        clazz,
-        sample_name: str,
-        example_name: str,
-        check_instance
+        self, clazz, sample_name: str, example_name: str, check_instance
     ) -> None:
         """
         Checks the attributes of each member in the given sample instance against the sample data.
@@ -208,10 +200,10 @@ class TestSamples(Basetest):
         """
         Test loading a dataclass instance from a YAML string obtained from a URL.
         """
-        debug=self.debug
-        #debug=True
+        debug = self.debug
+        # debug=True
         # royals
-        royals_sample=Sample.getRoyalsSample()
+        royals_sample = Sample.getRoyalsSample()
         if debug:
             print(royals_sample.to_yaml())
         royals_url = "https://raw.githubusercontent.com/WolfgangFahl/pyLoDStorage/master/sampledata/royals.yaml"

@@ -5,26 +5,27 @@ Created on 2020-08-22
 """
 
 import copy
-from dataclasses import field
-from enum import Enum
+from lodstorage.exception_handler import ExceptionHandler
 import os
 import re
 import sys
-from typing import Any, Dict, List, Optional
 import urllib
+from dataclasses import field
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
+import yaml
 from basemkit.yamlable import lod_storable
-from lodstorage.mwTable import MediaWikiTable
-from lodstorage.params import Param, Params
-from lodstorage.prefix_config import PrefixConfigs
-from lodstorage.prefixes import Prefixes
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.formatters.latex import LatexFormatter
 from pygments.lexers import get_lexer_by_name
 from tabulate import tabulate
-import yaml
 
+from lodstorage.mwTable import MediaWikiTable
+from lodstorage.params import Param, Params
+from lodstorage.prefix_config import PrefixConfigs
+from lodstorage.prefixes import Prefixes
 from lodstorage.yaml_path import YamlPath
 
 
@@ -48,6 +49,7 @@ class Format(Enum):
 
     def __str__(self):
         return self.value
+
 
 @lod_storable
 class ValueFormatter:
@@ -101,6 +103,7 @@ class ValueFormatter:
         legacy delegate
         """
         self.apply_format(record, key, resultFormat)
+
 
 @lod_storable
 class ValueFormatters:
@@ -426,8 +429,9 @@ class Query:
             markup = r"\href{%s}{%s}" % (url, title)
         return markup
 
-
-    def add_endpoint_prefixes(self, endpoint: "Endpoint", prefix_configs: PrefixConfigs) -> None:
+    def add_endpoint_prefixes(
+        self, endpoint: "Endpoint", prefix_configs: PrefixConfigs
+    ) -> None:
         """
         Add endpoint-specific PREFIX declarations to this query (via prefix_sets or legacy prefixes).
 
@@ -447,8 +451,9 @@ class Query:
 
         # Update self.prefixes: Full unique lines from merged query
         prefix_dict = Prefixes.extract_prefixes(self.query)
-        self.prefixes = [Prefixes.prefix_line(prefix_dict, prefix) for prefix in sorted(prefix_dict)]
-
+        self.prefixes = [
+            Prefixes.prefix_line(prefix_dict, prefix) for prefix in sorted(prefix_dict)
+        ]
 
     def prefixToLink(self, lod: list, prefix: str, tablefmt: str):
         """
@@ -642,9 +647,13 @@ class QueryManager(object):
                 queryDict["lang"] = self.lang
                 if not "query" in queryDict:
                     queryDict["query"] = queryDict[self.lang]
-                query = Query.from_dict(queryDict)
-                query.debug = self.debug
-                self.queriesByName[name] = query
+                try:
+                    query = Query.from_dict(queryDict)
+                    query.debug = self.debug
+                    self.queriesByName[name] = query
+                except Exception as ex:
+                    msg = f"Failed to load query '{name}' ({self.lang})"
+                    ExceptionHandler.handle(msg, ex, debug=self.debug)
 
     def getQueries(self, queriesPath=None, with_default: bool = True):
         """
@@ -673,6 +682,7 @@ class Endpoint:
     """
     a query endpoint
     """
+
     # Basic identification
     name: str = ""
     description: Optional[str] = None
@@ -684,9 +694,9 @@ class Endpoint:
     database: str = "blazegraph"
     method: str = "POST"
     # JDBC endpoints e.g. SQL
-    host: Optional[str]="localhost"
-    port: Optional[int]=3306
-    charset: Optional[str]="utf8mb4"
+    host: Optional[str] = "localhost"
+    port: Optional[int] = 3306
+    charset: Optional[str] = "utf8mb4"
 
     # Authentication and rate limiting
     calls_per_minute: Optional[int] = None
@@ -699,10 +709,13 @@ class Endpoint:
     prefixes: Optional[str] = None  # Legacy: inline prefixes for backward compatibility
 
     # Dataset characteristics
-    data_seeded: Optional[str] = None   # ISO date when data was initially seeded/imported: "2012-10-29"
-    auto_update: Optional[bool] = None  # if false data_seeded is the most recent state of data
+    data_seeded: Optional[str] = (
+        None  # ISO date when data was initially seeded/imported: "2012-10-29"
+    )
+    auto_update: Optional[bool] = (
+        None  # if false data_seeded is the most recent state of data
+    )
     mtriples: Optional[int] = None  # Dataset size in millions of triples
-
 
     @staticmethod
     def getSamples():
@@ -757,14 +770,14 @@ class Endpoint:
             str: PREFIX declarations
         """
         # default: empty
-        prefixes=""
+        prefixes = ""
         # Use inline prefixes if defined (legacy support)
         if self.prefixes:
-            prefixes=self.prefixes
+            prefixes = self.prefixes
 
         # Resolve from prefix_sets if available
         if self.prefix_sets and prefix_configs:
-            prefixes= prefix_configs.get_selected_declarations(self.prefix_sets)
+            prefixes = prefix_configs.get_selected_declarations(self.prefix_sets)
 
         return prefixes
 
@@ -793,10 +806,7 @@ class EndpointManager(object):
 
     @classmethod
     def getEndpoints(
-        cls,
-        endpointPath: str = None,
-        lang: str = None,
-        with_default: bool = True
+        cls, endpointPath: str = None, lang: str = None, with_default: bool = True
     ):
         """
         get the endpoints for the given endpointPath
@@ -816,7 +826,7 @@ class EndpointManager(object):
                 selected = lang is None or endpoint.lang == lang
                 if selected:
                     endpoints[name] = endpoint
-                    endpoint.name=name
+                    endpoint.name = name
         return endpoints
 
     @staticmethod
