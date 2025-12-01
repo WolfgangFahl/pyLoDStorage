@@ -26,7 +26,7 @@ class TestPrefixConfig(Basetest):
         """
         Basetest.setUp(self, debug=debug, profile=profile)
         self.prefixes_yaml_path = YamlPath.getSamplePath("prefixes.yaml")
-        self.pfix_configs = PrefixConfigs.ofYaml(self.prefixes_yaml_path)
+        self.pfix_configs = PrefixConfigs.of_yaml(self.prefixes_yaml_path)
 
     def get_all_prefixes(self) -> Dict[str, str]:
         """

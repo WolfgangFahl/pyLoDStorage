@@ -78,8 +78,10 @@ class PrefixConfigs:
             paths = YamlPath.getPaths("prefixes.yaml")
             yaml_path = paths[0] if paths else None
         if yaml_path and os.path.exists(yaml_path):
-            return cls.load_from_yaml_file(yaml_path)
-        return cls()  # Empty if no file
+            prefix_configs= cls.load_from_yaml_file(yaml_path)
+        else:
+            prefix_configs=cls() # Empty if no file
+        return prefix_configs
 
     def __post_init__(self):
         """
