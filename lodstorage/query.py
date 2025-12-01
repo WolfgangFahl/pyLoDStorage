@@ -424,6 +424,12 @@ class Query:
             markup = r"\href{%s}{%s}" % (url, title)
         return markup
 
+    def add_endpoint_prefixes(self, endpoint: "Endpoint", prefix_configs: PrefixConfigs):
+        prefixes_str = endpoint.get_prefixes(prefix_configs)
+        if prefixes_str:
+            self.prefixes = prefixes_str.splitlines()
+            self.query = f"{prefixes_str}\n{self.query}"
+
     def prefixToLink(self, lod: list, prefix: str, tablefmt: str):
         """
         convert url prefixes to link according to the given table format

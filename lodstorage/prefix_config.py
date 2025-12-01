@@ -5,9 +5,13 @@ Created on 2025-06-04
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+import os
+from typing import ClassVar, Optional
+from typing import Dict, List, Optional, ClassVar
 
 from basemkit.yamlable import lod_storable
+
+from lodstorage.yaml_path import YamlPath
 
 
 @dataclass
@@ -46,13 +50,36 @@ class PrefixConfig:
 class PrefixConfigs:
     """Collection of prefix configurations loaded from YAML."""
 
+    # ClassVars: IGNORED by @dataclass
+    # Enables singleton
+    _instance: ClassVar[Optional["PrefixConfigs"]] = None
+    _prefixes_path: ClassVar[Optional[str]] = None
+
     prefix_sets: Dict[str, PrefixConfig] = field(default_factory=dict)
 
     @classmethod
-    def ofYaml(cls, yaml_path: str) -> "PrefixConfigs":
-        """Load prefix configurations from YAML file."""
-        prefix_configs = cls.load_from_yaml_file(yaml_path)
-        return prefix_configs
+    def get_instance(cls) -> "PrefixConfigs":
+        """Get singleton PrefixConfigs (loads prefixes.yaml via YamlPath if needed)."""
+        if cls._instance is None:
+            cls._instance = cls.of_yaml()
+        return cls._instance
+
+    @classmethod
+    def preload(cls, prefixes_path: str) -> "PrefixConfigs":
+        """Preload singleton with specific prefixes path."""
+        cls._instance = cls.of_yaml(prefixes_path)
+        cls._prefixes_path = prefixes_path
+        return cls._instance
+
+    @classmethod
+    def of_yaml(cls, yaml_path: str = None) -> "PrefixConfigs":
+        """Load from YAML (uses prefixes.yaml via YamlPath if yaml_path=None)."""
+        if yaml_path is None:
+            paths = YamlPath.getPaths("prefixes.yaml")
+            yaml_path = paths[0] if paths else None
+        if yaml_path and os.path.exists(yaml_path):
+            return cls.load_from_yaml_file(yaml_path)
+        return cls()  # Empty if no file
 
     def __post_init__(self):
         """
