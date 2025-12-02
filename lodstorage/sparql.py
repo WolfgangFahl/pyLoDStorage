@@ -75,7 +75,7 @@ class SPARQL(object):
         Constructs a User-Agent string compliant with Wikimedia policy.
         """
         version = Version()
-        user_agent= f"{version.name}/{version.version} ({version.cm_url}; {version.authors}) Python-requests/{requests.__version__}"
+        user_agent= f"{version.name}/{version.version}"
         return user_agent
 
     @classmethod
