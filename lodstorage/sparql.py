@@ -7,12 +7,11 @@ Created on 2020-08-14
 import datetime
 import time
 from sys import stderr
-from typing import Union
 
 import requests
 from SPARQLWrapper import SPARQLWrapper2
 from SPARQLWrapper.Wrapper import POST, POSTDIRECTLY
-
+from lodstorage.version import Version
 from lodstorage.lod import LOD
 from lodstorage.params import Params
 from lodstorage.rate_limiter import RateLimiter
@@ -40,7 +39,7 @@ class SPARQL(object):
         isFuseki=False,
         typedLiterals=False,
         profile=False,
-        agent="PyLodStorage",
+        agent=None,
         method="POST",
         calls_per_minute: int = None,
     ):
@@ -64,10 +63,20 @@ class SPARQL(object):
         self.debug = debug
         self.typedLiterals = typedLiterals
         self.profile = profile
-        self.sparql = SPARQLWrapper2(url)
+        if agent is None:
+            agent=self.get_user_agent()
+        self.sparql = SPARQLWrapper2(url,agent=agent)
         self.method = method
-        self.sparql.agent = agent
-        self.rate_limiter = RateLimiter(calls_per_minute=calls_per_minute)
+        self.rate_limiter = RateLimiter(calls_per_minute=calls_per_minute or 60)  # Default 1/sec safe for Wikidata
+
+    @classmethod
+    def get_user_agent(cls) -> str:
+        """
+        Constructs a User-Agent string compliant with Wikimedia policy.
+        """
+        version = Version()
+        user_agent= f"{version.name}/{version.version} ({version.cm_url}; {version.authors}) Python-requests/{requests.__version__}"
+        return user_agent
 
     @classmethod
     def fromEndpointConf(cls, endpointConf) -> "SPARQL":
@@ -152,9 +161,13 @@ class SPARQL(object):
         Raises:
             Exception if HTTP request fails
         """
+        self._wait_rate_limit()
         rdf_format = RdfFormat.by_label(rdf_format)
         mime_type = rdf_format.mime_type
-        headers = {"Accept": mime_type}
+        headers = {
+            "Accept": mime_type,
+            "User-Agent": SPARQL.get_user_agent()
+        }
         response = requests.post(
             self.url,
             data={"query": query},
