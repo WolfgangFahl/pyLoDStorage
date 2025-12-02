@@ -65,7 +65,8 @@ class SPARQL(object):
         self.profile = profile
         if agent is None:
             agent=self.get_user_agent()
-        self.sparql = SPARQLWrapper2(url,agent=agent)
+        self.sparql = SPARQLWrapper2(url)
+        self.sparql.agent=agent
         self.method = method
         self.rate_limiter = RateLimiter(calls_per_minute=calls_per_minute or 60)  # Default 1/sec safe for Wikidata
 
