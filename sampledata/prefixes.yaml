@@ -1,20 +1,15 @@
-# pre-fix sets for omnigraph, lodstorage and snapquery
-#
-# see
-#   https://github.com/WolfgangFahl/pyLoDStorage
-#   https://github.com/WolfgangFahl/pyomnigraph
-#   https://github.com/WolfgangFahl/snapquery
-prefix_sets:
+# Prefix sets for OmniGraph, LoDStorage and SnapQuery
+# see https://github.com/WolfgangFahl/pyLoDStorage, pyomnigraph, snapquery
 
+prefix_sets:
   # Blazegraph-specific prefixes
   blazegraph:
-    name: "blazegraph"
+    name: "Blazegraph"
     url: "https://blazegraph.com/"
     wikidata_id: "Q20127748"
     description: "High Performance Graph Database"
     prefixes:
       bd: "http://www.bigdata.com/rdf#"
-
 
   # Creative Commons
   commons:
@@ -25,7 +20,7 @@ prefix_sets:
     prefixes:
       cc: "http://creativecommons.org/ns#"
 
-  # DataCite prefixes (for DOI/research data identifiers, used in DBLP RDF)
+  # DataCite prefixes
   datacite:
     name: "DataCite"
     wikidata_id: "Q105762834"
@@ -34,16 +29,16 @@ prefix_sets:
     prefixes:
       datacite: "http://purl.org/spar/datacite/"
 
-  # Dublin Core
-  dc:
-    name: "Dublin Core"
-    wikidata_id: "Q624610"
-    url: "https://www.dublincore.org/"
-    description: "Metadata standard for describing resources"
+  # DBpedia prefixes
+  dbpedia:
+    name: "DBpedia"
+    url: "https://www.dbpedia.org/"
+    wikidata_id: "Q465"
+    description: "Online database project of structured data extracted from Wikipedia"
     prefixes:
-      dct: "http://purl.org/dc/terms/"
-      dc: "http://purl.org/dc/terms/"
-      dc11: "http://purl.org/dc/elements/1.1/"
+      dbo: "http://dbpedia.org/ontology/"
+      dbr: "http://dbpedia.org/resource/"
+      dbp: "http://dbpedia.org/property/"
 
   # DBLP-specific prefixes
   dblp:
@@ -56,16 +51,16 @@ prefix_sets:
       dblpc: "https://dblp.org/rdf/contribution#"
       dblpp: "https://dblp.org/rdf/person#"
 
-  # DBpedia prefixes
-  dbpedia:
-    name: "DBpedia"
-    url: "https://www.dbpedia.org/"
-    wikidata_id: "Q465"
-    description: "Online database project of structured data extracted from Wikipedia"
+  # Dublin Core
+  dc:
+    name: "Dublin Core"
+    wikidata_id: "Q624610"
+    url: "https://www.dublincore.org/"
+    description: "Metadata standard for describing resources"
     prefixes:
-      dbo: "http://dbpedia.org/ontology/"
-      dbr: "http://dbpedia.org/resource/"
-      dbp: "http://dbpedia.org/property/"
+      dct: "http://purl.org/dc/terms/"
+      dc: "http://purl.org/dc/terms/"
+      dc11: "http://purl.org/dc/elements/1.1/"
 
   # DNB (Deutsche Nationalbibliothek) prefixes
   dnb:
@@ -103,13 +98,12 @@ prefix_sets:
       wdtn: "http://factgrid.de/prop/direct-normalized/"
       wdv: "http://factgrid.de/value/"
 
-  # foaf
-  # https://prefix.cc/foaf
+  # foaf https://prefix.cc/foaf
   foaf:
     name: "foaf"
     wikidata_id: "Q1389366"
     url: "http://xmlns.com/foaf/0.1/"
-    description: "Fried of a Friend"
+    description: "Friend of a Friend"
     prefixes:
       foaf: "http://xmlns.com/foaf/0.1/"
 
@@ -175,12 +169,21 @@ prefix_sets:
       olympics: "http://wallscope.co.uk/ontology/olympics/"
       medal: "http://wallscope.co.uk/resource/olympics/medal/"
 
+  # OntoLex (Lemon)
+  ontolex:
+    name: "OntoLex-Lemon"
+    wikidata_id: "Q96397500"
+    url: "https://www.w3.org/2016/05/ontolex/"
+    description: "Lexicon model for ontologies providing rich linguistic grounding"
+    prefixes:
+      ontolex: "http://www.w3.org/ns/lemon/ontolex#"
+
   # OpenStreetMap prefixes
   osm:
     name: "OpenStreetMap"
     url: "https://www.openstreetmap.org/"
     wikidata_id: "Q936"
-    description: "OpenStreetMap:online collaborative project creating a world geographic database"
+    description: "OpenStreetMap: online collaborative project creating a world geographic database"
     prefixes:
       geo: "http://www.opengis.net/ont/geosparql#"
       osmm: "https://www.openstreetmap.org/meta/"
@@ -202,14 +205,6 @@ prefix_sets:
       xsd: "http://www.w3.org/2001/XMLSchema#"
       skos: "http://www.w3.org/2004/02/skos/core#"
       schema: "http://schema.org/"
-  # OntoLex (Lemon)
-  ontolex:
-    name: "OntoLex-Lemon"
-    wikidata_id: "Q96397500"
-    url: "https://www.w3.org/2016/05/ontolex/"
-    description: "Lexicon model for ontologies providing rich linguistic grounding"
-    prefixes:
-      ontolex: "http://www.w3.org/ns/lemon/ontolex#"
 
   # PROV Ontology
   prov:
@@ -222,7 +217,7 @@ prefix_sets:
 
   # PubChem prefixes
   pubchem:
-    name: "pubchem"
+    name: "PubChem"
     url: "https://pubchem.ncbi.nlm.nih.gov/"
     description: "chemical information database"
     wikidata_id: "Q278487"
@@ -286,5 +281,3 @@ prefix_sets:
     description: "Yet Another Great Ontology"
     prefixes:
       yago: "http://yago-knowledge.org/resource/"
-
-
