@@ -40,6 +40,69 @@ Usage
 =====
 see [test cases](https://github.com/WolfgangFahl/pyLoDStorage/tree/master/tests)
 
+Command Line Interface
+======================
+sparqlquery
+```bash
+sparqlquery -h
+usage: sparqlquery [-h] [-d] [-ep ENDPOINTPATH] [-fp FORMATSPATH] [-li]
+                   [--limit LIMIT] [--params PARAMS] [-le] [-sq]
+                   [-qp QUERIESPATH] [-q QUERY] [-qf QUERYFILE]
+                   [-qn QUERYNAME] [-en ENDPOINTNAME] [--method METHOD]
+                   [-f {csv,json,html,xml,tsv,latex,mediawiki,raw,github}]
+                   [-m MIMETYPE] [-p] [-raw] [-V]
+
+commandline query of endpoints in diverse languages such as SPARQL/SQL
+
+  Created by Wolfgang Fahl on 2020-09-10.
+  Copyright 2020-2025 Wolfgang Fahl. All rights reserved.
+
+  Licensed under the Apache License 2.0
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Distributed on an "AS IS" basis without warranties
+  or conditions of any kind, either express or implied.
+
+USAGE
+
+options:
+  -h, --help            show this help message and exit
+  -d, --debug           set debug [default: False]
+  -ep ENDPOINTPATH, --endpointPath ENDPOINTPATH
+                        path to yaml file to configure endpoints to use for
+                        queries
+  -fp FORMATSPATH, --formatsPath FORMATSPATH
+                        path to yaml file to configure formats to use for
+                        query result documentation
+  -li, --list           show the list of available queries
+  --limit LIMIT         set limit parameter of query
+  --params PARAMS       query parameters as Key-value pairs in the format
+                        key1=value1,key2=value2
+  -le, --listEndpoints  show the list of available endpoints
+  -sq, --showQuery      show the query
+  -qp QUERIESPATH, --queriesPath QUERIESPATH
+                        path to YAML file with query definitions
+  -q QUERY, --query QUERY
+                        the query to run
+  -qf QUERYFILE, --queryFile QUERYFILE
+                        the query file to run
+  -qn QUERYNAME, --queryName QUERYNAME
+                        run a named query
+  -en ENDPOINTNAME, --endpointName ENDPOINTNAME
+                        Name of the endpoint to use for queries. Available by
+                        default: ['wikidata', 'wikidata-main', 'wikidata-
+                        scholarly', 'wikidata-legacy-full', 'wikidata-dbis',
+                        'wikidata-qlever', ...]
+  --method METHOD       method to be used for SPARQL queries
+  -f {csv,json,html,xml,tsv,latex,mediawiki,raw,github}, --format {csv,json,html,xml,tsv,latex,mediawiki,raw,github}
+  -m MIMETYPE, --mimeType MIMETYPE
+                        MIME-type to use for the raw query
+  -p, --prefixes        add predefined prefixes for endpoint
+  -raw                  return the raw query result from the endpoint. (MIME
+                        type defined over -f or -m)
+  -V, --version         show program's version number and exit
+```
+
 ## Documentation
 [Wiki](http://wiki.bitplan.com/index.php/PyLoDStorage)
 
