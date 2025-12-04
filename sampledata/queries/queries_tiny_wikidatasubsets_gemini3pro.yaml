@@ -1,0 +1,68 @@
+# Tiny Subsets from Wikidata (queries_tiny_subsets.yaml)
+# https://phabricator.wikimedia.org/T329368
+# WF 2025-11-23
+
+Countries_and_Capitals:
+  title: Countries and Capitals
+  description: A list of sovereign states and their capital cities.
+  prefix_sets:
+    - standard_wikidata
+  sparql: |
+    SELECT ?country ?countryLabel ?capital ?capitalLabel WHERE {
+      ?country wdt:P31 wd:Q3624078 .       # Instance of: sovereign state
+      ?country wdt:P36 ?capital .          # Has capital
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?countryLabel
+
+Timezones:
+  title: Timezones
+  description: List of timezones including their UTC offsets.
+  prefix_sets:
+    - standard_wikidata
+  sparql: |
+    SELECT ?timezone ?timezoneLabel ?utc_offset WHERE {
+      ?timezone wdt:P31/wdt:P279* wd:Q12143 . # Instance of (or subclass of): time zone
+      ?timezone wdt:P2907 ?utc_offset .       # Has UTC offset
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?utc_offset
+
+Airports_IATA:
+  title: Airports (IATA)
+  description: List of airports that feature an IATA airport code.
+  prefix_sets:
+    - standard_wikidata
+  sparql: |
+    SELECT ?airport ?airportLabel ?iata_code WHERE {
+      ?airport wdt:P31 wd:Q1248784 .       # Instance of: airport
+      ?airport wdt:P238 ?iata_code .       # Has IATA airport code
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?iata_code
+
+Languages_ISO:
+  title: Languages
+  description: List of human languages with an ISO 639-1 code.
+  prefix_sets:
+    - standard_wikidata
+  sparql: |
+    SELECT ?language ?languageLabel ?iso_code WHERE {
+      ?language wdt:P31/wdt:P279* wd:Q315 .   # Instance of (or subclass of): language
+      ?language wdt:P218 ?iso_code .          # Has ISO 639-1 code
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?iso_code
+
+Units_Measurement:
+  title: Units of Measurement
+  description: List of measurement units that have a unit symbol.
+  prefix_sets:
+    - standard_wikidata
+  sparql: |
+    SELECT ?unit ?unitLabel ?symbol WHERE {
+      ?unit wdt:P31/wdt:P279* wd:Q47574 .     # Instance of (or subclass of): unit of measurement
+      ?unit wdt:P5061 ?symbol .               # Has unit symbol
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?unitLabel

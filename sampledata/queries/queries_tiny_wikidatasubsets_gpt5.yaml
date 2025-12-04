@@ -1,0 +1,86 @@
+# Wikidata Standard Entity Lists (queries_wikidata_standard_sets.yaml)
+# Related: https://phabricator.wikimedia.org/T329368
+# 2025-12-04
+
+Countries_and_capitals:
+  title: Countries and their capitals (with ISO codes)
+  description: List sovereign states with their capital(s) and ISO 3166-1 codes.
+  prefix_sets:
+    - wikidata
+  sparql: |
+    SELECT ?country ?countryLabel ?iso2 ?iso3 ?numeric ?capital ?capitalLabel WHERE {
+      ?country wdt:P31 wd:Q6256 .
+      FILTER NOT EXISTS { ?country wdt:P576 ?dissolved }  # exclude dissolved/abolished countries
+      OPTIONAL { ?country wdt:P36 ?capital . }
+      OPTIONAL { ?country wdt:P297 ?iso2 . }   # ISO 3166-1 alpha-2
+      OPTIONAL { ?country wdt:P298 ?iso3 . }   # ISO 3166-1 alpha-3
+      OPTIONAL { ?country wdt:P299 ?numeric . }# ISO 3166-1 numeric
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?countryLabel
+
+Time_zones:
+  title: Time zones with TZ database identifiers and UTC offsets
+  description: List time zones (IANA/TZDB), including optional UTC offsets if available.
+  prefix_sets:
+    - wikidata
+  sparql: |
+    SELECT ?timezone ?timezoneLabel ?tzid ?utcOffset WHERE {
+      ?timezone wdt:P31 wd:Q12143 .           # instance of time zone
+      OPTIONAL { ?timezone wdt:P3428 ?tzid . }    # TZ database name
+      OPTIONAL { ?timezone wdt:P2907 ?utcOffset . } # UTC offset
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?timezoneLabel
+
+Airports:
+  title: Airports with codes, country, and coordinates
+  description: List airports and aerodromes with IATA/ICAO codes, country, and coordinates.
+  prefix_sets:
+    - wikidata
+  sparql: |
+    SELECT ?airport ?airportLabel ?iata ?icao ?country ?countryLabel ?coord WHERE {
+      ?airport wdt:P31/wdt:P279* wd:Q1248784 .   # instance/subclass of airport
+      OPTIONAL { ?airport wdt:P238 ?iata . }     # IATA airport code
+      OPTIONAL { ?airport wdt:P239 ?icao . }     # ICAO airport code
+      OPTIONAL { ?airport wdt:P17 ?country . }   # country
+      OPTIONAL { ?airport wdt:P625 ?coord . }    # coordinates
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?countryLabel ?airportLabel
+
+Languages:
+  title: Languages with ISO and IETF tags
+  description: List human languages with ISO 639-1/2/3 codes, IETF tag, and Wikimedia language code where available.
+  prefix_sets:
+    - wikidata
+  sparql: |
+    SELECT ?language ?languageLabel ?iso639_1 ?iso639_2 ?iso639_3 ?ietf ?wikimediaCode WHERE {
+      ?language wdt:P31/wdt:P279* wd:Q34770 . # instance/subclass of language
+      OPTIONAL { ?language wdt:P218 ?iso639_1 . }  # ISO 639-1
+      OPTIONAL { ?language wdt:P219 ?iso639_2 . }  # ISO 639-2
+      OPTIONAL { ?language wdt:P220 ?iso639_3 . }  # ISO 639-3
+      OPTIONAL { ?language wdt:P305 ?ietf . }      # IETF language tag
+      OPTIONAL { ?language wdt:P424 ?wikimediaCode . } # Wikimedia language code
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?languageLabel
+
+Units_of_measurement:
+  title: Units of measurement with symbols and SI affiliation
+  description: List units of measurement, including unit symbol and whether they are SI base units or part of a system.
+  prefix_sets:
+    - wikidata
+  sparql: |
+    SELECT ?unit ?unitLabel ?symbol ?isSIBaseUnit ?system ?systemLabel WHERE {
+      ?unit wdt:P31/wdt:P279* wd:Q47574 .  # instance/subclass of unit of measurement
+      OPTIONAL { ?unit wdt:P5061 ?symbol . }  # unit symbol
+      OPTIONAL {
+        VALUES ?siBase { wd:Q83030 }       # SI base unit
+        ?unit wdt:P31 ?siBase .
+        BIND(true AS ?isSIBaseUnit)
+      }
+      OPTIONAL { ?unit wdt:P361 ?system . }   # part of a measurement system (e.g., SI)
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?unitLabel

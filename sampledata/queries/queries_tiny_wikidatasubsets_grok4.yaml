@@ -1,0 +1,94 @@
+# Wikidata Tiny Subsets (queries_wikidata_tiny_subsets.yaml)
+# Based on Phabricator task T329368: tiny subsets from Wikidata
+# https://phabricator.wikimedia.org/T329368
+# Defining SPARQL queries for suggested useful lists
+# These queries are designed to generate CSV-exportable results from Wikidata.
+# Queries can be run on Wikidata Query Service (https://query.wikidata.org/) or QLever (https://qlever.cs.uni-freiburg.de/wikidata).
+
+Countries_and_capitals:
+  title: Countries and their capitals
+  description: List of countries with their capital cities, including labels in English (or auto-language).
+  prefix_sets:
+    - wikidata  # Assumes wd: <http://www.wikidata.org/entity/>, wdt: <http://www.wikidata.org/prop/direct/>, etc.
+    - rdf  # For rdfs:label
+  sparql: |
+    SELECT ?country ?countryLabel ?capital ?capitalLabel WHERE {
+      ?country wdt:P31 wd:Q6256 .  # instance of country
+      ?country wdt:P36 ?capital .  # capital
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+    }
+    ORDER BY ?countryLabel
+  short_urls:
+    wikidata-query: https://w.wiki/shorturl  # Placeholder; generate actual short URL from Wikidata Query Service
+    qlever-wikidata: https://qlever.cs.uni-freiburg.de/wikidata/shorturl  # Placeholder for QLever
+
+Timezones:
+  title: List of timezones
+  description: Select timezones with their labels and UTC offsets.
+  prefix_sets:
+    - wikidata
+    - rdf
+  sparql: |
+    SELECT ?timezone ?timezoneLabel ?utcOffset WHERE {
+      ?timezone wdt:P31 wd:Q17272692 .  # instance of time zone
+      OPTIONAL { ?timezone wdt:P2907 ?utcOffset . }  # UTC offset in minutes
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+    }
+    ORDER BY ?timezoneLabel
+  short_urls:
+    wikidata-query: https://w.wiki/shorturl
+    qlever-wikidata: https://qlever.cs.uni-freiburg.de/wikidata/shorturl
+
+Airports:
+  title: List of airports
+  description: List of airports with their labels, IATA codes, and countries.
+  prefix_sets:
+    - wikidata
+    - rdf
+  sparql: |
+    SELECT ?airport ?airportLabel ?iataCode ?country ?countryLabel WHERE {
+      ?airport wdt:P31 wd:Q1248784 .  # instance of airport
+      OPTIONAL { ?airport wdt:P238 ?iataCode . }  # IATA airport code
+      OPTIONAL { ?airport wdt:P17 ?country . }  # country
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+    }
+    ORDER BY ?airportLabel
+  short_urls:
+    wikidata-query: https://w.wiki/shorturl
+    qlever-wikidata: https://qlever.cs.uni-freiburg.de/wikidata/shorturl
+
+Languages:
+  title: List of languages
+  description: List of natural languages with their labels, ISO 639-1 codes, and native speakers count.
+  prefix_sets:
+    - wikidata
+    - rdf
+  sparql: |
+    SELECT ?language ?languageLabel ?isoCode ?speakers WHERE {
+      ?language wdt:P31 wd:Q1288568 .  # instance of natural language (more specific than general language)
+      OPTIONAL { ?language wdt:P218 ?isoCode . }  # ISO 639-1 code
+      OPTIONAL { ?language wdt:P1098 ?speakers . }  # number of native speakers
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+    }
+    ORDER BY DESC(?speakers) ?languageLabel
+  short_urls:
+    wikidata-query: https://w.wiki/shorturl
+    qlever-wikidata: https://qlever.cs.uni-freiburg.de/wikidata/shorturl
+
+Units:
+  title: List of units of measurement
+  description: List of units with their labels, symbols, and quantities they measure.
+  prefix_sets:
+    - wikidata
+    - rdf
+  sparql: |
+    SELECT ?unit ?unitLabel ?symbol ?quantity ?quantityLabel WHERE {
+      ?unit wdt:P31 wd:Q47574 .  # instance of unit of measurement
+      OPTIONAL { ?unit wdt:P5061 ?symbol . }  # unit symbol
+      OPTIONAL { ?unit wdt:P111 ?quantity . }  # measures quantity
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" . }
+    }
+    ORDER BY ?unitLabel
+  short_urls:
+    wikidata-query: https://w.wiki/shorturl
+    qlever-wikidata: https://qlever.cs.uni-freiburg.de/wikidata/shorturl

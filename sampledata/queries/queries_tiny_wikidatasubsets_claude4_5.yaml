@@ -1,0 +1,82 @@
+# Wikidata Tiny Subsets Queries
+# https://phabricator.wikimedia.org/T329368
+# Goal:Regularly updated standard entity lists from Wikidata
+# WF 2025-12-04
+
+Countries_and_capitals:
+  title: Countries with their capitals
+  description: List of countries and their capital cities from Wikidata
+  prefix_sets:
+    - rdf
+    - wikidata
+  sparql: |
+    SELECT ?country ?countryLabel ?capital ?capitalLabel WHERE {
+      ?country wdt:P31 wd:Q6256 .  # instance of country
+      ?country wdt:P36 ?capital .   # capital
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?countryLabel
+
+Timezones:
+  title: Timezones with UTC offsets
+  description: List of UTC timezones with their UTC offsets
+  prefix_sets:
+    - rdf
+    - wikidata
+  sparql: |
+    SELECT DISTINCT ?timezone ?timezoneLabel ?utcOffset WHERE {
+      ?timezone wdt:P31 wd:Q12143 .  # instance of timezone
+      OPTIONAL { ?timezone wdt:P2907 ?utcOffset . }  # UTC offset
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?utcOffset ?timezoneLabel
+
+Airports:
+  title: International airports with codes
+  description: List of international airports with IATA and ICAO codes
+  prefix_sets:
+    - rdf
+    - wikidata
+  sparql: |
+    SELECT ?airport ?airportLabel ?iata ?icao ?countryLabel ?coordinates WHERE {
+      ?airport wdt:P31/wdt:P279* wd:Q1248784 .  # instance of airport
+      ?airport wdt:P238 ?iata .   # IATA airport code
+      OPTIONAL { ?airport wdt:P239 ?icao . }  # ICAO airport code
+      OPTIONAL { ?airport wdt:P17 ?country . }  # country
+      OPTIONAL { ?airport wdt:P625 ?coordinates . }  # coordinates
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?iata
+
+Languages:
+  title: Languages with ISO codes
+  description: List of languages with ISO 639 codes
+  prefix_sets:
+    - rdf
+    - wikidata
+  sparql: |
+    SELECT ?language ?languageLabel ?iso6391 ?iso6392 ?iso6393 WHERE {
+      ?language wdt:P31 wd:Q34770 .  # instance of language
+      OPTIONAL { ?language wdt:P218 ?iso6391 . }  # ISO 639-1 code
+      OPTIONAL { ?language wdt:P219 ?iso6392 . }  # ISO 639-2 code
+      OPTIONAL { ?language wdt:P220 ?iso6393 . }  # ISO 639-3 code
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+      FILTER(BOUND(?iso6391) || BOUND(?iso6392) || BOUND(?iso6393))
+    }
+    ORDER BY ?iso6391
+
+Units:
+  title: Units of measurement
+  description: List of units of measurement with their symbols and quantities
+  prefix_sets:
+    - rdf
+    - wikidata
+  sparql: |
+    SELECT ?unit ?unitLabel ?symbol ?quantityLabel WHERE {
+      ?unit wdt:P31/wdt:P279* wd:Q47574 .  # instance of unit of measurement
+      OPTIONAL { ?unit wdt:P5061 ?symbol . }  # unit symbol
+      OPTIONAL { ?unit wdt:P111 ?quantity . }  # measured physical quantity
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    ORDER BY ?quantityLabel ?unitLabel
+    LIMIT 1000
