@@ -162,24 +162,30 @@ class SPARQL(object):
         Raises:
             Exception if HTTP request fails
         """
-        self._wait_rate_limit()
         rdf_format = RdfFormat.by_label(rdf_format)
         mime_type = rdf_format.mime_type
         headers = {
             "Accept": mime_type,
             "User-Agent": SPARQL.get_user_agent()
         }
-        response = requests.post(
-            self.url,
-            data={"query": query},
-            headers=headers,
-            timeout=timeout,
-        )
+
+        # Wrap the actual HTTP call with rate limiting
+        @self.rate_limiter.rate_limited
+        def _do_request():
+            return requests.post(
+                self.url,
+                data={"query": query},
+                headers=headers,
+                timeout=timeout,
+            )
+
+        response = _do_request()
+
         if response.status_code != 200:
             msg = f"HTTP {response.status_code}: {response.text}"
             raise Exception(msg)
-        text = response.text.strip()
-        return text
+
+        return response.text.strip()
 
     def rawQuery(self, queryString: str, method=POST):
         """
