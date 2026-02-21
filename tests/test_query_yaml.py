@@ -35,6 +35,40 @@ class TestQueryYaml(Basetest):
         self.assertTrue(len(qm.queriesByName) > 8)
         pass
 
+    def testApplyParametersWithDefaultValues(self):
+        """
+        Test that apply_parameters_with_check falls back to default_value from
+        param_list when param_dict is empty or None (issue #158).
+        """
+        from lodstorage.params import Params
+
+        param = Param(name="limit", type="int", default_value="10")
+        query_str = "SELECT * FROM foo LIMIT {{ limit }}"
+        params = Params(query_str)
+
+        # Empty dict — should use default, not raise
+        result = params.apply_parameters_with_check(param_dict={}, param_list=[param])
+        self.assertEqual("SELECT * FROM foo LIMIT 10", result)
+
+        # None — should use default, not raise
+        result = params.apply_parameters_with_check(param_dict=None, param_list=[param])
+        self.assertEqual("SELECT * FROM foo LIMIT 10", result)
+
+        # Explicit override takes precedence over default
+        result = params.apply_parameters_with_check(
+            param_dict={"limit": "25"}, param_list=[param]
+        )
+        self.assertEqual("SELECT * FROM foo LIMIT 25", result)
+
+        # No default and no param_dict — must raise
+        param_no_default = Param(name="limit", type="int")
+        params2 = Params(query_str)
+        with self.assertRaises(Exception) as ctx:
+            params2.apply_parameters_with_check(
+                param_dict=None, param_list=[param_no_default]
+            )
+        self.assertIn("limit", str(ctx.exception))
+
     def testQuerySerialization(self):
         """
         Test YAML serialization of Query objects with parameters

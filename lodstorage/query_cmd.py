@@ -96,7 +96,10 @@ class QueryCmd:
 
         if self.queryCode:
             params = Params(self.query.query)
-            self.query.query = params.apply_parameters_with_check(args.params)
+            param_list = self.query.param_list if self.query.param_list else None
+            self.query.query = params.apply_parameters_with_check(
+                args.params, param_list=param_list
+            )
             self.queryCode = self.query.query
             if debug or args.showQuery:
                 print(f"{args.language}:\n{self.query.query}")

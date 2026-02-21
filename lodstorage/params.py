@@ -7,7 +7,7 @@ Created on 2024-05-06
 import argparse
 import re
 from dataclasses import field
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from basemkit.yamlable import lod_storable
 
@@ -86,26 +86,44 @@ class Params:
             query = re.sub(pattern, value_str, query)
         return query
 
-    def apply_parameters_with_check(self, param_dict: dict = None) -> str:
+    def apply_parameters_with_check(
+        self,
+        param_dict: Optional[Dict] = None,
+        param_list: Optional[List["Param"]] = None,
+    ) -> str:
         """
         Apply parameters to the query string with parameter checking.
 
         This method checks if the query requires parameters. If parameters are required
-        but not provided, it raises an exception with a descriptive message. If parameters
-        are provided, it applies them to the query.
+        but not provided, it falls back to default_value entries from param_list (if
+        supplied). If no defaults are available for one or more parameters it raises an
+        exception with a descriptive message. If parameters are provided, it applies
+        them to the query.
 
         Args:
             param_dict (dict, optional): A dictionary of parameter names and values.
+            param_list (list of Param, optional): Parameter definitions that carry
+                default_value fallbacks used when param_dict is empty or None.
 
         Returns:
             str: The query string with parameters applied, if applicable.
 
         Raises:
-            Exception: If parameters are required but not provided.
+            Exception: If parameters are required but not provided and no defaults
+                are available.
         """
         query = self.query
         if self.has_params:
-            if not param_dict:
+            # Build a merged dict: defaults from param_list overridden by param_dict
+            merged: Dict = {}
+            if param_list:
+                for param in param_list:
+                    if param.default_value is not None:
+                        merged[param.name] = param.default_value
+            if param_dict:
+                merged.update(param_dict)
+
+            if not merged:
                 param_names = list(
                     dict.fromkeys(self.params)
                 )  # remove duplicates while preserving order
@@ -117,7 +135,7 @@ class Params:
                 msg = f"Query needs {len(param_names)} parameter{plural_suffix}: {displayed_params}"
                 raise Exception(msg)
             else:
-                self.set(param_dict)
+                self.set(merged)
                 query = self.apply_parameters()
         return query
 
