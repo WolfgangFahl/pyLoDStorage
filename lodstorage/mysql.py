@@ -107,3 +107,31 @@ class MySqlQuery:
         finally:
             cursor.close()
             connection.close()
+
+    def query(self, sql: str, params: Any = None) -> List[Dict[str, Any]]:
+        """
+        SQLBackend protocol alias for execute_sql_query.
+
+        Args:
+            sql: the SQL query to execute
+            params: ignored (not yet supported at the pymysql layer)
+
+        Returns:
+            list of dicts, one per row
+        """
+        return self.execute_sql_query(sql)
+
+    def query_gen(
+        self, sql: str, params: Any = None
+    ) -> Generator[Dict[str, Any], None, None]:
+        """
+        SQLBackend protocol alias for query_generator.
+
+        Args:
+            sql: the SQL query to execute
+            params: ignored (not yet supported at the pymysql layer)
+
+        Yields:
+            one dict per row
+        """
+        return self.query_generator(sql)

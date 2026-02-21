@@ -10,7 +10,6 @@ from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
 from lodstorage.query import EndpointManager, QueryManager
 from lodstorage.sparql import SPARQL
-
 from lodstorage.yaml_path import YamlPath
 from tests.basetest import Basetest
 from tests.endpoint_test import EndpointTest
@@ -77,7 +76,9 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         debug = False
 
         endpoint_path = YamlPath.getSamplePath("endpoints_qlever.yaml")
-        endpoints = EndpointManager.getEndpoints(endpointPath=endpoint_path, lang="sparql", with_default=False)
+        endpoints = EndpointManager.getEndpoints(
+            endpointPath=endpoint_path, lang="sparql", with_default=False
+        )
         endpoint_name = "olympics-qlever"
         endpoint = endpoints[endpoint_name]
 
@@ -88,7 +89,12 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         self.assertEqual(endpoint.prefix_sets, ["rdf", "olympics"])
 
         olympics_queries_path = f"{self.sampledata_dir}/queries/queries_olympics.yaml"
-        qm = QueryManager(queriesPath=olympics_queries_path, with_default=False, lang="sparql", debug=False)
+        qm = QueryManager(
+            queriesPath=olympics_queries_path,
+            with_default=False,
+            lang="sparql",
+            debug=False,
+        )
         query = qm.queriesByName["Athletes_by_gold_medals"]
 
         if debug:
@@ -97,7 +103,9 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         query.add_endpoint_prefixes(endpoint, PrefixConfigs.get_instance())
 
         if debug:
-            print(f"Query after (has rdf?: {'PREFIX rdf:' in query.query}, olympics?: {'PREFIX olympics:' in query.query})")
+            print(
+                f"Query after (has rdf?: {'PREFIX rdf:' in query.query}, olympics?: {'PREFIX olympics:' in query.query})"
+            )
             print(f"Full query:\n{query.query}")
 
         self.assertIn("PREFIX rdf:", query.query)

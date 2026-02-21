@@ -268,20 +268,33 @@ class SQLDB(object):
             pass
         cur.close()
 
-    def query(self, sqlQuery, params=None):
+    def query_gen(self, sql: str, params=None):
         """
-        run the given sqlQuery and return a list of Dicts
+        SQLBackend protocol alias for queryGen.
+
+        Args:
+            sql: the SQL query to be executed
+            params: the query params, if any
+
+        Returns:
+            a generator of dicts
+        """
+        return self.queryGen(sql, params)
+
+    def query(self, sql, params=None):
+        """
+        run the given sql query and return a list of Dicts
 
         Args:
 
-            sqlQuery(string): the SQL query to be executed
+            sql(string): the SQL query to be executed
             params(tuple): the query params, if any
 
         Returns:
             list: a list of Dicts
         """
         resultList = []
-        for record in self.queryGen(sqlQuery, params):
+        for record in self.queryGen(sql, params):
             resultList.append(record)
         return resultList
 

@@ -14,14 +14,13 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 import requests
 
-from lodstorage.mysql import MySqlQuery
 from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.query import Endpoint, EndpointManager, Format, ValueFormatter
 from lodstorage.query_cmd import QueryCmd
 from lodstorage.rate_limiter import RateLimiter
 from lodstorage.sparql import SPARQL
-from lodstorage.sql import SQLDB
-from lodstorage.version import Version  # Use sqlq.py module for MySQL endpoints
+from lodstorage.sql_backend import get_sql_backend
+from lodstorage.version import Version
 
 __version__ = Version.version
 __date__ = Version.date
@@ -93,13 +92,8 @@ class QueryMain(QueryCmd):
                     self.formats = ["*:wikidata"]
                 qlod = sparql.queryAsListOfDicts(self.queryCode)
             elif args.language == "sql":
-                if endpointConf.endpoint.startswith("jdbc:mysql"):
-                    query_tool = MySqlQuery(endpointConf, debug=args.debug)
-                    qlod = query_tool.execute_sql_query(self.queryCode)
-                else:
-                    # Use existing SQLDB for other SQL endpoints
-                    sqlDB = SQLDB(endpointConf.endpoint)
-                    qlod = sqlDB.query(self.queryCode)
+                backend = get_sql_backend(endpointConf, debug=args.debug)
+                qlod = backend.query(self.queryCode)
             else:
                 raise Exception(f"language {args.language} not known/supported")
             self.format_output(qlod)

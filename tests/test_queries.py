@@ -251,7 +251,7 @@ class TestQueries(EndpointTest):
         ]
         showServerDown = True
         showResult = self.debug
-        #showResult = True
+        # showResult = True
         for testArg in testArgs:
             endpointName = testArg.get("en")
             args = [
@@ -451,7 +451,7 @@ class TestQueries(EndpointTest):
             json_str = self.captureQueryMain(args)
             json_data = json.loads(json_str)
             if debug:
-                print(json.dumps(json_data, indent=2,default=str))
+                print(json.dumps(json_data, indent=2, default=str))
                 print(len(json_data))
             self.assertEqual(limit, len(json_data))
 

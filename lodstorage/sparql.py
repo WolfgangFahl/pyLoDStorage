@@ -11,11 +11,12 @@ from sys import stderr
 import requests
 from SPARQLWrapper import SPARQLWrapper2
 from SPARQLWrapper.Wrapper import POST, POSTDIRECTLY
-from lodstorage.version import Version
+
 from lodstorage.lod import LOD
 from lodstorage.params import Params
 from lodstorage.rate_limiter import RateLimiter
 from lodstorage.rdf_format import RdfFormat
+from lodstorage.version import Version
 
 
 class SPARQL(object):
@@ -64,11 +65,13 @@ class SPARQL(object):
         self.typedLiterals = typedLiterals
         self.profile = profile
         if agent is None:
-            agent=self.get_user_agent()
+            agent = self.get_user_agent()
         self.sparql = SPARQLWrapper2(url)
-        self.sparql.agent=agent
+        self.sparql.agent = agent
         self.method = method
-        self.rate_limiter = RateLimiter(calls_per_minute=calls_per_minute or 60)  # Default 1/sec safe for Wikidata
+        self.rate_limiter = RateLimiter(
+            calls_per_minute=calls_per_minute or 60
+        )  # Default 1/sec safe for Wikidata
 
     @classmethod
     def get_user_agent(cls) -> str:
@@ -76,7 +79,7 @@ class SPARQL(object):
         Constructs a User-Agent string compliant with Wikimedia policy.
         """
         version = Version()
-        user_agent= f"{version.name}/{version.version}"
+        user_agent = f"{version.name}/{version.version}"
         return user_agent
 
     @classmethod
@@ -164,10 +167,7 @@ class SPARQL(object):
         """
         rdf_format = RdfFormat.by_label(rdf_format)
         mime_type = rdf_format.mime_type
-        headers = {
-            "Accept": mime_type,
-            "User-Agent": SPARQL.get_user_agent()
-        }
+        headers = {"Accept": mime_type, "User-Agent": SPARQL.get_user_agent()}
 
         # Wrap the actual HTTP call with rate limiting
         @self.rate_limiter.rate_limited

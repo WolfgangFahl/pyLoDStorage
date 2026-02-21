@@ -6,7 +6,6 @@ Created on 2020-08-22
 """
 
 import copy
-from lodstorage.exception_handler import ExceptionHandler
 import os
 import re
 import sys
@@ -23,6 +22,7 @@ from pygments.formatters.latex import LatexFormatter
 from pygments.lexers import get_lexer_by_name
 from tabulate import tabulate
 
+from lodstorage.exception_handler import ExceptionHandler
 from lodstorage.mwTable import MediaWikiTable
 from lodstorage.params import Param, Params
 from lodstorage.prefix_config import PrefixConfigs
@@ -757,11 +757,11 @@ class Endpoint:
         Get samples for Endpoint
         """
         sample_dicts = cls.getSamples()
-        endpoint_list=[]
+        endpoint_list = []
         for sample_dict in sample_dicts:
-            endpoint=cls(**sample_dict)
+            endpoint = cls(**sample_dict)
             endpoint_list.append(endpoint)
-        samples= {"sample-endpoints": endpoint_list}
+        samples = {"sample-endpoints": endpoint_list}
         return samples
 
     @classmethod
@@ -832,7 +832,6 @@ class EndpointManager(object):
 
     def __iter__(self):
         return iter(self.endpoints.values())
-
 
     @classmethod
     def getEndpoints(

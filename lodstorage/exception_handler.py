@@ -3,6 +3,7 @@ Created on 2025-12-01
 
 @author: wf
 """
+
 import logging
 import traceback
 
@@ -13,9 +14,7 @@ class ExceptionHandler:
     """
 
     @classmethod
-    def handle(
-        cls, msg: str, ex: Exception, debug: bool = False
-    ):
+    def handle(cls, msg: str, ex: Exception, debug: bool = False):
         """Centralized exception logging (non-fatal).
 
         Args:
