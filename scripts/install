@@ -1,5 +1,26 @@
 #!/bin/bash
 # WF 2023-07-19
-# simple install via pyproject.toml
+# WF 2026-02-21 - added extras support
+#
+# Usage:
+#   scripts/install           # base install
+#   scripts/install mysql     # base + MySQL backend
+#   scripts/install duckdb    # base + DuckDB backend
+#   scripts/install all       # base + all optional backends
+#
 pip install pylatexenc
-pip install .
+
+extras=""
+for arg in "$@"; do
+  case "$arg" in
+    mysql)  extras="${extras:+$extras,}mysql" ;;
+    duckdb) extras="${extras:+$extras,}duckdb" ;;
+    all)    extras="mysql,duckdb" ;;
+  esac
+done
+
+if [ -n "$extras" ]; then
+  pip install ".[$extras]"
+else
+  pip install .
+fi

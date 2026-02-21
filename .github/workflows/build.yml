@@ -29,7 +29,7 @@ jobs:
           python -m pip install --upgrade pip
       - name: install
         run: |
-          scripts/install
+          scripts/install all
       - name: doc
         run: |
           scripts/doc

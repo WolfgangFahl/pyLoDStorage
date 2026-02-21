@@ -1,5 +1,11 @@
 # AGENTS.md — pyLoDStorage Developer Guide
 
+## Agent Behaviour Rules
+
+**Never** commit, push, or create a GitHub issue without explicitly asking the user first.
+
+---
+
 ## Project Overview
 
 `pyLoDStorage` is a Python library (requires ≥3.10) for working with **Lists of Dicts (LoD)** as a lightweight tabular data abstraction, with backends for SQLite, MySQL, SPARQL/RDF, YAML, JSON, and CSV. Build system: **hatchling**. Version is sourced from `lodstorage/__init__.py`.
@@ -87,20 +93,35 @@ from tabulate import tabulate
 from lodstorage.lod import LOD
 ```
 
-Always use top-level imports. Inline (deferred) imports inside functions are only acceptable for **optional** dependencies not listed in `pyproject.toml` — i.e. libraries that may not be installed. Never use inline imports for standard library modules or packages declared in `[project.dependencies]`.
+Always use top-level imports. Never use inline (deferred) imports inside functions. For **optional** dependencies (those in `[project.optional-dependencies]`, not `[project.dependencies]`), use a `try/except ImportError` guard at **module level** and substitute `None`. Guard usage at the call site with a clear error message.
 
 ```python
-# WRONG — pymysql is a declared dependency, inline import is needless
+# WRONG — inline import inside a function
 def get_backend():
     from lodstorage.mysql import MySqlQuery
     backend = MySqlQuery(...)
     return backend
 
-# CORRECT
+# CORRECT — top-level import for declared dependencies
 from lodstorage.mysql import MySqlQuery
 
 def get_backend():
     backend = MySqlQuery(...)
+    return backend
+
+# CORRECT — module-level try/except for optional dependencies
+try:
+    from lodstorage.mysql import MySqlQuery
+except ImportError:
+    MySqlQuery = None  # type: ignore
+
+def get_backend(endpoint):
+    if MySqlQuery is None:
+        raise Exception(
+            "MySQL backend requested but PyMySQL is not installed. "
+            "Install it with: pip install pyLodStorage[mysql]"
+        )
+    backend = MySqlQuery(endpoint=endpoint)
     return backend
 ```
 

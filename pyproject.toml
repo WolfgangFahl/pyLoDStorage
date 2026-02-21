@@ -41,8 +41,6 @@ dependencies = [
   "python-slugify>=8.0.1",
   # https://pypi.org/project/orjson/
   'orjson>=3.9.15',
-  # https://pypi.org/project/PyMySQL/
-  'PyMySQL>=1.1.1',
   # https://pypi.org/project/requests/
   'requests>=2.31.0'
 ]
@@ -66,6 +64,14 @@ Source = "https://github.com/WolfgangFahl/pyLodStorage/blob/master/lodstorage/sq
 IssueTracker = "https://github.com/WolfgangFahl/pyLodStorage/issues"
 
 [project.optional-dependencies]
+mysql = [
+  # https://pypi.org/project/PyMySQL/
+  "PyMySQL>=1.1.1",
+]
+duckdb = [
+  # https://pypi.org/project/duckdb/
+  "duckdb>=1.1.0",
+]
 test = [
   "green",
 ]
