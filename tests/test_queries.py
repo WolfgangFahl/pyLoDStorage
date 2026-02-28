@@ -237,6 +237,87 @@ class TestQueries(EndpointTest):
         used_prefixes = {line.split(":")[0].strip() for line in cities_query.prefixes}
         self.assertEqual(len(used_prefixes), len(cities_query.prefixes))  # no dups
 
+    def test_issue_160_prefix_sets_with_command_line(self):
+        """
+        Test that --prefixes flag properly applies prefix_sets from endpoint configuration.
+
+        This tests the fix for issue #160 where the PREFIX declarations were not being
+        added to the SPARQL query when using the --prefixes flag with an endpoint that
+        has prefix_sets configured.
+
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/160
+        """
+        debug = self.debug
+        # debug = True
+
+        # Create a simple query without prefixes
+        query_without_prefixes = """
+SELECT ?s ?p ?o 
+WHERE {
+  ?s ?p ?o .
+}
+LIMIT 1
+"""
+
+        # Test with wikidata endpoint which has prefix_sets configured
+        args = Namespace(
+            debug=debug,
+            language="sparql",
+            endpointName="wikidata",
+            endpointPath=None,
+            queriesPath=None,
+            formatsPath=None,
+            query=query_without_prefixes,
+            queryName=None,
+            queryFile=None,
+            list=False,
+            listEndpoints=False,
+            showQuery=False,
+            prefixes=True,
+            prefixesPath=None,
+            method=None,
+            format=Format.json,
+            mimeType=None,
+            raw=False,
+            limit=1,
+            params=None,
+        )
+
+        query_main = QueryMain(args)
+        query_main.init_managers()
+        query_main.query = Query(
+            name="test", query=query_without_prefixes, lang="sparql"
+        )
+        query_main.queryCode = query_without_prefixes
+
+        # Get the endpoint configuration
+        endpoint_conf = query_main.endpoints.get("wikidata")
+        self.assertIsNotNone(endpoint_conf)
+        self.assertIsNotNone(endpoint_conf.prefix_sets)
+
+        # Simulate what handle_args does for SPARQL queries with --prefixes
+        prefix_configs = PrefixConfigs.get_instance()
+        query_main.query.add_endpoint_prefixes(endpoint_conf, prefix_configs)
+        # This is the critical fix: update queryCode after adding prefixes
+        query_main.queryCode = query_main.query.query
+
+        # Verify that prefixes were added to the query
+        self.assertIn("PREFIX", query_main.queryCode)
+        self.assertIn("SELECT ?s ?p ?o", query_main.queryCode)
+
+        # Verify that common Wikidata prefixes are present
+        expected_prefixes = ["wd:", "wdt:", "rdfs:"]
+        for prefix in expected_prefixes:
+            self.assertIn(
+                prefix,
+                query_main.queryCode,
+                f"Expected prefix {prefix} not found in query",
+            )
+
+        if debug:
+            print("Query with prefixes applied:")
+            print(query_main.queryCode)
+
     def testQueryEndpoints(self):
         """
         tests the sparql endpoint commandline endpoint selection
@@ -382,7 +463,7 @@ class TestQueries(EndpointTest):
         args = [
             "-qp",
             f"{queriesPath}",
-            "-l" "sparql",
+            "-lsparql",
             "-qn",
             "MachadoDeAssis",
             "-f",
@@ -414,7 +495,7 @@ class TestQueries(EndpointTest):
                         self.assertTrue(hasattr(endpoint, attrname))
                 args = [
                     # "-qp", f"{queriesPath}",
-                    "-l" "sparql",
+                    "-lsparql",
                     "-en",
                     f"{endpoint_name}",
                     "-qn",
@@ -737,7 +818,7 @@ class TestEndpoints(EndpointTest):
 
         for i, (name, endpoint) in enumerate(self.yieldSampleEndpoints()):
             if debug:
-                print(f"Testing endpoint {i+1}: {name}")
+                print(f"Testing endpoint {i + 1}: {name}")
 
             sparql = SPARQL(endpoint.endpoint)  # Assuming SPARQL class is available
             sparql.sparql.setTimeout(5.0)

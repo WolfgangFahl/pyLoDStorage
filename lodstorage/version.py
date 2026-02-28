@@ -15,5 +15,5 @@ class Version(object):
     name = "pylodstorage"
     version = lodstorage.__version__
     date = "2020-09-10"
-    updated = "2026-02-21"
+    updated = "2026-02-28"
     description = "python List of Dict (Table) Storage library"

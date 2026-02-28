@@ -76,9 +76,12 @@ class QueryMain(QueryCmd):
             if args.language == "sparql":
                 sparql = SPARQL.fromEndpointConf(endpointConf)
                 if args.prefixes and endpointConf is not None:
-                    self.query.add_endpoint_prefixes(
-                        endpointConf, PrefixConfigs.get_instance()
-                    )
+                    prefix_configs = PrefixConfigs.get_instance()
+                    if args.prefixesPath:
+                        prefix_configs = PrefixConfigs.preload(args.prefixesPath)
+                    self.query.add_endpoint_prefixes(endpointConf, prefix_configs)
+                    # Update queryCode after adding prefixes
+                    self.queryCode = self.query.query
                 if args.raw:
                     qres = self.rawQuery(
                         endpointConf,
@@ -252,6 +255,12 @@ USAGE
             "--prefixes",
             action="store_true",
             help="add predefined prefixes for endpoint",
+        )
+        parser.add_argument(
+            "-pp",
+            "--prefixesPath",
+            default=None,
+            help="path to yaml file with prefix set definitions (defaults to prefixes.yaml in current directory or sampledata)",
         )
         parser.add_argument(
             "-raw",
