@@ -95,7 +95,7 @@ class QueryCmd:
             self.query = Query(name="?", query=self.queryCode, lang=args.language)
 
         if self.queryCode:
-            params = Params(self.query.query)
+            params = Params(self.query.query, with_audit=not args.no_audit)
             param_list = self.query.param_list if self.query.param_list else None
             self.query.query = params.apply_parameters_with_check(
                 args.params, param_list=param_list
@@ -188,6 +188,13 @@ class QueryCmd:
         )
         parser.add_argument(
             "-sq", "--showQuery", action="store_true", help="show the query"
+        )
+        parser.add_argument(
+            "--no-audit",
+            dest="no_audit",
+            action="store_true",
+            default=False,
+            help="disable parameter value security audit [default: %(default)s]",
         )
         parser.add_argument(
             "-qp", "--queriesPath", help="path to YAML file with query definitions"

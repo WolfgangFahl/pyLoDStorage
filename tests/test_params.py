@@ -68,3 +68,23 @@ class TestParams(Basetest):
 
         msg = str(context.exception)
         self.assertTrue("Query needs 2 parameters: name, place" in msg, msg)
+
+    def test_no_audit(self):
+        """
+        test that with_audit=False suppresses the security audit
+        see https://github.com/WolfgangFahl/pyLoDStorage/issues/161
+        """
+        query = "SELECT * WHERE { ?s ?p {{ value }} }"
+        illegal_value = {"value": "safe;injection"}
+
+        # Default: audit on — illegal char must raise ValueError
+        params_with_audit = Params(query, with_audit=True)
+        params_with_audit.set(illegal_value)
+        with self.assertRaises(ValueError):
+            params_with_audit.apply_parameters()
+
+        # --no-audit: audit off — same value must pass without error
+        params_no_audit = Params(query, with_audit=False)
+        params_no_audit.set(illegal_value)
+        result = params_no_audit.apply_parameters()
+        self.assertIn("safe;injection", result)
