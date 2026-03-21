@@ -136,6 +136,11 @@ class QueryCmd:
             xml = lod2xml.asXml()
             print(xml)
 
+        elif args.format is Format.raw:
+            for row in qlod:
+                values = list(row.values())
+                line = "\t".join(str(v) for v in values)
+                print(line)
         else:
             raise Exception(f"format {args.format} not supported yet")
 

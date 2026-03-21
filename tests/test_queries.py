@@ -24,6 +24,7 @@ from lodstorage.query import (
     ValueFormatter,
     ValueFormatters,
 )
+from lodstorage.query_cmd import QueryCmd
 from lodstorage.querymain import QueryMain
 from lodstorage.querymain import main as queryMain
 from lodstorage.sparql import SPARQL
@@ -704,6 +705,36 @@ determines the number of instances available in the OpenStreetMap for the placeT
 
             except Exception as ex:
                 print(f"{query.title} at {endpointUrl} failed: {ex}")
+
+    def test_issue162_raw_format(self):
+        """
+        test raw format output
+
+        https://github.com/WolfgangFahl/pyLoDStorage/issues/162
+        """
+        debug = self.debug
+        qlod = [
+            {"grant": "GRANT USAGE ON *.* TO `test`@`%`"},
+            {"grant": "GRANT ALL PRIVILEGES ON `testdb`.* TO `test`@`%`"},
+        ]
+        args = Namespace(
+            debug=debug,
+            format=Format.raw,
+        )
+        query_cmd = QueryCmd.__new__(QueryCmd)
+        query_cmd.args = args
+        query_cmd.query = Query(name="test", query="SHOW GRANTS", lang="sql")
+        stdout = io.StringIO()
+        with redirect_stdout(stdout):
+            query_cmd.format_output(qlod)
+        result = stdout.getvalue()
+        if debug:
+            print(result)
+        self.assertIn("GRANT USAGE ON *.* TO `test`@`%`", result)
+        self.assertIn("GRANT ALL PRIVILEGES ON `testdb`.* TO `test`@`%`", result)
+        # raw format should not contain any table markup or quoting
+        self.assertNotIn("{|", result)
+        self.assertNotIn('"GRANT', result)
 
 
 class TestEndpoints(EndpointTest):
