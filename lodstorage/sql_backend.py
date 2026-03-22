@@ -5,7 +5,7 @@ Unified SQL backend abstraction for pyLoDStorage.
 
 Defines the SQLBackend Protocol (duck-typed interface) and the
 get_sql_backend() factory that resolves the correct backend from
-an endpoint descriptor, hiding the jdbc:mysql and jdbc:duckdb
+an endpoint descriptor, hiding the jdbc:mysql, jdbc:duckdb, and jdbc:postgresql
 routing details from all call sites.
 
 Created on 2026-02-21
@@ -27,6 +27,11 @@ try:
 except ImportError:
     DuckDBQuery = None  # type: ignore
 
+try:
+    from lodstorage.postgresql import PostgreSqlQuery
+except ImportError:
+    PostgreSqlQuery = None  # type: ignore
+
 
 @runtime_checkable
 class SQLBackend(Protocol):
@@ -40,6 +45,7 @@ class SQLBackend(Protocol):
         - lodstorage.sql.SQLDB              (SQLite, always available)
         - lodstorage.mysql.MySqlQuery       (MySQL/MariaDB, optional: pip install pyLodStorage[mysql])
         - lodstorage.duckdb_query.DuckDBQuery (DuckDB, optional: pip install pyLodStorage[duckdb])
+        - lodstorage.postgresql.PostgreSqlQuery (PostgreSQL, optional: pip install pyLodStorage[postgresql])
     """
 
     def query(self, sql: str, params: Any = None) -> list[dict]:
@@ -82,7 +88,7 @@ def get_sql_backend(endpoint, debug: bool = False) -> SQLBackend:
         debug: enable debug output on the returned backend
 
     Returns:
-        SQLBackend — SQLDB, MySqlQuery, or DuckDBQuery depending on endpoint
+        SQLBackend — SQLDB, MySqlQuery, DuckDBQuery, or PostgreSqlQuery depending on endpoint
 
     Raises:
         Exception: if the requested backend's optional dependency is not installed
@@ -110,6 +116,15 @@ def get_sql_backend(endpoint, debug: bool = False) -> SQLBackend:
                 "Install it with: pip install pyLodStorage[duckdb]"
             )
         backend = DuckDBQuery(endpoint=endpoint, debug=debug)
+        return backend
+
+    if url.startswith("jdbc:postgresql"):
+        if PostgreSqlQuery is None:
+            raise Exception(
+                "PostgreSQL backend requested but psycopg2 is not installed. "
+                "Install it with: pip install pyLodStorage[postgresql]"
+            )
+        backend = PostgreSqlQuery(endpoint=endpoint, debug=debug)
         return backend
 
     backend = SQLDB(dbname=url, debug=debug)

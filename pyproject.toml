@@ -72,6 +72,10 @@ duckdb = [
   # https://pypi.org/project/duckdb/
   "duckdb>=1.1.0",
 ]
+postgresql = [
+  # https://pypi.org/project/psycopg2-binary/
+  "psycopg2-binary>=2.9.9",
+]
 test = [
   "green",
 ]
