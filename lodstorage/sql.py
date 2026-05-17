@@ -256,6 +256,11 @@ class SQLDB(object):
             query = cur.execute(sqlQuery, params)
         else:
             query = cur.execute(sqlQuery)
+        # description is None for statements that do not return rows
+        # (e.g. CREATE TABLE, INSERT, UPDATE, DELETE)
+        if query.description is None:
+            cur.close()
+            return
         colname = [d[0] for d in query.description]
         try:
             # loop over all rows
@@ -281,7 +286,7 @@ class SQLDB(object):
         """
         return self.queryGen(sql, params)
 
-    def query(self, sql, params=None):
+    def query(self, sql, params=None, commit: bool = False):
         """
         run the given sql query and return a list of Dicts
 
@@ -289,6 +294,8 @@ class SQLDB(object):
 
             sql(string): the SQL query to be executed
             params(tuple): the query params, if any
+            commit(bool): if True, commit the connection after execution
+                (required for DDL/DML statements such as CREATE/INSERT/UPDATE)
 
         Returns:
             list: a list of Dicts
@@ -296,6 +303,8 @@ class SQLDB(object):
         resultList = []
         for record in self.queryGen(sql, params):
             resultList.append(record)
+        if commit:
+            self.c.commit()
         return resultList
 
     def queryAll(self, entityInfo, fixDates=True):

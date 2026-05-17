@@ -40,13 +40,15 @@ class DuckDBQuery:
         self.debug = debug
         self.con = duckdb.connect(self.path)
 
-    def query(self, sql: str, params: Any = None) -> list[dict]:
+    def query(self, sql: str, params: Any = None, commit: bool = False) -> list[dict]:
         """
         Execute an SQL query and return all results eagerly.
 
         Args:
             sql: the SQL query string to execute
             params: optional positional parameters (list or tuple)
+            commit: if True, commit the connection after execution
+                (required for DDL/DML statements such as CREATE/INSERT/UPDATE)
 
         Returns:
             list of dicts, one per row
@@ -54,9 +56,15 @@ class DuckDBQuery:
         if self.debug:
             logging.debug(f"DuckDBQuery.query: {sql!r} params={params}")
         rel = self.con.execute(sql, params or [])
+        if rel.description is None:
+            if commit:
+                self.con.commit()
+            return []
         cols = [d[0] for d in rel.description]
         rows = rel.fetchall()
         result = [dict(zip(cols, row)) for row in rows]
+        if commit:
+            self.con.commit()
         return result
 
     def query_gen(self, sql: str, params: Any = None) -> Generator[dict, None, None]:

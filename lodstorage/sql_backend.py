@@ -48,13 +48,15 @@ class SQLBackend(Protocol):
         - lodstorage.postgresql.PostgreSqlQuery (PostgreSQL, optional: pip install pyLodStorage[postgresql])
     """
 
-    def query(self, sql: str, params: Any = None) -> list[dict]:
+    def query(self, sql: str, params: Any = None, commit: bool = False) -> list[dict]:
         """
         Execute an SQL query and return all results eagerly.
 
         Args:
             sql: the SQL query string to execute
             params: optional query parameters (support depends on backend)
+            commit: if True, commit the underlying connection after execution
+                (required for DDL/DML statements such as CREATE/INSERT/UPDATE)
 
         Returns:
             list of dicts, one per row

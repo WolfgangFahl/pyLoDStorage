@@ -72,19 +72,28 @@ class PostgreSqlQuery:
                 decoded_record[key] = value
         return decoded_record
 
-    def execute_sql_query(self, query: str) -> List[Dict[str, Any]]:
+    def execute_sql_query(
+        self, query: str, commit: bool = False
+    ) -> List[Dict[str, Any]]:
         """
         Executes an SQL query using the provided connection parameters.
 
         Args:
             query (str): The SQL query to execute.
+            commit (bool): if True, commit the connection before closing
+                (required for DDL/DML statements such as CREATE/INSERT/UPDATE)
 
         Returns:
             list: A list of dictionaries representing the query results.
         """
         connection, cursor = self.get_cursor(query)
         cursor.execute(query)
-        raw_lod = cursor.fetchall()
+        if cursor.description is None:
+            raw_lod = []
+        else:
+            raw_lod = cursor.fetchall()
+        if commit:
+            connection.commit()
         connection.close()
         lod = []
         for raw_row in raw_lod:
@@ -110,18 +119,22 @@ class PostgreSqlQuery:
             cursor.close()
             connection.close()
 
-    def query(self, sql: str, params: Any = None) -> List[Dict[str, Any]]:
+    def query(
+        self, sql: str, params: Any = None, commit: bool = False
+    ) -> List[Dict[str, Any]]:
         """
         SQLBackend protocol alias for execute_sql_query.
 
         Args:
             sql: the SQL query to execute
             params: ignored (not yet supported at the psycopg2 layer)
+            commit: if True, commit the connection after execution
+                (required for DDL/DML statements such as CREATE/INSERT/UPDATE)
 
         Returns:
             list of dicts, one per row
         """
-        return self.execute_sql_query(sql)
+        return self.execute_sql_query(sql, commit=commit)
 
     def query_gen(
         self, sql: str, params: Any = None

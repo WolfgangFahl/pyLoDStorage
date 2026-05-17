@@ -96,7 +96,7 @@ class QueryMain(QueryCmd):
                 qlod = sparql.queryAsListOfDicts(self.queryCode)
             elif args.language == "sql":
                 backend = get_sql_backend(endpointConf, debug=args.debug)
-                qlod = backend.query(self.queryCode)
+                qlod = backend.query(self.queryCode, commit=args.commit)
             else:
                 raise Exception(f"language {args.language} not known/supported")
             self.format_output(qlod)
@@ -266,6 +266,12 @@ USAGE
             "-raw",
             action="store_true",
             help="return the raw query result from the endpoint. (MIME type defined over -f or -m)",
+        )
+        parser.add_argument(
+            "--commit",
+            action="store_true",
+            help="commit the SQL transaction after execution "
+            "(required for DDL/DML statements such as CREATE/INSERT/UPDATE)",
         )
         parser.add_argument(
             "-V", "--version", action="version", version=program_version_message
