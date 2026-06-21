@@ -72,6 +72,11 @@ class SPARQL(object):
         self.rate_limiter = RateLimiter(
             calls_per_minute=calls_per_minute or 60
         )  # Default 1/sec safe for Wikidata
+        # rate limited query call (see issue #165) - built once so the
+        # limiter's call budget persists across queries
+        self._rate_limited_query = self.rate_limiter.rate_limited(
+            lambda: self.sparql.query()
+        )
 
     @classmethod
     def get_user_agent(cls) -> str:
@@ -200,7 +205,7 @@ class SPARQL(object):
         queryString = self.fix_comments(queryString)
         self.sparql.setQuery(queryString)
         self.sparql.method = method
-        bindings = self.sparql.query()
+        bindings = self._rate_limited_query()
         return bindings
 
     def fix_comments(self, query_string: str) -> str:
