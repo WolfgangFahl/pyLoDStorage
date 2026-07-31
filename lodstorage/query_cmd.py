@@ -39,12 +39,16 @@ class QueryCmd:
         self.with_default_queries = with_default_queries
 
     def init_managers(self):
-        self.endpoints = EndpointManager.getEndpoints(self.args.endpointPath)
+        # --no-default makes the explicitly given -ep/-qp files authoritative - see issue #168
+        with_default = not getattr(self.args, "no_default", False)
+        self.endpoints = EndpointManager.getEndpoints(
+            self.args.endpointPath, with_default=with_default
+        )
         self.qm = QueryManager(
             lang=self.args.language,
             debug=self.debug,
             queriesPath=self.args.queriesPath,
-            with_default=self.with_default_queries,
+            with_default=self.with_default_queries and with_default,
         )
 
     def handle_args(self) -> bool:
@@ -163,6 +167,12 @@ class QueryCmd:
             "--endpointPath",
             default=None,
             help="path to yaml file to configure endpoints to use for queries",
+        )
+        parser.add_argument(
+            "--no-default",
+            dest="no_default",
+            action="store_true",
+            help="do not merge the default yaml files from ~/.pylodstorage - the given -ep/-qp files are authoritative",
         )
         ValueFormatters.get_instance()
         parser.add_argument(
