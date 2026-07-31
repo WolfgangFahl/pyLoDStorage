@@ -1,4 +1,4 @@
-# CITATION.cff for https://github.com/WolfgangFahl/snapquery
+# CITATION.cff for https://github.com/WolfgangFahl/pyLoDStorage
 cff-version: 1.2.0
 title: pyLoDStorage
 message: >-
@@ -16,6 +16,7 @@ authors:
 identifiers:
   - type: doi
     value: 10.5281/zenodo.17805335
+    description: Concept DOI (all versions) on Zenodo
 repository-code: 'https://github.com/WolfgangFahl/pyLoDStorage'
 url: 'https://wiki.bitplan.com/index.php/PyLoDStorage'
 abstract: >-
@@ -28,5 +29,3 @@ keywords:
   - YAML
   - CSV
 license: Apache-2.0
-version: v0.19.0
-date-released: '2026-02-21'
