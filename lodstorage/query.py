@@ -22,11 +22,13 @@ from pygments.formatters.latex import LatexFormatter
 from pygments.lexers import get_lexer_by_name
 from tabulate import tabulate
 
+from lodstorage.action_stats import ActionStats
 from lodstorage.exception_handler import ExceptionHandler
 from lodstorage.mwTable import MediaWikiTable
 from lodstorage.params import Param, Params
 from lodstorage.prefix_config import PrefixConfigs
 from lodstorage.prefixes import Prefixes
+from lodstorage.sparql import SPARQL
 from lodstorage.yaml_path import YamlPath
 
 
@@ -799,6 +801,27 @@ class Endpoint:
 
         return prefixes
 
+    def test_availability(self, timeout: float = 5.0) -> bool:
+        """
+        test whether this SPARQL endpoint answers a one row probe query
+
+        Args:
+            timeout: seconds to wait for the answer
+
+        Returns:
+            bool: True if the endpoint answered
+        """
+        probe_query = "SELECT ?item WHERE { BIND(<http://www.wikidata.org/entity/Q2> AS ?item) } LIMIT 1"
+        is_available = False
+        try:
+            sparql = SPARQL.fromEndpointConf(self)
+            sparql.sparql.setTimeout(timeout)
+            results = sparql.query(probe_query)
+            is_available = results is not None
+        except Exception:
+            is_available = False
+        return is_available
+
     def __str__(self):
         """
         Returns:
@@ -913,6 +936,48 @@ class EndpointManager(object):
                 concrete.local = endpoint.local or target.local
                 resolved[name] = concrete
         return resolved
+
+    @classmethod
+    def get_working_endpoint(
+        cls,
+        names: List[str],
+        endpoints: Optional[Dict[str, Endpoint]] = None,
+        min_ratio: float = 0.5,
+        timeout: float = 5.0,
+        debug: bool = False,
+    ) -> Optional[Endpoint]:
+        """
+        get the first endpoint of the given names that answers a probe query
+
+        Args:
+            names: the endpoint names to try in order
+            endpoints: the endpoints by name, default: getEndpoints()
+            min_ratio: the minimum ratio of answering endpoints, below it None is returned
+            timeout: seconds to wait per probe
+            debug: if True print the availability per endpoint
+
+        Returns:
+            Optional[Endpoint]: the first answering endpoint or None
+        """
+        if endpoints is None:
+            endpoints = cls.getEndpoints()
+        stats = ActionStats()
+        working_endpoint = None
+        for name in names:
+            endpoint = endpoints.get(name)
+            is_available = endpoint is not None and endpoint.test_availability(
+                timeout=timeout
+            )
+            stats.add(is_available)
+            if is_available and working_endpoint is None:
+                working_endpoint = endpoint
+            if debug:
+                print(f"{name}: {'✅' if is_available else '❌'}")
+        if stats.ratio < min_ratio:
+            if debug:
+                print(f"Not enough endpoints available: {stats}")
+            working_endpoint = None
+        return working_endpoint
 
     @staticmethod
     def getEndpointNames(endpointPath=None, lang: str = None) -> list:
