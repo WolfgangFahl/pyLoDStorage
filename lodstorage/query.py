@@ -689,6 +689,8 @@ class Endpoint:
     description: Optional[str] = None
     # abstract name: the name of the endpoint this entry resolves to
     alias: Optional[str] = None
+    # set on loading: True if the entry is defined in the local ~/.pylodstorage layer
+    local: bool = False
 
     # Connection details
     lang: str = "SPARQL"
@@ -853,11 +855,14 @@ class EndpointManager(object):
         endpointPaths = YamlPath.getPaths(
             "endpoints.yaml", endpointPath, with_default=with_default
         )
+        local_path = YamlPath.getDefaultPath("endpoints.yaml")
         all_endpoints = {}
         for lEndpointPath in endpointPaths:
             em = cls.ofYaml(lEndpointPath)
+            is_local = with_default and lEndpointPath == local_path
             for name, endpoint in em.endpoints.items():
                 endpoint.name = name
+                endpoint.local = is_local
                 all_endpoints[name] = endpoint
         resolved = cls.resolve_aliases(all_endpoints)
         endpoints = {}
@@ -905,6 +910,7 @@ class EndpointManager(object):
                 concrete = copy.copy(target)
                 concrete.name = name
                 concrete.alias = target.name
+                concrete.local = endpoint.local or target.local
                 resolved[name] = concrete
         return resolved
 

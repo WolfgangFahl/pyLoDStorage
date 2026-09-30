@@ -6,8 +6,10 @@ Created on 2026-09-30
 
 import os
 import tempfile
+from unittest.mock import patch
 
 from lodstorage.query import Endpoint, EndpointManager
+from lodstorage.yaml_path import YamlPath
 from tests.basetest import Basetest
 
 
@@ -97,3 +99,45 @@ class TestEndpointAlias(Basetest):
         endpoint = endpoints["wikidata"]
         self.assertEqual("https://qlever.example.org/api", endpoint.endpoint)
         self.assertEqual("qlever-local", endpoint.alias)
+        self.assertFalse(endpoint.local)
+
+    def test_local_layer(self):
+        """
+        entries of the local ~/.pylodstorage layer are marked local,
+        an abstract name redefined there is local as well
+        """
+        packaged_yaml = """endpoints:
+  'wikidata':
+    endpoint: https://query.example.org/sparql
+    lang: sparql
+  'dblp':
+    endpoint: https://dblp.example.org/sparql
+    lang: sparql
+"""
+        local_yaml = """endpoints:
+  'qlever-local':
+    endpoint: https://qlever.example.org/api
+    database: qlever
+    lang: sparql
+  'wikidata':
+    alias: qlever-local
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            packaged_path = os.path.join(tmpdir, "endpoints.yaml")
+            local_path = os.path.join(tmpdir, "local_endpoints.yaml")
+            for yaml_path, yaml_text in [
+                (packaged_path, packaged_yaml),
+                (local_path, local_yaml),
+            ]:
+                with open(yaml_path, "w") as yaml_file:
+                    yaml_file.write(yaml_text)
+            with patch.object(YamlPath, "getDefaultPath", return_value=local_path):
+                endpoints = EndpointManager.getEndpoints(
+                    endpointPath=packaged_path, lang="sparql", with_default=True
+                )
+        self.assertFalse(endpoints["dblp"].local)
+        self.assertTrue(endpoints["qlever-local"].local)
+        self.assertTrue(endpoints["wikidata"].local)
+        self.assertEqual(
+            "https://qlever.example.org/api", endpoints["wikidata"].endpoint
+        )
