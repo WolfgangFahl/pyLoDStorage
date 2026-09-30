@@ -687,6 +687,8 @@ class Endpoint:
     # Basic identification
     name: str = ""
     description: Optional[str] = None
+    # abstract name: the name of the endpoint this entry resolves to
+    alias: Optional[str] = None
 
     # Connection details
     lang: str = "SPARQL"
@@ -800,7 +802,10 @@ class Endpoint:
         Returns:
             str: a string representation of this Endpoint
         """
-        text = f"{self.name or ''}:{self.website or ''}:{self.endpoint or ''}({self.method or ''})"
+        name = self.name or ""
+        if self.alias:
+            name = f"{name} → {self.alias}"
+        text = f"{name}:{self.website or ''}:{self.endpoint or ''}({self.method or ''})"
         return text
 
 
@@ -848,15 +853,60 @@ class EndpointManager(object):
         endpointPaths = YamlPath.getPaths(
             "endpoints.yaml", endpointPath, with_default=with_default
         )
-        endpoints = {}
+        all_endpoints = {}
         for lEndpointPath in endpointPaths:
             em = cls.ofYaml(lEndpointPath)
             for name, endpoint in em.endpoints.items():
-                selected = lang is None or endpoint.lang == lang
-                if selected:
-                    endpoints[name] = endpoint
-                    endpoint.name = name
+                endpoint.name = name
+                all_endpoints[name] = endpoint
+        resolved = cls.resolve_aliases(all_endpoints)
+        endpoints = {}
+        for name, endpoint in resolved.items():
+            selected = lang is None or endpoint.lang == lang
+            if selected:
+                endpoints[name] = endpoint
         return endpoints
+
+    @staticmethod
+    def resolve_aliases(endpoints: Dict[str, Endpoint]) -> Dict[str, Endpoint]:
+        """
+        resolve the abstract names of the given endpoints
+
+        an entry with an alias is replaced by a copy of the concrete endpoint
+        its alias chain ends in, keeping the abstract name and recording the
+        concrete name in alias
+
+        Args:
+            endpoints: the endpoints by name, the later layers already merged in
+
+        Returns:
+            Dict[str, Endpoint]: the endpoints with all aliases resolved
+
+        Raises:
+            ValueError: if an alias chain has a cycle or a missing target
+        """
+        resolved = {}
+        for name, endpoint in endpoints.items():
+            target = endpoint
+            chain = [name]
+            while target.alias:
+                if target.alias in chain:
+                    chain.append(target.alias)
+                    raise ValueError(f"alias cycle: {' → '.join(chain)}")
+                if target.alias not in endpoints:
+                    raise ValueError(
+                        f"alias target missing: {' → '.join(chain)} → {target.alias}"
+                    )
+                chain.append(target.alias)
+                target = endpoints[target.alias]
+            if target is endpoint:
+                resolved[name] = endpoint
+            else:
+                concrete = copy.copy(target)
+                concrete.name = name
+                concrete.alias = target.name
+                resolved[name] = concrete
+        return resolved
 
     @staticmethod
     def getEndpointNames(endpointPath=None, lang: str = None) -> list:
