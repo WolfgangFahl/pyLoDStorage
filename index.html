@@ -22706,7 +22706,9 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 <span class="normal">806</span>
 <span class="normal">807</span>
 <span class="normal">808</span>
-<span class="normal">809</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@lod_storable</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@lod_storable</span>
 <span class="k">class</span> <span class="nc">Endpoint</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    a query endpoint</span>
@@ -22717,6 +22719,8 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
     <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># abstract name: the name of the endpoint this entry resolves to</span>
     <span class="n">alias</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># set on loading: True if the entry is defined in the local ~/.pylodstorage layer</span>
+    <span class="n">local</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># Connection details</span>
     <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SPARQL&quot;</span>
@@ -22887,16 +22891,16 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">800</span>
-<span class="normal">801</span>
-<span class="normal">802</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">802</span>
 <span class="normal">803</span>
 <span class="normal">804</span>
 <span class="normal">805</span>
 <span class="normal">806</span>
 <span class="normal">807</span>
 <span class="normal">808</span>
-<span class="normal">809</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        str: a string representation of this Endpoint</span>
@@ -22932,14 +22936,14 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">769</span>
-<span class="normal">770</span>
-<span class="normal">771</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">771</span>
 <span class="normal">772</span>
 <span class="normal">773</span>
 <span class="normal">774</span>
 <span class="normal">775</span>
-<span class="normal">776</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">getDefault</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    get the default endpoint cofiguration</span>
@@ -23023,9 +23027,7 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">778</span>
-<span class="normal">779</span>
-<span class="normal">780</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">780</span>
 <span class="normal">781</span>
 <span class="normal">782</span>
 <span class="normal">783</span>
@@ -23043,7 +23045,9 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 <span class="normal">795</span>
 <span class="normal">796</span>
 <span class="normal">797</span>
-<span class="normal">798</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_prefixes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix_configs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PrefixConfigs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">798</span>
+<span class="normal">799</span>
+<span class="normal">800</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_prefixes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix_configs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PrefixConfigs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get prefix declarations for this endpoint.</span>
 
@@ -23090,9 +23094,7 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">756</span>
-<span class="normal">757</span>
-<span class="normal">758</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">758</span>
 <span class="normal">759</span>
 <span class="normal">760</span>
 <span class="normal">761</span>
@@ -23101,7 +23103,9 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 <span class="normal">764</span>
 <span class="normal">765</span>
 <span class="normal">766</span>
-<span class="normal">767</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Endpoint&quot;</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get samples for Endpoint</span>
@@ -23153,9 +23157,7 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 
               <details class="quote">
                 <summary>Source code in <code>lodstorage/query.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">812</span>
-<span class="normal">813</span>
-<span class="normal">814</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">814</span>
 <span class="normal">815</span>
 <span class="normal">816</span>
 <span class="normal">817</span>
@@ -23263,7 +23265,13 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
 <span class="normal">919</span>
 <span class="normal">920</span>
 <span class="normal">921</span>
-<span class="normal">922</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@lod_storable</span>
+<span class="normal">922</span>
+<span class="normal">923</span>
+<span class="normal">924</span>
+<span class="normal">925</span>
+<span class="normal">926</span>
+<span class="normal">927</span>
+<span class="normal">928</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@lod_storable</span>
 <span class="k">class</span> <span class="nc">EndpointManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    manages a set of SPARQL endpoints</span>
@@ -23307,11 +23315,14 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
         <span class="n">endpointPaths</span> <span class="o">=</span> <span class="n">YamlPath</span><span class="o">.</span><span class="n">getPaths</span><span class="p">(</span>
             <span class="s2">&quot;endpoints.yaml&quot;</span><span class="p">,</span> <span class="n">endpointPath</span><span class="p">,</span> <span class="n">with_default</span><span class="o">=</span><span class="n">with_default</span>
         <span class="p">)</span>
+        <span class="n">local_path</span> <span class="o">=</span> <span class="n">YamlPath</span><span class="o">.</span><span class="n">getDefaultPath</span><span class="p">(</span><span class="s2">&quot;endpoints.yaml&quot;</span><span class="p">)</span>
         <span class="n">all_endpoints</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">lEndpointPath</span> <span class="ow">in</span> <span class="n">endpointPaths</span><span class="p">:</span>
             <span class="n">em</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ofYaml</span><span class="p">(</span><span class="n">lEndpointPath</span><span class="p">)</span>
+            <span class="n">is_local</span> <span class="o">=</span> <span class="n">with_default</span> <span class="ow">and</span> <span class="n">lEndpointPath</span> <span class="o">==</span> <span class="n">local_path</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">em</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">endpoint</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="n">endpoint</span><span class="o">.</span><span class="n">local</span> <span class="o">=</span> <span class="n">is_local</span>
                 <span class="n">all_endpoints</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">endpoint</span>
         <span class="n">resolved</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">resolve_aliases</span><span class="p">(</span><span class="n">all_endpoints</span><span class="p">)</span>
         <span class="n">endpoints</span> <span class="o">=</span> <span class="p">{}</span>
@@ -23359,6 +23370,7 @@ Simple regex-based extraction that finds PREFIX declarations in the query text.<
                 <span class="n">concrete</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
                 <span class="n">concrete</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
                 <span class="n">concrete</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">concrete</span><span class="o">.</span><span class="n">local</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">local</span> <span class="ow">or</span> <span class="n">target</span><span class="o">.</span><span class="n">local</span>
                 <span class="n">resolved</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete</span>
         <span class="k">return</span> <span class="n">resolved</span>
 
@@ -23412,18 +23424,18 @@ Args:
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">911</span>
-<span class="normal">912</span>
-<span class="normal">913</span>
-<span class="normal">914</span>
-<span class="normal">915</span>
-<span class="normal">916</span>
-<span class="normal">917</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">917</span>
 <span class="normal">918</span>
 <span class="normal">919</span>
 <span class="normal">920</span>
 <span class="normal">921</span>
-<span class="normal">922</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">922</span>
+<span class="normal">923</span>
+<span class="normal">924</span>
+<span class="normal">925</span>
+<span class="normal">926</span>
+<span class="normal">927</span>
+<span class="normal">928</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">getEndpointNames</span><span class="p">(</span><span class="n">endpointPath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a list of all available endpoint names</span>
@@ -23521,9 +23533,7 @@ Args:
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">841</span>
-<span class="normal">842</span>
-<span class="normal">843</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">843</span>
 <span class="normal">844</span>
 <span class="normal">845</span>
 <span class="normal">846</span>
@@ -23548,7 +23558,12 @@ Args:
 <span class="normal">865</span>
 <span class="normal">866</span>
 <span class="normal">867</span>
-<span class="normal">868</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">getEndpoints</span><span class="p">(</span>
     <span class="bp">cls</span><span class="p">,</span> <span class="n">endpointPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">with_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">):</span>
@@ -23563,11 +23578,14 @@ Args:
     <span class="n">endpointPaths</span> <span class="o">=</span> <span class="n">YamlPath</span><span class="o">.</span><span class="n">getPaths</span><span class="p">(</span>
         <span class="s2">&quot;endpoints.yaml&quot;</span><span class="p">,</span> <span class="n">endpointPath</span><span class="p">,</span> <span class="n">with_default</span><span class="o">=</span><span class="n">with_default</span>
     <span class="p">)</span>
+    <span class="n">local_path</span> <span class="o">=</span> <span class="n">YamlPath</span><span class="o">.</span><span class="n">getDefaultPath</span><span class="p">(</span><span class="s2">&quot;endpoints.yaml&quot;</span><span class="p">)</span>
     <span class="n">all_endpoints</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">lEndpointPath</span> <span class="ow">in</span> <span class="n">endpointPaths</span><span class="p">:</span>
         <span class="n">em</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ofYaml</span><span class="p">(</span><span class="n">lEndpointPath</span><span class="p">)</span>
+        <span class="n">is_local</span> <span class="o">=</span> <span class="n">with_default</span> <span class="ow">and</span> <span class="n">lEndpointPath</span> <span class="o">==</span> <span class="n">local_path</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">em</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">endpoint</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="n">endpoint</span><span class="o">.</span><span class="n">local</span> <span class="o">=</span> <span class="n">is_local</span>
             <span class="n">all_endpoints</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">endpoint</span>
     <span class="n">resolved</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">resolve_aliases</span><span class="p">(</span><span class="n">all_endpoints</span><span class="p">)</span>
     <span class="n">endpoints</span> <span class="o">=</span> <span class="p">{}</span>
@@ -23598,9 +23616,9 @@ Args:
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">831</span>
-<span class="normal">832</span>
-<span class="normal">833</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Endpoint</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Endpoint</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get endpoint by name.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -23629,11 +23647,11 @@ Args:
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">820</span>
-<span class="normal">821</span>
-<span class="normal">822</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">822</span>
 <span class="normal">823</span>
-<span class="normal">824</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">of_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">yaml_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EndpointManager&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load prefix configurations from YAML file.&quot;&quot;&quot;</span>
     <span class="n">em</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">load_from_yaml_file</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">)</span>
@@ -23744,12 +23762,7 @@ concrete name in alias</p>
 
             <details class="quote">
               <summary>Source code in <code>lodstorage/query.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">870</span>
-<span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
-<span class="normal">874</span>
-<span class="normal">875</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">875</span>
 <span class="normal">876</span>
 <span class="normal">877</span>
 <span class="normal">878</span>
@@ -23783,7 +23796,13 @@ concrete name in alias</p>
 <span class="normal">906</span>
 <span class="normal">907</span>
 <span class="normal">908</span>
-<span class="normal">909</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">909</span>
+<span class="normal">910</span>
+<span class="normal">911</span>
+<span class="normal">912</span>
+<span class="normal">913</span>
+<span class="normal">914</span>
+<span class="normal">915</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">resolve_aliases</span><span class="p">(</span><span class="n">endpoints</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    resolve the abstract names of the given endpoints</span>
@@ -23821,6 +23840,7 @@ concrete name in alias</p>
             <span class="n">concrete</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
             <span class="n">concrete</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
             <span class="n">concrete</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">concrete</span><span class="o">.</span><span class="n">local</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">local</span> <span class="ow">or</span> <span class="n">target</span><span class="o">.</span><span class="n">local</span>
             <span class="n">resolved</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete</span>
     <span class="k">return</span> <span class="n">resolved</span>
 </code></pre></div></td></tr></table></div>
