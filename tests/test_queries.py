@@ -166,6 +166,8 @@ class TestQueries(EndpointTest):
                 "US President Nicknames",
                 "-l",
                 "sparql",
+                # the query declares no prefixes - only Blazegraph knows the Wikidata prefixes by itself
+                "-p",
                 "-f",
                 resultFormat,
             ]
@@ -525,7 +527,15 @@ LIMIT 1
                 "--limit",
                 f"{limit}",
             ],
-            ["-qn", "US President Nicknames", "-l", "sparql", "--limit", f"{limit}"],
+            [
+                "-qn",
+                "US President Nicknames",
+                "-l",
+                "sparql",
+                "-p",
+                "--limit",
+                f"{limit}",
+            ],
         ]
         debug = self.debug
         debug = True

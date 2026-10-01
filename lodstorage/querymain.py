@@ -64,6 +64,17 @@ class QueryMain(QueryCmd):
             if endpointConf:
                 self.query.tryItUrl = endpointConf.website
                 self.query.database = endpointConf.database
+            # prefixes first - the limit is applied to the query code with its prefixes
+            add_prefixes = (
+                args.language == "sparql" and args.prefixes and endpointConf is not None
+            )
+            if add_prefixes:
+                prefix_configs = PrefixConfigs.get_instance()
+                if args.prefixesPath:
+                    prefix_configs = PrefixConfigs.preload(args.prefixesPath)
+                self.query.add_endpoint_prefixes(endpointConf, prefix_configs)
+                # Update queryCode after adding prefixes
+                self.queryCode = self.query.query
             if self.query.limit:
                 if "limit" in self.queryCode or "LIMIT" in self.queryCode:
                     self.queryCode = re.sub(
@@ -75,13 +86,6 @@ class QueryMain(QueryCmd):
                     self.queryCode += f"\nLIMIT {self.query.limit}"
             if args.language == "sparql":
                 sparql = SPARQL.fromEndpointConf(endpointConf)
-                if args.prefixes and endpointConf is not None:
-                    prefix_configs = PrefixConfigs.get_instance()
-                    if args.prefixesPath:
-                        prefix_configs = PrefixConfigs.preload(args.prefixesPath)
-                    self.query.add_endpoint_prefixes(endpointConf, prefix_configs)
-                    # Update queryCode after adding prefixes
-                    self.queryCode = self.query.query
                 if args.raw:
                     qres = self.rawQuery(
                         endpointConf,
