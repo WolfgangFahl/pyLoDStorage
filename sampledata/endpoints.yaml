@@ -111,6 +111,22 @@ endpoints:
         data_seeded: 2025-06-01
         mtriples: 17029
 
+    # QLever Wikidata index at RWTH Aachen following the Wikidata updates
+    'wikidata-qlever-dbis':
+      description: |
+        RWTH Aachen chair of Database and Information systems.
+        QLever Wikidata endpoint following the Wikidata updates.
+      lang: sparql
+      method: POST
+      database: qlever
+      endpoint: https://qlever-api.wikidata.dbis.rwth-aachen.de/
+      website: https://query-gui-aachen.wikidata.dbis.rwth-aachen.de
+      calls_per_minute: 60
+      auto_update: true
+      prefix_sets:
+        - rdf
+        - wikidata
+
     # QLever-hosted Wikidata index (external)
     'wikidata-qlever':
       description: "QLever Wikidata endpoint at qlever.dev (external, non-Blazegraph)."

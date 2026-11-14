@@ -56,3 +56,21 @@ class TestWorkingEndpoint(Basetest):
             ["closed", "missing", "wikidata"], endpoints=endpoints, min_ratio=0.5
         )
         self.assertIsNone(none_working)
+
+    def test_wikidata_qlever_dbis(self):
+        """
+        the RWTH Aachen QLever is a packaged endpoint with the prefix sets
+        a query without PREFIX lines needs on QLever
+        """
+        packaged = EndpointManager.getEndpoints(lang="sparql", with_default=False)
+        self.assertIn("wikidata-qlever-dbis", packaged)
+        endpoint = packaged["wikidata-qlever-dbis"]
+        self.assertEqual("qlever", endpoint.database)
+        for prefix_set in ["rdf", "wikidata"]:
+            self.assertIn(prefix_set, endpoint.prefix_sets)
+        if not endpoint.test_availability():
+            self.skipTest(f"{endpoint.endpoint} does not answer")
+        working = EndpointManager.get_working_endpoint(
+            ["wikidata-qlever-dbis"], endpoints=packaged, min_ratio=0.5
+        )
+        self.assertEqual("wikidata-qlever-dbis", working.name)
